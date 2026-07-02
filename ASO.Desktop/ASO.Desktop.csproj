@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationTitle>Software ASO</ApplicationTitle>
+    <Product>Software ASO</Product>
+    <Company>ASO</Company>
+    <Description>Sistema de gestión de centros de procesamiento de caña de azúcar</Description>
+  </PropertyGroup>
+
+</Project>

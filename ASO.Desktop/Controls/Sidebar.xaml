@@ -1,0 +1,81 @@
+<UserControl x:Class="ASO.Desktop.Controls.Sidebar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="220"
+             Background="{StaticResource SidebarBrush}">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <!-- Logo / Marca -->
+    <Border Grid.Row="0" Padding="20,24,20,20" BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="0,0,0,1">
+      <StackPanel>
+        <TextBlock Text="Software ASO" FontSize="18" FontWeight="Bold"
+                   Foreground="{StaticResource PrimaryBrush}" />
+        <TextBlock Text="Gestión de Zafra" FontSize="11"
+                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+      </StackPanel>
+    </Border>
+
+    <!-- Navegación principal -->
+    <StackPanel Grid.Row="1" Margin="0,8,0,0">
+      <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav" IsChecked="True">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="&#xE9F5;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                     VerticalAlignment="Center" Margin="0,0,10,0" />
+          <TextBlock Text="Producción" VerticalAlignment="Center" />
+        </StackPanel>
+      </RadioButton>
+      <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="&#xE7B8;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                     VerticalAlignment="Center" Margin="0,0,10,0" />
+          <TextBlock Text="Inventario" VerticalAlignment="Center" />
+        </StackPanel>
+      </RadioButton>
+      <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                     VerticalAlignment="Center" Margin="0,0,10,0" />
+          <TextBlock Text="Gestión de FLotas" VerticalAlignment="Center" />
+        </StackPanel>
+      </RadioButton>
+      <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="&#xE90F;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                     VerticalAlignment="Center" Margin="0,0,10,0" />
+          <TextBlock Text="Mantenimiento" VerticalAlignment="Center" />
+        </StackPanel>
+      </RadioButton>
+    </StackPanel>
+
+    <!-- Utilidades -->
+    <StackPanel Grid.Row="2" Margin="0,0,0,16">
+      <Border BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+        <StackPanel>
+          <RadioButton Style="{StaticResource NavItemStyle}" GroupName="UtilNav">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                         VerticalAlignment="Center" Margin="0,0,10,0" />
+              <TextBlock Text="Configuración" VerticalAlignment="Center" />
+            </StackPanel>
+          </RadioButton>
+          <RadioButton Style="{StaticResource NavItemStyle}" GroupName="UtilNav">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE897;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                         VerticalAlignment="Center" Margin="0,0,10,0" />
+              <TextBlock Text="Ayuda" VerticalAlignment="Center" />
+            </StackPanel>
+          </RadioButton>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Grid>
+</UserControl>
