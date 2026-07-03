@@ -6,7 +6,7 @@
         xmlns:controls="clr-namespace:ASO.Desktop.Controls"
         xmlns:views="clr-namespace:ASO.Desktop.Views"
         mc:Ignorable="d"
-        Title="Software ASO - Dashboard de Producción"
+        Title="Software ASO — Gestión de Zafra"
         Height="800" Width="1280"
         MinHeight="640" MinWidth="1024"
         WindowStartupLocation="CenterScreen"
@@ -35,11 +35,11 @@
     </Menu>
 
     <!-- Sidebar -->
-    <controls:Sidebar Grid.Row="1" Grid.Column="0"
+    <controls:Sidebar x:Name="MainSidebar" Grid.Row="1" Grid.Column="0"
                       BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="0,0,1,0" />
 
-    <!-- Contenido principal -->
-    <views:DashboardView Grid.Row="1" Grid.Column="1" Margin="20" />
+    <!-- Contenido principal (cambia según la sección seleccionada) -->
+    <ContentControl x:Name="ContentArea" Grid.Row="1" Grid.Column="1" Margin="20" />
 
   </Grid>
 </Window>

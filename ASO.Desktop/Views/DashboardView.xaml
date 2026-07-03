@@ -6,6 +6,30 @@
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="900">
 
-  <Grid />
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Margin="0,0,0,16">
+      <TextBlock Text="Inicio · Dashboard gerencial" FontSize="20" FontWeight="Bold"
+                 Foreground="{StaticResource TextPrimaryBrush}" />
+      <TextBlock Text="Indicadores de flota, combustible, producción y finanzas de la zafra activa."
+                 FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+    </StackPanel>
+
+    <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="&#xE80F;" FontFamily="Segoe MDL2 Assets" FontSize="40"
+                   Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" />
+        <TextBlock Text="Panel en construcción" FontSize="16" FontWeight="SemiBold"
+                   Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,12,0,0" />
+        <TextBlock Text="Mostrará los KPIs clave cuando los módulos operativos empiecen a registrar datos."
+                   FontSize="12" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center"
+                   Margin="0,4,0,0" TextAlignment="Center" MaxWidth="380" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+  </Grid>
 
 </UserControl>
