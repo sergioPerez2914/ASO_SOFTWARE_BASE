@@ -1,0 +1,71 @@
+<UserControl x:Class="ASO.Desktop.Views.EmpleadosView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="640" d:DesignWidth="960">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Encabezado -->
+    <StackPanel Grid.Row="0" Margin="0,0,0,16">
+      <TextBlock Text="Empleados" FontSize="20" FontWeight="Bold"
+                 Foreground="{StaticResource TextPrimaryBrush}" />
+      <TextBlock Text="Catálogo maestro de empleados del centro"
+                 FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+    </StackPanel>
+
+    <!-- Buscador y acciones -->
+    <Grid Grid.Row="1" Margin="0,0,0,12">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+        <TextBlock Text="Buscar" VerticalAlignment="Center" Margin="0,0,8,0"
+                   FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+        <TextBox Width="280" Padding="6,4" VerticalContentAlignment="Center"
+                 Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+        <Button Content="Actualizar" Padding="12,6" Margin="0,0,8,0" Cursor="Hand"
+                Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
+                Foreground="{StaticResource TextPrimaryBrush}"
+                Command="{Binding RefrescarCommand}" />
+        <Button Content="Eliminar" Padding="12,6" Margin="0,0,8,0" Cursor="Hand"
+                Background="Transparent" BorderBrush="{StaticResource DangerBrush}"
+                Foreground="{StaticResource DangerBrush}"
+                Command="{Binding EliminarCommand}" />
+        <Button Content="Editar" Padding="12,6" Margin="0,0,8,0" Cursor="Hand"
+                Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
+                Foreground="{StaticResource TextPrimaryBrush}"
+                Command="{Binding EditarCommand}" />
+        <Button Content="Agregar" Padding="12,6" Cursor="Hand" BorderThickness="0"
+                Background="{StaticResource PrimaryBrush}" Foreground="White"
+                Command="{Binding AgregarCommand}" />
+      </StackPanel>
+    </Grid>
+
+    <!-- Tabla -->
+    <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="8">
+      <DataGrid Style="{StaticResource DataGridStyle}"
+                ItemsSource="{Binding ItemsView}"
+                SelectedItem="{Binding SelectedItem}">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*" />
+          <DataGridTextColumn Header="Cédula" Binding="{Binding Cedula}" Width="130" />
+          <DataGridTextColumn Header="Cargo" Binding="{Binding Cargo}" Width="220" />
+          <DataGridTextColumn Header="Estado" Binding="{Binding EstadoTexto}" Width="90" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+  </Grid>
+</UserControl>

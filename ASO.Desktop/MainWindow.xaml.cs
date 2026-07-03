@@ -1,4 +1,5 @@
 using System.Windows;
+using ASO.Desktop.Services;
 using ASO.Desktop.Views;
 
 namespace ASO.Desktop;
@@ -14,6 +15,30 @@ public partial class MainWindow : Window
 
         MainSidebar.NavigationRequested += OnNavigationRequested;
         ContentArea.Content = new DashboardView(); // sección inicial: Inicio
+
+        var usuario = SesionActual.Instancia.UsuarioActual;
+        if (usuario is not null)
+            UsuarioActualLabel.Text = $"{usuario.NombreCompleto} · {usuario.Rol}";
+    }
+
+    private void OnCerrarSesion(object sender, RoutedEventArgs e)
+    {
+        SesionActual.Instancia.CerrarSesion();
+
+        var login = new LoginView();
+        if (login.ShowDialog() == true)
+        {
+            var nuevaVentana = new MainWindow();
+            Application.Current.MainWindow = nuevaVentana;
+            nuevaVentana.Show();
+        }
+        else
+        {
+            Application.Current.Shutdown();
+            return;
+        }
+
+        Close();
     }
 
     private void OnNavigationRequested(object? sender, string section)
@@ -50,10 +75,7 @@ public partial class MainWindow : Window
                 "Reportes",
                 "Producción diaria, consumo de combustible y estados financieros.",
                 "Fase 5", ""),
-            "Maestros" => new PlaceholderView(
-                "Maestros · Catálogos",
-                "Activos, empleados, clientes, proveedores, frentes de corte y zafra.",
-                "Fase 0", ""),
+            "Maestros" => new EmpleadosView(),
             "Configuracion" => new PlaceholderView(
                 "Configuración",
                 "Usuarios, roles, parámetros del sistema y auditoría.",

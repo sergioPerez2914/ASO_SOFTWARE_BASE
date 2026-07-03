@@ -1,0 +1,13 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:ASO.Desktop.ViewModels"
+                    xmlns:views="clr-namespace:ASO.Desktop.Views">
+
+  <!-- Cada editor CRUD aporta un UserControl de formulario; CrudEditorWindow los aloja
+       a través de estos DataTemplate implícitos, sin conocer la entidad concreta. -->
+
+  <DataTemplate DataType="{x:Type vm:EmpleadoEditorViewModel}">
+    <views:EmpleadoEditorView />
+  </DataTemplate>
+
+</ResourceDictionary>

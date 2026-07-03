@@ -24,15 +24,33 @@
     </Grid.ColumnDefinitions>
 
     <!-- Barra de menú superior -->
-    <Menu Grid.Row="0" Grid.ColumnSpan="2"
-          Background="{StaticResource SurfaceBrush}"
-          BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1"
-          FontSize="12" Padding="4,2">
-      <MenuItem Header="_Archivo" />
-      <MenuItem Header="_Ver" />
-      <MenuItem Header="_Herramientas" />
-      <MenuItem Header="A_yuda" />
-    </Menu>
+    <Grid Grid.Row="0" Grid.ColumnSpan="2"
+          Background="{StaticResource SurfaceBrush}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <Menu Grid.Column="0"
+            Background="Transparent"
+            FontSize="12" Padding="4,2">
+        <MenuItem Header="_Archivo" />
+        <MenuItem Header="_Ver" />
+        <MenuItem Header="_Herramientas" />
+        <MenuItem Header="A_yuda" />
+      </Menu>
+
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+        <TextBlock x:Name="UsuarioActualLabel" VerticalAlignment="Center" FontSize="12"
+                    Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0" />
+        <Button Content="Cerrar sesión" FontSize="11" Padding="8,4" Cursor="Hand"
+                Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
+                Foreground="{StaticResource TextPrimaryBrush}" Click="OnCerrarSesion" />
+      </StackPanel>
+
+      <Border Grid.ColumnSpan="2" VerticalAlignment="Bottom"
+              BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" />
+    </Grid>
 
     <!-- Sidebar -->
     <controls:Sidebar x:Name="MainSidebar" Grid.Row="1" Grid.Column="0"
