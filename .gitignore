@@ -19,3 +19,9 @@ packages/
 # OS files
 Thumbs.db
 .DS_Store
+
+# Claude Code (local machine settings)
+.claude/settings.local.json
+
+# Configuración por máquina (cadena de conexión, etc.) — no se sube al repo
+appsettings.local.json

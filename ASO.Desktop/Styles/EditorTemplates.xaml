@@ -10,4 +10,8 @@
     <views:EmpleadoEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:InventoryEditorViewModel}">
+    <views:InventoryEditorView />
+  </DataTemplate>
+
 </ResourceDictionary>

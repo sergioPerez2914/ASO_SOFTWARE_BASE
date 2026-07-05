@@ -15,9 +15,13 @@ public enum StockStatus
 /// Modelo de presentación temporal; se alineará con la entidad
 /// <c>ArticuloInventario</c> del dominio cuando exista la capa de datos.
 /// </summary>
-public class InventoryItem
+public class InventoryItem : IEntidad<string>
 {
     public string Codigo { get; set; } = string.Empty;
+
+    /// <summary>Identidad para el esqueleto CRUD genérico: el artículo se identifica por su código.</summary>
+    public string Id => Codigo;
+
     public string Nombre { get; set; } = string.Empty;
     public string Categoria { get; set; } = string.Empty;
     public string Unidad { get; set; } = string.Empty;

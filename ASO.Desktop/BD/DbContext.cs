@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ASO.Desktop.Models;
+using ASO.Desktop.Configuration;
 
 namespace ASO.Desktop.BD;
 
@@ -12,8 +13,9 @@ public class AsoDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            // Reemplaza con tu cadena de conexión real de SQL Server
-            optionsBuilder.UseSqlServer("Server=DESKTOP-UHOHO1R\\SQLEXPRESS;Database=Pruebita;Trusted_Connection=True;TrustServerCertificate=True;");
+            // La cadena de conexión vive en appsettings.json / appsettings.local.json,
+            // no en el código. Cada máquina configura la suya sin tocar el repo.
+            optionsBuilder.UseSqlServer(AppConfig.ConnectionString);
         }
     }
 
@@ -52,6 +54,7 @@ public class AsoDbContext : DbContext
             entity.Property(i => i.CostoUnitario).HasColumnType("decimal(18,2)").IsRequired();
 
             // Ignoramos miembros calculados en C# para que no busquen columnas físicas en SQL
+            entity.Ignore(i => i.Id);          // alias de Codigo para el CRUD genérico (IEntidad<string>)
             entity.Ignore(i => i.ValorTotal);
             entity.Ignore(i => i.Estado);
             entity.Ignore(i => i.EstadoTexto);

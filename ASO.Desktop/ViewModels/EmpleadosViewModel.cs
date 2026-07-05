@@ -1,7 +1,7 @@
 using System;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
-using ASO.Desktop.BD;
+using ASO.Desktop.Configuration;
 
 namespace ASO.Desktop.ViewModels;
 
@@ -10,7 +10,7 @@ namespace ASO.Desktop.ViewModels;
 /// </summary>
 public class EmpleadosViewModel : CrudViewModelBase<Empleado, int>
 {
-    public EmpleadosViewModel() : this(new SqlEmpleadoDataSource()) { }
+    public EmpleadosViewModel() : this(DataSourceFactory.CrearEmpleados()) { }
 
     public EmpleadosViewModel(IEmpleadoDataSource source) : base(source) { }
 

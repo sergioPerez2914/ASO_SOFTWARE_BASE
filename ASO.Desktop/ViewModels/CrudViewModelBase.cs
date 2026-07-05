@@ -69,8 +69,17 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
     protected abstract T CrearNuevo();
     protected abstract CrudEditorViewModelBase<T> CrearEditor(T item);
 
+    /// <summary>
+    /// Filtro adicional propio del maestro (p. ej. por categoría), que se combina con el
+    /// buscador de texto. Por defecto no filtra nada. Al cambiar el criterio, llamar a
+    /// <c>ItemsView.Refresh()</c>.
+    /// </summary>
+    protected virtual bool PasaFiltroExtra(T item) => true;
+
     private bool FiltrarItem(object obj)
-        => obj is T item && (string.IsNullOrWhiteSpace(TextoBusqueda) || CoincideBusqueda(item, TextoBusqueda.Trim()));
+        => obj is T item
+           && (string.IsNullOrWhiteSpace(TextoBusqueda) || CoincideBusqueda(item, TextoBusqueda.Trim()))
+           && PasaFiltroExtra(item);
 
     private void Agregar()
     {

@@ -65,9 +65,11 @@
       </Border>
     </UniformGrid>
 
-    <!-- Filtros -->
+    <!-- Filtros y acciones -->
     <Grid Grid.Row="2" Margin="0,0,0,12">
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
@@ -75,22 +77,41 @@
       <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
         <TextBlock Text="Buscar" VerticalAlignment="Center" Margin="0,0,8,0"
                    FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
-        <TextBox Width="280" Padding="6,4" VerticalContentAlignment="Center"
-                 Text="{Binding Busqueda, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBox Width="220" Padding="6,4" VerticalContentAlignment="Center"
+                 Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}" />
       </StackPanel>
 
-      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
         <TextBlock Text="Categoría" VerticalAlignment="Center" Margin="0,0,8,0"
                    FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
-        <ComboBox Width="200" Padding="6,4"
+        <ComboBox Width="190" Padding="6,4"
                   ItemsSource="{Binding Categorias}"
                   SelectedItem="{Binding CategoriaSeleccionada}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+        <Button Content="Actualizar" Padding="12,6" Margin="0,0,8,0" Cursor="Hand"
+                Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
+                Foreground="{StaticResource TextPrimaryBrush}"
+                Command="{Binding RefrescarCommand}" />
+        <Button Content="Eliminar" Padding="12,6" Margin="0,0,8,0" Cursor="Hand"
+                Background="Transparent" BorderBrush="{StaticResource DangerBrush}"
+                Foreground="{StaticResource DangerBrush}"
+                Command="{Binding EliminarCommand}" />
+        <Button Content="Editar" Padding="12,6" Margin="0,0,8,0" Cursor="Hand"
+                Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
+                Foreground="{StaticResource TextPrimaryBrush}"
+                Command="{Binding EditarCommand}" />
+        <Button Content="Agregar" Padding="12,6" Cursor="Hand" BorderThickness="0"
+                Background="{StaticResource PrimaryBrush}" Foreground="White"
+                Command="{Binding AgregarCommand}" />
       </StackPanel>
     </Grid>
 
     <!-- Tabla -->
     <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8">
-      <DataGrid Style="{StaticResource DataGridStyle}" ItemsSource="{Binding ItemsView}">
+      <DataGrid Style="{StaticResource DataGridStyle}" ItemsSource="{Binding ItemsView}"
+                SelectedItem="{Binding SelectedItem}">
         <DataGrid.Columns>
           <DataGridTextColumn Header="Código" Binding="{Binding Codigo}" Width="90" />
           <DataGridTextColumn Header="Artículo" Binding="{Binding Nombre}" Width="*" />

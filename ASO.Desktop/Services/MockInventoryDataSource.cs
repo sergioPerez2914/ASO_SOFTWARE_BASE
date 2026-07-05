@@ -1,15 +1,17 @@
 using System.Collections.Generic;
+using System.Linq;
 using ASO.Desktop.Models;
 
 namespace ASO.Desktop.Services;
 
 /// <summary>
 /// Datos de ejemplo para el módulo de inventario mientras no existe base de datos.
-/// Reemplazar por un repositorio real (EF Core / SQL Server) en la capa de infraestructura.
+/// Mantiene el estado en memoria durante la sesión para que las altas/ediciones/bajas
+/// persistan. Reemplazar por un repositorio real (EF Core / SQL Server) en la capa de infraestructura.
 /// </summary>
 public class MockInventoryDataSource : IInventoryDataSource
 {
-    public IEnumerable<InventoryItem> GetItems() => new List<InventoryItem>
+    private readonly List<InventoryItem> _items = new()
     {
         new() { Codigo = "REP-001", Nombre = "Cuchilla de corte base",          Categoria = "Cuchillas",             Unidad = "und", Ubicacion = "Almacén A-1", StockActual = 42,  StockMinimo = 20,  CostoUnitario = 85.50m },
         new() { Codigo = "REP-002", Nombre = "Cuchilla trituradora",            Categoria = "Cuchillas",             Unidad = "und", Ubicacion = "Almacén A-1", StockActual = 12,  StockMinimo = 15,  CostoUnitario = 120.00m },
@@ -28,4 +30,27 @@ public class MockInventoryDataSource : IInventoryDataSource
         new() { Codigo = "COR-060", Nombre = "Correa de transmisión trapezoidal", Categoria = "Correas",             Unidad = "und", Ubicacion = "Almacén C-2", StockActual = 22,  StockMinimo = 10,  CostoUnitario = 33.60m },
         new() { Codigo = "BAT-070", Nombre = "Batería 12V 150Ah",               Categoria = "Baterías",              Unidad = "und", Ubicacion = "Almacén A-2", StockActual = 3,   StockMinimo = 5,   CostoUnitario = 210.00m }
     };
+
+    public IEnumerable<InventoryItem> GetAll() => _items;
+
+    public InventoryItem? GetById(string id) =>
+        _items.FirstOrDefault(i => i.Codigo == id);
+
+    public InventoryItem Add(InventoryItem item)
+    {
+        _items.Add(item);
+        return item;
+    }
+
+    public void Update(InventoryItem item)
+    {
+        var indice = _items.FindIndex(i => i.Codigo == item.Codigo);
+        if (indice >= 0)
+            _items[indice] = item;
+    }
+
+    public void Delete(string id)
+    {
+        _items.RemoveAll(i => i.Codigo == id);
+    }
 }
