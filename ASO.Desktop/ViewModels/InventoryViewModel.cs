@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Data;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
+using ASO.Desktop.BD;
 
 namespace ASO.Desktop.ViewModels;
 
@@ -21,7 +22,7 @@ public class InventoryViewModel : ViewModelBase
     public ICollectionView ItemsView { get; }
     public ObservableCollection<string> Categorias { get; }
 
-    public InventoryViewModel() : this(new MockInventoryDataSource()) { }
+    public InventoryViewModel() : this(new SqlInventoryDataSource()) { }
 
     public InventoryViewModel(IInventoryDataSource source)
     {
