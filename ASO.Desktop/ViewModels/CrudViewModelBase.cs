@@ -34,8 +34,8 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
         ItemsView.Filter = FiltrarItem;
 
         AgregarCommand = new RelayCommand(Agregar, () => _sesion.Puede($"{ModuloPermiso}.Crear"));
-        EditarCommand = new RelayCommand(Editar, () => SelectedItem is not null && _sesion.Puede($"{ModuloPermiso}.Editar"));
-        EliminarCommand = new RelayCommand(Eliminar, () => SelectedItem is not null && _sesion.Puede($"{ModuloPermiso}.Eliminar"));
+        EditarCommand = new RelayCommand(Editar, () => SelectedItem is { } e && PuedeEditar(e) && _sesion.Puede($"{ModuloPermiso}.Editar"));
+        EliminarCommand = new RelayCommand(Eliminar, () => SelectedItem is { } b && PuedeEliminar(b) && _sesion.Puede($"{ModuloPermiso}.Eliminar"));
         RefrescarCommand = new RelayCommand(Refrescar);
     }
 
@@ -75,6 +75,15 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
     /// <c>ItemsView.Refresh()</c>.
     /// </summary>
     protected virtual bool PasaFiltroExtra(T item) => true;
+
+    /// <summary>
+    /// ¿El elemento admite edición? Los documentos con máquina de estados quedan inmutables
+    /// al confirmarse. Por defecto todo es editable (comportamiento de un maestro simple).
+    /// </summary>
+    protected virtual bool PuedeEditar(T item) => true;
+
+    /// <summary>¿El elemento admite borrado? Ver <see cref="PuedeEditar"/>.</summary>
+    protected virtual bool PuedeEliminar(T item) => true;
 
     private bool FiltrarItem(object obj)
         => obj is T item

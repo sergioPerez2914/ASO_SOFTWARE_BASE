@@ -1,11 +1,14 @@
 using System.Windows;
+using ASO.Desktop.Navigation;
 using ASO.Desktop.Services;
+using ASO.Desktop.ViewModels;
 using ASO.Desktop.Views;
 
 namespace ASO.Desktop;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// Shell de la aplicación: menú de módulos/submódulos a la izquierda y, a la derecha,
+/// el resumen del módulo o el submódulo abierto.
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -13,8 +16,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        MainSidebar.NavigationRequested += OnNavigationRequested;
-        ContentArea.Content = new DashboardView(); // sección inicial: Inicio
+        MainSidebar.NavegacionSolicitada += (_, e) => Navegar(e.Modulo, e.Submodulo);
+        Navegar(ModuloCatalogo.Inicio, null);
 
         var usuario = SesionActual.Instancia.UsuarioActual;
         if (usuario is not null)
@@ -41,46 +44,65 @@ public partial class MainWindow : Window
         Close();
     }
 
-    private void OnNavigationRequested(object? sender, string section)
+    /// <summary>
+    /// Único punto de cambio de sección: sin submódulo muestra el resumen del módulo,
+    /// con submódulo abre su pantalla. El menú lateral se sincroniza con lo que se muestra.
+    /// </summary>
+    private void Navegar(Modulo modulo, Submodulo? submodulo)
     {
-        ContentArea.Content = section switch
+        MainSidebar.Sincronizar(modulo, submodulo);
+
+        ContentArea.Content = submodulo is not null
+            ? CrearVistaSubmodulo(modulo, submodulo)
+            : CrearVistaModulo(modulo);
+    }
+
+    private object CrearVistaModulo(Modulo modulo)
+    {
+        if (modulo.Clave == ModuloCatalogo.Inicio.Clave)
         {
-            "Inicio" => new DashboardView(),
-            "Inventario" => new InventoryView(),
-            "Operaciones" => new PlaceholderView(
-                "Operaciones · Cosecha",
-                "Registro diario, tickets de pesaje, frentes de corte y tiempos muertos.",
-                "Fase 1", ""),
-            "Flota" => new PlaceholderView(
-                "Flota y activos",
-                "Hoja de vida, horómetros/odómetros y disponibilidad de la flota.",
-                "Fase 1", ""),
-            "Combustible" => new PlaceholderView(
-                "Combustible",
-                "Despacho por cisterna, rendimiento L/ton y alertas de consumo.",
-                "Fase 1", ""),
-            "Mantenimiento" => new PlaceholderView(
-                "Mantenimiento",
-                "Órdenes de trabajo y mantenimiento preventivo por horas de uso.",
-                "Fase 2", ""),
-            "Finanzas" => new PlaceholderView(
-                "Finanzas",
-                "Cuentas por cobrar y por pagar, bancos y flujo de caja.",
-                "Fase 3", ""),
-            "Nomina" => new PlaceholderView(
-                "Nómina y destajo",
-                "Tarifas de destajo, turnos de zafra y liquidaciones.",
-                "Fase 4", ""),
-            "Reportes" => new PlaceholderView(
-                "Reportes",
-                "Producción diaria, consumo de combustible y estados financieros.",
-                "Fase 5", ""),
-            "Maestros" => new EmpleadosView(),
-            "Configuracion" => new PlaceholderView(
-                "Configuración",
-                "Usuarios, roles, parámetros del sistema y auditoría.",
-                "", ""),
-            _ => new PlaceholderView(section, "Sección no reconocida.", "")
-        };
+            var inicio = new InicioViewModel();
+            inicio.ModuloSolicitado += (_, m) => Navegar(m, null);
+            return new InicioView { DataContext = inicio };
+        }
+
+        var dashboard = new ModuloDashboardViewModel(modulo);
+        dashboard.SubmoduloSolicitado += (_, s) => Navegar(modulo, s);
+        return new ModuloDashboardView { DataContext = dashboard };
+    }
+
+    /// <summary>
+    /// Los submódulos ya implementados se enrutan a su pantalla real; el resto cae en el
+    /// marcador de posición hasta que tengan la suya.
+    /// </summary>
+    private object CrearVistaSubmodulo(Modulo modulo, Submodulo submodulo)
+    {
+        switch (submodulo.Clave)
+        {
+            case "Operaciones.Registro":
+                var registro = new RegistroOperacionViewModel(modulo, submodulo);
+                registro.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new RegistroOperacionView { DataContext = registro };
+
+            case "Operaciones.Seguimiento":
+                var seguimiento = new SeguimientoViewModel(modulo, submodulo);
+                seguimiento.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new SeguimientoView { DataContext = seguimiento };
+
+            case "Flota.Gestion":
+                var gestion = new GestionFlotaViewModel(modulo, submodulo);
+                gestion.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new GestionFlotaView { DataContext = gestion };
+
+            case "Flota.Mantenimiento":
+                var mantenimiento = new MantenimientoViewModel(modulo, submodulo);
+                mantenimiento.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new MantenimientoView { DataContext = mantenimiento };
+
+            default:
+                var vm = new SubmoduloViewModel(modulo, submodulo);
+                vm.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new SubmoduloView { DataContext = vm };
+        }
     }
 }

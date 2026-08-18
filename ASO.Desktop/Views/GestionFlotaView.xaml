@@ -1,0 +1,399 @@
+<UserControl x:Class="ASO.Desktop.Views.GestionFlotaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:models="clr-namespace:ASO.Desktop.Models"
+             mc:Ignorable="d"
+             d:DesignHeight="640" d:DesignWidth="1100">
+
+  <UserControl.Resources>
+    <!-- Botón secundario de acciones del detalle -->
+    <Style x:Key="AccionSecundariaStyle" TargetType="Button">
+      <Setter Property="Padding" Value="12,6" />
+      <Setter Property="Margin" Value="8,0,0,0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+
+    <!-- Contenido visible solo en modo tarjetas -->
+    <Style x:Key="SoloTarjetasStyle" TargetType="FrameworkElement">
+      <Setter Property="Visibility" Value="Visible" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding HayDetalle}" Value="True">
+          <Setter Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Encabezado con la ruta módulo · submódulo -->
+    <Grid Grid.Row="0" Margin="0,0,0,16">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="{Binding Ruta}" FontSize="12"
+                   Foreground="{StaticResource TextMutedBrush}" />
+        <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
+                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+        <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
+                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+      </StackPanel>
+
+      <Button Grid.Column="1" Content="Volver al módulo" VerticalAlignment="Top"
+              Padding="12,6" Cursor="Hand" Background="Transparent"
+              BorderBrush="{StaticResource BorderBrush}"
+              Foreground="{StaticResource TextPrimaryBrush}"
+              Command="{Binding VolverCommand}" />
+    </Grid>
+
+    <!-- ================= MODO TARJETAS ================= -->
+    <Grid Grid.Row="1" Style="{StaticResource SoloTarjetasStyle}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+
+          <TextBox Grid.Column="0" Width="220" VerticalAlignment="Center"
+                   Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Buscar por código, placa, marca o modelo" />
+
+          <WrapPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+            <RadioButton Content="Todos" GroupName="FiltroFlota" IsChecked="True"
+                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Todos" />
+            <RadioButton Content="Cosechadoras" GroupName="FiltroFlota"
+                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Cosechadora" />
+            <RadioButton Content="Tractores" GroupName="FiltroFlota"
+                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Tractor" />
+            <RadioButton Content="Alzadoras" GroupName="FiltroFlota"
+                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Alzadora" />
+            <RadioButton Content="Transporte" GroupName="FiltroFlota"
+                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Transporte" />
+          </WrapPanel>
+
+          <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button Content="Nuevo activo" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
+                    Background="{StaticResource PrimaryBrush}" Foreground="White"
+                    Command="{Binding NuevoActivoCommand}" />
+            <Button Content="Actualizar" Style="{StaticResource AccionSecundariaStyle}"
+                    Command="{Binding RefrescarCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding ActivosView}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Style="{StaticResource CardButtonStyle}" Width="250" Margin="0,0,12,12"
+                      Command="{Binding DataContext.AbrirDetalleCommand,
+                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      CommandParameter="{Binding}"
+                      AutomationProperties.Name="{Binding Etiqueta}">
+                <StackPanel>
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Glifo}" Style="{StaticResource NavIconStyle}"
+                               FontSize="24" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,10,0" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Codigo}" FontSize="14" FontWeight="SemiBold"
+                                 Foreground="{StaticResource TextPrimaryBrush}" />
+                      <TextBlock Text="{Binding TipoTexto}" FontSize="11"
+                                 Foreground="{StaticResource TextMutedBrush}" />
+                    </StackPanel>
+                    <Border Grid.Column="2" Style="{StaticResource ChipEstadoActivoStyle}"
+                            VerticalAlignment="Top">
+                      <TextBlock Text="{Binding EstadoTexto}" FontSize="10" Foreground="White" />
+                    </Border>
+                  </Grid>
+
+                  <TextBlock Margin="0,10,0,0" FontSize="12"
+                             Foreground="{StaticResource TextSecondaryBrush}"
+                             TextTrimming="CharacterEllipsis">
+                    <Run Text="{Binding Marca, Mode=OneWay}" />
+                    <Run Text="{Binding Modelo, Mode=OneWay}" />
+                  </TextBlock>
+
+                  <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Placa}" FontSize="11"
+                               Foreground="{StaticResource TextMutedBrush}" />
+                    <TextBlock Grid.Column="1" Text="{Binding UsoTexto}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}" />
+                  </Grid>
+                </StackPanel>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Grid>
+
+    <!-- ================= MODO DETALLE ================= -->
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                  Visibility="{Binding HayDetalle, Converter={StaticResource BoolToVis}}">
+      <StackPanel>
+
+        <!-- Cabecera del activo -->
+        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" DataContext="{Binding ActivoSeleccionado}">
+              <TextBlock Text="{Binding Glifo}" Style="{StaticResource NavIconStyle}"
+                         FontSize="30" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,12,0" />
+              <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock FontSize="18" FontWeight="Bold"
+                             Foreground="{StaticResource TextPrimaryBrush}">
+                    <Run Text="{Binding Codigo, Mode=OneWay}" />
+                    <Run Text=" — " /><Run Text="{Binding Marca, Mode=OneWay}" />
+                    <Run Text="{Binding Modelo, Mode=OneWay}" />
+                  </TextBlock>
+                  <Border Style="{StaticResource ChipEstadoActivoStyle}" Margin="10,0,0,0"
+                          VerticalAlignment="Center">
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" Foreground="White" />
+                  </Border>
+                </StackPanel>
+                <TextBlock Text="{Binding TipoTexto}" FontSize="12"
+                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+              </StackPanel>
+            </StackPanel>
+
+            <WrapPanel Grid.Column="1" VerticalAlignment="Center">
+              <Button Content="Registrar mantenimiento" Padding="14,7" Cursor="Hand" FontSize="12"
+                      BorderThickness="0" Background="{StaticResource PrimaryBrush}" Foreground="White"
+                      Command="{Binding RegistrarMantenimientoCommand}" />
+              <Button Content="Editar" Style="{StaticResource AccionSecundariaStyle}"
+                      Command="{Binding EditarActivoCommand}" />
+              <Button Content="Operativo" Style="{StaticResource AccionSecundariaStyle}"
+                      Command="{Binding CambiarEstadoCommand}"
+                      CommandParameter="{x:Static models:EstadoActivo.Operativo}" />
+              <Button Content="A taller" Style="{StaticResource AccionSecundariaStyle}"
+                      Command="{Binding CambiarEstadoCommand}"
+                      CommandParameter="{x:Static models:EstadoActivo.EnTaller}" />
+              <Button Content="Fuera de servicio" Style="{StaticResource AccionSecundariaStyle}"
+                      Command="{Binding CambiarEstadoCommand}"
+                      CommandParameter="{x:Static models:EstadoActivo.FueraDeServicio}" />
+              <Button Content="Volver a la flota" Style="{StaticResource AccionSecundariaStyle}"
+                      Command="{Binding CerrarDetalleCommand}" />
+            </WrapPanel>
+          </Grid>
+        </Border>
+
+        <!-- Indicadores rápidos -->
+        <UniformGrid Rows="1" Columns="4" Margin="0,0,0,12">
+          <Border Style="{StaticResource CardStyle}" Margin="0,0,6,0">
+            <StackPanel>
+              <TextBlock Text="Uso actual" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+              <TextBlock Text="{Binding ActivoSeleccionado.UsoTexto}" FontSize="18" FontWeight="Bold"
+                         Foreground="{StaticResource TextPrimaryBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+          </Border>
+          <Border Style="{StaticResource CardStyle}" Margin="6,0,6,0">
+            <StackPanel>
+              <TextBlock Text="Último mantenimiento" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+              <TextBlock Text="{Binding UltimoMantenimientoTexto}" FontSize="14" FontWeight="SemiBold"
+                         Foreground="{StaticResource TextPrimaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Style="{StaticResource CardStyle}" Margin="6,0,6,0">
+            <StackPanel>
+              <TextBlock Text="Próxima revisión" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+              <TextBlock Text="{Binding ProximaRevisionTexto}" FontSize="14" FontWeight="SemiBold"
+                         Foreground="{StaticResource TextPrimaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Style="{StaticResource CardStyle}" Margin="6,0,0,0">
+            <StackPanel DataContext="{Binding ActivoSeleccionado}">
+              <TextBlock Text="Año · Placa" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+              <TextBlock FontSize="14" FontWeight="SemiBold" Margin="0,6,0,0"
+                         Foreground="{StaticResource TextPrimaryBrush}">
+                <Run Text="{Binding Anio, Mode=OneWay}" />
+                <Run Text=" · " /><Run Text="{Binding Placa, Mode=OneWay}" />
+              </TextBlock>
+            </StackPanel>
+          </Border>
+        </UniformGrid>
+
+        <!-- Dos columnas: ficha + revisiones | mantenimientos + uso -->
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+
+          <StackPanel Grid.Column="0">
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+              <StackPanel DataContext="{Binding ActivoSeleccionado}">
+                <TextBlock Text="Ficha" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,8" />
+                <TextBlock Text="Tipo" Style="{StaticResource FormLabelStyle}" Margin="0,4,0,2" />
+                <TextBlock Text="{Binding TipoTexto}" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Marca y modelo" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
+                <TextBlock FontSize="12" Foreground="{StaticResource TextPrimaryBrush}">
+                  <Run Text="{Binding Marca, Mode=OneWay}" /> <Run Text="{Binding Modelo, Mode=OneWay}" />
+                  <Run Text=" (" /><Run Text="{Binding Anio, Mode=OneWay}" /><Run Text=")" />
+                </TextBlock>
+                <TextBlock Text="Descripción" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
+                <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
+                           Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
+                <TextBlock Text="{Binding Notas}" FontSize="12" TextWrapping="Wrap"
+                           Foreground="{StaticResource TextSecondaryBrush}" />
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+              <StackPanel>
+                <TextBlock Text="Revisiones" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,8" />
+                <ItemsControl ItemsSource="{Binding Recomendaciones}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid Margin="0,6">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Style="{StaticResource ChipRecomendacionStyle}"
+                                VerticalAlignment="Top" Margin="0,2,10,0">
+                          <TextBlock Text="{Binding EstadoTexto}" FontSize="10" Foreground="White" />
+                        </Border>
+                        <StackPanel Grid.Column="1">
+                          <TextBlock Text="{Binding Regla.Revision}" FontSize="12" FontWeight="SemiBold"
+                                     Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
+                                     Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+
+          <StackPanel Grid.Column="2">
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+              <StackPanel>
+                <TextBlock Text="Últimos mantenimientos" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,8" />
+                <ItemsControl ItemsSource="{Binding UltimosMantenimientos}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <StackPanel Margin="0,6">
+                        <TextBlock FontSize="11" Foreground="{StaticResource TextMutedBrush}">
+                          <Run Text="{Binding Fecha, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy}}" />
+                          <Run Text=" · " /><Run Text="{Binding TipoTexto, Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                        <TextBlock FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0">
+                          <Run Text="Costo: " /><Run Text="{Binding CostoTotalTexto, Mode=OneWay}" />
+                          <Run Text=" · " /><Run Text="{Binding RealizadoPor, Mode=OneWay}" />
+                        </TextBlock>
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+              <StackPanel>
+                <TextBlock Text="Historial de uso" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,8" />
+
+                <Border Margin="0,0,0,8"
+                        Background="{StaticResource BackgroundBrush}"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                  <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource AlertBoxStyle}">
+                      <Setter Property="Visibility" Value="Visible" />
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding ActivoSeleccionado.EsTransporte}" Value="True">
+                          <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </Border.Style>
+                  <TextBlock FontSize="11" TextWrapping="Wrap"
+                             Foreground="{StaticResource TextSecondaryBrush}"
+                             Text="El uso de las máquinas se alimentará de Telemetría y de los vales de combustible; hoy se muestran las lecturas capturadas al registrar mantenimientos." />
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding HistorialUso}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid Margin="0,6">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="*" />
+                          <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                          <TextBlock Text="{Binding FechaTexto}" FontSize="11"
+                                     Foreground="{StaticResource TextMutedBrush}" />
+                          <TextBlock Text="{Binding Titulo}" FontSize="12" FontWeight="SemiBold"
+                                     Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                          <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
+                                     Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <Border Grid.Column="1" VerticalAlignment="Top" Margin="8,0,0,0"
+                                DataContext="{Binding Remesa}"
+                                Visibility="{Binding DataContext.TieneRemesa,
+                                             RelativeSource={RelativeSource AncestorType=Grid},
+                                             Converter={StaticResource BoolToVis}}"
+                                Style="{StaticResource ChipEstadoStyle}">
+                          <TextBlock Text="{Binding EstadoTexto}" FontSize="10" Foreground="White" />
+                        </Border>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

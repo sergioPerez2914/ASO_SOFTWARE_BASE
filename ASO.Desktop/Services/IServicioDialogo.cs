@@ -12,4 +12,7 @@ public interface IServicioDialogo
     bool MostrarEditor(CrudEditorViewModelBase editor);
 
     bool Confirmar(string titulo, string mensaje);
+
+    /// <summary>Aviso sin decisión: reglas de negocio rechazadas, resultados de una acción.</summary>
+    void Informar(string titulo, string mensaje);
 }

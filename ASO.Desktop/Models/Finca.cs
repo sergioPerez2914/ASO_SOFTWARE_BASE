@@ -1,0 +1,34 @@
+using System.Collections.Generic;
+
+namespace ASO.Desktop.Models;
+
+/// <summary>
+/// Finca del productor. El código debe corresponder con el aperturado en el CAM y el
+/// nombre con el del título de propiedad (reglamento de remesas).
+///
+/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
+/// </summary>
+public class Finca : IEntidad<int>
+{
+    public int Id { get; set; }
+    public string CodigoCam { get; set; } = string.Empty;
+    public string Nombre { get; set; } = string.Empty;
+    public List<Lote> Lotes { get; set; } = new();
+
+    public string Etiqueta => $"{CodigoCam} · {Nombre}";
+}
+
+/// <summary>Área de corte dentro de una parcela.</summary>
+public class Lote
+{
+    public int Id { get; set; }
+    public string Nombre { get; set; } = string.Empty;
+    public List<Tablon> Tablones { get; set; } = new();
+}
+
+/// <summary>Área de corte dentro de un lote.</summary>
+public class Tablon
+{
+    public int Id { get; set; }
+    public string Nombre { get; set; } = string.Empty;
+}

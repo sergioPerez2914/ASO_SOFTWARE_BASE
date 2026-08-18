@@ -24,6 +24,9 @@ public abstract class CrudEditorViewModelBase : ViewModelBase
     public ICommand GuardarCommand { get; }
     public ICommand CancelarCommand { get; }
 
+    /// <summary>Ancho de la ventana modal. Los formularios largos lo suben (p. ej. la remesa).</summary>
+    public virtual double AnchoEditor => 420;
+
     protected CrudEditorViewModelBase()
     {
         GuardarCommand = new RelayCommand(Guardar);

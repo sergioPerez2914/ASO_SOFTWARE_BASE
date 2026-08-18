@@ -4,14 +4,31 @@
                     xmlns:views="clr-namespace:ASO.Desktop.Views">
 
   <!-- Cada editor CRUD aporta un UserControl de formulario; CrudEditorWindow los aloja
-       a través de estos DataTemplate implícitos, sin conocer la entidad concreta. -->
+       a través de DataTemplate implícitos declarados aquí, sin conocer la entidad concreta.
+       Se irán registrando a medida que cada submódulo tenga su editor. -->
 
-  <DataTemplate DataType="{x:Type vm:EmpleadoEditorViewModel}">
-    <views:EmpleadoEditorView />
+  <DataTemplate DataType="{x:Type vm:RemesaEditorViewModel}">
+    <views:RemesaEditorView />
   </DataTemplate>
 
-  <DataTemplate DataType="{x:Type vm:InventoryEditorViewModel}">
-    <views:InventoryEditorView />
+  <DataTemplate DataType="{x:Type vm:RecepcionRemesaEditorViewModel}">
+    <views:RecepcionRemesaEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:AnularRemesaEditorViewModel}">
+    <views:AnularRemesaEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:NotaEditorViewModel}">
+    <views:NotaEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:ActivoEditorViewModel}">
+    <views:ActivoEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:MantenimientoEditorViewModel}">
+    <views:MantenimientoEditorView />
   </DataTemplate>
 
 </ResourceDictionary>

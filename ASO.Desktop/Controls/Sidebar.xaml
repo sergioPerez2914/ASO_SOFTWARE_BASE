@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             d:DesignHeight="700" d:DesignWidth="220"
+             d:DesignHeight="700" d:DesignWidth="240"
              Background="{StaticResource SidebarBrush}">
 
   <Grid>
@@ -23,112 +23,67 @@
       </StackPanel>
     </Border>
 
-    <!-- Navegación (todas las secciones del plan) -->
+    <!-- Navegación de dos niveles: módulo + sus submódulos -->
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-      <StackPanel Margin="0,8,0,16">
+      <ItemsControl ItemsSource="{Binding Items}" Margin="0,8,0,16">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <StackPanel>
 
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav" IsChecked="True"
-                     Tag="Inicio" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE80F;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Inicio" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
+              <Button Style="{StaticResource NavItemStyle}"
+                      AutomationProperties.Name="{Binding Nombre}"
+                      Command="{Binding DataContext.SeleccionarModuloCommand,
+                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      CommandParameter="{Binding}">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="{Binding Icono}" Style="{StaticResource NavIconStyle}"
+                             FontSize="16" Width="20" TextAlignment="Center" Margin="0,0,10,0" />
+                  <TextBlock Grid.Column="1" Text="{Binding Nombre}" VerticalAlignment="Center" />
+                  <Button Grid.Column="2" Style="{StaticResource NavChevronStyle}"
+                          AutomationProperties.Name="{Binding TextoChevron}"
+                          ToolTip="{Binding TextoChevron}"
+                          Command="{Binding DataContext.AlternarExpansionCommand,
+                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          CommandParameter="{Binding}"
+                          Visibility="{Binding TieneSubmodulos, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding GlifoChevron}" Style="{StaticResource NavIconStyle}"
+                               FontSize="12" />
+                  </Button>
+                </Grid>
+              </Button>
 
-        <TextBlock Style="{StaticResource NavGroupHeaderStyle}" Text="Operación diaria" />
+              <ItemsControl ItemsSource="{Binding Submodulos}"
+                            Visibility="{Binding EstaExpandido, Converter={StaticResource BoolToVis}}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Button Style="{StaticResource NavSubItemStyle}"
+                            AutomationProperties.Name="{Binding Nombre}"
+                            Command="{Binding DataContext.SeleccionarSubmoduloCommand,
+                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}">
+                      <Grid>
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Icono}" Style="{StaticResource NavIconStyle}"
+                                   FontSize="14" Width="18" TextAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding Nombre}" VerticalAlignment="Center" />
+                      </Grid>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
 
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Operaciones" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE9F5;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Operaciones" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Flota" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Flota y activos" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Combustible" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE945;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Combustible" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-
-        <TextBlock Style="{StaticResource NavGroupHeaderStyle}" Text="Taller" />
-
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Mantenimiento" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE90F;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Mantenimiento" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Inventario" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE7B8;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Inventario" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-
-        <TextBlock Style="{StaticResource NavGroupHeaderStyle}" Text="Administración" />
-
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Finanzas" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE8C7;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Finanzas" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Nomina" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Nómina y destajo" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-
-        <TextBlock Style="{StaticResource NavGroupHeaderStyle}" Text="Sistema" />
-
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Reportes" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Reportes" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Maestros" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE8F1;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Maestros" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-        <RadioButton Style="{StaticResource NavItemStyle}" GroupName="MainNav"
-                     Tag="Configuracion" Checked="OnNavChecked">
-          <StackPanel Orientation="Horizontal">
-            <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                       VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBlock Text="Configuración" VerticalAlignment="Center" />
-          </StackPanel>
-        </RadioButton>
-
-      </StackPanel>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
     </ScrollViewer>
   </Grid>
 </UserControl>

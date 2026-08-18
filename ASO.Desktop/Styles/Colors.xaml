@@ -19,6 +19,14 @@
     <Color x:Key="InfoColor">#3B82F6</Color>
     <Color x:Key="FooterColor">#E2E8F0</Color>
 
+    <!-- Navegación lateral: el hover es gris neutro y el seleccionado azulado,
+         para que no se confundan entre sí. -->
+    <Color x:Key="NavHoverColor">#DEE3EA</Color>
+    <Color x:Key="NavSelectedColor">#D8E2F6</Color>
+    <Color x:Key="NavPressedColor">#C8D6F0</Color>
+    <Color x:Key="NavIndicatorColor">#2563EB</Color>
+    <Color x:Key="NavTextSecondaryColor">#475569</Color>
+
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
     <SolidColorBrush x:Key="SidebarBrush" Color="{StaticResource SidebarColor}" />
@@ -35,5 +43,10 @@
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
     <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}" />
     <SolidColorBrush x:Key="FooterBrush" Color="{StaticResource FooterColor}" />
+    <SolidColorBrush x:Key="NavHoverBrush" Color="{StaticResource NavHoverColor}" />
+    <SolidColorBrush x:Key="NavSelectedBrush" Color="{StaticResource NavSelectedColor}" />
+    <SolidColorBrush x:Key="NavPressedBrush" Color="{StaticResource NavPressedColor}" />
+    <SolidColorBrush x:Key="NavIndicatorBrush" Color="{StaticResource NavIndicatorColor}" />
+    <SolidColorBrush x:Key="NavTextSecondaryBrush" Color="{StaticResource NavTextSecondaryColor}" />
 
 </ResourceDictionary>

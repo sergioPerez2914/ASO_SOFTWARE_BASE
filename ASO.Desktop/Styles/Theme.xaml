@@ -1,11 +1,76 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models="clr-namespace:ASO.Desktop.Models">
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="Colors.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <FontFamily x:Key="AppFont">Segoe UI</FontFamily>
+  <FontFamily x:Key="IconFont">Segoe MDL2 Assets</FontFamily>
+
+  <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+  <!-- Chip de estado de una remesa. El color lo decide el enum, no el texto.
+       Lo comparten el listado de Registro de Operación y el de Seguimiento. -->
+  <Style x:Key="ChipEstadoStyle" TargetType="Border">
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Borrador}">
+        <Setter Property="Background" Value="{StaticResource WarningBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Confirmada}">
+        <Setter Property="Background" Value="{StaticResource InfoBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Recibida}">
+        <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Anulada}">
+        <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Chip de estado de un activo de flota -->
+  <Style x:Key="ChipEstadoActivoStyle" TargetType="Border">
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.Operativo}">
+        <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.EnTaller}">
+        <Setter Property="Background" Value="{StaticResource WarningBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.FueraDeServicio}">
+        <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Chip de urgencia de una recomendación de revisión -->
+  <Style x:Key="ChipRecomendacionStyle" TargetType="Border">
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.Vencido}">
+        <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.Proximo}">
+        <Setter Property="Background" Value="{StaticResource WarningBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.AlDia}">
+        <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
 
   <!-- Tarjeta base -->
   <Style x:Key="CardStyle" TargetType="Border">
@@ -38,34 +103,226 @@
     <Setter Property="TextDecorations" Value="Underline" />
   </Style>
 
-  <!-- Ítem de navegación lateral -->
-  <Style x:Key="NavItemStyle" TargetType="RadioButton">
+  <!-- Formularios: etiqueta + controles de captura. Solo setters, sin ControlTemplate,
+       para heredar el comportamiento nativo de cada control. -->
+  <Style x:Key="FormLabelStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+    <Setter Property="Margin" Value="0,10,0,4" />
+  </Style>
+
+  <Style x:Key="FormTextBoxStyle" TargetType="TextBox">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style x:Key="FormComboBoxStyle" TargetType="ComboBox">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style x:Key="FormDatePickerStyle" TargetType="DatePicker">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <!-- Valor calculado de solo lectura dentro de un formulario (p. ej. el peso neto). -->
+  <Style x:Key="FormValorCalculadoStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!-- Icono de la navegación lateral (glifo MDL2).
+       FontWeight fijo en Normal: la fuente no tiene cara bold y WPF la sintetiza,
+       ensuciando el glifo justo en el estado seleccionado. -->
+  <Style x:Key="NavIconStyle" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+    <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
+    <Setter Property="UseLayoutRounding" Value="True" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+  </Style>
+
+  <!-- Chevron de plegar/desplegar un módulo. Va anidado dentro del botón de módulo:
+       WPF marca el clic como manejado, así que pliega sin disparar la navegación. -->
+  <Style x:Key="NavChevronStyle" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Root" Background="{TemplateBinding Background}" CornerRadius="4"
+                  SnapsToDevicePixels="True">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Root" Property="Background" Value="{StaticResource NavPressedBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Root" Property="Background" Value="{StaticResource NavPressedBrush}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Ítem de navegación lateral: módulo (primer nivel).
+       El orden de la plantilla importa: la barra se dibuja DESPUÉS del fondo,
+       si no el hover la tapa. -->
+  <Style x:Key="NavItemStyle" TargetType="Button">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
     <Setter Property="FontSize" Value="13" />
     <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="Padding" Value="16,12" />
-    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Padding" Value="20,11,16,11" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="UseLayoutRounding" Value="True" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Grid SnapsToDevicePixels="True">
+            <Border x:Name="Root" Background="{TemplateBinding Background}" />
+            <Border x:Name="FocusRing" BorderBrush="{StaticResource NavIndicatorBrush}"
+                    BorderThickness="0" SnapsToDevicePixels="True" />
+            <Border x:Name="ActiveBar" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                    Margin="0,6" CornerRadius="0,2,2,0" SnapsToDevicePixels="True"
+                    Background="{StaticResource NavIndicatorBrush}" Visibility="Collapsed" />
+            <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Root" Property="Background" Value="{StaticResource NavHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Root" Property="Background" Value="{StaticResource NavPressedBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="FocusRing" Property="BorderThickness" Value="1" />
+            </Trigger>
+            <DataTrigger Binding="{Binding EstaSeleccionado}" Value="True">
+              <Setter TargetName="ActiveBar" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Style.Triggers>
+      <!-- Módulo abierto pero mostrando un submódulo: sólo color, sin fondo ni barra,
+           para que nunca haya dos ítems marcados con barra a la vez. -->
+      <MultiDataTrigger>
+        <MultiDataTrigger.Conditions>
+          <Condition Binding="{Binding EstaActivo}" Value="True" />
+          <Condition Binding="{Binding EstaSeleccionado}" Value="False" />
+        </MultiDataTrigger.Conditions>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+      </MultiDataTrigger>
+      <DataTrigger Binding="{Binding EstaSeleccionado}" Value="True">
+        <Setter Property="Background" Value="{StaticResource NavSelectedBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Ítem de navegación lateral: submódulo (segundo nivel).
+       Misma plantilla que el módulo; sólo cambian tamaño, color base y sangría. -->
+  <Style x:Key="NavSubItemStyle" TargetType="Button">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{StaticResource NavTextSecondaryBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="44,8,16,8" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="SnapsToDevicePixels" Value="True" />
+    <Setter Property="UseLayoutRounding" Value="True" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Grid SnapsToDevicePixels="True">
+            <Border x:Name="Root" Background="{TemplateBinding Background}" />
+            <Border x:Name="FocusRing" BorderBrush="{StaticResource NavIndicatorBrush}"
+                    BorderThickness="0" SnapsToDevicePixels="True" />
+            <Border x:Name="ActiveBar" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                    Margin="0,5" CornerRadius="0,2,2,0" SnapsToDevicePixels="True"
+                    Background="{StaticResource NavIndicatorBrush}" Visibility="Collapsed" />
+            <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Root" Property="Background" Value="{StaticResource NavHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Root" Property="Background" Value="{StaticResource NavPressedBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="FocusRing" Property="BorderThickness" Value="1" />
+            </Trigger>
+            <DataTrigger Binding="{Binding EstaSeleccionado}" Value="True">
+              <Setter TargetName="ActiveBar" Property="Visibility" Value="Visible" />
+            </DataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding EstaSeleccionado}" Value="True">
+        <Setter Property="Background" Value="{StaticResource NavSelectedBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Tarjeta pulsable (módulo en Inicio, submódulo en el dashboard) -->
+  <Style x:Key="CardButtonStyle" TargetType="Button">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="16" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Template">
       <Setter.Value>
-        <ControlTemplate TargetType="RadioButton">
-          <Border x:Name="Root" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
-            <Grid>
-              <Border x:Name="ActiveBar" Width="3" HorizontalAlignment="Left"
-                      Background="{StaticResource AccentBlueBrush}" Visibility="Collapsed" />
-              <ContentPresenter VerticalAlignment="Center" Margin="8,0,0,0" />
-            </Grid>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Root" Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="8" Padding="{TemplateBinding Padding}">
+            <ContentPresenter />
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="#DDE3EC" />
-            </Trigger>
-            <Trigger Property="IsChecked" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="#DDE3EC" />
-              <Setter TargetName="ActiveBar" Property="Visibility" Value="Visible" />
-              <Setter Property="FontWeight" Value="SemiBold" />
+              <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentBlueBrush}" />
+              <Setter TargetName="Root" Property="Background" Value="#F8FAFF" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -168,14 +425,6 @@
     <Setter Property="SelectionMode" Value="Single" />
     <Setter Property="RowBackground" Value="Transparent" />
     <Setter Property="AlternatingRowBackground" Value="#F8FAFC" />
-  </Style>
-
-  <!-- Encabezado de grupo en el menú lateral -->
-  <Style x:Key="NavGroupHeaderStyle" TargetType="TextBlock">
-    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="11" />
-    <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
-    <Setter Property="Margin" Value="24,14,16,4" />
   </Style>
 
 </ResourceDictionary>

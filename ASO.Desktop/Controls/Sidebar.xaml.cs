@@ -1,25 +1,27 @@
 using System;
-using System.Windows;
 using System.Windows.Controls;
+using ASO.Desktop.Navigation;
+using ASO.Desktop.ViewModels;
 
 namespace ASO.Desktop.Controls;
 
 public partial class Sidebar : UserControl
 {
+    private readonly SidebarViewModel _viewModel = new();
+
     /// <summary>
-    /// Se dispara cuando el usuario selecciona un módulo. El argumento es el
-    /// identificador de sección tomado del <c>Tag</c> del ítem de navegación.
+    /// Se dispara cuando el usuario elige un módulo o uno de sus submódulos.
     /// </summary>
-    public event EventHandler<string>? NavigationRequested;
+    public event EventHandler<NavegacionEventArgs>? NavegacionSolicitada;
 
     public Sidebar()
     {
         InitializeComponent();
+
+        DataContext = _viewModel;
+        _viewModel.NavegacionSolicitada += (_, e) => NavegacionSolicitada?.Invoke(this, e);
     }
 
-    private void OnNavChecked(object sender, RoutedEventArgs e)
-    {
-        if (sender is RadioButton { Tag: string section })
-            NavigationRequested?.Invoke(this, section);
-    }
+    /// <summary>Marca en el menú la sección visible, sin volver a pedir navegación.</summary>
+    public void Sincronizar(Modulo modulo, Submodulo? submodulo) => _viewModel.Sincronizar(modulo, submodulo);
 }
