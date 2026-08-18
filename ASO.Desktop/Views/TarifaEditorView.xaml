@@ -1,0 +1,92 @@
+<UserControl x:Class="ASO.Desktop.Views.TarifaEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="440">
+
+  <StackPanel>
+    <TextBlock Text="Concepto" Style="{StaticResource FormLabelStyle}" />
+    <TextBox Style="{StaticResource FormTextBoxStyle}"
+             Text="{Binding Concepto, UpdateSourceTrigger=PropertyChanged}" />
+
+    <Grid Margin="0,0,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="Servicio" Style="{StaticResource FormLabelStyle}" />
+        <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                  ItemsSource="{Binding Servicios}" SelectedItem="{Binding Servicio}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <TextBlock Text="Ámbito" Style="{StaticResource FormLabelStyle}" />
+        <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                  ItemsSource="{Binding Ambitos}" SelectedItem="{Binding Ambito}" />
+      </StackPanel>
+    </Grid>
+
+    <TextBlock Text="Cobro = lo que se le factura al ingenio. Pago por destajo = lo que se le paga al núcleo o al trabajador."
+               FontSize="11" TextWrapping="Wrap"
+               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="Unidad" Style="{StaticResource FormLabelStyle}" />
+        <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                  ItemsSource="{Binding Unidades}" SelectedItem="{Binding Unidad}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <TextBlock Text="Monto por unidad" Style="{StaticResource FormLabelStyle}" />
+        <TextBox Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding Monto, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+    </Grid>
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="Vigente desde" Style="{StaticResource FormLabelStyle}" />
+        <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                    SelectedDate="{Binding VigenteDesde}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <TextBlock Text="Vigente hasta (opcional)" Style="{StaticResource FormLabelStyle}" />
+        <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                    SelectedDate="{Binding VigenteHasta}" />
+      </StackPanel>
+    </Grid>
+
+    <TextBlock Text="Sin fecha de fin, la tarifa rige indefinidamente. Las facturas y liquidaciones ya emitidas conservan el monto que se les aplicó."
+               FontSize="11" TextWrapping="Wrap"
+               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+
+    <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" />
+    <TextBox Style="{StaticResource FormTextBoxStyle}"
+             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+             VerticalContentAlignment="Top"
+             Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+
+    <CheckBox Content="Activa" Margin="0,14,0,0" Cursor="Hand"
+              Foreground="{StaticResource TextPrimaryBrush}"
+              IsChecked="{Binding Activa}" />
+  </StackPanel>
+</UserControl>
