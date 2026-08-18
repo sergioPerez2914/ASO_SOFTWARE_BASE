@@ -1,0 +1,42 @@
+<UserControl x:Class="ASO.Desktop.Views.PersonalCampoEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="380">
+
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVisLocal" />
+  </UserControl.Resources>
+
+  <StackPanel>
+    <TextBlock Text="Nombre y apellido" Style="{StaticResource FormLabelStyle}" />
+    <TextBox Style="{StaticResource FormTextBoxStyle}"
+             Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+
+    <TextBlock Text="Cédula" Style="{StaticResource FormLabelStyle}" />
+    <TextBox Style="{StaticResource FormTextBoxStyle}"
+             Text="{Binding Cedula, UpdateSourceTrigger=PropertyChanged}" />
+
+    <TextBlock Text="Rol en la remesa" Style="{StaticResource FormLabelStyle}" />
+    <ComboBox Style="{StaticResource FormComboBoxStyle}"
+              ItemsSource="{Binding Roles}"
+              SelectedItem="{Binding Rol}" />
+
+    <StackPanel Visibility="{Binding NucleoObligatorio, Converter={StaticResource BoolToVisLocal}}">
+      <TextBlock Text="Núcleo (C.O.D)" Style="{StaticResource FormLabelStyle}" />
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding Nucleos}"
+                DisplayMemberPath="Etiqueta"
+                SelectedItem="{Binding NucleoSeleccionado}" />
+      <TextBlock Text="Determina a quién se paga el corte, el alza y el transporte de la remesa."
+                 FontSize="11" TextWrapping="Wrap"
+                 Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+    </StackPanel>
+
+    <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
+              Foreground="{StaticResource TextPrimaryBrush}"
+              IsChecked="{Binding Activo}" />
+  </StackPanel>
+</UserControl>
