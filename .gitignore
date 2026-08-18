@@ -25,3 +25,7 @@ Thumbs.db
 
 # Configuración por máquina (cadena de conexión, etc.) — no se sube al repo
 appsettings.local.json
+
+# Documentación interna del equipo (reglamentos del CAM, análisis, especificaciones).
+# El repositorio es PÚBLICO: estos documentos son de uso interno y no se publican.
+docs/
