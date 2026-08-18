@@ -129,6 +129,7 @@
               </Style>
             </DataGridTextColumn.ElementStyle>
           </DataGridTextColumn>
+          <DataGridTextColumn Header="Facturada" Binding="{Binding FacturadaTexto}" Width="110" />
           <DataGridTemplateColumn Header="Estado" Width="110">
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate>

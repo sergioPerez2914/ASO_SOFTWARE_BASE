@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ASO.Desktop.Models;
@@ -15,14 +15,17 @@ public sealed class FlotaService
     private readonly IActivoFlotaDataSource _activos;
     private readonly IRemesaDataSource _remesas;
     private readonly IMantenimientoRegistroDataSource _mantenimientos;
+    private readonly IValeCombustibleDataSource? _vales;
 
     public FlotaService(IActivoFlotaDataSource activos,
                         IRemesaDataSource remesas,
-                        IMantenimientoRegistroDataSource mantenimientos)
+                        IMantenimientoRegistroDataSource mantenimientos,
+                        IValeCombustibleDataSource? vales = null)
     {
         _activos = activos;
         _remesas = remesas;
         _mantenimientos = mantenimientos;
+        _vales = vales;
     }
 
     public ActivoFlota Agregar(ActivoFlota activo)
@@ -53,8 +56,9 @@ public sealed class FlotaService
     /// <summary>
     /// Historial de uso, descendente por fecha. Transporte: derivado de las remesas de
     /// Operaciones (incluidas las anuladas: también son historia de la unidad). Máquinas:
-    /// lecturas de horómetro capturadas con los mantenimientos — el uso real llegará con
-    /// Telemetría y los vales de combustible.
+    /// lecturas de horómetro capturadas con los mantenimientos. A ambos se suman los vales de
+    /// combustible confirmados, que son la fuente más frecuente de lecturas del instrumento
+    /// (el detalle por sensor llegará con Telemetría).
     /// </summary>
     public IReadOnlyList<UsoActivoItem> ObtenerHistorialUso(ActivoFlota activo)
     {
@@ -78,7 +82,18 @@ public sealed class FlotaService
                     Detalle = $"{m.LecturaUso:N0} h — registrada con mantenimiento {m.TipoTexto.ToLowerInvariant()}"
                 });
 
-        return [.. items.OrderByDescending(i => i.Fecha)];
+        var despachos = _vales?.GetByActivo(activo.Id)
+            .Where(v => v.Estado == EstadoVale.Confirmado)
+            .Select(v => new UsoActivoItem
+            {
+                Fecha = v.Fecha,
+                Titulo = "Vale de combustible",
+                Detalle = $"{v.LitrosTexto} · lectura {v.LecturaTexto}" +
+                          (v.ConsumoPorUnidad is not null ? $" · {v.ConsumoTexto}" : string.Empty) +
+                          (v.AlertaConsumo ? " · consumo alto" : string.Empty)
+            }) ?? [];
+
+        return [.. items.Concat(despachos).OrderByDescending(i => i.Fecha)];
     }
 
     private void Validar(ActivoFlota activo)

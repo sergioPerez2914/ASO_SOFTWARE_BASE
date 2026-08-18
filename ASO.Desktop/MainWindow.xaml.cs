@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using ASO.Desktop.Navigation;
 using ASO.Desktop.Services;
 using ASO.Desktop.ViewModels;
@@ -98,6 +98,51 @@ public partial class MainWindow : Window
                 var mantenimiento = new MantenimientoViewModel(modulo, submodulo);
                 mantenimiento.VolverSolicitado += (_, _) => Navegar(modulo, null);
                 return new MantenimientoView { DataContext = mantenimiento };
+
+            case "Nomina.Empleados":
+                var empleados = new EmpleadosViewModel(modulo, submodulo);
+                empleados.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new EmpleadosView { DataContext = empleados };
+
+            case "Finanzas.Tarifas":
+                var tarifas = new TarifasViewModel(modulo, submodulo);
+                tarifas.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new TarifasView { DataContext = tarifas };
+
+            case "Inventario.Repuestos":
+                var repuestos = new RepuestosViewModel(modulo, submodulo);
+                repuestos.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new RepuestosView { DataContext = repuestos };
+
+            case "Inventario.Combustible":
+                var combustible = new CombustibleViewModel(modulo, submodulo);
+                combustible.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new CombustibleView { DataContext = combustible };
+
+            case "Nomina.Horarios":
+                var horarios = new HorariosViewModel(modulo, submodulo);
+                horarios.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new HorariosView { DataContext = horarios };
+
+            case "Nomina.Liquidaciones":
+                var liquidaciones = new LiquidacionesViewModel(modulo, submodulo);
+                liquidaciones.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new LiquidacionesView { DataContext = liquidaciones };
+
+            case "Finanzas.CuentasPorCobrar":
+                var cxc = new CuentasPorCobrarViewModel(modulo, submodulo);
+                cxc.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new CuentasPorCobrarView { DataContext = cxc };
+
+            case "Finanzas.CuentasPorPagar":
+                var cxp = new CuentasPorPagarViewModel(modulo, submodulo);
+                cxp.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new CuentasPorPagarView { DataContext = cxp };
+
+            case "Inventario.Producto":
+                var producto = new ProductoViewModel(modulo, submodulo);
+                producto.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new ProductoView { DataContext = producto };
 
             default:
                 var vm = new SubmoduloViewModel(modulo, submodulo);

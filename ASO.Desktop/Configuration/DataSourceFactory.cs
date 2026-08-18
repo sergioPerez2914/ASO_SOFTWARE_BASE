@@ -1,4 +1,4 @@
-using ASO.Desktop.BD;
+﻿using ASO.Desktop.BD;
 using ASO.Desktop.Services;
 
 namespace ASO.Desktop.Configuration;
@@ -12,13 +12,19 @@ namespace ASO.Desktop.Configuration;
 /// </summary>
 public static class DataSourceFactory
 {
+    // Empleados e inventario conmutan Mock/SQL segun el flag, pero tambien se cachean:
+    // varios submodulos comparten estas fuentes y con mocks (sin BD) cada instancia nueva
+    // perderia lo capturado al navegar entre pantallas.
+    private static IEmpleadoDataSource? _empleados;
+    private static IInventoryDataSource? _inventario;
+
     public static IEmpleadoDataSource CrearEmpleados() =>
-        AppConfig.UseMock
+        _empleados ??= AppConfig.UseMock
             ? new MockEmpleadoDataSource()
             : new SqlEmpleadoDataSource();
 
     public static IInventoryDataSource CrearInventario() =>
-        AppConfig.UseMock
+        _inventario ??= AppConfig.UseMock
             ? new MockInventoryDataSource()
             : new SqlInventoryDataSource();
 
@@ -35,6 +41,17 @@ public static class DataSourceFactory
     private static IActivoFlotaDataSource? _activosFlota;
     private static IMantenimientoRegistroDataSource? _mantenimientos;
     private static IReglaMantenimientoDataSource? _reglasMantenimiento;
+    private static ITarifaDataSource? _tarifas;
+    private static ISalidaInventarioDataSource? _salidasInventario;
+    private static IJornadaDataSource? _jornadas;
+    private static ILiquidacionDataSource? _liquidaciones;
+    private static IFacturaClienteDataSource? _facturasCliente;
+    private static IProveedorDataSource? _proveedores;
+    private static IFacturaProveedorDataSource? _facturasProveedor;
+    private static ITanqueCombustibleDataSource? _tanquesCombustible;
+    private static IValeCombustibleDataSource? _valesCombustible;
+    private static IRecargaCombustibleDataSource? _recargasCombustible;
+    private static IConceptoNominaDataSource? _conceptosNomina;
 
     public static IRemesaDataSource CrearRemesas() =>
         _remesas ??= new MockRemesaDataSource();
@@ -63,4 +80,37 @@ public static class DataSourceFactory
 
     public static IReglaMantenimientoDataSource CrearReglasMantenimiento() =>
         _reglasMantenimiento ??= new MockReglaMantenimientoDataSource();
+
+    public static ITarifaDataSource CrearTarifas() =>
+        _tarifas ??= new MockTarifaDataSource();
+
+    public static ISalidaInventarioDataSource CrearSalidasInventario() =>
+        _salidasInventario ??= new MockSalidaInventarioDataSource();
+
+    public static IJornadaDataSource CrearJornadas() =>
+        _jornadas ??= new MockJornadaDataSource();
+
+    public static ILiquidacionDataSource CrearLiquidaciones() =>
+        _liquidaciones ??= new MockLiquidacionDataSource();
+
+    public static IFacturaClienteDataSource CrearFacturasCliente() =>
+        _facturasCliente ??= new MockFacturaClienteDataSource();
+
+    public static IProveedorDataSource CrearProveedores() =>
+        _proveedores ??= new MockProveedorDataSource();
+
+    public static IFacturaProveedorDataSource CrearFacturasProveedor() =>
+        _facturasProveedor ??= new MockFacturaProveedorDataSource();
+
+    public static ITanqueCombustibleDataSource CrearTanquesCombustible() =>
+        _tanquesCombustible ??= new MockTanqueCombustibleDataSource();
+
+    public static IValeCombustibleDataSource CrearValesCombustible() =>
+        _valesCombustible ??= new MockValeCombustibleDataSource();
+
+    public static IRecargaCombustibleDataSource CrearRecargasCombustible() =>
+        _recargasCombustible ??= new MockRecargaCombustibleDataSource();
+
+    public static IConceptoNominaDataSource CrearConceptosNomina() =>
+        _conceptosNomina ??= new MockConceptoNominaDataSource();
 }

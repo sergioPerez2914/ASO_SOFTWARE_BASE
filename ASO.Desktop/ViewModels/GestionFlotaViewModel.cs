@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -40,7 +40,7 @@ public sealed class GestionFlotaViewModel : ViewModelBase
         var mantenimientos = DataSourceFactory.CrearMantenimientos();
         _remesas = DataSourceFactory.CrearRemesas();
 
-        _flota = new FlotaService(activos, _remesas, mantenimientos);
+        _flota = new FlotaService(activos, _remesas, mantenimientos, DataSourceFactory.CrearValesCombustible());
         _mantenimiento = new MantenimientoService(mantenimientos, activos,
             DataSourceFactory.CrearReglasMantenimiento(), DataSourceFactory.CrearEventosOperacion(), _remesas);
         _dialogos = new ServicioDialogo();

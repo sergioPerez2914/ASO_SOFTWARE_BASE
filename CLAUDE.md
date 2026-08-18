@@ -38,13 +38,17 @@ Se eliminaron las pantallas anteriores (inventario, empleados, nómina/tarifas) 
 presentación. Ahora son **cinco módulos con submódulos**; al entrar a un módulo se ve su dashboard
 resumen y se despliega su lista de submódulos en el menú lateral.
 
-| Módulo | Submódulos |
-|---|---|
-| Operaciones | Registro de Operación · Seguimiento |
-| Flota | Gestión de Flota · Mantenimiento · Telemetría |
-| Inventario | Repuestos · Combustible · Producto |
-| Nómina | Liquidaciones · Empleados · Gestión de Horarios |
-| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas |
+| Módulo | Submódulos | Estado |
+|---|---|---|
+| Operaciones | Registro de Operación · Seguimiento | funcionales |
+| Flota | Gestión de Flota · Mantenimiento · **Telemetría** | funcionales, salvo Telemetría (pendiente) |
+| Inventario | Repuestos · Combustible · Producto | funcionales |
+| Nómina | Liquidaciones · Empleados · Gestión de Horarios | funcionales |
+| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas | funcionales |
+
+**Los 13 submódulos están construidos sobre mocks; el único que falta es Flota · Telemetría.**
+Las reglas de Nómina y Finanzas se implementaron con supuestos provisionales (ver más abajo),
+porque el socio todavía no aportó tarifario real ni formatos de liquidación y factura.
 
 - `Navigation/ModuloCatalogo.cs` — **fuente única** de la estructura (clave, nombre, descripción, icono,
   indicadores y submódulos). Sidebar, Inicio, dashboards y enrutado leen de aquí: agregar o renombrar
@@ -53,15 +57,95 @@ resumen y se despliega su lista de submódulos en el menú lateral.
   `NavegacionSolicitada`. `MainWindow.Navegar(modulo, submodulo)` decide la vista y llama a
   `Sincronizar` para reflejar la selección (evita ciclos de navegación).
 - `Views/InicioView` — lanzador con una tarjeta por módulo.
-- `Views/ModuloDashboardView` — resumen del módulo: indicadores (aún en "—", sin datos) + tarjeta por
-  submódulo.
+- `Views/ModuloDashboardView` — resumen del módulo: indicadores + tarjeta por submódulo. Los valores
+  los calcula `ModuloDashboardViewModel.CalcularIndicadores` (un `switch` por clave de módulo); todos
+  los módulos tienen datos reales salvo el "Tiempo muerto" de Operaciones, sin definir.
 - `Views/SubmoduloView` — submódulo en construcción, con ruta `Módulo · Submódulo` y "Volver al módulo".
 - `Styles/Colors.xaml` + `Theme.xaml` — paleta y estilos (CardStyle, CardButtonStyle, NavItemStyle,
   NavSubItemStyle, DataGridStyle). Iconos = Segoe MDL2 Assets.
-- Se conserva la infraestructura reutilizable: framework CRUD (`CrudViewModelBase`,
-  `CrudEditorViewModelBase`, `CrudEditorWindow`, `IServicioDialogo`), login/sesión y la capa de datos
-  (`Models`, `Services`, `BD`, `DataSourceFactory`) — todavía sin pantallas que la usen.
+- Framework CRUD reutilizable (`CrudViewModelBase`, `CrudEditorViewModelBase`, `CrudEditorWindow`,
+  `IServicioDialogo`), login/sesión y capa de datos (`Models`, `Services`, `BD`, `DataSourceFactory`):
+  hoy los usan los 13 submódulos.
 - El estado previo al reset quedó en la rama `respaldo/pre-reset-modulos`.
+
+## Cómo se agrega un submódulo (receta)
+
+Archivos a **crear**: `Models/<X>.cs` (con `Clonar()`, snapshots de texto de los catálogos que cita y
+props `…Texto`; los modelos NO implementan INotifyPropertyChanged) · `Services/I<X>DataSource.cs` +
+`Mock<X>DataSource` · `Services/<X>Service.cs` si es documento (métodos `PuedeX` puros para el
+`CanExecute` + transiciones que revalidan y lanzan `InvalidOperationException` en español) ·
+`ViewModels/<Submodulo>ViewModel.cs` · editores · vistas XAML.
+
+Archivos a **modificar** siempre: `Configuration/DataSourceFactory.cs` (campo cacheado `??=`),
+`MainWindow.CrearVistaSubmodulo` (un `case` por clave), `Styles/EditorTemplates.xaml` (un
+`DataTemplate` por editor, o la ventana sale vacía) y `Styles/Theme.xaml` (un `Chip…Style` por enum
+de estado nuevo).
+
+Arquetipos a copiar: **A** listado CRUD (`RegistroOperacionViewModel` + `RegistroOperacionView`),
+**B** tarjetas/detalle (`GestionFlotaViewModel`), **C** reporte de solo lectura (`ProductoViewModel`),
+y **contenedor de dos padrones** (`EmpleadosViewModel`, `CuentasPorPagarViewModel`).
+
+## Patrones agregados al construir Inventario, Nómina y Finanzas
+
+- **Documento con líneas**: `Liquidacion` y `FacturaCliente` llevan una `List<…Linea>` dentro. Su
+  `Clonar()` hace **copia profunda** de la lista — `MemberwiseClone` la compartiría y editar la copia
+  mutaría lo que está en pantalla.
+- **Tarifa única con ámbito y vigencia** (`Models/Tarifa.cs`): una sola entidad para lo que se cobra
+  al ingenio y lo que se paga por destajo (`AmbitoTarifa`), con `VigenteDesde`/`VigenteHasta`.
+  `TarifaService.ObtenerVigente` es la única puerta de consulta; **los documentos copian el monto**
+  (`TarifaMonto`), nunca guardan solo el Id: una factura reimpresa no puede cambiar de importe.
+- **Facturación sin tocar la máquina de estados de la remesa**: `Remesa.FacturaClienteId` es un campo
+  aparte, no un valor nuevo de `EstadoRemesa`. Sirve de control antifacturación doble y deja
+  "Recibida" como estado terminal de la operación.
+- **Anti-doble-pago en nómina**: `Liquidacion.RemesaIdsIncluidas` registra qué remesas ya se
+  liquidaron; al generar se descartan las que estén en otra liquidación no anulada del mismo sujeto.
+- **Costo de taller derivado, no capturado**: al confirmar una salida de inventario,
+  `InventarioService` recalcula `MantenimientoRegistro.CostoRepuestos` sumando sus salidas
+  confirmadas (resuelve el TODO del modelo). El registro de mantenimiento sigue siendo inmutable
+  desde la UI.
+- **El vale de combustible es la fuente principal de lecturas**: al confirmarlo se descuenta la
+  cisterna, se calcula el consumo del período y se adelanta el horómetro/odómetro del activo.
+  Anularlo repone los litros pero **no** revierte la lectura (el instrumento marca lo que marca).
+  `FlotaService` recibe los vales por constructor opcional y los suma al historial de uso.
+- **Registros de solo inserción**: las jornadas de trabajo no se editan ni se borran (`HorarioService`);
+  de esas horas sale un pago, y el criterio favorece la futura sincronización offline.
+- **Dos padrones de personal sin unificar**: `Empleado` (nómina/taller, entidad EF) y `PersonalCampo`
+  (quien firma la remesa, con núcleo C.O.D). Nómina · Empleados los administra por separado en una
+  vista conmutable.
+- **`MotivoEditorViewModel`**: editor genérico de "decir por qué"; lo reutilizan todas las anulaciones
+  nuevas (salida, vale, liquidación, factura de cliente y de proveedor).
+- **Umbral configurable** (`appsettings.json` → `Combustible:UmbralAlertaConsumo`, 0.25 = 25 %):
+  cuánto puede superar un vale al promedio histórico del activo antes de marcarse con alerta.
+
+## Aviso al socio (base de datos)
+
+- `InventoryItem.StockActual` y `StockMinimo` pasaron de `int` a **`decimal(18,2)`** (hay artículos por
+  metro, kilo y litro). La tabla `Inventarios` necesita un `ALTER COLUMN`; ya está reflejado en
+  `BD/DbContext.cs`.
+- Entidades nuevas pendientes de persistir: `Tarifa`, `SalidaInventario`, `TanqueCombustible`,
+  `ValeCombustible`, `RecargaCombustible`, `JornadaTrabajo`, `Liquidacion` (+ `LiquidacionLinea`),
+  `ConceptoNomina`, `FacturaCliente` (+ `FacturaClienteLinea`), `Proveedor`, `FacturaProveedor`, y el
+  campo `Remesa.FacturaClienteId`.
+- Todas las fuentes se registran en `Configuration/DataSourceFactory.cs`: ahí es donde el socio
+  enchufa las implementaciones EF sin tocar ViewModels ni vistas.
+
+## Decisiones PROVISIONALES pendientes del socio
+
+Están marcadas en el código con el comentario `// PROVISIONAL:` (búsqueda: `grep -rn "PROVISIONAL"`).
+Lo que hace falta para cerrarlas:
+
+1. **Tarifario real** (lo que paga el ingenio por tonelada y lo que se paga a cada núcleo). Los montos
+   de `MockTarifaDataSource` son inventados.
+2. **Formatos en papel**: vale de combustible, salida de almacén, recarga de cisterna.
+3. **Ejemplo de una liquidación ya hecha** y **de una factura al ingenio**, para validar líneas,
+   períodos y desglose.
+4. **Cuadro de turnos** real (hoy solo Diurno/Nocturno) y qué cuenta como "tiempo muerto".
+5. Si el chofer lleva núcleo (C.O.D) y si una persona puede estar en los dos padrones.
+6. Qué pasa con las remesas confirmadas **sin pesaje**: hoy no aportan toneladas y no se liquidan.
+7. Cliente único vs. maestro de clientes, plazo de crédito real, y el tratamiento de notas de crédito
+   y reverso de cobros.
+8. Medición de la cisterna (contómetro vs. aforo) y de dónde saldría el kilometraje para la unidad
+   `Kilometro` de las tarifas.
 
 ## El plan (SIGZ / ASO) — fases
 
@@ -103,6 +187,15 @@ con `CanExecute = sesion.Puede("...")`; secciones del sidebar filtradas por rol.
 
 ## Próximo paso sugerido
 
-Con el shell ya reestructurado, el primer submódulo real sería **Operaciones · Registro de Operación**
-(el ticket de pesaje): mock + interfaz + estados + `ISesionActual` + comandos con `CanExecute`, para
-dejar la plantilla "documento de movimiento" que luego replican combustible e inventario.
+1. **Flota · Telemetría**, el único submódulo sin construir. Es también lo que permitiría desglosar el
+   L/ton por máquina y frente, hoy calculado solo de forma global.
+2. **Matriz RBAC real**: `SesionActual.Puede()` sigue devolviendo `true` para cualquier usuario
+   autenticado. Todos los comandos ya piden su permiso (`Inventario.ConfirmarSalida`,
+   `Finanzas.Facturar`, `Nomina.Cerrar`…), así que conectar la matriz no obliga a tocar ViewModels;
+   sin ella, la segregación de funciones que exige el diseño de autorización no es efectiva.
+3. **Conexión a base de datos** con el socio (ver "Aviso al socio" más arriba) y resolución de las
+   decisiones provisionales.
+
+Permisos ya en uso, por si sirven de base a la matriz: `Remesas.*`, `Flota.*`, `Mantenimiento.*`,
+`Seguimiento.AgregarNota`, `Inventario.*` (incluye `OverrideStock`), `Combustible.*`, `Empleados.*`,
+`Horarios.*`, `Nomina.*`, `Finanzas.*`, `Tarifas.*`.
