@@ -1,0 +1,225 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
+using ASO.Desktop.Configuration;
+using ASO.Desktop.Models;
+using ASO.Desktop.Navigation;
+using ASO.Desktop.Services;
+
+namespace ASO.Desktop.ViewModels;
+
+/// <summary>
+/// Inventario · Combustible: los vales despachados y el estado de las cisternas.
+///
+/// Las reglas viven en <see cref="CombustibleService"/>; aquí solo se pide la acción y se
+/// refleja el resultado. Tras cada transición se recargan las cisternas porque su existencia
+/// cambió: la tarjeta de arriba y la grilla miran el mismo hecho desde dos ángulos.
+/// </summary>
+public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, int>
+{
+    private const string FiltroTodos = "Todos";
+
+    private readonly IValeCombustibleDataSource _vales;
+    private readonly ITanqueCombustibleDataSource _tanques;
+    private readonly IServicioDialogo _dialogos;
+    private readonly ISesionActual _sesionActual;
+    private readonly CombustibleService _servicio;
+
+    private string _filtroEstado = FiltroTodos;
+
+    public event EventHandler? VolverSolicitado;
+
+    public CombustibleViewModel(Modulo modulo, Submodulo submodulo)
+        : this(modulo, submodulo, DataSourceFactory.CrearValesCombustible(), new ServicioDialogo(), SesionActual.Instancia)
+    {
+    }
+
+    private CombustibleViewModel(Modulo modulo,
+                                 Submodulo submodulo,
+                                 IValeCombustibleDataSource vales,
+                                 IServicioDialogo dialogos,
+                                 ISesionActual sesion)
+        : base(vales, dialogos, sesion)
+    {
+        Modulo = modulo;
+        Submodulo = submodulo;
+
+        _vales = vales;
+        _dialogos = dialogos;
+        _sesionActual = sesion;
+        _tanques = DataSourceFactory.CrearTanquesCombustible();
+
+        _servicio = new CombustibleService(
+            vales, _tanques, DataSourceFactory.CrearRecargasCombustible(), DataSourceFactory.CrearActivosFlota());
+
+        Tanques = new ObservableCollection<TanqueCombustible>(_tanques.GetAll());
+
+        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
+
+        CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
+        {
+            _filtroEstado = filtro;
+            ItemsView.Refresh();
+        });
+
+        ConfirmarCommand = new RelayCommand(Confirmar,
+            () => SelectedItem is { } v && _servicio.PuedeConfirmar(v) && _sesionActual.Puede("Combustible.Confirmar"));
+
+        AnularCommand = new RelayCommand(Anular,
+            () => SelectedItem is { } v && _servicio.PuedeAnular(v) && _sesionActual.Puede("Combustible.Anular"));
+
+        RegistrarRecargaCommand = new RelayCommand(RegistrarRecarga,
+            () => _sesionActual.Puede("Combustible.Recargar"));
+    }
+
+    // --- Encabezado de la pantalla ---
+    public Modulo Modulo { get; }
+    public Submodulo Submodulo { get; }
+    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
+
+    public ICommand VolverCommand { get; }
+    public ICommand CambiarFiltroEstadoCommand { get; }
+    public ICommand ConfirmarCommand { get; }
+    public ICommand AnularCommand { get; }
+    public ICommand RegistrarRecargaCommand { get; }
+
+    public ObservableCollection<TanqueCombustible> Tanques { get; }
+
+    /// <summary>
+    /// Rendimiento del centro en la última semana: litros despachados por tonelada recibida.
+    /// Es el número que el reglamento vuelve comparable entre zafras.
+    /// </summary>
+    public string RendimientoTexto
+    {
+        get
+        {
+            var litrosPorTonelada = _servicio.LitrosPorTonelada(DataSourceFactory.CrearRemesas());
+            return litrosPorTonelada is { } valor
+                ? $"Rendimiento (7 días): {valor:N2} L/t"
+                : "Rendimiento (7 días): sin caña recibida en el período";
+        }
+    }
+
+    // --- Puntos de extensión del CRUD ---
+
+    protected override string ModuloPermiso => "Combustible";
+
+    protected override bool CoincideBusqueda(ValeCombustible item, string texto) =>
+        item.ActivoCodigo.Contains(texto, StringComparison.OrdinalIgnoreCase)
+        || item.ActivoEtiqueta.Contains(texto, StringComparison.OrdinalIgnoreCase)
+        || item.TanqueNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
+        || item.ResponsableNombre.Contains(texto, StringComparison.OrdinalIgnoreCase);
+
+    protected override bool PasaFiltroExtra(ValeCombustible item) => _filtroEstado switch
+    {
+        "Borrador" => item.Estado == EstadoVale.Borrador,
+        "Confirmado" => item.Estado == EstadoVale.Confirmado,
+        "Anulado" => item.Estado == EstadoVale.Anulado,
+        "Alerta" => item.AlertaConsumo,
+        _ => true
+    };
+
+    protected override bool PuedeEditar(ValeCombustible item) => _servicio.PuedeEditar(item);
+
+    protected override bool PuedeEliminar(ValeCombustible item) => _servicio.PuedeEliminar(item);
+
+    protected override ValeCombustible CrearNuevo() => new()
+    {
+        Fecha = DateTime.Today,
+        Estado = EstadoVale.Borrador,
+        CreadoPorId = _sesionActual.UsuarioActual?.Id ?? 0,
+        FechaCreacion = DateTime.Now
+    };
+
+    protected override CrudEditorViewModelBase<ValeCombustible> CrearEditor(ValeCombustible item) =>
+        new ValeCombustibleEditorViewModel(item, _tanques, DataSourceFactory.CrearActivosFlota());
+
+    // --- Transiciones ---
+
+    private void Confirmar()
+    {
+        if (SelectedItem is not { } vale)
+            return;
+
+        Aplicar(vale, () => _servicio.Confirmar(vale));
+    }
+
+    private void Anular()
+    {
+        if (SelectedItem is not { } vale)
+            return;
+
+        var editor = new MotivoEditorViewModel(
+            $"Anular vale Nº {vale.Id}",
+            $"{vale.ActivoEtiqueta} — {vale.LitrosTexto} desde {vale.TanqueNombre}",
+            "Motivo de la anulación",
+            "Indique el motivo de la anulación.");
+
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        Aplicar(vale, () => _servicio.Anular(vale, editor.Motivo));
+    }
+
+    private void RegistrarRecarga()
+    {
+        var editor = new RecargaEditorViewModel(_tanques);
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        try
+        {
+            _servicio.RegistrarRecarga(editor.ObtenerRecarga(_sesionActual.UsuarioActual?.Id ?? 0));
+        }
+        catch (InvalidOperationException ex)
+        {
+            _dialogos.Informar("No se pudo registrar la recarga", ex.Message);
+        }
+        finally
+        {
+            RefrescarTanques();
+        }
+    }
+
+    /// <summary>
+    /// Ejecuta una transición y refleja el resultado. Si el servicio la rechaza se informa en
+    /// vez de tragarse el error: el botón habilitado es cortesía, la regla la impone el servicio.
+    /// </summary>
+    private void Aplicar(ValeCombustible original, Func<ValeCombustible> transicion)
+    {
+        try
+        {
+            var actualizado = transicion();
+
+            var indice = Items.IndexOf(original);
+            if (indice >= 0)
+                Items[indice] = actualizado;
+
+            SelectedItem = actualizado;
+            ItemsView.Refresh();
+
+            if (actualizado.AlertaConsumo)
+                _dialogos.Informar("Consumo por encima de lo habitual",
+                    $"El vale Nº {actualizado.Id} marca {actualizado.ConsumoTexto} frente a un promedio de " +
+                    $"{actualizado.PromedioTexto} en {actualizado.ActivoEtiqueta}. Conviene revisar la unidad.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _dialogos.Informar("No se pudo completar la operación", ex.Message);
+        }
+        finally
+        {
+            RefrescarTanques();
+        }
+    }
+
+    private void RefrescarTanques()
+    {
+        Tanques.Clear();
+        foreach (var tanque in _tanques.GetAll())
+            Tanques.Add(tanque);
+
+        OnPropertyChanged(nameof(RendimientoTexto));
+    }
+}

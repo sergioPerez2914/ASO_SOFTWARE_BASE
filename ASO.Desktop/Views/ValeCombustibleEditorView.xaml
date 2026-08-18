@@ -1,0 +1,69 @@
+<UserControl x:Class="ASO.Desktop.Views.ValeCombustibleEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="480">
+
+  <StackPanel>
+    <TextBlock Text="Cisterna de origen" Style="{StaticResource FormLabelStyle}" />
+    <ComboBox Style="{StaticResource FormComboBoxStyle}"
+              ItemsSource="{Binding Tanques}"
+              DisplayMemberPath="Nombre"
+              SelectedItem="{Binding TanqueSeleccionado}" />
+    <TextBlock Text="{Binding ExistenciaTexto}" FontSize="11" TextWrapping="Wrap"
+               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+
+    <TextBlock Text="Activo que recibe el combustible" Style="{StaticResource FormLabelStyle}" />
+    <ComboBox Style="{StaticResource FormComboBoxStyle}"
+              ItemsSource="{Binding Activos}"
+              DisplayMemberPath="Etiqueta"
+              SelectedItem="{Binding ActivoSeleccionado}" />
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="Litros" Style="{StaticResource FormLabelStyle}" />
+        <TextBox Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding Litros, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <TextBlock Text="{Binding EtiquetaLectura}" Style="{StaticResource FormLabelStyle}" />
+        <TextBox Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding Lectura, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="4">
+        <TextBlock Text="Fecha" Style="{StaticResource FormLabelStyle}" />
+        <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                    SelectedDate="{Binding Fecha}" />
+      </StackPanel>
+    </Grid>
+
+    <TextBlock Text="{Binding AyudaLectura}" FontSize="11" TextWrapping="Wrap"
+               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+
+    <TextBlock Text="Responsable del despacho" Style="{StaticResource FormLabelStyle}" />
+    <TextBox Style="{StaticResource FormTextBoxStyle}"
+             Text="{Binding ResponsableNombre, UpdateSourceTrigger=PropertyChanged}" />
+
+    <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" />
+    <TextBox Style="{StaticResource FormTextBoxStyle}"
+             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+             VerticalContentAlignment="Top"
+             Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+
+    <TextBlock Text="Al confirmar el vale se descuenta la cisterna, se calcula el consumo del período y se actualiza la lectura del activo."
+               FontSize="11" TextWrapping="Wrap"
+               Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,0" />
+  </StackPanel>
+</UserControl>

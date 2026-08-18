@@ -1,0 +1,203 @@
+<UserControl x:Class="ASO.Desktop.Views.CombustibleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="640" d:DesignWidth="1100">
+
+  <UserControl.Resources>
+    <!-- Botón secundario de la barra de herramientas -->
+    <Style x:Key="BarraBotonStyle" TargetType="Button">
+      <Setter Property="Padding" Value="12,6" />
+      <Setter Property="Margin" Value="8,0,0,0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Encabezado con la ruta módulo · submódulo -->
+    <Grid Grid.Row="0" Margin="0,0,0,16">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="{Binding Ruta}" FontSize="12"
+                   Foreground="{StaticResource TextMutedBrush}" />
+        <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
+                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+        <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
+                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+      </StackPanel>
+
+      <Button Grid.Column="1" Content="Volver al módulo" VerticalAlignment="Top"
+              Padding="12,6" Cursor="Hand" Background="Transparent"
+              BorderBrush="{StaticResource BorderBrush}"
+              Foreground="{StaticResource TextPrimaryBrush}"
+              Command="{Binding VolverCommand}" />
+    </Grid>
+
+    <!-- Estado de las cisternas: lo primero que se mira antes de despachar -->
+    <ItemsControl Grid.Row="1" ItemsSource="{Binding Tanques}" Margin="0,0,0,12">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Border Style="{StaticResource CardStyle}" Width="280" Margin="0,0,12,0">
+            <StackPanel>
+              <TextBlock Text="{Binding Nombre}" FontSize="13" FontWeight="SemiBold"
+                         Foreground="{StaticResource TextPrimaryBrush}" />
+              <TextBlock Text="{Binding ExistenciaTexto}" FontSize="20" FontWeight="Bold"
+                         Foreground="{StaticResource PrimaryBrush}" Margin="0,4,0,0" />
+              <ProgressBar Height="6" Margin="0,8,0,0" Minimum="0" Maximum="100"
+                           Value="{Binding PorcentajeLleno, Mode=OneWay}"
+                           Background="{StaticResource BorderBrush}"
+                           Foreground="{StaticResource AccentBlueBrush}"
+                           BorderThickness="0" />
+              <TextBlock Text="{Binding PorcentajeTexto}" FontSize="11" Margin="0,4,0,0"
+                         Foreground="{StaticResource TextMutedBrush}" />
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
+    <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+          <TextBox Width="240" VerticalAlignment="Center"
+                   Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Buscar por activo, cisterna o responsable" />
+          <TextBlock Text="{Binding RendimientoTexto}" FontSize="12" Margin="16,0,0,0"
+                     VerticalAlignment="Center"
+                     Foreground="{StaticResource TextSecondaryBrush}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
+                    HorizontalAlignment="Right" VerticalAlignment="Center">
+          <RadioButton Content="Todos" GroupName="FiltroVale" IsChecked="True"
+                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todos" />
+          <RadioButton Content="Borrador" GroupName="FiltroVale"
+                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
+          <RadioButton Content="Confirmado" GroupName="FiltroVale"
+                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmado" />
+          <RadioButton Content="Anulado" GroupName="FiltroVale"
+                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulado" />
+          <RadioButton Content="Con alerta" GroupName="FiltroVale"
+                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Alerta" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,12,0,0">
+          <Button Content="Nuevo vale" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
+                  Background="{StaticResource PrimaryBrush}" Foreground="White"
+                  Command="{Binding AgregarCommand}" />
+          <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
+                  Command="{Binding EditarCommand}" />
+          <Button Content="Confirmar" Style="{StaticResource BarraBotonStyle}"
+                  Command="{Binding ConfirmarCommand}" />
+          <Button Content="Anular" Style="{StaticResource BarraBotonStyle}"
+                  Command="{Binding AnularCommand}" />
+          <Button Content="Registrar recarga" Style="{StaticResource BarraBotonStyle}"
+                  Command="{Binding RegistrarRecargaCommand}" />
+          <Button Content="Eliminar" Style="{StaticResource BarraBotonStyle}"
+                  Command="{Binding EliminarCommand}" />
+          <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
+                  Command="{Binding RefrescarCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Grid.Row="3" Style="{StaticResource CardStyle}">
+      <DataGrid Style="{StaticResource DataGridStyle}"
+                ItemsSource="{Binding ItemsView}"
+                SelectedItem="{Binding SelectedItem}">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
+          <DataGridTextColumn Header="Fecha" Width="100"
+                              Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" />
+          <DataGridTextColumn Header="Activo" Binding="{Binding ActivoEtiqueta}" Width="200" />
+          <DataGridTextColumn Header="Cisterna" Binding="{Binding TanqueNombre}" Width="150" />
+          <DataGridTextColumn Header="Litros" Binding="{Binding LitrosTexto}" Width="90">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Right" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+          <DataGridTextColumn Header="Lectura" Binding="{Binding LecturaTexto}" Width="100">
+            <DataGridTextColumn.ElementStyle>
+              <Style TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Right" />
+              </Style>
+            </DataGridTextColumn.ElementStyle>
+          </DataGridTextColumn>
+          <DataGridTemplateColumn Header="Consumo" Width="*">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{Binding ConsumoTexto}" FontSize="12"
+                             Foreground="{StaticResource TextPrimaryBrush}" />
+                  <TextBlock Text="Consumo alto" FontSize="11" Margin="8,0,0,0" FontWeight="SemiBold"
+                             Foreground="{StaticResource WarningBrush}" Visibility="Collapsed">
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding AlertaConsumo}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
+                </StackPanel>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTemplateColumn Header="Estado" Width="110">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <Border Style="{StaticResource ChipEstadoValeStyle}">
+                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" Foreground="White" />
+                </Border>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+  </Grid>
+</UserControl>
