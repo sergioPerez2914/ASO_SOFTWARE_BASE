@@ -82,9 +82,44 @@ public class MockRemesaDataSource : IRemesaDataSource
             FechaConfirmacion = Hoy.AddDays(-3).AddHours(8).AddMinutes(5),
             FechaAnulacion = Hoy.AddDays(-3).AddHours(8).AddMinutes(30)
         },
+        // Recibidas recientes: son las que quedan disponibles para facturar al ingenio.
+        new()
+        {
+            Id = 5,
+            FincaId = 2, FincaCodigoCam = "F-0245", FincaNombre = "Santa Rita",
+            LoteNombre = "Lote 2", TablonNombre = "Tablón C", TipoCosecha = TipoCosecha.Mecanizada,
+            OperadorId = 2, OperadorNombre = "Rafael Colmenares", OperadorNucleoCodigo = "N-14",
+            TractoristaId = 5, TractoristaNombre = "José Graterol", TractoristaNucleoCodigo = "N-14",
+            ChoferId = 9, ChoferNombre = "Alexis Camacho",
+            VehiculoId = 2, VehiculoPlaca = "A45DE6F",
+            RemeseroId = 11, RemeseroNombre = "Yelitza Ramírez",
+            NucleoCorteCodigo = "N-14", NucleoAlzaEmpujeCodigo = "N-14", NucleoTransporteCodigo = "N-05",
+            InicioCarga = Hoy.AddDays(-4).AddHours(7), FinCarga = Hoy.AddDays(-4).AddHours(9).AddMinutes(20),
+            LlegadaCentral = Hoy.AddDays(-4).AddHours(11),
+            PesoBrutoT = 30.80m, TaraT = 13.60m,
+            Estado = EstadoRemesa.Recibida, CreadoPorId = 2, FechaCreacion = Hoy.AddDays(-4).AddHours(7),
+            FechaConfirmacion = Hoy.AddDays(-4).AddHours(9).AddMinutes(30)
+        },
+        new()
+        {
+            Id = 6,
+            FincaId = 1, FincaCodigoCam = "F-0112", FincaNombre = "La Esperanza",
+            LoteNombre = "Lote 1", TablonNombre = "Tablón B", TipoCosecha = TipoCosecha.Manual,
+            OperadorId = 1, OperadorNombre = "Juan Pérez", OperadorNucleoCodigo = "N-05",
+            TractoristaId = 4, TractoristaNombre = "Pedro Escalona", TractoristaNucleoCodigo = "N-05",
+            ChoferId = 8, ChoferNombre = "Douglas Piña",
+            VehiculoId = 1, VehiculoPlaca = "A12BC3D",
+            RemeseroId = 10, RemeseroNombre = "Ana Torres",
+            NucleoCorteCodigo = "N-05", NucleoAlzaEmpujeCodigo = "N-05", NucleoTransporteCodigo = "N-05",
+            InicioCarga = Hoy.AddDays(-2).AddHours(6).AddMinutes(30), FinCarga = Hoy.AddDays(-2).AddHours(8).AddMinutes(45),
+            LlegadaCentral = Hoy.AddDays(-2).AddHours(10).AddMinutes(15),
+            PesoBrutoT = 28.90m, TaraT = 13.20m,
+            Estado = EstadoRemesa.Recibida, CreadoPorId = 2, FechaCreacion = Hoy.AddDays(-2).AddHours(6),
+            FechaConfirmacion = Hoy.AddDays(-2).AddHours(9)
+        },
     };
 
-    private int _siguienteId = 5;
+    private int _siguienteId = 7;
 
     public IEnumerable<Remesa> GetAll() => _remesas;
 

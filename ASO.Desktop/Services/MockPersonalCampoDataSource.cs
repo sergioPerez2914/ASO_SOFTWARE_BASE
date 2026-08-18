@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ASO.Desktop.Models;
 
@@ -26,7 +26,7 @@ public class MockPersonalCampoDataSource : IPersonalCampoDataSource
 
         new() { Id = 10, Nombre = "Ana Torres",         Cedula = "34567890", Rol = RolCampo.Remesero,    NucleoCodigo = "N-05" },
         new() { Id = 11, Nombre = "Yelitza Ramírez",    Cedula = "35678901", Rol = RolCampo.Remesero,    NucleoCodigo = "N-14" },
-        new() { Id = 12, Nombre = "Carlos Aguilar",     Cedula = "36789012", Rol = RolCampo.Remesero,    NucleoCodigo = "N-21" },
+        new() { Id = 12, Nombre = "Carlos Aguilar",     Cedula = "36789012", Rol = RolCampo.Remesero,    NucleoCodigo = "N-21", Activo = false },
     };
 
     private int _siguienteId = 13;

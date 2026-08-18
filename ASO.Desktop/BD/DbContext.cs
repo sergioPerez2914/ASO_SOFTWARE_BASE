@@ -47,8 +47,11 @@ public class AsoDbContext : DbContext
             entity.Property(i => i.Categoria).IsRequired().HasMaxLength(100);
             entity.Property(i => i.Unidad).IsRequired().HasMaxLength(20);
             entity.Property(i => i.Ubicacion).IsRequired().HasMaxLength(50);
-            entity.Property(i => i.StockActual).IsRequired();
-            entity.Property(i => i.StockMinimo).IsRequired();
+            // TODO socio BD: StockActual/StockMinimo pasaron de int a decimal para admitir
+            // artículos por metro, kilo o litro. La tabla existente necesita un
+            // ALTER COLUMN ... decimal(18,2) antes de usar esta configuración contra SQL.
+            entity.Property(i => i.StockActual).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(i => i.StockMinimo).HasColumnType("decimal(18,2)").IsRequired();
 
             // Especificamos precisión decimal para dinero (18 enteros, 2 decimales)
             entity.Property(i => i.CostoUnitario).HasColumnType("decimal(18,2)").IsRequired();
@@ -58,6 +61,7 @@ public class AsoDbContext : DbContext
             entity.Ignore(i => i.ValorTotal);
             entity.Ignore(i => i.Estado);
             entity.Ignore(i => i.EstadoTexto);
+            entity.Ignore(i => i.StockTexto);
         });
 
     }

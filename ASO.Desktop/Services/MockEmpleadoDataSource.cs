@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ASO.Desktop.Models;
 
@@ -16,9 +16,12 @@ public class MockEmpleadoDataSource : IEmpleadoDataSource
         new() { Id = 2, Nombre = "María Gómez",    Cedula = "23456789", Cargo = "Chofer de transporte",    Activo = true },
         new() { Id = 3, Nombre = "Carlos Rodríguez", Cedula = "34567890", Cargo = "Mecánico de taller",    Activo = true },
         new() { Id = 4, Nombre = "Ana Torres",     Cedula = "45678901", Cargo = "Encargada de inventario", Activo = false },
+        new() { Id = 5, Nombre = "Luis Bastidas",  Cedula = "56789012", Cargo = "Almacenista",             Activo = true },
+        new() { Id = 6, Nombre = "Yaneth Salas",   Cedula = "67890123", Cargo = "Administradora",          Activo = true },
+        new() { Id = 7, Nombre = "Ramón Piñero",   Cedula = "78901234", Cargo = "Mecánico de taller",      Activo = true },
     };
 
-    private int _siguienteId = 5;
+    private int _siguienteId = 8;
 
     public IEnumerable<Empleado> GetAll() => _empleados;
 

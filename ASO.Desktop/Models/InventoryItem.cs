@@ -26,8 +26,12 @@ public class InventoryItem : IEntidad<string>
     public string Categoria { get; set; } = string.Empty;
     public string Unidad { get; set; } = string.Empty;
     public string Ubicacion { get; set; } = string.Empty;
-    public int StockActual { get; set; }
-    public int StockMinimo { get; set; }
+    /// <summary>
+    /// Existencia actual. Es <c>decimal</c> y no <c>int</c> porque hay artículos que se
+    /// almacenan por metro, kilo o litro (mangueras, lubricantes) y admiten fracciones.
+    /// </summary>
+    public decimal StockActual { get; set; }
+    public decimal StockMinimo { get; set; }
     public decimal CostoUnitario { get; set; }
 
     public decimal ValorTotal => StockActual * CostoUnitario;
@@ -43,4 +47,9 @@ public class InventoryItem : IEntidad<string>
         StockStatus.Bajo => "Stock bajo",
         _ => "Disponible"
     };
+
+    public string StockTexto => $"{StockActual:N2} {Unidad}";
+
+    /// <summary>Copia superficial (solo hay tipos de valor y cadenas) para no mutar el original en la lista.</summary>
+    public InventoryItem Clonar() => (InventoryItem)MemberwiseClone();
 }

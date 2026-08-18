@@ -90,6 +90,17 @@ public class Remesa : IEntidad<int>
     public DateTime FechaCreacion { get; set; }
     // TODO: ZafraId cuando exista el maestro de zafras; todo se filtra por la zafra activa.
 
+    /// <summary>
+    /// Factura de Cuentas por Cobrar que incluyó esta remesa. Va en un campo aparte y no como
+    /// un valor más de <see cref="Estado"/> a propósito: "Recibida" sigue siendo el estado
+    /// terminal de la operación, y facturar es un hecho de Finanzas que no debe alterar la
+    /// máquina de estados del documento de campo. Además, así la bandera sirve de control
+    /// antifacturación doble: si tiene factura, no vuelve a ofrecerse para facturar.
+    /// </summary>
+    public int? FacturaClienteId { get; set; }
+
+    public bool Facturada => FacturaClienteId is not null;
+
     public string EstadoTexto => Estado switch
     {
         EstadoRemesa.Borrador => "Borrador",
@@ -101,6 +112,8 @@ public class Remesa : IEntidad<int>
     public string TipoCosechaTexto => TipoCosecha == TipoCosecha.Manual ? "Manual" : "Mecanizada";
 
     public string UbicacionTexto => $"{LoteNombre} · {TablonNombre}";
+
+    public string FacturadaTexto => FacturaClienteId is { } id ? $"FC-{id:D4}" : "No facturada";
 
     /// <summary>Copia superficial (solo hay tipos de valor y cadenas) para no mutar el original en la lista.</summary>
     public Remesa Clonar() => (Remesa)MemberwiseClone();

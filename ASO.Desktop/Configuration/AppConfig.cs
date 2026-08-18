@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Globalization;
 using Microsoft.Extensions.Configuration;
 
 namespace ASO.Desktop.Configuration;
@@ -34,4 +35,15 @@ public static class AppConfig
     /// </summary>
     public static bool UseMock =>
         bool.TryParse(_config["UseMock"], out var valor) && valor;
+
+    /// <summary>
+    /// Cuanto puede superar un vale al promedio historico del activo antes de marcarse como
+    /// consumo anomalo, en fraccion (0,25 = 25 %). Clave "Combustible:UmbralAlertaConsumo".
+    /// Es configurable a proposito: el umbral util depende de la maquina y de la zafra.
+    /// </summary>
+    public static decimal UmbralAlertaConsumo =>
+        decimal.TryParse(_config["Combustible:UmbralAlertaConsumo"],
+                         NumberStyles.Any, CultureInfo.InvariantCulture, out var umbral) && umbral >= 0
+            ? umbral
+            : 0.25m;
 }
