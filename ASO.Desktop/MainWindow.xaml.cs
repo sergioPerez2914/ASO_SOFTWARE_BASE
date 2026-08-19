@@ -89,6 +89,11 @@ public partial class MainWindow : Window
                 seguimiento.VolverSolicitado += (_, _) => Navegar(modulo, null);
                 return new SeguimientoView { DataContext = seguimiento };
 
+            case "Operaciones.FincasNucleos":
+                var fincasNucleos = new FincasYNucleosViewModel(modulo, submodulo);
+                fincasNucleos.VolverSolicitado += (_, _) => Navegar(modulo, null);
+                return new FincasYNucleosView { DataContext = fincasNucleos };
+
             case "Flota.Gestion":
                 var gestion = new GestionFlotaViewModel(modulo, submodulo);
                 gestion.VolverSolicitado += (_, _) => Navegar(modulo, null);

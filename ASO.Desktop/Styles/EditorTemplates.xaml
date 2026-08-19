@@ -92,4 +92,12 @@
     <views:ProveedorEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:FincaEditorViewModel}">
+    <views:FincaEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:NucleoEditorViewModel}">
+    <views:NucleoEditorView />
+  </DataTemplate>
+
 </ResourceDictionary>

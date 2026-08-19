@@ -41,7 +41,9 @@ public static class ModuloCatalogo
                 new Submodulo("Operaciones.Registro", "Registro de Operación",
                     "Remesas de caña: finca, núcleos, carga y pesaje en el central.", ""),
                 new Submodulo("Operaciones.Seguimiento", "Seguimiento",
-                    "Estado y avance de las operaciones en curso.", "")
+                    "Estado y avance de las operaciones en curso.", ""),
+                new Submodulo("Operaciones.FincasNucleos", "Fincas y Núcleos",
+                    "Catálogo de fincas, lotes/tablones y núcleos de productores.", "")
             ]),
 
         new Modulo(
