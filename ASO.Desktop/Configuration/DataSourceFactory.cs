@@ -31,7 +31,6 @@ public static class DataSourceFactory
     // Las fuentes de abajo se cachean: los mocks guardan su estado en memoria y cada
     // navegación crea un ViewModel nuevo, así que devolver una instancia distinta cada vez
     // haría perder lo capturado al salir y volver a entrar al submodulo.
-    // TODO socio BD: agregar aqui las implementaciones EF (EfRemesaDataSource, etc.).
     private static IRemesaDataSource? _remesas;
     private static IFincaDataSource? _fincas;
     private static INucleoDataSource? _nucleos;
@@ -54,63 +53,63 @@ public static class DataSourceFactory
     private static IConceptoNominaDataSource? _conceptosNomina;
 
     public static IRemesaDataSource CrearRemesas() =>
-        _remesas ??= new MockRemesaDataSource();
+        _remesas ??= AppConfig.UseMock ? new MockRemesaDataSource() : new SqlRemesaDataSource();
 
     public static IFincaDataSource CrearFincas() =>
-        _fincas ??= new MockFincaDataSource();
+        _fincas ??= AppConfig.UseMock ? new MockFincaDataSource() : new SqlFincaDataSource();
 
     public static INucleoDataSource CrearNucleos() =>
-        _nucleos ??= new MockNucleoDataSource();
+        _nucleos ??= AppConfig.UseMock ? new MockNucleoDataSource() : new SqlNucleoDataSource();
 
     public static IPersonalCampoDataSource CrearPersonalCampo() =>
-        _personalCampo ??= new MockPersonalCampoDataSource();
+        _personalCampo ??= AppConfig.UseMock ? new MockPersonalCampoDataSource() : new SqlPersonalCampoDataSource();
 
     // Los vehículos del combo de remesas son una proyección del catálogo único de flota.
     public static IVehiculoDataSource CrearVehiculos() =>
         _vehiculos ??= new VehiculoDataSourceAdapter(CrearActivosFlota());
 
     public static IEventoOperacionDataSource CrearEventosOperacion() =>
-        _eventosOperacion ??= new MockEventoOperacionDataSource();
+        _eventosOperacion ??= AppConfig.UseMock ? new MockEventoOperacionDataSource() : new SqlEventoOperacionDataSource();
 
     public static IActivoFlotaDataSource CrearActivosFlota() =>
-        _activosFlota ??= new MockActivoFlotaDataSource();
+        _activosFlota ??= AppConfig.UseMock ? new MockActivoFlotaDataSource() : new SqlActivoFlotaDataSource();
 
     public static IMantenimientoRegistroDataSource CrearMantenimientos() =>
-        _mantenimientos ??= new MockMantenimientoRegistroDataSource();
+        _mantenimientos ??= AppConfig.UseMock ? new MockMantenimientoRegistroDataSource() : new SqlMantenimientoRegistroDataSource();
 
     public static IReglaMantenimientoDataSource CrearReglasMantenimiento() =>
-        _reglasMantenimiento ??= new MockReglaMantenimientoDataSource();
+        _reglasMantenimiento ??= AppConfig.UseMock ? new MockReglaMantenimientoDataSource() : new SqlReglaMantenimientoDataSource();
 
     public static ITarifaDataSource CrearTarifas() =>
-        _tarifas ??= new MockTarifaDataSource();
+        _tarifas ??= AppConfig.UseMock ? new MockTarifaDataSource() : new SqlTarifaDataSource();
 
     public static ISalidaInventarioDataSource CrearSalidasInventario() =>
-        _salidasInventario ??= new MockSalidaInventarioDataSource();
+        _salidasInventario ??= AppConfig.UseMock ? new MockSalidaInventarioDataSource() : new SqlSalidaInventarioDataSource();
 
     public static IJornadaDataSource CrearJornadas() =>
-        _jornadas ??= new MockJornadaDataSource();
+        _jornadas ??= AppConfig.UseMock ? new MockJornadaDataSource() : new SqlJornadaDataSource();
 
     public static ILiquidacionDataSource CrearLiquidaciones() =>
-        _liquidaciones ??= new MockLiquidacionDataSource();
+        _liquidaciones ??= AppConfig.UseMock ? new MockLiquidacionDataSource() : new SqlLiquidacionDataSource();
 
     public static IFacturaClienteDataSource CrearFacturasCliente() =>
-        _facturasCliente ??= new MockFacturaClienteDataSource();
+        _facturasCliente ??= AppConfig.UseMock ? new MockFacturaClienteDataSource() : new SqlFacturaClienteDataSource();
 
     public static IProveedorDataSource CrearProveedores() =>
-        _proveedores ??= new MockProveedorDataSource();
+        _proveedores ??= AppConfig.UseMock ? new MockProveedorDataSource() : new SqlProveedorDataSource();
 
     public static IFacturaProveedorDataSource CrearFacturasProveedor() =>
-        _facturasProveedor ??= new MockFacturaProveedorDataSource();
+        _facturasProveedor ??= AppConfig.UseMock ? new MockFacturaProveedorDataSource() : new SqlFacturaProveedorDataSource();
 
     public static ITanqueCombustibleDataSource CrearTanquesCombustible() =>
-        _tanquesCombustible ??= new MockTanqueCombustibleDataSource();
+        _tanquesCombustible ??= AppConfig.UseMock ? new MockTanqueCombustibleDataSource() : new SqlTanqueCombustibleDataSource();
 
     public static IValeCombustibleDataSource CrearValesCombustible() =>
-        _valesCombustible ??= new MockValeCombustibleDataSource();
+        _valesCombustible ??= AppConfig.UseMock ? new MockValeCombustibleDataSource() : new SqlValeCombustibleDataSource();
 
     public static IRecargaCombustibleDataSource CrearRecargasCombustible() =>
-        _recargasCombustible ??= new MockRecargaCombustibleDataSource();
+        _recargasCombustible ??= AppConfig.UseMock ? new MockRecargaCombustibleDataSource() : new SqlRecargaCombustibleDataSource();
 
     public static IConceptoNominaDataSource CrearConceptosNomina() =>
-        _conceptosNomina ??= new MockConceptoNominaDataSource();
+        _conceptosNomina ??= AppConfig.UseMock ? new MockConceptoNominaDataSource() : new SqlConceptoNominaDataSource();
 }
