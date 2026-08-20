@@ -3,8 +3,8 @@ using ASO.Desktop.Models;
 namespace ASO.Desktop.Services;
 
 /// <summary>
-/// Liquidaciones de nómina. Hoy la implementa un mock en memoria; mañana la implementará un
-/// repositorio EF Core sin cambiar la UI ni el ViewModel.
+/// Liquidaciones de nómina. La implementa una fuente EF Core;
+/// la interfaz mantiene la UI y los ViewModels ajenos a la persistencia.
 /// </summary>
 public interface ILiquidacionDataSource : ICrudDataSource<Liquidacion, int>
 {

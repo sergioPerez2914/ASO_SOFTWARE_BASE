@@ -26,8 +26,11 @@ public enum EstadoSalida
 ///
 /// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
-public class SalidaInventario : IEntidad<int>
+public class SalidaInventario : IEntidad<int>, IDeOrganizacion
 {
+    /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
+    public int OrganizacionId { get; set; }
+
     public int Id { get; set; }
 
     public DateTime Fecha { get; set; }

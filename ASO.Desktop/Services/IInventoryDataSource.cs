@@ -4,8 +4,8 @@ namespace ASO.Desktop.Services;
 
 /// <summary>
 /// Fuente de datos del inventario, con operaciones CRUD sobre el catálogo de artículos
-/// (identificados por su <c>Codigo</c>). Hoy la implementa un mock en memoria; mañana la
-/// implementará un repositorio EF Core sin cambiar la UI ni el ViewModel.
+/// (identificados por su <c>Codigo</c>). La implementa
+/// una fuente EF Core; la interfaz mantiene la UI y los ViewModels ajenos a la persistencia.
 /// </summary>
 public interface IInventoryDataSource : ICrudDataSource<InventoryItem, string>
 {

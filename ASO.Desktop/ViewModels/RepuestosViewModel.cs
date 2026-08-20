@@ -97,7 +97,7 @@ public sealed class RepuestosViewModel : CrudViewModelBase<InventoryItem, string
             () => SalidaSeleccionada is { } s && _servicio.PuedeAnular(s) && _sesionActual.Puede("Inventario.AnularSalida"));
 
         EliminarSalidaCommand = new RelayCommand(EliminarSalida,
-            () => SalidaSeleccionada is { } s && _servicio.PuedeEliminar(s) && _sesionActual.Puede("Inventario.Eliminar"));
+            () => SalidaSeleccionada is { } s && _servicio.PuedeEliminar(s) && _sesionActual.Puede("Inventario.EliminarSalida"));
     }
 
     // --- Encabezado de la pantalla ---

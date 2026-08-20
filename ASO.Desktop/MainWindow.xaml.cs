@@ -1,4 +1,5 @@
-﻿using System.Windows;
+using System.Windows;
+using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
 using ASO.Desktop.Services;
 using ASO.Desktop.ViewModels;
@@ -19,9 +20,51 @@ public partial class MainWindow : Window
         MainSidebar.NavegacionSolicitada += (_, e) => Navegar(e.Modulo, e.Submodulo);
         Navegar(ModuloCatalogo.Inicio, null);
 
-        var usuario = SesionActual.Instancia.UsuarioActual;
-        if (usuario is not null)
-            UsuarioActualLabel.Text = $"{usuario.NombreCompleto} · {usuario.Rol}";
+        MostrarCabecera();
+    }
+
+    /// <summary>
+    /// Quién está dentro y sobre qué núcleo. El núcleo se muestra siempre — no solo al
+    /// Desarrollador — porque saber en qué organización se está escribiendo importa antes
+    /// de guardar nada.
+    /// </summary>
+    private void MostrarCabecera()
+    {
+        var sesion = SesionActual.Instancia;
+
+        if (sesion.UsuarioActual is { } usuario)
+            UsuarioActualLabel.Text = $"{usuario.NombreCompleto} · {usuario.RolTexto}";
+
+        if (Ambito.OrganizacionId is { } organizacionId)
+        {
+            var organizacion = DataSourceFactory.CrearOrganizaciones().GetById(organizacionId);
+            NucleoActualLabel.Text = organizacion?.Etiqueta ?? $"Núcleo {organizacionId}";
+            NucleoChip.Visibility = Visibility.Visible;
+        }
+
+        CambiarNucleoBoton.Visibility = sesion.Puede(Permisos.Organizaciones.Cambiar)
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    /// <summary>
+    /// Cambiar de núcleo reconstruye la ventana entera, igual que al iniciar sesión: el menú,
+    /// los dashboards y las listas se arman en sus constructores leyendo el ámbito, así que
+    /// refrescarlos en sitio sería reimplementar ese arranque en otro camino.
+    /// </summary>
+    private void OnCambiarNucleo(object sender, RoutedEventArgs e)
+    {
+        if (!SesionActual.Instancia.Puede(Permisos.Organizaciones.Cambiar))
+            return;
+
+        var selector = new SeleccionOrganizacionView { Owner = this };
+        if (selector.ShowDialog() != true)
+            return;
+
+        var nuevaVentana = new MainWindow();
+        Application.Current.MainWindow = nuevaVentana;
+        nuevaVentana.Show();
+        Close();
     }
 
     private void OnCerrarSesion(object sender, RoutedEventArgs e)
@@ -59,16 +102,38 @@ public partial class MainWindow : Window
 
     private object CrearVistaModulo(Modulo modulo)
     {
-        if (modulo.Clave == ModuloCatalogo.Inicio.Clave)
+        // Los módulos fijados (Peticiones, Usuarios) no tienen submódulos, así que la guarda
+        // de CrearVistaSubmodulo no los alcanza: se comprueban aquí.
+        if (!SesionActual.Instancia.Ve(modulo))
+            return new InicioView { DataContext = CrearInicio() };
+
+        if (modulo.Clave == ModuloCatalogo.Administracion.Clave)
         {
-            var inicio = new InicioViewModel();
-            inicio.ModuloSolicitado += (_, m) => Navegar(m, null);
-            return new InicioView { DataContext = inicio };
+            var administracion = new AdministracionViewModel(modulo);
+            administracion.VolverSolicitado += (_, _) => Navegar(ModuloCatalogo.Inicio, null);
+            return new AdministracionView { DataContext = administracion };
         }
+
+        if (modulo.Clave == ModuloCatalogo.Peticiones.Clave)
+        {
+            var peticiones = new PeticionesViewModel(modulo);
+            peticiones.VolverSolicitado += (_, _) => Navegar(ModuloCatalogo.Inicio, null);
+            return new PeticionesView { DataContext = peticiones };
+        }
+
+        if (modulo.Clave == ModuloCatalogo.Inicio.Clave)
+            return new InicioView { DataContext = CrearInicio() };
 
         var dashboard = new ModuloDashboardViewModel(modulo);
         dashboard.SubmoduloSolicitado += (_, s) => Navegar(modulo, s);
         return new ModuloDashboardView { DataContext = dashboard };
+    }
+
+    private InicioViewModel CrearInicio()
+    {
+        var inicio = new InicioViewModel();
+        inicio.ModuloSolicitado += (_, m) => Navegar(m, null);
+        return inicio;
     }
 
     /// <summary>
@@ -77,6 +142,16 @@ public partial class MainWindow : Window
     /// </summary>
     private object CrearVistaSubmodulo(Modulo modulo, Submodulo submodulo)
     {
+        // Última barrera: el menú ya oculta lo que el rol no ve, pero a una pantalla también
+        // se llega desde el lanzador de Inicio y desde las tarjetas del dashboard. Comprobarlo
+        // aquí, en el único punto por el que pasan las tres, cierra los tres caminos a la vez.
+        if (!SesionActual.Instancia.Ve(submodulo))
+        {
+            var denegado = SubmoduloViewModel.SinPermiso(modulo, submodulo);
+            denegado.VolverSolicitado += (_, _) => Navegar(modulo, null);
+            return new SubmoduloView { DataContext = denegado };
+        }
+
         switch (submodulo.Clave)
         {
             case "Operaciones.Registro":

@@ -23,8 +23,11 @@ public enum EstadoFacturaProveedor
 ///
 /// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
-public class FacturaProveedor : IEntidad<int>
+public class FacturaProveedor : IEntidad<int>, IDeOrganizacion
 {
+    /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
+    public int OrganizacionId { get; set; }
+
     public int Id { get; set; }
 
     /// <summary>Número que trae el documento del proveedor, no un correlativo del centro.</summary>

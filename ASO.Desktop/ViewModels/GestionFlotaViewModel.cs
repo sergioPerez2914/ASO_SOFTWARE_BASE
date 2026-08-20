@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -25,13 +25,14 @@ public sealed class GestionFlotaViewModel : ViewModelBase
     private readonly FlotaService _flota;
     private readonly MantenimientoService _mantenimiento;
     private readonly IServicioDialogo _dialogos;
+    private readonly SolicitudesDeCambio _solicitudes;
     private readonly ISesionActual _sesion;
     private readonly IRemesaDataSource _remesas;
 
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
     public event EventHandler? VolverSolicitado;
 
-    public GestionFlotaViewModel(Modulo modulo, Submodulo submodulo)
+    public GestionFlotaViewModel(Modulo modulo, Submodulo submodulo, ISesionActual? sesion = null)
     {
         Modulo = modulo;
         Submodulo = submodulo;
@@ -44,7 +45,8 @@ public sealed class GestionFlotaViewModel : ViewModelBase
         _mantenimiento = new MantenimientoService(mantenimientos, activos,
             DataSourceFactory.CrearReglasMantenimiento(), DataSourceFactory.CrearEventosOperacion(), _remesas);
         _dialogos = new ServicioDialogo();
-        _sesion = SesionActual.Instancia;
+        _solicitudes = new SolicitudesDeCambio(_sesion, _dialogos);
+        _sesion = sesion ?? SesionActual.Instancia;
 
         Activos = new ObservableCollection<ActivoFlota>(activos.GetAll());
         ActivosView = CollectionViewSource.GetDefaultView(Activos);
@@ -57,9 +59,12 @@ public sealed class GestionFlotaViewModel : ViewModelBase
         AbrirDetalleCommand = new RelayCommand<ActivoFlota>(activo => ActivoSeleccionado = activo);
         CerrarDetalleCommand = new RelayCommand(() => ActivoSeleccionado = null);
 
-        NuevoActivoCommand = new RelayCommand(NuevoActivo, () => _sesion.Puede("Flota.Crear"));
+        // Alta y edicion de flota son de administrador; el remesero las SOLICITA (el boton
+        // sigue activo y abre una peticion en vez de quedarse gris).
+        NuevoActivoCommand = new RelayCommand(NuevoActivo,
+            () => _solicitudes.PuedeIntentar(Permisos.Flota.Crear));
         EditarActivoCommand = new RelayCommand(EditarActivo,
-            () => ActivoSeleccionado is not null && _sesion.Puede("Flota.Editar"));
+            () => ActivoSeleccionado is not null && _solicitudes.PuedeIntentar(Permisos.Flota.Editar));
 
         CambiarEstadoCommand = new RelayCommand<EstadoActivo>(CambiarEstado,
             estado => ActivoSeleccionado is { } a && a.Estado != estado && _sesion.Puede("Flota.CambiarEstado"));
@@ -216,6 +221,13 @@ public sealed class GestionFlotaViewModel : ViewModelBase
 
     private void NuevoActivo()
     {
+        if (_solicitudes.RequierePeticion(Permisos.Flota.Crear))
+        {
+            _solicitudes.Solicitar(Permisos.Flota.Crear, "Agregar activo de flota",
+                nameof(ActivoFlota), string.Empty, "Alta de una unidad nueva");
+            return;
+        }
+
         var editor = new ActivoEditorViewModel(new ActivoFlota { Estado = EstadoActivo.Operativo });
         if (!_dialogos.MostrarEditor(editor))
             return;
@@ -236,6 +248,13 @@ public sealed class GestionFlotaViewModel : ViewModelBase
     {
         if (ActivoSeleccionado is not { } actual)
             return;
+
+        if (_solicitudes.RequierePeticion(Permisos.Flota.Editar))
+        {
+            _solicitudes.Solicitar(Permisos.Flota.Editar, "Modificar activo de flota",
+                nameof(ActivoFlota), actual.Id.ToString(), actual.Etiqueta);
+            return;
+        }
 
         var editor = new ActivoEditorViewModel(actual);
         if (!_dialogos.MostrarEditor(editor))

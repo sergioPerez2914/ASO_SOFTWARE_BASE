@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -22,13 +22,16 @@ public sealed class ModuloDashboardViewModel : ViewModelBase
 
     public Modulo Modulo { get; }
     public IReadOnlyList<Indicador> Indicadores { get; }
-    public IReadOnlyList<Submodulo> Submodulos => Modulo.Submodulos;
+    public IReadOnlyList<Submodulo> Submodulos { get; }
 
     public ICommand AbrirSubmoduloCommand { get; }
 
-    public ModuloDashboardViewModel(Modulo modulo)
+    public ModuloDashboardViewModel(Modulo modulo) : this(modulo, SesionActual.Instancia) { }
+
+    public ModuloDashboardViewModel(Modulo modulo, ISesionActual sesion)
     {
         Modulo = modulo;
+        Submodulos = sesion.SubmodulosVisibles(modulo);
         Indicadores = CalcularIndicadores(modulo)
             ?? [.. modulo.Indicadores.Select(e => new Indicador(e, "—", "sin datos"))];
 

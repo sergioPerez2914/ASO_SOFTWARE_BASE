@@ -4,8 +4,8 @@ using ASO.Desktop.Models;
 namespace ASO.Desktop.Services;
 
 /// <summary>
-/// Recargas de cisterna. Hoy la implementa un mock en memoria; mañana la implementará un
-/// repositorio EF Core sin cambiar la UI ni el ViewModel.
+/// Recargas de cisterna. La implementa una fuente EF Core;
+/// la interfaz mantiene la UI y los ViewModels ajenos a la persistencia.
 /// </summary>
 public interface IRecargaCombustibleDataSource : ICrudDataSource<RecargaCombustible, int>
 {

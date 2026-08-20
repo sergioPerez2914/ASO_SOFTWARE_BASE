@@ -54,7 +54,7 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
     public string ResumenDeuda =>
         $"Por pagar {_servicio.TotalPorPagar():N2} · vencido {_servicio.TotalVencido():N2}";
 
-    protected override string ModuloPermiso => "Finanzas";
+    protected override string ModuloPermiso => "FacturasProveedor";
 
     protected override bool CoincideBusqueda(FacturaProveedor item, string texto) =>
         item.ProveedorNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
@@ -152,7 +152,7 @@ public sealed class ProveedoresCrudViewModel : CrudViewModelBase<Proveedor, int>
         _proveedores = proveedores;
     }
 
-    protected override string ModuloPermiso => "Finanzas";
+    protected override string ModuloPermiso => "Proveedores";
 
     protected override bool CoincideBusqueda(Proveedor item, string texto) =>
         item.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase)

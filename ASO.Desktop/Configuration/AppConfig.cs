@@ -30,13 +30,6 @@ public static class AppConfig
             "Revisa appsettings.json o crea appsettings.local.json a partir de appsettings.local.example.json.");
 
     /// <summary>
-    /// Si es true la app usa datos mock (en memoria) y no necesita SQL Server.
-    /// Clave "UseMock" en appsettings(.local).json. Por defecto false (SQL real).
-    /// </summary>
-    public static bool UseMock =>
-        bool.TryParse(_config["UseMock"], out var valor) && valor;
-
-    /// <summary>
     /// Cuanto puede superar un vale al promedio historico del activo antes de marcarse como
     /// consumo anomalo, en fraccion (0,25 = 25 %). Clave "Combustible:UmbralAlertaConsumo".
     /// Es configurable a proposito: el umbral util depende de la maquina y de la zafra.

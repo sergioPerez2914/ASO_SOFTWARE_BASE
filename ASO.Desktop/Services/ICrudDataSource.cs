@@ -4,9 +4,12 @@ using ASO.Desktop.Models;
 namespace ASO.Desktop.Services;
 
 /// <summary>
-/// Fuente de datos con operaciones CRUD para una entidad maestra. Hoy la implementa un
-/// mock en memoria; mañana la implementará un repositorio EF Core sin cambiar la UI ni
-/// el ViewModel.
+/// Fuente de datos con operaciones CRUD para una entidad maestra. La implementan las clases
+/// <c>Sql…DataSource</c> de <c>BD/</c>; la interfaz mantiene la UI y los ViewModels ajenos a la
+/// persistencia.
+///
+/// Devuelve <c>IEnumerable</c> y no <c>IQueryable</c>, así que el filtrado por organización NO
+/// puede vivir aquí: lo aplica EF con un filtro global (ver <c>BD/DbContext.cs</c>).
 /// </summary>
 public interface ICrudDataSource<T, TId> where T : IEntidad<TId>
 {

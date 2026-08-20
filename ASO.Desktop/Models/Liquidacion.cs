@@ -44,8 +44,11 @@ public enum OrigenLinea
 ///
 /// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
-public class Liquidacion : IEntidad<int>
+public class Liquidacion : IEntidad<int>, IDeOrganizacion
 {
+    /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
+    public int OrganizacionId { get; set; }
+
     public int Id { get; set; }
 
     public SujetoLiquidacion SujetoTipo { get; set; }

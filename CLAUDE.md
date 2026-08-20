@@ -27,9 +27,12 @@ Es escritorio, no web (no hay dev server / puerto). `dotnet run` dentro de `ASO.
 
 - **Se mantiene WPF** y se usa el shell actual como base (no se migra a WinForms pese al plan original).
 - **MVVM ligero**: `ViewModels/ViewModelBase.cs` (INotifyPropertyChanged). Lógica fuera del code-behind.
-- **Datos mock detrás de interfaces** para poder cambiar a EF Core sin tocar UI ni ViewModel.
-  Ejemplo hecho: `Services/IInventoryDataSource.cs` (impl. `MockInventoryDataSource`). Cuando exista BD,
-  el socio crea `EfInventoryDataSource : IInventoryDataSource` y se inyecta — sin cambiar la vista.
+- **Datos detrás de interfaces** (`Services/I<X>DataSource.cs`), resueltas en
+  `Configuration/DataSourceFactory.cs`. La UI y los ViewModels no conocen EF Core.
+- **Ya no hay mocks** (2026-08-20). Las 19 clases `Mock…DataSource`, `MockAuthService` y el flag
+  `UseMock` se eliminaron: el único camino es SQL Server. El modo "sin BD" no sobrevivía al
+  aislamiento por núcleo, porque los mocks no pasan por el filtro global de EF y habrían dejado
+  ver los datos de todas las organizaciones.
 - **Regla de oro**: toda regla de negocio vive en servicios de dominio, nunca en eventos de botones.
 
 ## Estructura de módulos (reset de 2026-08-17)
@@ -40,13 +43,17 @@ resumen y se despliega su lista de submódulos en el menú lateral.
 
 | Módulo | Submódulos | Estado |
 |---|---|---|
-| Operaciones | Registro de Operación · Seguimiento | funcionales |
+| Operaciones | Registro de Operación · Seguimiento · Fincas y Núcleos | funcionales |
 | Flota | Gestión de Flota · Mantenimiento · **Telemetría** | funcionales, salvo Telemetría (pendiente) |
 | Inventario | Repuestos · Combustible · Producto | funcionales |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios | funcionales |
 | Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas | funcionales |
 
-**Los 13 submódulos están construidos sobre mocks; el único que falta es Flota · Telemetría.**
+Además hay **tres módulos fijados** fuera de esa lista, sin submódulos, que se muestran en el menú
+según el permiso: **Inicio**, **Peticiones** (bandeja de solicitudes de cambio) y **Administración**
+(núcleos, usuarios y permisos).
+
+**Los 14 submódulos están construidos; el único que falta es Flota · Telemetría.**
 Las reglas de Nómina y Finanzas se implementaron con supuestos provisionales (ver más abajo),
 porque el socio todavía no aportó tarifario real ni formatos de liquidación y factura.
 
@@ -70,16 +77,22 @@ porque el socio todavía no aportó tarifario real ni formatos de liquidación y
 
 ## Cómo se agrega un submódulo (receta)
 
-Archivos a **crear**: `Models/<X>.cs` (con `Clonar()`, snapshots de texto de los catálogos que cita y
-props `…Texto`; los modelos NO implementan INotifyPropertyChanged) · `Services/I<X>DataSource.cs` +
-`Mock<X>DataSource` · `Services/<X>Service.cs` si es documento (métodos `PuedeX` puros para el
+Archivos a **crear**: `Models/<X>.cs` (con `Clonar()`, snapshots de texto de los catálogos que cita,
+props `…Texto`, y **`: IDeOrganizacion` con su `OrganizacionId`** si la entidad pertenece a un núcleo;
+los modelos NO implementan INotifyPropertyChanged) · `Services/I<X>DataSource.cs` +
+`BD/Sql<X>DataSource.cs` · `Services/<X>Service.cs` si es documento (métodos `PuedeX` puros para el
 `CanExecute` + transiciones que revalidan y lanzan `InvalidOperationException` en español) ·
 `ViewModels/<Submodulo>ViewModel.cs` · editores · vistas XAML.
 
 Archivos a **modificar** siempre: `Configuration/DataSourceFactory.cs` (campo cacheado `??=`),
-`MainWindow.CrearVistaSubmodulo` (un `case` por clave), `Styles/EditorTemplates.xaml` (un
-`DataTemplate` por editor, o la ventana sale vacía) y `Styles/Theme.xaml` (un `Chip…Style` por enum
-de estado nuevo).
+`BD/DbContext.cs` (`DbSet` + configuración), `MainWindow.CrearVistaSubmodulo` (un `case` por clave),
+`Styles/EditorTemplates.xaml` (un `DataTemplate` por editor, o la ventana sale vacía) y
+`Styles/Theme.xaml` (un `Chip…Style` por enum de estado nuevo). Después, `dotnet ef migrations add`.
+
+El permiso de navegación **no se declara**: `Submodulo.Permiso` lo deriva de la clave
+(`Ver.<Clave>`), así que basta con dar de alta el submódulo en `ModuloCatalogo`. Lo que sí hay que
+hacer es sumarlo al rol que corresponda en `Services/MatrizPermisos.cs`, o no lo verá nadie salvo
+el Desarrollador.
 
 Arquetipos a copiar: **A** listado CRUD (`RegistroOperacionViewModel` + `RegistroOperacionView`),
 **B** tarjetas/detalle (`GestionFlotaViewModel`), **C** reporte de solo lectura (`ProductoViewModel`),
@@ -117,25 +130,97 @@ y **contenedor de dos padrones** (`EmpleadosViewModel`, `CuentasPorPagarViewMode
 - **Umbral configurable** (`appsettings.json` → `Combustible:UmbralAlertaConsumo`, 0.25 = 25 %):
   cuánto puede superar un vale al promedio histórico del activo antes de marcarse con alerta.
 
-## Aviso al socio (base de datos)
+## Persistencia
 
-- `InventoryItem.StockActual` y `StockMinimo` pasaron de `int` a **`decimal(18,2)`** (hay artículos por
-  metro, kilo y litro). La tabla `Inventarios` necesita un `ALTER COLUMN`; ya está reflejado en
-  `BD/DbContext.cs`.
-- Entidades nuevas pendientes de persistir: `Tarifa`, `SalidaInventario`, `TanqueCombustible`,
-  `ValeCombustible`, `RecargaCombustible`, `JornadaTrabajo`, `Liquidacion` (+ `LiquidacionLinea`),
-  `ConceptoNomina`, `FacturaCliente` (+ `FacturaClienteLinea`), `Proveedor`, `FacturaProveedor`, y el
-  campo `Remesa.FacturaClienteId`.
-- Todas las fuentes se registran en `Configuration/DataSourceFactory.cs`: ahí es donde el socio
-  enchufa las implementaciones EF sin tocar ViewModels ni vistas.
+Las entidades de dominio persisten en **SQL Server vía EF Core Migrations**. Desde el 2026-08-20 no
+hay mocks: `Configuration/DataSourceFactory.cs` devuelve siempre la implementación `Sql…`.
+
+- **Migraciones** en `ASO.Desktop/Migrations/`, por fases:
+  `Baseline00_EmpleadoInventario` → `Fase1_CatalogosSimples` → `Fase2_CatalogosConRelaciones` →
+  `Fase3_DocumentosPlanos` → `Fase4_ColeccionesAnidadas` → `Fase5_EventoOperacion` →
+  `FixStockActualStockMinimoDecimal` → `Fase6_OrganizacionYSeguridad`.
+- **La cadena de conexión vive solo en `appsettings.local.json`** (por máquina, en `.gitignore`).
+- **No hay claves foráneas reales** en las tablas planas: las relaciones son `int` sueltos y la
+  integridad es de la aplicación, con snapshots de texto (`…Nombre`, `…Codigo`) en cada documento.
+
+## Núcleos: aislamiento por organización (2026-08-20)
+
+Cada **núcleo** que usa ASO es una `Organizacion` y no ve los datos de ningún otro. Es una entidad
+**nueva y distinta** de `Nucleo`, que sigue siendo el catálogo de **núcleos de productores** (C.O.D
+del CAM) usado para decidir a quién se le paga. No confundirlas: una `Remesa` cita **tres** núcleos
+de productores a la vez (corte, alza y transporte) y **una sola** organización.
+
+- **`Models/IDeOrganizacion.cs`** marca las entidades sujetas al ámbito. Las 21 persistidas lo
+  implementan, más `Usuario`, `PermisoUsuario` y `PeticionCambio`.
+- **`BD/DbContext.cs` hace todo el trabajo, en dos sitios:**
+  - `AplicarFiltroDeOrganizacion` recorre el modelo y pone un `HasQueryFilter` a cada
+    `IDeOrganizacion`. Es **fail-closed**: sin ámbito fijado no se ve nada, en vez de verse todo.
+  - `SaveChanges()` estampa `OrganizacionId` en toda fila nueva. Un solo sitio, en vez de los 25
+    `Sql…DataSource`: olvidarlo en uno crearía filas que después ninguna consulta devolvería.
+- **`Services/Ambito.cs`** guarda la organización activa. La fija `SesionActual.IniciarSesion` a
+  partir del usuario; solo el Desarrollador la cambia después (`Ambito.Cambiar`).
+- **`IgnoreQueryFilters()` se usa en dos sitios y solo dos**: el login (al autenticar todavía no hay
+  ámbito) y la lectura de los ajustes de permisos del usuario que entra. Ambos en
+  `BD/SqlUsuarioDataSource.cs`.
+- **`Organizaciones` no lleva filtro** — es la tabla que define el ámbito. El permiso es toda la
+  barrera, y solo el Desarrollador lo tiene.
+- **Añadir una entidad al ámbito** es implementar `IDeOrganizacion`: el filtro y el estampado la
+  recogen solos.
+
+## Roles y permisos (2026-08-20)
+
+Tres roles (`Models/Rol.cs`), cada uno con un conjunto base en `Services/MatrizPermisos.cs` que el
+administrador ajusta por usuario con `PermisoUsuario` (concede o revoca; **revocar gana**).
+
+| Rol | Alcance |
+|---|---|
+| **Remesero** | 24 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios y Combustible. Crea, edita y confirma; **no anula nada**, no entra a Finanzas, Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
+| **AdministradorNucleo** | Todo dentro de SU núcleo (88 permisos). No puede cambiar de núcleo ni administrar el padrón de organizaciones, ni crear usuarios Desarrollador |
+| **Desarrollador** | Los 91 permisos, y es el único que atraviesa organizaciones |
+
+- **`Services/Permisos.cs`** es el catálogo de cadenas. Los de navegación llevan prefijo `Ver.` y se
+  **derivan de la clave del submódulo**, así que no pueden desincronizarse al renombrar.
+- **`SesionActual`** calcula el conjunto efectivo **una vez al entrar** y lo cachea. No es
+  optimización prematura: `CommandManager.RequerySuggested` dispara los `CanExecute` de toda la
+  ventana ante cualquier entrada del usuario. Consecuencia: **un cambio de rol o de permisos se
+  aplica al volver a iniciar sesión**, no en caliente.
+- **Cuatro caminos llevan a una pantalla** y los cuatro filtran con la misma regla
+  (`Services/NavegacionPermitida.cs`): sidebar, lanzador de Inicio, tarjetas del dashboard y la
+  guarda de `MainWindow.CrearVistaSubmodulo`.
+- **Colisiones de permisos corregidas** al conectar la matriz: `Finanzas.*` la compartían las
+  facturas al ingenio, las de proveedor y el padrón de proveedores (ahora `FacturasCliente.*`,
+  `FacturasProveedor.*` y `Proveedores.*`); `Empleados.*` cubría los dos padrones (ahora
+  `PersonalCampo.*`); e `Inventario.Eliminar` significaba a la vez borrar un artículo del catálogo y
+  borrar una salida en borrador (ahora `Inventario.EliminarSalida`).
+- **Contraseñas**: PBKDF2-SHA256 con salt por usuario y 210 000 iteraciones
+  (`Services/Passwords.cs`), sin dependencias nuevas. No hay usuarios sembrados ni contraseñas por
+  defecto: en la primera ejecución contra una base sin usuarios, `Views/PrimerArranqueView` pide el
+  nombre del núcleo y crea el usuario Desarrollador.
+
+## Peticiones de cambio
+
+Cuando al remesero le falta un permiso **de los sensibles** (`MatrizPermisos.Solicitables`), el botón
+no queda gris: pide el motivo con el `MotivoEditorViewModel` de siempre y deja una `PeticionCambio`
+en la bandeja del administrador (módulo fijado **Peticiones**).
+
+- **Aprobar autoriza, no ejecuta.** La petición no guarda la mutación; el administrador hace el
+  cambio en la pantalla que corresponde, con sus validaciones y su máquina de estados intactas.
+  Un motor que reprodujera mutaciones guardadas se saltaría justo esas comprobaciones.
+- **`PeticionService.Resolver` exige aprobador ≠ solicitante**, que es la segregación de funciones
+  del diseño de autorización.
+- Hoy son solicitables `Remesas.Anular`, `Remesas.Recepcion`, `Flota.Crear`, `Flota.Editar`,
+  `Combustible.Anular` y `Combustible.Recargar`: **exactamente** las acciones sensibles que aparecen
+  en las pantallas que el remesero ve. Al ampliar lo que ve un rol, ampliar la lista **y** cablear el
+  comando con `SolicitudesDeCambio`, o la regla queda muerta.
 
 ## Decisiones PROVISIONALES pendientes del socio
 
 Están marcadas en el código con el comentario `// PROVISIONAL:` (búsqueda: `grep -rn "PROVISIONAL"`).
 Lo que hace falta para cerrarlas:
 
-1. **Tarifario real** (lo que paga el ingenio por tonelada y lo que se paga a cada núcleo). Los montos
-   de `MockTarifaDataSource` son inventados.
+1. **Tarifario real** (lo que paga el ingenio por tonelada y lo que se paga a cada núcleo). Sin
+   mocks, la tabla `Tarifas` arranca vacía: hay que cargar el tarifario real antes de facturar o
+   liquidar nada.
 2. **Formatos en papel**: vale de combustible, salida de almacén, recarga de cisterna.
 3. **Ejemplo de una liquidación ya hecha** y **de una factura al ingenio**, para validar líneas,
    períodos y desglose.
@@ -153,7 +238,11 @@ Fase 0 fundación (auth, roles, maestros, shell) · **Fase 1** núcleo operativo
 combustible) · Fase 2 taller e inventario · Fase 3 finanzas (CxC/CxP/bancos) · Fase 4 nómina por destajo ·
 Fase 5 dashboard gerencial + reportes · Fase 6 (post-MVP) offline, API REST, app móvil.
 
-Roles: Admin, Operaciones, Taller, Finanzas, RRHH, Consulta. Todo se filtra por la **zafra activa**.
+Roles: **Remesero, AdministradorNucleo, Desarrollador** (los seis anteriores —Admin, Operaciones,
+Taller, Finanzas, RRHH, Consulta— se sustituyeron el 2026-08-20; ver "Roles y permisos").
+Todo se filtra por la **zafra activa**, todavía pendiente: quedan 7 `// TODO: ZafraId`. El mecanismo
+donde encaja ya existe — sería un `IDeZafra` con su segundo `HasQueryFilter`, igual que
+`IDeOrganizacion`.
 
 ## Diseño del sistema de tickets ("documento de movimiento")
 
@@ -185,17 +274,28 @@ Entidades para la BD: Usuario/Rol/Permiso (+N:M), ReglaAprobacion, Aprobacion, y
 `Estado` + `CreadoPorId` + `ZafraId` + registro en `Auditoria`. En WPF: `ISesionActual` inyectado; comandos
 con `CanExecute = sesion.Puede("...")`; secciones del sidebar filtradas por rol.
 
+**Estado (2026-08-20):** hechas las capas 1 (RBAC), 3 (segregación: aprobador ≠ solicitante) y 5
+(auditoría de la decisión, en `PeticionCambio`). La capa 2 está en su versión simple —una petición,
+un aprobador— sin niveles ni umbrales configurables, y la 4 (override por excepción) sigue sin
+formalizarse. **Falta lo importante: la comprobación sigue siendo solo de UI.** Los servicios de
+dominio no consultan `ISesionActual`, así que la defensa en profundidad que pide este diseño todavía
+no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
+
 ## Próximo paso sugerido
 
-1. **Flota · Telemetría**, el único submódulo sin construir. Es también lo que permitiría desglosar el
+1. **Aplicar `Fase6_OrganizacionYSeguridad` a la base** (`dotnet ef database update`) y hacer el
+   recorrido de verificación: primer arranque, un usuario por rol, y comprobar que con el núcleo 2
+   activo no se ve ni una fila del núcleo 1.
+2. **Llevar la comprobación de permisos a los servicios de dominio.** Hoy toda la autorización vive
+   en el `CanExecute` de los comandos: quien llame a un servicio desde otro sitio se la salta.
+3. **Flota · Telemetría**, el único submódulo sin construir. Es también lo que permitiría desglosar el
    L/ton por máquina y frente, hoy calculado solo de forma global.
-2. **Matriz RBAC real**: `SesionActual.Puede()` sigue devolviendo `true` para cualquier usuario
-   autenticado. Todos los comandos ya piden su permiso (`Inventario.ConfirmarSalida`,
-   `Finanzas.Facturar`, `Nomina.Cerrar`…), así que conectar la matriz no obliga a tocar ViewModels;
-   sin ella, la segregación de funciones que exige el diseño de autorización no es efectiva.
-3. **Conexión a base de datos** con el socio (ver "Aviso al socio" más arriba) y resolución de las
-   decisiones provisionales.
+4. **Resolver las decisiones provisionales** con el socio (tarifario, formatos, turnos): ahora que la
+   BD está conectada y no hay mocks, cada supuesto sin confirmar se convierte en datos reales mal
+   cargados.
+5. **Sacar la cadena de conexión de `appsettings.json`** y rotar la contraseña de `sa`: el repositorio
+   es público y esa credencial da acceso total al servidor, por debajo de todo el control de acceso
+   que se acaba de construir.
 
-Permisos ya en uso, por si sirven de base a la matriz: `Remesas.*`, `Flota.*`, `Mantenimiento.*`,
-`Seguimiento.AgregarNota`, `Inventario.*` (incluye `OverrideStock`), `Combustible.*`, `Empleados.*`,
-`Horarios.*`, `Nomina.*`, `Finanzas.*`, `Tarifas.*`.
+El catálogo completo de permisos está en `Services/Permisos.cs` (91 en uso) y el reparto por rol en
+`Services/MatrizPermisos.cs`.

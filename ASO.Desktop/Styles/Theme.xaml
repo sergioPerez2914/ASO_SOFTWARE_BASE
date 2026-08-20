@@ -66,6 +66,25 @@
     </Style.Triggers>
   </Style>
 
+  <!-- Chip de estado de una petición de cambio -->
+  <Style x:Key="ChipEstadoPeticionStyle" TargetType="Border">
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding EstadoTexto}" Value="Pendiente">
+        <Setter Property="Background" Value="{StaticResource WarningBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding EstadoTexto}" Value="Aprobada">
+        <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding EstadoTexto}" Value="Rechazada">
+        <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
   <!-- Chip de existencia de un artículo de almacén -->
   <Style x:Key="ChipStockStyle" TargetType="Border">
     <Setter Property="CornerRadius" Value="10" />

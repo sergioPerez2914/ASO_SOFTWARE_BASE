@@ -1,23 +1,31 @@
+using System.Collections.Generic;
 using ASO.Desktop.Models;
 
 namespace ASO.Desktop.Services;
 
 /// <summary>
-/// Usuario con sesión activa en la aplicación. Sirve de base para las reglas de
-/// autorización por rol descritas en el plan (RBAC, segregación de funciones).
+/// Usuario con sesion activa. Es la unica puerta de autorizacion de la aplicacion:
+/// todos los comandos preguntan aqui antes de habilitarse.
 /// </summary>
 public interface ISesionActual
 {
     Usuario? UsuarioActual { get; }
     bool EstaAutenticado { get; }
 
-    void IniciarSesion(Usuario usuario);
+    /// <summary>
+    /// Abre sesion, calcula el conjunto efectivo de permisos (base del rol + concedidos
+    /// - revocados) y fija el ambito de organizacion a partir del usuario.
+    /// </summary>
+    void IniciarSesion(Usuario usuario, IEnumerable<PermisoUsuario>? ajustes = null);
+
     void CerrarSesion();
 
-    /// <summary>
-    /// ¿El usuario actual puede realizar <paramref name="permiso"/> (formato "Módulo.Acción")?
-    /// Hoy solo exige sesión iniciada; se conectará a la matriz de roles RBAC de la Fase 0
-    /// sin cambiar las ViewModels que ya llaman a este método.
-    /// </summary>
+    /// <summary>¿El usuario actual puede realizar <paramref name="permiso"/> ("Modulo.Accion")?</summary>
     bool Puede(string permiso);
+
+    /// <summary>
+    /// No puede, pero el permiso es de los sensibles y el usuario tiene derecho a pedirlo:
+    /// en vez de un boton muerto, el comando abre una peticion al administrador del nucleo.
+    /// </summary>
+    bool PuedeSolicitar(string permiso);
 }

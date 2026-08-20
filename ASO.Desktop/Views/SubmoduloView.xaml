@@ -39,9 +39,9 @@
       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
         <TextBlock Text="{Binding Submodulo.Icono}" FontFamily="{StaticResource IconFont}" FontSize="40"
                    Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" />
-        <TextBlock Text="Submódulo en construcción" FontSize="16" FontWeight="SemiBold"
+        <TextBlock Text="{Binding Titulo}" FontSize="16" FontWeight="SemiBold"
                    Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,12,0,0" />
-        <TextBlock Text="Todavía no tiene pantallas ni fuente de datos conectada."
+        <TextBlock Text="{Binding Detalle}"
                    FontSize="12" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center"
                    Margin="0,4,0,0" TextAlignment="Center" MaxWidth="380" TextWrapping="Wrap" />
       </StackPanel>

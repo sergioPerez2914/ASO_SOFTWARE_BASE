@@ -20,7 +20,8 @@ public class SqlTarifaDataSource : ITarifaDataSource
         return context.Tarifas.Find(id);
     }
 
-    // RigeEn() es un método C# (no traducible a SQL); se filtra en memoria como hace el mock.
+    // RigeEn() es un método C# que EF no sabe traducir a SQL, así que el filtro de vigencia
+    // se resuelve en memoria: el ToList() de antes es deliberado, no un descuido.
     public IEnumerable<Tarifa> GetVigentes(DateTime fecha)
     {
         using var context = new AsoDbContext();

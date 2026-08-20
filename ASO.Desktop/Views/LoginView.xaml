@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
         Title="Iniciar sesión — Software ASO"
-        Height="440" Width="380"
+        Height="380" Width="380"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
@@ -41,10 +41,6 @@
         <Button Content="Iniciar sesión" Margin="0,18,0,0" Padding="8,10"
                 Background="{StaticResource PrimaryBrush}" Foreground="White" BorderThickness="0"
                 Cursor="Hand" Click="OnIniciarSesion" />
-
-        <TextBlock Margin="0,16,0,0" FontSize="11" TextWrapping="Wrap"
-                    Foreground="{StaticResource TextMutedBrush}"
-                    Text="Usuarios de prueba: admin/admin123, operaciones/1234, taller/1234, finanzas/1234, rrhh/1234, consulta/1234" />
       </StackPanel>
     </Border>
   </Grid>

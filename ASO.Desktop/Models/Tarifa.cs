@@ -50,8 +50,11 @@ public enum ServicioZafra
 ///
 /// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
-public class Tarifa : IEntidad<int>
+public class Tarifa : IEntidad<int>, IDeOrganizacion
 {
+    /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
+    public int OrganizacionId { get; set; }
+
     public int Id { get; set; }
 
     public string Concepto { get; set; } = string.Empty;

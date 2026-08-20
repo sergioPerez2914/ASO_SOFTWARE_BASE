@@ -35,7 +35,7 @@ public sealed class PersonalCampoCrudViewModel : CrudViewModelBase<PersonalCampo
 
     public ICommand CambiarFiltroRolCommand { get; }
 
-    protected override string ModuloPermiso => "Empleados";
+    protected override string ModuloPermiso => "PersonalCampo";
 
     protected override bool CoincideBusqueda(PersonalCampo item, string texto) =>
         item.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase)

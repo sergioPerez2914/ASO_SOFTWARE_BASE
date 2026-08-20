@@ -7,8 +7,11 @@ namespace ASO.Desktop.Models;
 ///
 /// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
-public class ReglaMantenimiento : IEntidad<int>
+public class ReglaMantenimiento : IEntidad<int>, IDeOrganizacion
 {
+    /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
+    public int OrganizacionId { get; set; }
+
     public int Id { get; set; }
     public TipoActivo Tipo { get; set; }
     public string Revision { get; set; } = string.Empty;

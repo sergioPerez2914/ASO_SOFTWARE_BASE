@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using ASO.Desktop.Navigation;
+using ASO.Desktop.Services;
 
 namespace ASO.Desktop.ViewModels;
 
@@ -29,10 +30,10 @@ public sealed class SubmoduloNavItem(Modulo modulo, Submodulo submodulo) : ViewM
 
 public sealed class ModuloNavItem : ViewModelBase
 {
-    public ModuloNavItem(Modulo modulo)
+    public ModuloNavItem(Modulo modulo, ISesionActual sesion)
     {
         Modulo = modulo;
-        Submodulos = [.. modulo.Submodulos.Select(s => new SubmoduloNavItem(modulo, s))];
+        Submodulos = [.. sesion.SubmodulosVisibles(modulo).Select(s => new SubmoduloNavItem(modulo, s))];
     }
 
     public Modulo Modulo { get; }
@@ -94,12 +95,16 @@ public sealed class SidebarViewModel : ViewModelBase
     public ICommand SeleccionarSubmoduloCommand { get; }
     public ICommand AlternarExpansionCommand { get; }
 
-    public SidebarViewModel()
+    public SidebarViewModel() : this(SesionActual.Instancia) { }
+
+    public SidebarViewModel(ISesionActual sesion)
     {
+        // El menu se arma una vez por ventana y la ventana se reconstruye al entrar, al salir
+        // y al cambiar de nucleo, asi que aqui basta con filtrar al construir.
         Items =
         [
-            new ModuloNavItem(ModuloCatalogo.Inicio),
-            .. ModuloCatalogo.Modulos.Select(m => new ModuloNavItem(m))
+            .. ModuloCatalogo.Fijados.Where(sesion.Ve).Select(m => new ModuloNavItem(m, sesion)),
+            .. sesion.ModulosVisibles().Select(m => new ModuloNavItem(m, sesion))
         ];
 
         SeleccionarModuloCommand = new RelayCommand<ModuloNavItem>(item =>

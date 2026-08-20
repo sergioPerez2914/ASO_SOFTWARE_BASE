@@ -21,6 +21,7 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
 
     private readonly RemesaService _servicio;
     private readonly IServicioDialogo _dialogos;
+    private readonly SolicitudesDeCambio _solicitudes = new();
     private readonly ISesionActual _sesionActual;
     private readonly IFincaDataSource _fincas;
     private readonly INucleoDataSource _nucleos;
@@ -58,11 +59,13 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
         ConfirmarCommand = new RelayCommand(Confirmar,
             () => SelectedItem is { } r && _servicio.PuedeConfirmar(r) && _sesionActual.Puede("Remesas.Confirmar"));
 
+        // Se habilitan tambien para quien solo puede SOLICITARLAS: el boton no queda gris sin
+        // explicacion, sino que abre una peticion al administrador (ver SolicitudesDeCambio).
         AnularCommand = new RelayCommand(Anular,
-            () => SelectedItem is { } r && _servicio.PuedeAnular(r) && _sesionActual.Puede("Remesas.Anular"));
+            () => SelectedItem is { } r && _servicio.PuedeAnular(r) && _solicitudes.PuedeIntentar(Permisos.Remesas.Anular));
 
         RegistrarRecepcionCommand = new RelayCommand(RegistrarRecepcion,
-            () => SelectedItem is { } r && _servicio.PuedeRegistrarRecepcion(r) && _sesionActual.Puede("Remesas.Recepcion"));
+            () => SelectedItem is { } r && _servicio.PuedeRegistrarRecepcion(r) && _solicitudes.PuedeIntentar(Permisos.Remesas.Recepcion));
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -132,10 +135,23 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
         Aplicar(remesa, () => _servicio.Confirmar(remesa));
     }
 
+    /// <summary>Como se ve la remesa en la bandeja del administrador, congelado al solicitar.</summary>
+    private static string Describir(Remesa remesa) =>
+        string.IsNullOrWhiteSpace(remesa.FincaNombre)
+            ? $"Remesa Nº {remesa.Id}"
+            : $"Remesa Nº {remesa.Id} · {remesa.FincaNombre}";
+
     private void Anular()
     {
         if (SelectedItem is not { } remesa)
             return;
+
+        if (_solicitudes.RequierePeticion(Permisos.Remesas.Anular))
+        {
+            _solicitudes.Solicitar(Permisos.Remesas.Anular, "Anular remesa",
+                nameof(Remesa), remesa.Id.ToString(), Describir(remesa));
+            return;
+        }
 
         var editor = new AnularRemesaEditorViewModel(remesa);
         if (!_dialogos.MostrarEditor(editor))
@@ -148,6 +164,13 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
     {
         if (SelectedItem is not { } remesa)
             return;
+
+        if (_solicitudes.RequierePeticion(Permisos.Remesas.Recepcion))
+        {
+            _solicitudes.Solicitar(Permisos.Remesas.Recepcion, "Registrar recepción de remesa",
+                nameof(Remesa), remesa.Id.ToString(), Describir(remesa));
+            return;
+        }
 
         var editor = new RecepcionRemesaEditorViewModel(remesa);
         if (!_dialogos.MostrarEditor(editor))

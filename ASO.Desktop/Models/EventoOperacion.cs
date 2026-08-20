@@ -31,8 +31,11 @@ public enum TipoEventoOperacion
 ///
 /// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
-public class EventoOperacion : IEntidad<int>
+public class EventoOperacion : IEntidad<int>, IDeOrganizacion
 {
+    /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
+    public int OrganizacionId { get; set; }
+
     public int Id { get; set; }
     public int RemesaId { get; set; }
     public TipoEventoOperacion Tipo { get; set; }

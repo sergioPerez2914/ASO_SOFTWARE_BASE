@@ -109,7 +109,7 @@ public sealed class CuentasPorCobrarViewModel : CrudViewModelBase<FacturaCliente
 
     // --- Puntos de extensión del CRUD ---
 
-    protected override string ModuloPermiso => "Finanzas";
+    protected override string ModuloPermiso => "FacturasCliente";
 
     protected override bool CoincideBusqueda(FacturaCliente item, string texto) =>
         item.NumeroTexto.Contains(texto, StringComparison.OrdinalIgnoreCase)

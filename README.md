@@ -16,9 +16,16 @@ dotnet run
 
 O abrir `ASO.slnx` en Visual Studio 2022.
 
-La aplicación arranca con datos de ejemplo en memoria (`"UseMock": true` en
-`appsettings.local.json`), así que no hace falta base de datos para probarla.
-Usuario de prueba: `admin` / `admin123`.
+Hace falta **SQL Server**: copia `ASO.Desktop/appsettings.local.example.json` como
+`appsettings.local.json` y pon ahí tu cadena de conexión. Luego aplica el esquema:
+
+```bash
+cd ASO.Desktop
+dotnet ef database update
+```
+
+En el primer arranque contra una base sin usuarios, la aplicación pide el nombre del núcleo y crea
+el usuario desarrollador. No hay usuarios ni contraseñas por defecto.
 
 ## Estructura
 
@@ -27,12 +34,13 @@ ASO/
 ├── ASO.slnx
 └── ASO.Desktop/          # Aplicación WPF (MVVM ligero)
     ├── Models/           # Entidades del dominio
-    ├── Services/         # Servicios de dominio + fuentes de datos (interfaces y mocks)
+    ├── Services/         # Servicios de dominio, sesión/permisos y contratos de datos
     ├── ViewModels/       # Lógica de presentación
     ├── Views/            # Pantallas y editores
     ├── Navigation/       # Catálogo de módulos y submódulos (fuente única)
     ├── Configuration/    # Configuración y composición de fuentes de datos
-    ├── BD/               # EF Core / SQL Server
+    ├── BD/               # EF Core / SQL Server (DbContext + fuentes Sql…)
+    ├── Migrations/       # Migraciones EF Core
     ├── Controls/         # Sidebar y componentes reutilizables
     └── Styles/           # Paleta y estilos
 ```
@@ -41,19 +49,33 @@ ASO/
 
 | Módulo | Submódulos |
 |---|---|
-| Operaciones | Registro de Operación · Seguimiento |
+| Operaciones | Registro de Operación · Seguimiento · Fincas y Núcleos |
 | Flota | Gestión de Flota · Mantenimiento · Telemetría *(pendiente)* |
 | Inventario | Repuestos · Combustible · Producto |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios |
 | Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas |
 
+Más tres secciones fijas según el rol: **Inicio**, **Peticiones** y **Administración** (núcleos,
+usuarios y permisos).
+
+## Roles
+
+| Rol | Qué puede |
+|---|---|
+| **Remesero** | Lo del día a día en campo: remesas, seguimiento, flota, mantenimiento, horarios y combustible. Lo sensible (anular, recepción, alta de flota, recarga de cisterna) lo **solicita** al administrador |
+| **Administrador de núcleo** | Todo dentro de su núcleo, incluidos los usuarios y la bandeja de peticiones |
+| **Desarrollador** | Todo, y es el único que puede cambiar de núcleo sin cerrar sesión |
+
+Cada núcleo es una instalación aislada: sus datos no se cruzan con los de ningún otro.
+
 ## Estado del proyecto
 
-Los 13 submódulos están construidos y funcionan sobre datos en memoria; falta **Flota · Telemetría**.
+Los 14 submódulos están construidos; falta **Flota · Telemetría**. Las entidades de dominio
+persisten en SQL Server (EF Core Migrations) y los datos están aislados por núcleo. La matriz de
+roles y permisos está conectada: los comandos que piden un permiso ahora lo exigen de verdad.
 
 Pendiente:
 
-- Persistencia real (Entity Framework Core + SQL Server), en construcción por el socio.
-- Matriz de roles y permisos: los comandos ya piden su permiso, pero la sesión los concede todos.
+- La autorización se comprueba en la interfaz, no dentro de los servicios de dominio.
 - Reglas de negocio de Nómina y Finanzas pendientes de confirmación (tarifario, formatos y turnos
   reales). Están marcadas en el código con `// PROVISIONAL:`.

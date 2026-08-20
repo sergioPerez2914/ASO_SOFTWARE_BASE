@@ -19,8 +19,11 @@ public enum RolCampo
 ///
 /// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
-public class PersonalCampo : IEntidad<int>
+public class PersonalCampo : IEntidad<int>, IDeOrganizacion
 {
+    /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
+    public int OrganizacionId { get; set; }
+
     public int Id { get; set; }
     public string Nombre { get; set; } = string.Empty;
     public string Cedula { get; set; } = string.Empty;

@@ -1,0 +1,47 @@
+<Window x:Class="ASO.Desktop.Views.SeleccionOrganizacionView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="Elegir núcleo — Software ASO"
+        Height="320" Width="420"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow"
+        Background="{StaticResource BackgroundBrush}"
+        FontFamily="Segoe UI">
+
+  <Grid Margin="28">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Margin="0,0,0,18">
+      <TextBlock Text="Núcleo activo" FontSize="20" FontWeight="Bold"
+                 Foreground="{StaticResource PrimaryBrush}" />
+      <TextBlock Text="{Binding Mensaje}" FontSize="12" TextWrapping="Wrap"
+                 Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0" />
+    </StackPanel>
+
+    <Border Grid.Row="1" Style="{StaticResource CardStyle}" VerticalAlignment="Top">
+      <StackPanel>
+        <TextBlock Text="Organización" FontSize="12"
+                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4" />
+        <ComboBox ItemsSource="{Binding Organizaciones}"
+                  SelectedItem="{Binding Seleccionada}"
+                  DisplayMemberPath="Etiqueta" Padding="8,6" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+          <Button Content="Cancelar" Padding="14,8" Cursor="Hand" Margin="0,0,8,0"
+                  Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
+                  Foreground="{StaticResource TextPrimaryBrush}" Click="OnCancelar" />
+          <Button Content="Entrar al núcleo" Padding="14,8" Cursor="Hand" BorderThickness="0"
+                  Background="{StaticResource PrimaryBrush}" Foreground="White"
+                  Click="OnAceptar" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

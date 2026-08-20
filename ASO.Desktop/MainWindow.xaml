@@ -1,4 +1,4 @@
-﻿<Window x:Class="ASO.Desktop.MainWindow"
+<Window x:Class="ASO.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -41,6 +41,15 @@
       </Menu>
 
       <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+        <Border x:Name="NucleoChip" VerticalAlignment="Center" Margin="0,0,10,0"
+                CornerRadius="10" Padding="8,2" Visibility="Collapsed"
+                Background="{StaticResource PrimaryBrush}">
+          <TextBlock x:Name="NucleoActualLabel" FontSize="11" Foreground="White" />
+        </Border>
+        <Button x:Name="CambiarNucleoBoton" Content="Cambiar núcleo" FontSize="11" Padding="8,4"
+                Cursor="Hand" Margin="0,0,8,0" Visibility="Collapsed"
+                Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
+                Foreground="{StaticResource TextPrimaryBrush}" Click="OnCambiarNucleo" />
         <TextBlock x:Name="UsuarioActualLabel" VerticalAlignment="Center" FontSize="12"
                     Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0" />
         <Button Content="Cerrar sesión" FontSize="11" Padding="8,4" Cursor="Hand"

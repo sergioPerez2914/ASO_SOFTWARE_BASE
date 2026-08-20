@@ -15,8 +15,11 @@ public enum TipoConcepto
 /// Modelo de presentación temporal; se alineará con la entidad del dominio cuando exista
 /// la capa de datos.
 /// </summary>
-public class ConceptoNomina : IEntidad<int>
+public class ConceptoNomina : IEntidad<int>, IDeOrganizacion
 {
+    /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
+    public int OrganizacionId { get; set; }
+
     public int Id { get; set; }
     public string Nombre { get; set; } = string.Empty;
     public TipoConcepto Tipo { get; set; } = TipoConcepto.Devengo;

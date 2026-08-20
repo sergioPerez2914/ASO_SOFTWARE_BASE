@@ -67,6 +67,9 @@ namespace ASO.Desktop.Migrations
                     b.Property<decimal?>("OdometroKm")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Placa")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -95,6 +98,9 @@ namespace ASO.Desktop.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
@@ -130,6 +136,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Empleados");
@@ -155,6 +164,9 @@ namespace ASO.Desktop.Migrations
 
                     b.Property<DateTime>("FechaHora")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("RemesaId")
                         .HasColumnType("int");
@@ -208,6 +220,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("FacturasCliente");
@@ -259,6 +274,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProveedorId")
                         .HasColumnType("int");
 
@@ -290,6 +308,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Fincas");
@@ -313,6 +334,9 @@ namespace ASO.Desktop.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("StockActual")
                         .HasColumnType("decimal(18,2)");
@@ -373,6 +397,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PersonaId")
                         .HasColumnType("int");
 
@@ -421,6 +448,9 @@ namespace ASO.Desktop.Migrations
                     b.Property<string>("MotivoAnulacion")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("PeriodoDesde")
                         .HasColumnType("datetime2");
@@ -491,6 +521,9 @@ namespace ASO.Desktop.Migrations
                     b.Property<decimal?>("LecturaUso")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("RealizadoPor")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -530,9 +563,76 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Nucleos");
+                });
+
+            modelBuilder.Entity("ASO.Desktop.Models.Organizacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activa")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
+
+                    b.ToTable("Organizaciones");
+                });
+
+            modelBuilder.Entity("ASO.Desktop.Models.PermisoUsuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Concedido")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Permiso")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UsuarioNombre")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId", "Permiso")
+                        .IsUnique();
+
+                    b.ToTable("PermisosUsuario");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.PersonalCampo", b =>
@@ -561,12 +661,91 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rol")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.ToTable("PersonalCampo");
+                });
+
+            modelBuilder.Entity("ASO.Desktop.Models.PeticionCambio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("ComentarioResolucion")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("EntidadDescripcion")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("EntidadId")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Permiso")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<DateTime?>("ResueltoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ResueltoPorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResueltoPorNombre")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTime>("SolicitadoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SolicitadoPorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SolicitadoPorNombre")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("TipoEntidad")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PeticionesCambio");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Proveedor", b =>
@@ -589,6 +768,9 @@ namespace ASO.Desktop.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Rif")
                         .IsRequired()
@@ -633,6 +815,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProveedorNombre")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -664,6 +849,9 @@ namespace ASO.Desktop.Migrations
 
                     b.Property<decimal?>("IntervaloHoras")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Revision")
                         .IsRequired()
@@ -770,6 +958,9 @@ namespace ASO.Desktop.Migrations
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
 
                     b.Property<decimal?>("PesoBrutoT")
                         .HasColumnType("decimal(18,2)");
@@ -881,6 +1072,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("StockForzado")
                         .HasColumnType("bit");
 
@@ -916,6 +1110,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("TanquesCombustible");
@@ -948,6 +1145,9 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Servicio")
                         .HasColumnType("int");
 
@@ -963,6 +1163,51 @@ namespace ASO.Desktop.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Tarifas");
+                });
+
+            modelBuilder.Entity("ASO.Desktop.Models.Usuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NombreCompleto")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("NombreUsuario")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("PasswordSalt")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<int>("Rol")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NombreUsuario")
+                        .IsUnique();
+
+                    b.ToTable("Usuarios");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.ValeCombustible", b =>
@@ -1027,6 +1272,9 @@ namespace ASO.Desktop.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("int");
 
                     b.Property<decimal?>("PromedioHistorico")
                         .HasColumnType("decimal(18,2)");

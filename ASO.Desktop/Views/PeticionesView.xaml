@@ -1,0 +1,104 @@
+<UserControl x:Class="ASO.Desktop.Views.PeticionesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="640" d:DesignWidth="1100">
+
+  <UserControl.Resources>
+    <Style x:Key="BarraBotonStyle" TargetType="Button">
+      <Setter Property="Padding" Value="12,6" />
+      <Setter Property="Margin" Value="8,0,0,0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Encabezado -->
+    <StackPanel Grid.Row="0" Margin="0,0,0,16">
+      <TextBlock Text="{Binding Ruta}" FontSize="12"
+                 Foreground="{StaticResource TextMutedBrush}" />
+      <TextBlock Text="Peticiones de cambio" FontSize="20" FontWeight="Bold"
+                 Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+      <TextBlock Text="{Binding ResumenPendientes}" FontSize="12"
+                 Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+    </StackPanel>
+
+    <!-- Barra: filtro por estado y acciones -->
+    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+          <RadioButton Content="Pendientes" GroupName="FiltroPeticion" IsChecked="True"
+                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Command="{Binding CambiarFiltroCommand}" CommandParameter="Pendientes" />
+          <RadioButton Content="Resueltas" GroupName="FiltroPeticion"
+                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Command="{Binding CambiarFiltroCommand}" CommandParameter="Resueltas" />
+          <RadioButton Content="Todas" GroupName="FiltroPeticion"
+                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Command="{Binding CambiarFiltroCommand}" CommandParameter="Todas" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button Content="Aprobar" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
+                  Background="{StaticResource PrimaryBrush}" Foreground="White"
+                  Command="{Binding AprobarCommand}" />
+          <Button Content="Rechazar" Style="{StaticResource BarraBotonStyle}"
+                  Command="{Binding RechazarCommand}" />
+          <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
+                  Command="{Binding RefrescarCommand}" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
+                   Text="{Binding NotaAprobacion}" TextWrapping="Wrap" FontSize="11"
+                   Foreground="{StaticResource TextMutedBrush}" />
+      </Grid>
+    </Border>
+
+    <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+      <DataGrid Style="{StaticResource DataGridStyle}"
+                ItemsSource="{Binding PeticionesView}"
+                SelectedItem="{Binding Seleccionada}">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
+          <DataGridTextColumn Header="Solicitada" Width="130"
+                              Binding="{Binding SolicitadoEn, StringFormat=\{0:dd/MM/yyyy HH:mm\}}" />
+          <DataGridTextColumn Header="Quién" Binding="{Binding SolicitadoPorNombre}" Width="150" />
+          <DataGridTextColumn Header="Acción" Binding="{Binding Accion}" Width="180" />
+          <DataGridTextColumn Header="Sobre" Binding="{Binding EntidadDescripcion}" Width="200" />
+          <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*" />
+          <DataGridTemplateColumn Header="Estado" Width="110">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <Border Style="{StaticResource ChipEstadoPeticionStyle}">
+                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" Foreground="White" />
+                </Border>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTextColumn Header="Resuelta por" Binding="{Binding ResueltoPorNombre}" Width="150" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+  </Grid>
+</UserControl>

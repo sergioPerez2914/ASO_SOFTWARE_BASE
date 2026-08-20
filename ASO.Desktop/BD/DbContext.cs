@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ASO.Desktop.Models;
 using ASO.Desktop.Configuration;
+using ASO.Desktop.Services;
 
 namespace ASO.Desktop.BD;
 
@@ -40,6 +44,25 @@ public class AsoDbContext : DbContext
 
     // Fase 5 (evento derivado/adaptador)
     public DbSet<EventoOperacion> EventosOperacion { get; set; }
+
+    // Fase 6 (organización y seguridad)
+    public DbSet<Organizacion> Organizaciones { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<PermisoUsuario> PermisosUsuario { get; set; }
+    public DbSet<PeticionCambio> PeticionesCambio { get; set; }
+
+    /// <summary>
+    /// Organización sobre la que trabaja ESTE contexto. Se toma del ámbito al construirlo y no
+    /// cambia después: cada método de las fuentes Sql abre su propio contexto, así que un cambio
+    /// de núcleo se refleja en la siguiente consulta sin invalidar nada.
+    ///
+    /// Es un campo de instancia y no una lectura directa de <see cref="Ambito"/> dentro del filtro
+    /// porque EF parametriza el acceso al campo — el modelo se compila una sola vez y el valor
+    /// viaja como parámetro de la consulta.
+    /// </summary>
+    private readonly int? _organizacionId;
+
+    public AsoDbContext() => _organizacionId = Ambito.OrganizacionId;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -466,5 +489,131 @@ public class AsoDbContext : DbContext
             entity.Ignore(e => e.Glifo);
             entity.Ignore(e => e.FechaHoraTexto);
         });
+
+        // ---- Fase 6: organización (núcleo) y seguridad ----
+
+        modelBuilder.Entity<Organizacion>(entity =>
+        {
+            entity.HasKey(o => o.Id);
+            entity.Property(o => o.Codigo).IsRequired().HasMaxLength(20);
+            entity.Property(o => o.Nombre).IsRequired().HasMaxLength(150);
+            entity.HasIndex(o => o.Codigo).IsUnique();
+
+            entity.Ignore(o => o.Etiqueta);
+            entity.Ignore(o => o.EstadoTexto);
+        });
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.HasKey(u => u.Id);
+            entity.Property(u => u.NombreUsuario).IsRequired().HasMaxLength(60);
+            entity.Property(u => u.NombreCompleto).IsRequired().HasMaxLength(150);
+            entity.Property(u => u.PasswordHash).IsRequired().HasMaxLength(120);
+            entity.Property(u => u.PasswordSalt).IsRequired().HasMaxLength(60);
+
+            // Único en todo el sistema, no por organización: al autenticar todavía no se sabe
+            // a qué núcleo pertenece quien escribe, así que un nombre repetido sería ambiguo.
+            entity.HasIndex(u => u.NombreUsuario).IsUnique();
+
+            entity.Ignore(u => u.RolTexto);
+            entity.Ignore(u => u.EstadoTexto);
+        });
+
+        modelBuilder.Entity<PermisoUsuario>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.Property(p => p.Permiso).IsRequired().HasMaxLength(80);
+            entity.Property(p => p.UsuarioNombre).HasMaxLength(60);
+            entity.HasIndex(p => new { p.UsuarioId, p.Permiso }).IsUnique();
+
+            entity.Ignore(p => p.EfectoTexto);
+        });
+
+        modelBuilder.Entity<PeticionCambio>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+            entity.Property(p => p.Permiso).IsRequired().HasMaxLength(80);
+            entity.Property(p => p.Accion).IsRequired().HasMaxLength(120);
+            entity.Property(p => p.TipoEntidad).HasMaxLength(60);
+            entity.Property(p => p.EntidadId).HasMaxLength(60);
+            entity.Property(p => p.EntidadDescripcion).HasMaxLength(300);
+            entity.Property(p => p.Motivo).IsRequired().HasMaxLength(500);
+            entity.Property(p => p.SolicitadoPorNombre).HasMaxLength(150);
+            entity.Property(p => p.ResueltoPorNombre).HasMaxLength(150);
+            entity.Property(p => p.ComentarioResolucion).HasMaxLength(500);
+
+            entity.Ignore(p => p.EstaPendiente);
+            entity.Ignore(p => p.EstadoTexto);
+            entity.Ignore(p => p.Resumen);
+        });
+
+        AplicarFiltroDeOrganizacion(modelBuilder);
+    }
+
+    /// <summary>
+    /// Aísla los núcleos: ninguna consulta devuelve filas de otra organización, sin que las
+    /// fuentes de datos ni los ViewModels tengan que acordarse de filtrar.
+    ///
+    /// Recorre el modelo en vez de listar las entidades una por una, así una entidad nueva que
+    /// implemente <see cref="IDeOrganizacion"/> queda aislada por el solo hecho de existir.
+    /// Es fail-closed: sin ámbito fijado no se ve nada, en vez de verse todo.
+    ///
+    /// Para saltarlo hay que pedirlo explícitamente con <c>IgnoreQueryFilters()</c>, y hoy eso
+    /// solo pasa en el login y en el selector de organizaciones del Desarrollador.
+    /// </summary>
+    private void AplicarFiltroDeOrganizacion(ModelBuilder modelBuilder)
+    {
+        var plantilla = typeof(AsoDbContext).GetMethod(
+            nameof(FiltrarPorOrganizacion),
+            BindingFlags.NonPublic | BindingFlags.Instance)!;
+
+        foreach (var tipo in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(IDeOrganizacion).IsAssignableFrom(tipo.ClrType))
+                plantilla.MakeGenericMethod(tipo.ClrType).Invoke(this, [modelBuilder]);
+        }
+    }
+
+    /// <summary>
+    /// El filtro en sí. Se escribe como lambda normal — y no armando el árbol de expresión a
+    /// mano — porque así el compilador genera la captura de <c>_organizacionId</c> con la forma
+    /// exacta que EF sabe convertir en parámetro de consulta. El modelo se compila una sola vez
+    /// y el mismo modelo sirve para todas las organizaciones.
+    /// </summary>
+    private void FiltrarPorOrganizacion<T>(ModelBuilder modelBuilder) where T : class, IDeOrganizacion
+    {
+        modelBuilder.Entity<T>().HasQueryFilter(e => e.OrganizacionId == _organizacionId);
+    }
+
+    /// <summary>
+    /// Estampa la organización activa en toda fila nueva que pertenezca a un núcleo. Va aquí,
+    /// en un solo sitio, en vez de en los 24 <c>Sql…DataSource</c>: olvidarlo en uno solo
+    /// crearía filas huérfanas que después ninguna consulta devolvería.
+    /// </summary>
+    public override int SaveChanges()
+    {
+        EstamparOrganizacion();
+        return base.SaveChanges();
+    }
+
+    /// <summary>
+    /// La variante asíncrona tiene que estampar igual. Se sobrescribe aunque hoy la capa de datos
+    /// sea toda síncrona: el día que se agregue el primer <c>SaveChangesAsync</c>, sus filas
+    /// nacerían con <c>OrganizacionId = 0</c> y el filtro global las haría invisibles al instante.
+    /// </summary>
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+                                               CancellationToken cancellationToken = default)
+    {
+        EstamparOrganizacion();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    private void EstamparOrganizacion()
+    {
+        foreach (var entrada in ChangeTracker.Entries<IDeOrganizacion>())
+        {
+            if (entrada.State == EntityState.Added && entrada.Entity.OrganizacionId == 0)
+                entrada.Entity.OrganizacionId = Ambito.Exigir();
+        }
     }
 }

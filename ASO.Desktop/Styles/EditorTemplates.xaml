@@ -100,4 +100,16 @@
     <views:NucleoEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:OrganizacionEditorViewModel}">
+    <views:OrganizacionEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:UsuarioEditorViewModel}">
+    <views:UsuarioEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:PermisoUsuarioEditorViewModel}">
+    <views:PermisoUsuarioEditorView />
+  </DataTemplate>
+
 </ResourceDictionary>

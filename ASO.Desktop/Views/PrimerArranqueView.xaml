@@ -1,0 +1,59 @@
+<Window x:Class="ASO.Desktop.Views.PrimerArranqueView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="Configuración inicial — Software ASO"
+        Height="560" Width="420"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow"
+        Background="{StaticResource BackgroundBrush}"
+        FontFamily="Segoe UI">
+
+  <Grid Margin="28">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Margin="0,0,0,16">
+      <TextBlock Text="Configuración inicial" FontSize="20" FontWeight="Bold"
+                 Foreground="{StaticResource PrimaryBrush}" />
+      <TextBlock TextWrapping="Wrap" FontSize="12" Margin="0,4,0,0"
+                 Foreground="{StaticResource TextSecondaryBrush}"
+                 Text="{Binding Explicacion}" />
+    </StackPanel>
+
+    <Border Grid.Row="1" Style="{StaticResource CardStyle}" VerticalAlignment="Top">
+      <StackPanel>
+        <TextBlock Text="Código del núcleo" Style="{StaticResource FormLabelStyle}" />
+        <TextBox Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding CodigoNucleo, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock Text="Nombre del núcleo" Style="{StaticResource FormLabelStyle}" />
+        <TextBox Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding NombreNucleo, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock Text="Usuario desarrollador" Style="{StaticResource FormLabelStyle}" />
+        <TextBox x:Name="UsuarioBox" Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding NombreUsuario, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock Text="Nombre completo" Style="{StaticResource FormLabelStyle}" />
+        <TextBox Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding NombreCompleto, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock Text="Contraseña" Style="{StaticResource FormLabelStyle}" />
+        <PasswordBox x:Name="PasswordBox" Padding="8,6" />
+
+        <TextBlock Text="{Binding MensajeError}" Foreground="{StaticResource DangerBrush}"
+                   FontSize="12" TextWrapping="Wrap" Margin="0,10,0,0" />
+
+        <Button Content="Crear y continuar" Margin="0,18,0,0" Padding="8,10"
+                Background="{StaticResource PrimaryBrush}" Foreground="White" BorderThickness="0"
+                Cursor="Hand" Click="OnCrear" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

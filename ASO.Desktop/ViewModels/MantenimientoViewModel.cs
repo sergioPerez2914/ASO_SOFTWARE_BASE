@@ -39,7 +39,7 @@ public sealed class MantenimientoViewModel : ViewModelBase
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
     public event EventHandler? VolverSolicitado;
 
-    public MantenimientoViewModel(Modulo modulo, Submodulo submodulo)
+    public MantenimientoViewModel(Modulo modulo, Submodulo submodulo, ISesionActual? sesion = null)
     {
         Modulo = modulo;
         Submodulo = submodulo;
@@ -50,7 +50,7 @@ public sealed class MantenimientoViewModel : ViewModelBase
         _servicio = new MantenimientoService(_registrosFuente, _activosFuente,
             DataSourceFactory.CrearReglasMantenimiento(), DataSourceFactory.CrearEventosOperacion(), _remesas);
         _dialogos = new ServicioDialogo();
-        _sesion = SesionActual.Instancia;
+        _sesion = sesion ?? SesionActual.Instancia;
 
         // El filtro debe tener valor ANTES de cablear la vista: agregar el SortDescription
         // dispara un Refresh que ya ejecuta Filtrar.

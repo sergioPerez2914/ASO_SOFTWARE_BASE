@@ -3,7 +3,14 @@ using System.Linq;
 
 namespace ASO.Desktop.Navigation;
 
-public sealed record Submodulo(string Clave, string Nombre, string Descripcion, string Icono);
+public sealed record Submodulo(string Clave, string Nombre, string Descripcion, string Icono)
+{
+    /// <summary>
+    /// Permiso de navegación, DERIVADO de la clave en vez de declarado aparte: así no puede
+    /// desincronizarse al renombrar un submódulo. Ej.: "Ver.Operaciones.Registro".
+    /// </summary>
+    public string Permiso => Services.Permisos.Ver(Clave);
+}
 
 public sealed record Modulo(
     string Clave,
@@ -11,7 +18,12 @@ public sealed record Modulo(
     string Descripcion,
     string Icono,
     IReadOnlyList<string> Indicadores,
-    IReadOnlyList<Submodulo> Submodulos);
+    IReadOnlyList<Submodulo> Submodulos)
+{
+    /// <summary>Permiso propio. Solo decide por sí mismo en los módulos SIN submódulos
+    /// (Inicio, Peticiones); en el resto la visibilidad la deciden sus submódulos.</summary>
+    public string Permiso => Services.Permisos.Ver(Clave);
+}
 
 /// <summary>
 /// Fuente única de la estructura de navegación: cinco módulos, cada uno con sus submódulos.
@@ -29,6 +41,19 @@ public static class ModuloCatalogo
         [],
         []);
 
+    /// <summary>
+    /// Bandeja de peticiones de cambio. Es un pseudo-módulo fijado en el menú, igual que
+    /// <see cref="Inicio"/>: no cuelga de ninguno de los cinco porque las peticiones
+    /// atraviesan todos (una anulación de remesa y una de factura caen en la misma bandeja).
+    /// </summary>
+    public static Modulo Peticiones { get; } = new(
+        "Peticiones",
+        "Peticiones",
+        "Solicitudes de cambio pendientes de aprobación.",
+        "",
+        [],
+        []);
+
     public static IReadOnlyList<Modulo> Modulos { get; } =
     [
         new Modulo(
@@ -43,7 +68,7 @@ public static class ModuloCatalogo
                 new Submodulo("Operaciones.Seguimiento", "Seguimiento",
                     "Estado y avance de las operaciones en curso.", ""),
                 new Submodulo("Operaciones.FincasNucleos", "Fincas y Núcleos",
-                    "Catálogo de fincas, lotes/tablones y núcleos de productores.", "")
+                    "Catálogo de fincas, lotes/tablones y núcleos de productores.", "")
             ]),
 
         new Modulo(
@@ -107,6 +132,27 @@ public static class ModuloCatalogo
             ])
     ];
 
+    /// <summary>
+    /// Administración del sistema: núcleos, usuarios y permisos. Fijado como
+    /// <see cref="Peticiones"/>, y por el mismo motivo: no pertenece a ninguno de los cinco
+    /// módulos del negocio.
+    /// </summary>
+    public static Modulo Administracion { get; } = new(
+        "Administracion",
+        "Administración",
+        "Núcleos, usuarios, roles y permisos.",
+        "",
+        [],
+        []);
+
+    /// <summary>Todos los módulos fijados fuera de la lista de cinco, en orden de menú.</summary>
+    public static IReadOnlyList<Modulo> Fijados { get; } = [Inicio, Peticiones, Administracion];
+
     public static Modulo? BuscarModulo(string clave)
-        => clave == Inicio.Clave ? Inicio : Modulos.FirstOrDefault(m => m.Clave == clave);
+        => Fijados.FirstOrDefault(m => m.Clave == clave)
+           ?? Modulos.FirstOrDefault(m => m.Clave == clave);
+
+    /// <summary>Resuelve un submódulo por su clave completa ("Modulo.Submodulo").</summary>
+    public static Submodulo? BuscarSubmodulo(string clave)
+        => Modulos.SelectMany(m => m.Submodulos).FirstOrDefault(s => s.Clave == clave);
 }

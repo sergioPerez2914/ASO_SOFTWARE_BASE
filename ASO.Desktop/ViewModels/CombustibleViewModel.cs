@@ -23,6 +23,7 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
     private readonly IValeCombustibleDataSource _vales;
     private readonly ITanqueCombustibleDataSource _tanques;
     private readonly IServicioDialogo _dialogos;
+    private readonly SolicitudesDeCambio _solicitudes;
     private readonly ISesionActual _sesionActual;
     private readonly CombustibleService _servicio;
 
@@ -47,6 +48,7 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
 
         _vales = vales;
         _dialogos = dialogos;
+        _solicitudes = new SolicitudesDeCambio(sesion, dialogos);
         _sesionActual = sesion;
         _tanques = DataSourceFactory.CrearTanquesCombustible();
 
@@ -66,11 +68,12 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
         ConfirmarCommand = new RelayCommand(Confirmar,
             () => SelectedItem is { } v && _servicio.PuedeConfirmar(v) && _sesionActual.Puede("Combustible.Confirmar"));
 
+        // Anular un vale y recargar la cisterna son de administrador; el remesero las solicita.
         AnularCommand = new RelayCommand(Anular,
-            () => SelectedItem is { } v && _servicio.PuedeAnular(v) && _sesionActual.Puede("Combustible.Anular"));
+            () => SelectedItem is { } v && _servicio.PuedeAnular(v) && _solicitudes.PuedeIntentar(Permisos.Combustible.Anular));
 
         RegistrarRecargaCommand = new RelayCommand(RegistrarRecarga,
-            () => _sesionActual.Puede("Combustible.Recargar"));
+            () => _solicitudes.PuedeIntentar(Permisos.Combustible.Recargar));
     }
 
     // --- Encabezado de la pantalla ---
@@ -150,6 +153,14 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
         if (SelectedItem is not { } vale)
             return;
 
+        if (_solicitudes.RequierePeticion(Permisos.Combustible.Anular))
+        {
+            _solicitudes.Solicitar(Permisos.Combustible.Anular, "Anular vale de combustible",
+                nameof(ValeCombustible), vale.Id.ToString(),
+                $"Vale Nº {vale.Id} · {vale.ActivoEtiqueta} — {vale.LitrosTexto}");
+            return;
+        }
+
         var editor = new MotivoEditorViewModel(
             $"Anular vale Nº {vale.Id}",
             $"{vale.ActivoEtiqueta} — {vale.LitrosTexto} desde {vale.TanqueNombre}",
@@ -164,6 +175,13 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
 
     private void RegistrarRecarga()
     {
+        if (_solicitudes.RequierePeticion(Permisos.Combustible.Recargar))
+        {
+            _solicitudes.Solicitar(Permisos.Combustible.Recargar, "Registrar recarga de cisterna",
+                nameof(TanqueCombustible), string.Empty, "Entrada de combustible a la cisterna");
+            return;
+        }
+
         var editor = new RecargaEditorViewModel(_tanques);
         if (!_dialogos.MostrarEditor(editor))
             return;

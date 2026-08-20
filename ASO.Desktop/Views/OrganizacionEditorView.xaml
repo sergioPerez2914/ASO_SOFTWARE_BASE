@@ -1,0 +1,25 @@
+<UserControl x:Class="ASO.Desktop.Views.OrganizacionEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="380">
+
+  <StackPanel>
+    <TextBlock Text="Código" Style="{StaticResource FormLabelStyle}" />
+    <TextBox Style="{StaticResource FormTextBoxStyle}"
+             Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}" />
+
+    <TextBlock Text="Nombre" Style="{StaticResource FormLabelStyle}" />
+    <TextBox Style="{StaticResource FormTextBoxStyle}"
+             Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+
+    <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
+              IsChecked="{Binding Activa}" />
+
+    <TextBlock Text="Un núcleo no se elimina: sus datos quedarían sin dueño y dejarían de verse. Para retirarlo, desmárcalo como activo."
+               FontSize="11" TextWrapping="Wrap"
+               Foreground="{StaticResource TextMutedBrush}" Margin="0,10,0,0" />
+  </StackPanel>
+</UserControl>
