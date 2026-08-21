@@ -84,10 +84,18 @@ los modelos NO implementan INotifyPropertyChanged) · `Services/I<X>DataSource.c
 `CanExecute` + transiciones que revalidan y lanzan `InvalidOperationException` en español) ·
 `ViewModels/<Submodulo>ViewModel.cs` · editores · vistas XAML.
 
+La fuente de datos es una línea, no una clase: hereda de `SqlCrudDataSource<T, TId>` y solo declara
+las consultas que sean suyas. Si la entidad es una raíz con hijos que se guardan juntos, hereda de
+`SqlAgregadoDataSource<T, TId>` en su lugar. El ViewModel de la pantalla hereda de
+`PantallaViewModelBase`, o de `PantallaCrudViewModel<T, TId>` si además es el listado CRUD de un
+maestro; las dos ramas cumplen `IPantalla`, que es lo que el shell enruta.
+
 Archivos a **modificar** siempre: `Configuration/DataSourceFactory.cs` (campo cacheado `??=`),
-`BD/DbContext.cs` (`DbSet` + configuración), `MainWindow.CrearVistaSubmodulo` (un `case` por clave),
-`Styles/EditorTemplates.xaml` (un `DataTemplate` por editor, o la ventana sale vacía) y
-`Styles/Theme.xaml` (un `Chip…Style` por enum de estado nuevo). Después, `dotnet ef migrations add`.
+`BD/DbContext.cs` (`DbSet` + configuración), la tabla `Pantallas` de `MainWindow.xaml.cs` (una línea
+por clave de submódulo), `Styles/PantallaTemplates.xaml` (un `DataTemplate` por pantalla, o el área
+de contenido muestra el nombre del tipo del ViewModel), `Styles/EditorTemplates.xaml` (un
+`DataTemplate` por editor, o la ventana sale vacía) y `Styles/Theme.xaml` (un `Chip…Style` por enum
+de estado nuevo, con `BasedOn="{StaticResource ChipBaseStyle}"`). Después, `dotnet ef migrations add`.
 
 El permiso de navegación **no se declara**: `Submodulo.Permiso` lo deriva de la clave
 (`Ver.<Clave>`), así que basta con dar de alta el submódulo en `ModuloCatalogo`. Lo que sí hay que
@@ -155,8 +163,8 @@ de productores a la vez (corte, alza y transporte) y **una sola** organización.
 - **`BD/DbContext.cs` hace todo el trabajo, en dos sitios:**
   - `AplicarFiltroDeOrganizacion` recorre el modelo y pone un `HasQueryFilter` a cada
     `IDeOrganizacion`. Es **fail-closed**: sin ámbito fijado no se ve nada, en vez de verse todo.
-  - `SaveChanges()` estampa `OrganizacionId` en toda fila nueva. Un solo sitio, en vez de los 25
-    `Sql…DataSource`: olvidarlo en uno crearía filas que después ninguna consulta devolvería.
+  - `SaveChanges()` estampa `OrganizacionId` en toda fila nueva. Un solo sitio: olvidarlo en una
+    fuente de datos crearía filas que después ninguna consulta devolvería.
 - **`Services/Ambito.cs`** guarda la organización activa. La fija `SesionActual.IniciarSesion` a
   partir del usuario; solo el Desarrollador la cambia después (`Ambito.Cambiar`).
 - **`IgnoreQueryFilters()` se usa en dos sitios y solo dos**: el login (al autenticar todavía no hay
