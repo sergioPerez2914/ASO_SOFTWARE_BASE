@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
@@ -16,12 +15,10 @@ namespace ASO.Desktop.ViewModels;
 /// PROVISIONAL: pendiente de que el socio defina si una misma persona puede estar en ambos
 /// padrones; hasta entonces se administran por separado y no se cruzan cédulas entre ellos.
 /// </summary>
-public sealed class EmpleadosViewModel : ViewModelBase
+public sealed class EmpleadosViewModel : PantallaViewModelBase
 {
     public const string VistaAdministrativos = "Administrativos";
     public const string VistaCampo = "Campo";
-
-    public event EventHandler? VolverSolicitado;
 
     public EmpleadosViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, new ServicioDialogo(), SesionActual.Instancia)
@@ -32,20 +29,13 @@ public sealed class EmpleadosViewModel : ViewModelBase
                                Submodulo submodulo,
                                IServicioDialogo dialogos,
                                ISesionActual sesion)
+        : base(modulo, submodulo)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         Administrativos = new EmpleadosAdminViewModel(DataSourceFactory.CrearEmpleados(), dialogos, sesion);
         Campo = new PersonalCampoCrudViewModel(DataSourceFactory.CrearPersonalCampo(), dialogos, sesion);
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }
-
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
     public EmpleadosAdminViewModel Administrativos { get; }
     public PersonalCampoCrudViewModel Campo { get; }
@@ -56,17 +46,15 @@ public sealed class EmpleadosViewModel : ViewModelBase
         get => _vistaActual;
         set
         {
+            // Notifica todas: enumerar aqui un OnPropertyChanged por cada Mostrar… es
+            // la lista que se queda corta el dia que se agrega un padron mas.
             if (SetProperty(ref _vistaActual, value))
-            {
-                OnPropertyChanged(nameof(MostrarAdministrativos));
-                OnPropertyChanged(nameof(MostrarCampo));
-            }
+                OnTodasLasPropiedadesCambiaron();
         }
     }
 
     public bool MostrarAdministrativos => VistaActual == VistaAdministrativos;
     public bool MostrarCampo => VistaActual == VistaCampo;
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarVistaCommand { get; }
 }

@@ -16,7 +16,7 @@ namespace ASO.Desktop.ViewModels;
 /// <see cref="HorarioService"/>). El alta pasa igualmente por el servicio, que es quien
 /// impide abrir dos jornadas a la misma persona.
 /// </summary>
-public sealed class HorariosViewModel : CrudViewModelBase<JornadaTrabajo, int>
+public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, int>
 {
     private const string FiltroTodas = "Todas";
 
@@ -26,8 +26,6 @@ public sealed class HorariosViewModel : CrudViewModelBase<JornadaTrabajo, int>
     private readonly HorarioService _servicio;
 
     private string _filtroEstado = FiltroTodas;
-
-    public event EventHandler? VolverSolicitado;
 
     public HorariosViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, DataSourceFactory.CrearJornadas(), new ServicioDialogo(), SesionActual.Instancia)
@@ -39,17 +37,12 @@ public sealed class HorariosViewModel : CrudViewModelBase<JornadaTrabajo, int>
                               IJornadaDataSource jornadas,
                               IServicioDialogo dialogos,
                               ISesionActual sesion)
-        : base(jornadas, dialogos, sesion)
+        : base(modulo, submodulo, jornadas, dialogos, sesion)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _jornadas = jornadas;
         _dialogos = dialogos;
         _sesionActual = sesion;
         _servicio = new HorarioService(jornadas);
-
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -65,11 +58,7 @@ public sealed class HorariosViewModel : CrudViewModelBase<JornadaTrabajo, int>
     }
 
     // --- Encabezado de la pantalla ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarFiltroEstadoCommand { get; }
     public ICommand RegistrarEntradaCommand { get; }
     public ICommand RegistrarSalidaCommand { get; }

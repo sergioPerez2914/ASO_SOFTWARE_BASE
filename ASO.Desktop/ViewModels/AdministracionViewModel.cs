@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
@@ -14,13 +13,11 @@ namespace ASO.Desktop.ViewModels;
 /// <see cref="FincasYNucleosViewModel"/>. El de núcleos solo aparece para el Desarrollador:
 /// un administrador manda en el suyo, no reparte núcleos.
 /// </summary>
-public sealed class AdministracionViewModel : ViewModelBase
+public sealed class AdministracionViewModel : PantallaViewModelBase
 {
     public const string VistaOrganizaciones = "Organizaciones";
     public const string VistaUsuarios = "Usuarios";
     public const string VistaPermisos = "Permisos";
-
-    public event EventHandler? VolverSolicitado;
 
     public AdministracionViewModel(Modulo modulo)
         : this(modulo, new ServicioDialogo(), SesionActual.Instancia)
@@ -28,9 +25,8 @@ public sealed class AdministracionViewModel : ViewModelBase
     }
 
     private AdministracionViewModel(Modulo modulo, IServicioDialogo dialogos, ISesionActual sesion)
+        : base(modulo)
     {
-        Modulo = modulo;
-
         var usuarios = DataSourceFactory.CrearUsuarios();
         Organizaciones = new OrganizacionCrudViewModel(
             DataSourceFactory.CrearOrganizaciones(), dialogos, sesion);
@@ -41,12 +37,8 @@ public sealed class AdministracionViewModel : ViewModelBase
         PuedeVerOrganizaciones = sesion.Puede(Services.Permisos.Organizaciones.Crear);
         VistaActual = PuedeVerOrganizaciones ? VistaOrganizaciones : VistaUsuarios;
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }
-
-    public Modulo Modulo { get; }
-    public string Ruta => Modulo.Nombre;
 
     public OrganizacionCrudViewModel Organizaciones { get; }
     public UsuariosCrudViewModel Usuarios { get; }
@@ -68,12 +60,10 @@ public sealed class AdministracionViewModel : ViewModelBase
         get => _vistaActual;
         set
         {
+            // Notifica todas: enumerar aqui un OnPropertyChanged por cada Mostrar… es
+            // la lista que se queda corta el dia que se agrega un padron mas.
             if (SetProperty(ref _vistaActual, value))
-            {
-                OnPropertyChanged(nameof(MostrarOrganizaciones));
-                OnPropertyChanged(nameof(MostrarUsuarios));
-                OnPropertyChanged(nameof(MostrarPermisos));
-            }
+                OnTodasLasPropiedadesCambiaron();
         }
     }
 
@@ -81,6 +71,5 @@ public sealed class AdministracionViewModel : ViewModelBase
     public bool MostrarUsuarios => VistaActual == VistaUsuarios;
     public bool MostrarPermisos => VistaActual == VistaPermisos;
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarVistaCommand { get; }
 }

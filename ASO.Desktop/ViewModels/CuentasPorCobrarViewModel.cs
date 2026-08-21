@@ -15,7 +15,7 @@ namespace ASO.Desktop.ViewModels;
 /// recibidas y el tarifario. Por eso el alta y la edición heredados del CRUD quedan
 /// deshabilitados y en su lugar están Generar, Emitir, Registrar cobro y Anular.
 /// </summary>
-public sealed class CuentasPorCobrarViewModel : CrudViewModelBase<FacturaCliente, int>
+public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCliente, int>
 {
     private const string FiltroTodas = "Todas";
 
@@ -25,8 +25,6 @@ public sealed class CuentasPorCobrarViewModel : CrudViewModelBase<FacturaCliente
     private readonly TarifaService _tarifas;
 
     private string _filtroEstado = FiltroTodas;
-
-    public event EventHandler? VolverSolicitado;
 
     public CuentasPorCobrarViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, DataSourceFactory.CrearFacturasCliente(), new ServicioDialogo(), SesionActual.Instancia)
@@ -38,17 +36,12 @@ public sealed class CuentasPorCobrarViewModel : CrudViewModelBase<FacturaCliente
                                       IFacturaClienteDataSource facturas,
                                       IServicioDialogo dialogos,
                                       ISesionActual sesion)
-        : base(facturas, dialogos, sesion)
+        : base(modulo, submodulo, facturas, dialogos, sesion)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _dialogos = dialogos;
         _sesionActual = sesion;
         _tarifas = new TarifaService(DataSourceFactory.CrearTarifas());
         _servicio = new FacturaClienteService(facturas, DataSourceFactory.CrearRemesas(), _tarifas);
-
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -79,11 +72,7 @@ public sealed class CuentasPorCobrarViewModel : CrudViewModelBase<FacturaCliente
     }
 
     // --- Encabezado de la pantalla ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarFiltroEstadoCommand { get; }
     public ICommand GenerarCommand { get; }
     public ICommand EmitirCommand { get; }

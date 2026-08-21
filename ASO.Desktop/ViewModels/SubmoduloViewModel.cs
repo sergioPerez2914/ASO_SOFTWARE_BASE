@@ -1,5 +1,3 @@
-using System;
-using System.Windows.Input;
 using ASO.Desktop.Navigation;
 
 namespace ASO.Desktop.ViewModels;
@@ -9,26 +7,14 @@ namespace ASO.Desktop.ViewModels;
 /// motivos por los que un submódulo puede no mostrarse: todavía no está construido, o el
 /// usuario no tiene permiso para verlo. El mensaje lo decide quien la crea.
 /// </summary>
-public sealed class SubmoduloViewModel : ViewModelBase
+public sealed class SubmoduloViewModel : PantallaViewModelBase
 {
-    public event EventHandler? VolverSolicitado;
-
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
-
     public string Titulo { get; private init; } = "Submódulo en construcción";
     public string Detalle { get; private init; } = "Todavía no tiene pantallas ni fuente de datos conectada.";
 
-    public ICommand VolverCommand { get; }
-
     public SubmoduloViewModel(Modulo modulo, Submodulo submodulo)
+        : base(modulo, submodulo)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
     }
 
     /// <summary>

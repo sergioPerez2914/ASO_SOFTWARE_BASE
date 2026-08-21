@@ -23,7 +23,7 @@ namespace ASO.Desktop.ViewModels;
 /// el servicio rechaza por falta de existencia y el usuario tiene el permiso de excepción, se
 /// le pregunta explícitamente antes de reintentar. No se fuerza en silencio.
 /// </summary>
-public sealed class RepuestosViewModel : CrudViewModelBase<InventoryItem, string>
+public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, string>
 {
     public const string VistaExistencias = "Existencias";
     public const string VistaSalidas = "Salidas";
@@ -39,8 +39,6 @@ public sealed class RepuestosViewModel : CrudViewModelBase<InventoryItem, string
     private string _filtroEstadoStock = FiltroTodos;
     private string _filtroEstadoSalida = FiltroTodos;
 
-    public event EventHandler? VolverSolicitado;
-
     public RepuestosViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, DataSourceFactory.CrearInventario(), new ServicioDialogo(), SesionActual.Instancia)
     {
@@ -51,11 +49,8 @@ public sealed class RepuestosViewModel : CrudViewModelBase<InventoryItem, string
                                IInventoryDataSource articulos,
                                IServicioDialogo dialogos,
                                ISesionActual sesion)
-        : base(articulos, dialogos, sesion)
+        : base(modulo, submodulo, articulos, dialogos, sesion)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _articulos = articulos;
         _dialogos = dialogos;
         _sesionActual = sesion;
@@ -67,8 +62,6 @@ public sealed class RepuestosViewModel : CrudViewModelBase<InventoryItem, string
             _fuenteSalidas.GetAll().OrderByDescending(s => s.Fecha));
         SalidasView = CollectionViewSource.GetDefaultView(Salidas);
         SalidasView.Filter = FiltrarSalida;
-
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
 
@@ -101,11 +94,7 @@ public sealed class RepuestosViewModel : CrudViewModelBase<InventoryItem, string
     }
 
     // --- Encabezado de la pantalla ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarVistaCommand { get; }
     public ICommand CambiarFiltroStockCommand { get; }
     public ICommand CambiarFiltroSalidaCommand { get; }
@@ -135,11 +124,10 @@ public sealed class RepuestosViewModel : CrudViewModelBase<InventoryItem, string
         get => _vistaActual;
         set
         {
+            // Notifica todas: enumerar aqui un OnPropertyChanged por cada Mostrar… es
+            // la lista que se queda corta el dia que se agrega un padron mas.
             if (SetProperty(ref _vistaActual, value))
-            {
-                OnPropertyChanged(nameof(MostrarExistencias));
-                OnPropertyChanged(nameof(MostrarSalidas));
-            }
+                OnTodasLasPropiedadesCambiaron();
         }
     }
 

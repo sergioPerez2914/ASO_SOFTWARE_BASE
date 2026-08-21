@@ -36,27 +36,22 @@ public sealed record EntregaProducto(
 /// PROVISIONAL: el corte por período usa rangos fijos. Cuando exista el maestro de zafras, el
 /// reporte se filtrará por la zafra activa como el resto del sistema.
 /// </summary>
-public sealed class ProductoViewModel : ViewModelBase
+public sealed class ProductoViewModel : PantallaViewModelBase
 {
     private const string RangoTodo = "Todo";
 
     private readonly IRemesaDataSource _remesas;
     private string _rango = RangoTodo;
 
-    public event EventHandler? VolverSolicitado;
-
     public ProductoViewModel(Modulo modulo, Submodulo submodulo)
+        : base(modulo, submodulo)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _remesas = DataSourceFactory.CrearRemesas();
 
         Entregas = [];
         EntregasView = CollectionViewSource.GetDefaultView(Entregas);
         EntregasView.Filter = FiltrarEntrega;
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         RefrescarCommand = new RelayCommand(Cargar);
 
         CambiarRangoCommand = new RelayCommand<string>(rango =>
@@ -70,11 +65,7 @@ public sealed class ProductoViewModel : ViewModelBase
     }
 
     // --- Encabezado de la pantalla ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand RefrescarCommand { get; }
     public ICommand CambiarRangoCommand { get; }
 

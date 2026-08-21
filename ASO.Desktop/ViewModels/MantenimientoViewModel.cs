@@ -25,7 +25,7 @@ public sealed class OpcionActivo
 /// historial) y el registro de mantenimientos realizados. Los registros son constancias
 /// inmutables: se agregan, no se editan ni se borran.
 /// </summary>
-public sealed class MantenimientoViewModel : ViewModelBase
+public sealed class MantenimientoViewModel : PantallaViewModelBase
 {
     private const string FiltroTodos = "Todos";
 
@@ -37,13 +37,10 @@ public sealed class MantenimientoViewModel : ViewModelBase
     private readonly ISesionActual _sesion;
 
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
-    public event EventHandler? VolverSolicitado;
 
     public MantenimientoViewModel(Modulo modulo, Submodulo submodulo, ISesionActual? sesion = null)
+        : base(modulo, submodulo)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _registrosFuente = DataSourceFactory.CrearMantenimientos();
         _activosFuente = DataSourceFactory.CrearActivosFlota();
         _remesas = DataSourceFactory.CrearRemesas();
@@ -64,7 +61,6 @@ public sealed class MantenimientoViewModel : ViewModelBase
         RegistrosView.SortDescriptions.Add(
             new SortDescription(nameof(MantenimientoRegistro.Fecha), ListSortDirection.Descending));
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         RefrescarCommand = new RelayCommand(Refrescar);
 
         RegistrarCommand = new RelayCommand(() => Registrar(null, null),
@@ -84,11 +80,7 @@ public sealed class MantenimientoViewModel : ViewModelBase
     }
 
     // --- Encabezado ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand RefrescarCommand { get; }
     public ICommand RegistrarCommand { get; }
     public ICommand RegistrarDesdeRecomendacionCommand { get; }

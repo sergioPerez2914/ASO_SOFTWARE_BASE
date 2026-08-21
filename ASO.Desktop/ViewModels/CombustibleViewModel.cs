@@ -16,7 +16,7 @@ namespace ASO.Desktop.ViewModels;
 /// refleja el resultado. Tras cada transición se recargan las cisternas porque su existencia
 /// cambió: la tarjeta de arriba y la grilla miran el mismo hecho desde dos ángulos.
 /// </summary>
-public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, int>
+public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible, int>
 {
     private const string FiltroTodos = "Todos";
 
@@ -29,8 +29,6 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
 
     private string _filtroEstado = FiltroTodos;
 
-    public event EventHandler? VolverSolicitado;
-
     public CombustibleViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, DataSourceFactory.CrearValesCombustible(), new ServicioDialogo(), SesionActual.Instancia)
     {
@@ -41,11 +39,8 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
                                  IValeCombustibleDataSource vales,
                                  IServicioDialogo dialogos,
                                  ISesionActual sesion)
-        : base(vales, dialogos, sesion)
+        : base(modulo, submodulo, vales, dialogos, sesion)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _vales = vales;
         _dialogos = dialogos;
         _solicitudes = new SolicitudesDeCambio(sesion, dialogos);
@@ -56,8 +51,6 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
             vales, _tanques, DataSourceFactory.CrearRecargasCombustible(), DataSourceFactory.CrearActivosFlota());
 
         Tanques = new ObservableCollection<TanqueCombustible>(_tanques.GetAll());
-
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -77,11 +70,7 @@ public sealed class CombustibleViewModel : CrudViewModelBase<ValeCombustible, in
     }
 
     // --- Encabezado de la pantalla ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarFiltroEstadoCommand { get; }
     public ICommand ConfirmarCommand { get; }
     public ICommand AnularCommand { get; }

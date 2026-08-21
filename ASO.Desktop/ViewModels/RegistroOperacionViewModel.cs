@@ -15,7 +15,7 @@ namespace ASO.Desktop.ViewModels;
 /// el resultado. Si el servicio rechaza una transición, se informa al usuario en vez de tragarse
 /// el error: el botón deshabilitado es cortesía, la regla la impone el servicio.
 /// </summary>
-public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
+public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, int>
 {
     private const string FiltroTodas = "Todas";
 
@@ -29,7 +29,6 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
     private readonly IActivoFlotaDataSource _vehiculos;
 
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
-    public event EventHandler? VolverSolicitado;
 
     public RegistroOperacionViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, DataSourceFactory.CrearRemesas(), new ServicioDialogo(), SesionActual.Instancia)
@@ -41,11 +40,8 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
                                        IRemesaDataSource remesas,
                                        IServicioDialogo dialogos,
                                        ISesionActual sesion)
-        : base(remesas, dialogos, sesion)
+        : base(modulo, submodulo, remesas, dialogos, sesion)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _servicio = new RemesaService(remesas);
         _dialogos = dialogos;
         _sesionActual = sesion;
@@ -53,8 +49,6 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
         _nucleos = DataSourceFactory.CrearNucleos();
         _personal = DataSourceFactory.CrearPersonalCampo();
         _vehiculos = DataSourceFactory.CrearActivosFlota();
-
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
 
         ConfirmarCommand = new RelayCommand(Confirmar,
             () => SelectedItem is { } r && _servicio.PuedeConfirmar(r) && _sesionActual.Puede("Remesas.Confirmar"));
@@ -75,11 +69,7 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
     }
 
     // --- Encabezado de la pantalla (mismo patrón que SubmoduloViewModel) ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand ConfirmarCommand { get; }
     public ICommand AnularCommand { get; }
     public ICommand RegistrarRecepcionCommand { get; }

@@ -14,14 +14,12 @@ namespace ASO.Desktop.ViewModels;
 /// Editar o borrar una tarifa no altera lo ya emitido: cada factura y cada liquidación
 /// guardan el monto que se les aplicó en el momento (ver <see cref="TarifaService"/>).
 /// </summary>
-public sealed class TarifasViewModel : CrudViewModelBase<Tarifa, int>
+public sealed class TarifasViewModel : PantallaCrudViewModel<Tarifa, int>
 {
     private const string FiltroTodas = "Todas";
 
     private readonly TarifaService _servicio;
     private string _filtroAmbito = FiltroTodas;
-
-    public event EventHandler? VolverSolicitado;
 
     public TarifasViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, DataSourceFactory.CrearTarifas(), new ServicioDialogo(), SesionActual.Instancia)
@@ -33,14 +31,9 @@ public sealed class TarifasViewModel : CrudViewModelBase<Tarifa, int>
                              ITarifaDataSource tarifas,
                              IServicioDialogo dialogos,
                              ISesionActual sesion)
-        : base(tarifas, dialogos, sesion)
+        : base(modulo, submodulo, tarifas, dialogos, sesion)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _servicio = new TarifaService(tarifas);
-
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
 
         CambiarFiltroAmbitoCommand = new RelayCommand<string>(filtro =>
         {
@@ -49,11 +42,6 @@ public sealed class TarifasViewModel : CrudViewModelBase<Tarifa, int>
         });
     }
 
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
-
-    public ICommand VolverCommand { get; }
     public ICommand CambiarFiltroAmbitoCommand { get; }
 
     protected override string ModuloPermiso => "Tarifas";

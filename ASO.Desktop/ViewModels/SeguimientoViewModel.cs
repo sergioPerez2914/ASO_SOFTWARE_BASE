@@ -18,7 +18,7 @@ namespace ASO.Desktop.ViewModels;
 /// No hereda de <see cref="CrudViewModelBase{T, TId}"/> a propósito: aquí no se dan de alta ni se
 /// borran remesas, solo se consultan y se les agregan notas.
 /// </summary>
-public sealed class SeguimientoViewModel : ViewModelBase
+public sealed class SeguimientoViewModel : PantallaViewModelBase
 {
     private const string FiltroTodas = "Todas";
 
@@ -28,7 +28,6 @@ public sealed class SeguimientoViewModel : ViewModelBase
     private readonly ISesionActual _sesion;
 
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
-    public event EventHandler? VolverSolicitado;
 
     public SeguimientoViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo,
@@ -45,10 +44,8 @@ public sealed class SeguimientoViewModel : ViewModelBase
                                  IEventoOperacionDataSource eventos,
                                  IServicioDialogo dialogos,
                                  ISesionActual sesion)
+        : base(modulo, submodulo)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _remesas = remesas;
         _servicio = new SeguimientoService(eventos);
         _dialogos = dialogos;
@@ -60,7 +57,6 @@ public sealed class SeguimientoViewModel : ViewModelBase
         RemesasView.SortDescriptions.Add(
             new SortDescription(nameof(Remesa.InicioCarga), ListSortDirection.Descending));
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         RefrescarCommand = new RelayCommand(Refrescar);
 
         AgregarNotaCommand = new RelayCommand(AgregarNota,
@@ -74,11 +70,7 @@ public sealed class SeguimientoViewModel : ViewModelBase
     }
 
     // --- Encabezado de la pantalla (mismo patrón que las demás) ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand RefrescarCommand { get; }
     public ICommand AgregarNotaCommand { get; }
     public ICommand CambiarFiltroEstadoCommand { get; }

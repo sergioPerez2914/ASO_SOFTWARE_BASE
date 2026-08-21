@@ -16,7 +16,7 @@ namespace ASO.Desktop.ViewModels;
 /// alta y la edición heredados del CRUD quedan deshabilitados y en su lugar están Generar,
 /// Agregar concepto, Cerrar, Pagar y Anular.
 /// </summary>
-public sealed class LiquidacionesViewModel : CrudViewModelBase<Liquidacion, int>
+public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, int>
 {
     private const string FiltroTodas = "Todas";
 
@@ -25,8 +25,6 @@ public sealed class LiquidacionesViewModel : CrudViewModelBase<Liquidacion, int>
     private readonly LiquidacionService _servicio;
 
     private string _filtroEstado = FiltroTodas;
-
-    public event EventHandler? VolverSolicitado;
 
     public LiquidacionesViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, DataSourceFactory.CrearLiquidaciones(), new ServicioDialogo(), SesionActual.Instancia)
@@ -38,11 +36,8 @@ public sealed class LiquidacionesViewModel : CrudViewModelBase<Liquidacion, int>
                                    ILiquidacionDataSource liquidaciones,
                                    IServicioDialogo dialogos,
                                    ISesionActual sesion)
-        : base(liquidaciones, dialogos, sesion)
+        : base(modulo, submodulo, liquidaciones, dialogos, sesion)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         _dialogos = dialogos;
         _sesionActual = sesion;
 
@@ -51,8 +46,6 @@ public sealed class LiquidacionesViewModel : CrudViewModelBase<Liquidacion, int>
             DataSourceFactory.CrearRemesas(),
             new TarifaService(DataSourceFactory.CrearTarifas()),
             new HorarioService(DataSourceFactory.CrearJornadas()));
-
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -93,11 +86,7 @@ public sealed class LiquidacionesViewModel : CrudViewModelBase<Liquidacion, int>
     }
 
     // --- Encabezado de la pantalla ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarFiltroEstadoCommand { get; }
     public ICommand GenerarCommand { get; }
     public ICommand AgregarConceptoCommand { get; }

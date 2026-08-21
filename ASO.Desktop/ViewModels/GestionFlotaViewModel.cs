@@ -18,7 +18,7 @@ namespace ASO.Desktop.ViewModels;
 /// Las reglas viven en <see cref="FlotaService"/> y <see cref="MantenimientoService"/>; los
 /// comandos solo piden la acción y reflejan el resultado.
 /// </summary>
-public sealed class GestionFlotaViewModel : ViewModelBase
+public sealed class GestionFlotaViewModel : PantallaViewModelBase
 {
     private const string FiltroTodos = "Todos";
 
@@ -30,13 +30,10 @@ public sealed class GestionFlotaViewModel : ViewModelBase
     private readonly IRemesaDataSource _remesas;
 
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
-    public event EventHandler? VolverSolicitado;
 
     public GestionFlotaViewModel(Modulo modulo, Submodulo submodulo, ISesionActual? sesion = null)
+        : base(modulo, submodulo)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         var activos = DataSourceFactory.CrearActivosFlota();
         var mantenimientos = DataSourceFactory.CrearMantenimientos();
         _remesas = DataSourceFactory.CrearRemesas();
@@ -53,7 +50,6 @@ public sealed class GestionFlotaViewModel : ViewModelBase
         ActivosView.Filter = Filtrar;
         ActivosView.SortDescriptions.Add(new SortDescription(nameof(ActivoFlota.Codigo), ListSortDirection.Ascending));
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         RefrescarCommand = new RelayCommand(() => { RecargarActivos(activos); });
 
         AbrirDetalleCommand = new RelayCommand<ActivoFlota>(activo => ActivoSeleccionado = activo);
@@ -80,11 +76,7 @@ public sealed class GestionFlotaViewModel : ViewModelBase
     }
 
     // --- Encabezado ---
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
-    public ICommand VolverCommand { get; }
     public ICommand RefrescarCommand { get; }
     public ICommand AbrirDetalleCommand { get; }
     public ICommand CerrarDetalleCommand { get; }

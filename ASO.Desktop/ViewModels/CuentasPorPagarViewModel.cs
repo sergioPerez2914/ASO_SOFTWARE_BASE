@@ -169,12 +169,10 @@ public sealed class ProveedoresCrudViewModel : CrudViewModelBase<Proveedor, int>
 /// Finanzas · Cuentas por Pagar: las facturas de compra y el maestro de proveedores en una
 /// pantalla conmutable, con el mismo patrón que Nómina · Empleados.
 /// </summary>
-public sealed class CuentasPorPagarViewModel : ViewModelBase
+public sealed class CuentasPorPagarViewModel : PantallaViewModelBase
 {
     public const string VistaFacturas = "Facturas";
     public const string VistaProveedores = "Proveedores";
-
-    public event EventHandler? VolverSolicitado;
 
     public CuentasPorPagarViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, new ServicioDialogo(), SesionActual.Instancia)
@@ -185,10 +183,8 @@ public sealed class CuentasPorPagarViewModel : ViewModelBase
                                      Submodulo submodulo,
                                      IServicioDialogo dialogos,
                                      ISesionActual sesion)
+        : base(modulo, submodulo)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         var proveedores = DataSourceFactory.CrearProveedores();
 
         Facturas = new FacturasProveedorCrudViewModel(
@@ -196,13 +192,8 @@ public sealed class CuentasPorPagarViewModel : ViewModelBase
 
         Proveedores = new ProveedoresCrudViewModel(proveedores, dialogos, sesion);
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }
-
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
     public FacturasProveedorCrudViewModel Facturas { get; }
     public ProveedoresCrudViewModel Proveedores { get; }
@@ -213,17 +204,15 @@ public sealed class CuentasPorPagarViewModel : ViewModelBase
         get => _vistaActual;
         set
         {
+            // Notifica todas: enumerar aqui un OnPropertyChanged por cada Mostrar… es
+            // la lista que se queda corta el dia que se agrega un padron mas.
             if (SetProperty(ref _vistaActual, value))
-            {
-                OnPropertyChanged(nameof(MostrarFacturas));
-                OnPropertyChanged(nameof(MostrarProveedores));
-            }
+                OnTodasLasPropiedadesCambiaron();
         }
     }
 
     public bool MostrarFacturas => VistaActual == VistaFacturas;
     public bool MostrarProveedores => VistaActual == VistaProveedores;
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarVistaCommand { get; }
 }

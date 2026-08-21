@@ -20,7 +20,7 @@ namespace ASO.Desktop.ViewModels;
 /// hace la acción en la pantalla que corresponde, con sus reglas intactas. El texto de la
 /// vista lo dice, para que nadie espere que la remesa se anule sola.
 /// </summary>
-public sealed class PeticionesViewModel : ViewModelBase
+public sealed class PeticionesViewModel : PantallaViewModelBase
 {
     private readonly IPeticionCambioDataSource _fuente;
     private readonly PeticionService _servicio;
@@ -28,8 +28,6 @@ public sealed class PeticionesViewModel : ViewModelBase
     private readonly ISesionActual _sesion;
 
     private string _filtroEstado = "Pendientes";
-
-    public event EventHandler? VolverSolicitado;
 
     public PeticionesViewModel(Modulo modulo)
         : this(modulo, DataSourceFactory.CrearPeticiones(), new ServicioDialogo(), SesionActual.Instancia)
@@ -40,8 +38,8 @@ public sealed class PeticionesViewModel : ViewModelBase
                                IPeticionCambioDataSource fuente,
                                IServicioDialogo dialogos,
                                ISesionActual sesion)
+        : base(modulo)
     {
-        Modulo = modulo;
         _fuente = fuente;
         _servicio = new PeticionService(fuente);
         _dialogos = dialogos;
@@ -51,7 +49,6 @@ public sealed class PeticionesViewModel : ViewModelBase
         PeticionesView = CollectionViewSource.GetDefaultView(Peticiones);
         PeticionesView.Filter = Filtrar;
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         RefrescarCommand = new RelayCommand(Refrescar);
 
         AprobarCommand = new RelayCommand(Aprobar, PuedeResolverSeleccionada);
@@ -63,9 +60,6 @@ public sealed class PeticionesViewModel : ViewModelBase
             PeticionesView.Refresh();
         });
     }
-
-    public Modulo Modulo { get; }
-    public string Ruta => Modulo.Nombre;
 
     public ObservableCollection<PeticionCambio> Peticiones { get; }
     public ICollectionView PeticionesView { get; }
@@ -81,7 +75,6 @@ public sealed class PeticionesViewModel : ViewModelBase
         }
     }
 
-    public ICommand VolverCommand { get; }
     public ICommand RefrescarCommand { get; }
     public ICommand AprobarCommand { get; }
     public ICommand RechazarCommand { get; }

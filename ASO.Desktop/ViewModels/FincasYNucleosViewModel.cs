@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
@@ -12,12 +11,10 @@ namespace ASO.Desktop.ViewModels;
 /// alojados en una sola vista conmutable, igual que <see cref="EmpleadosViewModel"/> hace con
 /// sus dos padrones.
 /// </summary>
-public sealed class FincasYNucleosViewModel : ViewModelBase
+public sealed class FincasYNucleosViewModel : PantallaViewModelBase
 {
     public const string VistaFincas = "Fincas";
     public const string VistaNucleos = "Nucleos";
-
-    public event EventHandler? VolverSolicitado;
 
     public FincasYNucleosViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, new ServicioDialogo(), SesionActual.Instancia)
@@ -28,20 +25,13 @@ public sealed class FincasYNucleosViewModel : ViewModelBase
                                     Submodulo submodulo,
                                     IServicioDialogo dialogos,
                                     ISesionActual sesion)
+        : base(modulo, submodulo)
     {
-        Modulo = modulo;
-        Submodulo = submodulo;
-
         Fincas = new FincaCrudViewModel(DataSourceFactory.CrearFincas(), dialogos, sesion);
         Nucleos = new NucleoCrudViewModel(DataSourceFactory.CrearNucleos(), dialogos, sesion);
 
-        VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }
-
-    public Modulo Modulo { get; }
-    public Submodulo Submodulo { get; }
-    public string Ruta => $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
     public FincaCrudViewModel Fincas { get; }
     public NucleoCrudViewModel Nucleos { get; }
@@ -52,17 +42,15 @@ public sealed class FincasYNucleosViewModel : ViewModelBase
         get => _vistaActual;
         set
         {
+            // Notifica todas: enumerar aqui un OnPropertyChanged por cada Mostrar… es
+            // la lista que se queda corta el dia que se agrega un padron mas.
             if (SetProperty(ref _vistaActual, value))
-            {
-                OnPropertyChanged(nameof(MostrarFincas));
-                OnPropertyChanged(nameof(MostrarNucleos));
-            }
+                OnTodasLasPropiedadesCambiaron();
         }
     }
 
     public bool MostrarFincas => VistaActual == VistaFincas;
     public bool MostrarNucleos => VistaActual == VistaNucleos;
 
-    public ICommand VolverCommand { get; }
     public ICommand CambiarVistaCommand { get; }
 }
