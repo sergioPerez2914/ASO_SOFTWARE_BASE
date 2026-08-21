@@ -1,59 +1,23 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
 
 namespace ASO.Desktop.BD;
 
-public class SqlFacturaClienteDataSource : IFacturaClienteDataSource
+/// <summary>La factura de venta se guarda entera con sus lineas.</summary>
+public class SqlFacturaClienteDataSource : SqlAgregadoDataSource<FacturaCliente, int>, IFacturaClienteDataSource
 {
-    public IEnumerable<FacturaCliente> GetAll()
-    {
-        using var context = new AsoDbContext();
-        return context.FacturasCliente.Include(f => f.Lineas).ToList();
-    }
+    protected override IQueryable<FacturaCliente> Incluir(IQueryable<FacturaCliente> consulta)
+        => consulta.Include(f => f.Lineas);
 
-    public FacturaCliente? GetById(int id)
-    {
-        using var context = new AsoDbContext();
-        return context.FacturasCliente.Include(f => f.Lineas).FirstOrDefault(f => f.Id == id);
-    }
+    protected override Expression<Func<FacturaCliente, bool>> PorId(int id) => f => f.Id == id;
 
-    public FacturaCliente Add(FacturaCliente item)
-    {
-        using var context = new AsoDbContext();
-        context.FacturasCliente.Add(item);
-        context.SaveChanges();
-        return item;
-    }
+    protected override IEnumerable<object> HijosDe(FacturaCliente raiz) => raiz.Lineas;
 
-    /// <summary>
-    /// Cada método abre un contexto nuevo (desconectado): un Update ingenuo de la cabecera
-    /// no borraría las líneas quitadas del lado cliente. Por eso se carga el grafo rastreado,
-    /// se eliminan las líneas viejas y recién ahí se asignan las nuevas.
-    /// </summary>
-    public void Update(FacturaCliente item)
-    {
-        using var context = new AsoDbContext();
-        var existente = context.FacturasCliente.Include(f => f.Lineas).First(f => f.Id == item.Id);
-
-        context.RemoveRange(existente.Lineas);
-        context.SaveChanges();
-
-        context.Entry(existente).CurrentValues.SetValues(item);
-        existente.Lineas = item.Lineas;
-        context.SaveChanges();
-    }
-
-    public void Delete(int id)
-    {
-        using var context = new AsoDbContext();
-        var factura = context.FacturasCliente.Include(f => f.Lineas).FirstOrDefault(f => f.Id == id);
-        if (factura != null)
-        {
-            context.FacturasCliente.Remove(factura);
-            context.SaveChanges();
-        }
-    }
+    protected override void CopiarHijos(FacturaCliente destino, FacturaCliente origen)
+        => destino.Lineas = origen.Lineas;
 }

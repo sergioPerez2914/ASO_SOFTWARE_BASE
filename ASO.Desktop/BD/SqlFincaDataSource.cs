@@ -1,62 +1,22 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
 
 namespace ASO.Desktop.BD;
 
-public class SqlFincaDataSource : IFincaDataSource
+/// <summary>La finca se guarda entera con sus lotes y los tablones de cada lote.</summary>
+public class SqlFincaDataSource : SqlAgregadoDataSource<Finca, int>, IFincaDataSource
 {
-    public IEnumerable<Finca> GetAll()
-    {
-        using var context = new AsoDbContext();
-        return context.Fincas.Include(f => f.Lotes).ThenInclude(l => l.Tablones).ToList();
-    }
+    protected override IQueryable<Finca> Incluir(IQueryable<Finca> consulta)
+        => consulta.Include(f => f.Lotes).ThenInclude(l => l.Tablones);
 
-    public Finca? GetById(int id)
-    {
-        using var context = new AsoDbContext();
-        return context.Fincas.Include(f => f.Lotes).ThenInclude(l => l.Tablones)
-            .FirstOrDefault(f => f.Id == id);
-    }
+    protected override Expression<Func<Finca, bool>> PorId(int id) => f => f.Id == id;
 
-    public Finca Add(Finca item)
-    {
-        using var context = new AsoDbContext();
-        context.Fincas.Add(item);
-        context.SaveChanges();
-        return item;
-    }
+    protected override IEnumerable<object> HijosDe(Finca raiz) => raiz.Lotes;
 
-    /// <summary>
-    /// Cada método abre un contexto nuevo (desconectado): un Update ingenuo de la cabecera
-    /// no borraría los Lotes/Tablones quitados del lado cliente. Por eso se carga el grafo
-    /// rastreado, se eliminan los hijos viejos y recién ahí se asignan los nuevos.
-    /// </summary>
-    public void Update(Finca item)
-    {
-        using var context = new AsoDbContext();
-        var existente = context.Fincas.Include(f => f.Lotes).ThenInclude(l => l.Tablones)
-            .First(f => f.Id == item.Id);
-
-        context.RemoveRange(existente.Lotes);
-        context.SaveChanges();
-
-        context.Entry(existente).CurrentValues.SetValues(item);
-        existente.Lotes = item.Lotes;
-        context.SaveChanges();
-    }
-
-    public void Delete(int id)
-    {
-        using var context = new AsoDbContext();
-        var finca = context.Fincas.Include(f => f.Lotes).ThenInclude(l => l.Tablones)
-            .FirstOrDefault(f => f.Id == id);
-        if (finca != null)
-        {
-            context.Fincas.Remove(finca);
-            context.SaveChanges();
-        }
-    }
+    protected override void CopiarHijos(Finca destino, Finca origen) => destino.Lotes = origen.Lotes;
 }

@@ -6,51 +6,12 @@ using ASO.Desktop.Services;
 
 namespace ASO.Desktop.BD;
 
-public class SqlTarifaDataSource : ITarifaDataSource
+public class SqlTarifaDataSource : SqlCrudDataSource<Tarifa, int>, ITarifaDataSource
 {
-    public IEnumerable<Tarifa> GetAll()
-    {
-        using var context = new AsoDbContext();
-        return context.Tarifas.ToList();
-    }
-
-    public Tarifa? GetById(int id)
-    {
-        using var context = new AsoDbContext();
-        return context.Tarifas.Find(id);
-    }
-
-    // RigeEn() es un método C# que EF no sabe traducir a SQL, así que el filtro de vigencia
-    // se resuelve en memoria: el ToList() de antes es deliberado, no un descuido.
+    /// <summary>
+    /// RigeEn() es un metodo C# que EF no sabe traducir a SQL, asi que el filtro de vigencia se
+    /// resuelve en memoria: traer la tabla entera antes de filtrar es deliberado, no un descuido.
+    /// </summary>
     public IEnumerable<Tarifa> GetVigentes(DateTime fecha)
-    {
-        using var context = new AsoDbContext();
-        return context.Tarifas.ToList().Where(t => t.Activa && t.RigeEn(fecha)).ToList();
-    }
-
-    public Tarifa Add(Tarifa item)
-    {
-        using var context = new AsoDbContext();
-        context.Tarifas.Add(item);
-        context.SaveChanges();
-        return item;
-    }
-
-    public void Update(Tarifa item)
-    {
-        using var context = new AsoDbContext();
-        context.Tarifas.Update(item);
-        context.SaveChanges();
-    }
-
-    public void Delete(int id)
-    {
-        using var context = new AsoDbContext();
-        var tarifa = context.Tarifas.Find(id);
-        if (tarifa != null)
-        {
-            context.Tarifas.Remove(tarifa);
-            context.SaveChanges();
-        }
-    }
+        => GetAll().Where(t => t.Activa && t.RigeEn(fecha)).ToList();
 }

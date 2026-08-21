@@ -6,23 +6,17 @@ using ASO.Desktop.Services;
 
 namespace ASO.Desktop.BD;
 
-public class SqlUsuarioDataSource : IUsuarioDataSource
+public class SqlUsuarioDataSource : SqlCrudDataSource<Usuario, int>, IUsuarioDataSource
 {
-    public IEnumerable<Usuario> GetAll()
-    {
-        using var context = new AsoDbContext();
-        return context.Usuarios.OrderBy(u => u.NombreUsuario).ToList();
-    }
-
-    public Usuario? GetById(int id)
-    {
-        using var context = new AsoDbContext();
-        return context.Usuarios.Find(id);
-    }
+    protected override IQueryable<Usuario> Ordenar(IQueryable<Usuario> consulta)
+        => consulta.OrderBy(u => u.NombreUsuario);
 
     // IgnoreQueryFilters: al autenticar no hay ambito todavia, asi que el filtro global
     // taparia al propio usuario que intenta entrar. Es uno de los dos sitios donde se salta
     // a proposito (el otro es el selector de organizaciones del Desarrollador).
+    //
+    // Por eso los tres metodos de abajo NO usan los ayudantes de la clase base: la base
+    // consulta siempre dentro del ambito, que es justo lo que aqui hay que evitar.
     public Usuario? BuscarPorNombreSinAmbito(string nombreUsuario)
     {
         using var context = new AsoDbContext();
@@ -44,31 +38,5 @@ public class SqlUsuarioDataSource : IUsuarioDataSource
     {
         using var context = new AsoDbContext();
         return context.Usuarios.IgnoreQueryFilters().Any();
-    }
-
-    public Usuario Add(Usuario item)
-    {
-        using var context = new AsoDbContext();
-        context.Usuarios.Add(item);
-        context.SaveChanges();
-        return item;
-    }
-
-    public void Update(Usuario item)
-    {
-        using var context = new AsoDbContext();
-        context.Usuarios.Update(item);
-        context.SaveChanges();
-    }
-
-    public void Delete(int id)
-    {
-        using var context = new AsoDbContext();
-        var usuario = context.Usuarios.Find(id);
-        if (usuario != null)
-        {
-            context.Usuarios.Remove(usuario);
-            context.SaveChanges();
-        }
     }
 }
