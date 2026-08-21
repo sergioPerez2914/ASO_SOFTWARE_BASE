@@ -21,6 +21,14 @@
               SelectedItem="{Binding RolSeleccionado}"
               DisplayMemberPath="Texto" />
 
+    <StackPanel Visibility="{Binding MostrarNucleo, Converter={StaticResource BoolToVis}}">
+      <TextBlock Text="Núcleo" Style="{StaticResource FormLabelStyle}" />
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding NucleosDisponibles}"
+                SelectedItem="{Binding NucleoSeleccionado}"
+                DisplayMemberPath="Etiqueta" />
+    </StackPanel>
+
     <TextBlock Text="{Binding EtiquetaPassword}" Style="{StaticResource FormLabelStyle}" />
     <PasswordBox x:Name="PasswordBox" Padding="8,6" PasswordChanged="OnPasswordChanged" />
 

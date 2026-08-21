@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using ASO.Desktop.Configuration;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
 
@@ -21,7 +22,8 @@ public sealed class UsuarioEditorViewModel : CrudEditorViewModelBase<Usuario>
 
     private readonly Usuario _original;
 
-    public UsuarioEditorViewModel(Usuario original, ISesionActual? sesion = null) : base(original)
+    public UsuarioEditorViewModel(Usuario original, ISesionActual? sesion = null,
+        IOrganizacionDataSource? organizaciones = null) : base(original)
     {
         _original = original;
         var actual = sesion ?? SesionActual.Instancia;
@@ -39,6 +41,22 @@ public sealed class UsuarioEditorViewModel : CrudEditorViewModelBase<Usuario>
 
         RolesDisponibles = [.. asignables.Select(r => new OpcionRol(r, Texto(r)))];
         _rolSeleccionado = RolesDisponibles.FirstOrDefault(o => o.Valor == rolInicial) ?? RolesDisponibles[0];
+
+        // Solo al crear, y solo para quien puede atravesar núcleos: un administrador de núcleo
+        // no elige núcleo, el suyo es el único que tiene. Editar no reasigna núcleo (moveria
+        // tambien los PermisoUsuario del usuario, acotados al núcleo donde vive hoy).
+        MostrarNucleo = EsNuevo && actual.Puede(Permisos.Organizaciones.Cambiar);
+        if (MostrarNucleo)
+        {
+            var fuente = organizaciones ?? DataSourceFactory.CrearOrganizaciones();
+            NucleosDisponibles = [.. fuente.GetAll().Where(o => o.Activa)];
+            _nucleoSeleccionado = NucleosDisponibles.FirstOrDefault(o => o.Id == Ambito.OrganizacionId)
+                                  ?? NucleosDisponibles.FirstOrDefault();
+        }
+        else
+        {
+            NucleosDisponibles = [];
+        }
     }
 
     public override string Titulo => EsNuevo ? "Nuevo usuario" : $"Usuario: {_original.NombreUsuario}";
@@ -86,6 +104,18 @@ public sealed class UsuarioEditorViewModel : CrudEditorViewModelBase<Usuario>
         set => SetProperty(ref _activo, value);
     }
 
+    /// <summary>Solo Desarrollador y solo al crear: ver comentario en el constructor.</summary>
+    public bool MostrarNucleo { get; }
+
+    public IReadOnlyList<Organizacion> NucleosDisponibles { get; }
+
+    private Organizacion? _nucleoSeleccionado;
+    public Organizacion? NucleoSeleccionado
+    {
+        get => _nucleoSeleccionado;
+        set => SetProperty(ref _nucleoSeleccionado, value);
+    }
+
     /// <summary>Texto plano, transitorio: solo vive mientras el editor está abierto.</summary>
     private string _passwordNueva = string.Empty;
     public string PasswordNueva
@@ -121,6 +151,12 @@ public sealed class UsuarioEditorViewModel : CrudEditorViewModelBase<Usuario>
             return false;
         }
 
+        if (MostrarNucleo && NucleoSeleccionado is null)
+        {
+            error = "Seleccione el núcleo del usuario.";
+            return false;
+        }
+
         error = null;
         return true;
     }
@@ -132,6 +168,9 @@ public sealed class UsuarioEditorViewModel : CrudEditorViewModelBase<Usuario>
         resultado.NombreCompleto = NombreCompleto.Trim();
         resultado.Rol = RolSeleccionado.Valor;
         resultado.Activo = Activo;
+
+        if (MostrarNucleo && NucleoSeleccionado is { } nucleo)
+            resultado.OrganizacionId = nucleo.Id;
 
         if (!string.IsNullOrEmpty(PasswordNueva))
         {
