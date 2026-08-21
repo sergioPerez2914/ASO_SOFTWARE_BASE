@@ -15,7 +15,7 @@ public sealed class ActivoEditorViewModel : CrudEditorViewModelBase<ActivoFlota>
     private readonly ActivoFlota _original;
     private readonly bool _esNuevo;
 
-    public ActivoEditorViewModel(ActivoFlota original) : base(original)
+    public ActivoEditorViewModel(ActivoFlota original)
     {
         _original = original;
         _esNuevo = original.Id == 0;

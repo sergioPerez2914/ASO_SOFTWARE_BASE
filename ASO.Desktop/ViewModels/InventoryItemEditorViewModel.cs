@@ -15,7 +15,6 @@ public sealed class InventoryItemEditorViewModel : CrudEditorViewModelBase<Inven
     private readonly IInventoryDataSource _articulos;
 
     public InventoryItemEditorViewModel(InventoryItem original, IInventoryDataSource articulos, bool esNuevo)
-        : base(original)
     {
         _original = original;
         _articulos = articulos;

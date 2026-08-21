@@ -15,7 +15,6 @@ public sealed class TarifaEditorViewModel : CrudEditorViewModelBase<Tarifa>
     private readonly TarifaService _servicio;
 
     public TarifaEditorViewModel(Tarifa original, TarifaService servicio)
-        : base(original)
     {
         _original = original;
         _servicio = servicio;

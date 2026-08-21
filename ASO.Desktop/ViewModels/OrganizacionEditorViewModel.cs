@@ -7,7 +7,7 @@ public sealed class OrganizacionEditorViewModel : CrudEditorViewModelBase<Organi
 {
     private readonly Organizacion _original;
 
-    public OrganizacionEditorViewModel(Organizacion original) : base(original)
+    public OrganizacionEditorViewModel(Organizacion original)
     {
         _original = original;
         _codigo = original.Codigo;

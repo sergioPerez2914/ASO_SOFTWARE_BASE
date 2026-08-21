@@ -23,7 +23,7 @@ public sealed class UsuarioEditorViewModel : CrudEditorViewModelBase<Usuario>
     private readonly Usuario _original;
 
     public UsuarioEditorViewModel(Usuario original, ISesionActual? sesion = null,
-        IOrganizacionDataSource? organizaciones = null) : base(original)
+        IOrganizacionDataSource? organizaciones = null)
     {
         _original = original;
         var actual = sesion ?? SesionActual.Instancia;

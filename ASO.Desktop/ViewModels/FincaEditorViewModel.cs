@@ -71,7 +71,6 @@ public sealed class FincaEditorViewModel : CrudEditorViewModelBase<Finca>
     private readonly IFincaDataSource _fincas;
 
     public FincaEditorViewModel(Finca original, IFincaDataSource fincas)
-        : base(original)
     {
         _original = original;
         _fincas = fincas;

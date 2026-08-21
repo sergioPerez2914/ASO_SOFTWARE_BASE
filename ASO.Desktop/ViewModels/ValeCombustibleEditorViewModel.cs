@@ -20,7 +20,6 @@ public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<Val
     public ValeCombustibleEditorViewModel(ValeCombustible original,
                                           ITanqueCombustibleDataSource tanques,
                                           IActivoFlotaDataSource activos)
-        : base(original)
     {
         _original = original;
 

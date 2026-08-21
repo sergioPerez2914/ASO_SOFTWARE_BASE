@@ -18,7 +18,6 @@ public sealed class PersonalCampoEditorViewModel : CrudEditorViewModelBase<Perso
     public PersonalCampoEditorViewModel(PersonalCampo original,
                                         IPersonalCampoDataSource personal,
                                         INucleoDataSource nucleos)
-        : base(original)
     {
         _original = original;
         _personal = personal;

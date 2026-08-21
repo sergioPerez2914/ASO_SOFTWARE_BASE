@@ -22,7 +22,6 @@ public sealed class SalidaInventarioEditorViewModel : CrudEditorViewModelBase<Sa
                                            IInventoryDataSource articulos,
                                            IActivoFlotaDataSource activos,
                                            IMantenimientoRegistroDataSource mantenimientos)
-        : base(original)
     {
         _original = original;
         _mantenimientos = mantenimientos;

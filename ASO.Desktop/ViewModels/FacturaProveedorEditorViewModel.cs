@@ -19,7 +19,6 @@ public sealed class FacturaProveedorEditorViewModel : CrudEditorViewModelBase<Fa
     public FacturaProveedorEditorViewModel(FacturaProveedor original,
                                            IProveedorDataSource proveedores,
                                            CuentasPorPagarService servicio)
-        : base(original)
     {
         _original = original;
         _servicio = servicio;

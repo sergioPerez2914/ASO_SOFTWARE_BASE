@@ -15,7 +15,6 @@ public sealed class PermisoUsuarioEditorViewModel : CrudEditorViewModelBase<Perm
     private readonly PermisoUsuario _original;
 
     public PermisoUsuarioEditorViewModel(PermisoUsuario original, IReadOnlyList<Usuario> usuarios)
-        : base(original)
     {
         _original = original;
         Usuarios = usuarios;

@@ -24,7 +24,6 @@ public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrab
                                   HorarioService servicio,
                                   IEmpleadoDataSource empleados,
                                   IPersonalCampoDataSource personalCampo)
-        : base(original)
     {
         _original = original;
         _servicio = servicio;

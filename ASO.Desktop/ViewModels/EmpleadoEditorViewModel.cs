@@ -15,7 +15,6 @@ public sealed class EmpleadoEditorViewModel : CrudEditorViewModelBase<Empleado>
     private readonly IEmpleadoDataSource _empleados;
 
     public EmpleadoEditorViewModel(Empleado original, IEmpleadoDataSource empleados)
-        : base(original)
     {
         _original = original;
         _empleados = empleados;

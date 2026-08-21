@@ -15,7 +15,6 @@ public sealed class ProveedorEditorViewModel : CrudEditorViewModelBase<Proveedor
     private readonly IProveedorDataSource _proveedores;
 
     public ProveedorEditorViewModel(Proveedor original, IProveedorDataSource proveedores)
-        : base(original)
     {
         _original = original;
         _proveedores = proveedores;

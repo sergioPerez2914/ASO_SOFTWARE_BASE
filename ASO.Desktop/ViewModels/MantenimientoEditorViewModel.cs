@@ -35,7 +35,7 @@ public sealed class MantenimientoEditorViewModel : CrudEditorViewModelBase<Mante
                                         IReadOnlyList<ActivoFlota> activos,
                                         IRemesaDataSource remesas,
                                         ActivoFlota? preseleccionado = null,
-                                        string? descripcionSugerida = null) : base(original)
+                                        string? descripcionSugerida = null)
     {
         _original = original;
         _remesas = remesas;

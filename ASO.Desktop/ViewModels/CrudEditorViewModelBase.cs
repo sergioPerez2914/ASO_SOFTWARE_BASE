@@ -56,10 +56,6 @@ public abstract class CrudEditorViewModelBase : ViewModelBase
 /// </summary>
 public abstract class CrudEditorViewModelBase<T> : CrudEditorViewModelBase
 {
-    protected CrudEditorViewModelBase(T original)
-    {
-    }
-
     /// <summary>Reconstruye la entidad con los valores editados (conservando el <c>Id</c> original).</summary>
     public abstract T ObtenerResultado();
 }

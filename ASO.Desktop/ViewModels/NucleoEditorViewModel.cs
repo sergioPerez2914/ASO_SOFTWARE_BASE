@@ -16,7 +16,6 @@ public sealed class NucleoEditorViewModel : CrudEditorViewModelBase<Nucleo>
     private readonly INucleoDataSource _nucleos;
 
     public NucleoEditorViewModel(Nucleo original, INucleoDataSource nucleos)
-        : base(original)
     {
         _original = original;
         _nucleos = nucleos;

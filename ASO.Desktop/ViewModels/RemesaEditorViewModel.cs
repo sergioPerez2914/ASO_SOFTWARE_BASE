@@ -26,7 +26,7 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
                                  IFincaDataSource fincas,
                                  INucleoDataSource nucleos,
                                  IPersonalCampoDataSource personal,
-                                 IVehiculoDataSource vehiculos) : base(original)
+                                 IVehiculoDataSource vehiculos)
     {
         _original = original;
         _esNuevo = original.Id == 0;
