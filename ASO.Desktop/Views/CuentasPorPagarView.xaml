@@ -60,8 +60,10 @@
     </StackPanel>
 
     <!-- Facturas de compra -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarFacturas, Converter={StaticResource BoolToVis}}"
-          DataContext="{Binding Facturas}">
+    <Grid Grid.Row="2" Visibility="{Binding MostrarFacturas, Converter={StaticResource BoolToVis}}">
+      <!-- DataContext en un Grid interno: compartir elemento con Visibility haría que esa
+           binding se resuelva contra el sub-VM (sin MostrarFacturas) y no contra este ViewModel. -->
+      <Grid DataContext="{Binding Facturas}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
@@ -158,11 +160,12 @@
           </DataGrid.Columns>
         </DataGrid>
       </Border>
+      </Grid>
     </Grid>
 
     <!-- Maestro de proveedores -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarProveedores, Converter={StaticResource BoolToVis}}"
-          DataContext="{Binding Proveedores}">
+    <Grid Grid.Row="2" Visibility="{Binding MostrarProveedores, Converter={StaticResource BoolToVis}}">
+      <Grid DataContext="{Binding Proveedores}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
@@ -217,6 +220,7 @@
           </DataGrid.Columns>
         </DataGrid>
       </Border>
+      </Grid>
     </Grid>
   </Grid>
 </UserControl>

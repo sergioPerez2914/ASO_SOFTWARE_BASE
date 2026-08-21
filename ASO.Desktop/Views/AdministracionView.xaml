@@ -64,8 +64,11 @@
     </StackPanel>
 
     <!-- Padron de nucleos (solo Desarrollador) -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarOrganizaciones, Converter={StaticResource BoolToVis}}"
-          DataContext="{Binding Organizaciones}">
+    <Grid Grid.Row="2" Visibility="{Binding MostrarOrganizaciones, Converter={StaticResource BoolToVis}}">
+      <!-- El DataContext va en un Grid interno: si compartiera elemento con Visibility, esa
+           binding se resolvería contra el sub-VM (que no tiene MostrarOrganizaciones) en vez
+           del AdministracionViewModel, y se quedaría en su valor por defecto (Visible). -->
+      <Grid DataContext="{Binding Organizaciones}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
@@ -106,11 +109,12 @@
           </DataGrid.Columns>
         </DataGrid>
       </Border>
+      </Grid>
     </Grid>
 
     <!-- Padron de usuarios -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarUsuarios, Converter={StaticResource BoolToVis}}"
-          DataContext="{Binding Usuarios}">
+    <Grid Grid.Row="2" Visibility="{Binding MostrarUsuarios, Converter={StaticResource BoolToVis}}">
+      <Grid DataContext="{Binding Usuarios}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
@@ -154,11 +158,12 @@
           </DataGrid.Columns>
         </DataGrid>
       </Border>
+      </Grid>
     </Grid>
 
     <!-- Ajustes de permisos -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarPermisos, Converter={StaticResource BoolToVis}}"
-          DataContext="{Binding Permisos}">
+    <Grid Grid.Row="2" Visibility="{Binding MostrarPermisos, Converter={StaticResource BoolToVis}}">
+      <Grid DataContext="{Binding Permisos}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
@@ -201,6 +206,7 @@
           </DataGrid.Columns>
         </DataGrid>
       </Border>
+      </Grid>
     </Grid>
   </Grid>
 </UserControl>

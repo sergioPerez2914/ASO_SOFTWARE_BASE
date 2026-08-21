@@ -60,8 +60,10 @@
     </StackPanel>
 
     <!-- Padrón administrativo: empleados de nómina del centro -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarAdministrativos, Converter={StaticResource BoolToVis}}"
-          DataContext="{Binding Administrativos}">
+    <Grid Grid.Row="2" Visibility="{Binding MostrarAdministrativos, Converter={StaticResource BoolToVis}}">
+      <!-- DataContext en un Grid interno: compartir elemento con Visibility haría que esa
+           binding se resuelva contra el sub-VM (sin MostrarAdministrativos) y no contra este ViewModel. -->
+      <Grid DataContext="{Binding Administrativos}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
@@ -132,11 +134,12 @@
           </DataGrid.Columns>
         </DataGrid>
       </Border>
+      </Grid>
     </Grid>
 
     <!-- Padrón de campo: quienes firman la remesa, con su núcleo (C.O.D) -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarCampo, Converter={StaticResource BoolToVis}}"
-          DataContext="{Binding Campo}">
+    <Grid Grid.Row="2" Visibility="{Binding MostrarCampo, Converter={StaticResource BoolToVis}}">
+      <Grid DataContext="{Binding Campo}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
@@ -214,6 +217,7 @@
           </DataGrid.Columns>
         </DataGrid>
       </Border>
+      </Grid>
     </Grid>
   </Grid>
 </UserControl>
