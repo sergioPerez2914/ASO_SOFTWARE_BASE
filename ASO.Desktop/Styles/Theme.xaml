@@ -11,13 +11,30 @@
 
   <BooleanToVisibilityConverter x:Key="BoolToVis" />
 
-  <!-- Chip de estado de una remesa. El color lo decide el enum, no el texto.
-       Lo comparten el listado de Registro de Operación y el de Seguimiento. -->
-  <Style x:Key="ChipEstadoStyle" TargetType="Border">
+  <!-- Boton secundario de la barra de herramientas de un listado (Editar, Eliminar,
+       Actualizar). Estaba copiado tal cual en el UserControl.Resources de trece vistas. -->
+  <Style x:Key="BarraBotonStyle" TargetType="Button">
+    <Setter Property="Padding" Value="12,6" />
+    <Setter Property="Margin" Value="8,0,0,0" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+  </Style>
+
+  <!-- Forma comun de los chips de estado: pastilla gris con el texto en blanco. Cada chip
+       concreto solo aporta sus DataTrigger, que es lo unico en lo que se diferencian. -->
+  <Style x:Key="ChipBaseStyle" TargetType="Border">
     <Setter Property="CornerRadius" Value="10" />
     <Setter Property="Padding" Value="8,2" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  </Style>
+
+  <!-- Chip de estado de una remesa. El color lo decide el enum, no el texto.
+       Lo comparten el listado de Registro de Operación y el de Seguimiento. -->
+  <Style x:Key="ChipEstadoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Borrador}">
         <Setter Property="Background" Value="{StaticResource WarningBrush}" />
@@ -35,11 +52,7 @@
   </Style>
 
   <!-- Chip Activo/Inactivo: lo comparten los maestros simples (empleados, tarifas, proveedores) -->
-  <Style x:Key="ChipActivoStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipActivoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Activo}" Value="True">
         <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
@@ -48,11 +61,7 @@
   </Style>
 
   <!-- Chip de vigencia de una tarifa: el estado combina el flag Activa con las fechas -->
-  <Style x:Key="ChipVigenciaTarifaStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipVigenciaTarifaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Vigente">
         <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
@@ -67,11 +76,7 @@
   </Style>
 
   <!-- Chip de estado de una petición de cambio -->
-  <Style x:Key="ChipEstadoPeticionStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipEstadoPeticionStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Pendiente">
         <Setter Property="Background" Value="{StaticResource WarningBrush}" />
@@ -86,10 +91,7 @@
   </Style>
 
   <!-- Chip de existencia de un artículo de almacén -->
-  <Style x:Key="ChipStockStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
+  <Style x:Key="ChipStockStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:StockStatus.Bajo}">
@@ -102,11 +104,7 @@
   </Style>
 
   <!-- Chip de estado de una salida de almacén -->
-  <Style x:Key="ChipEstadoSalidaStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipEstadoSalidaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoSalida.Borrador}">
         <Setter Property="Background" Value="{StaticResource WarningBrush}" />
@@ -121,11 +119,7 @@
   </Style>
 
   <!-- Chip de estado de un vale de combustible -->
-  <Style x:Key="ChipEstadoValeStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipEstadoValeStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoVale.Borrador}">
         <Setter Property="Background" Value="{StaticResource WarningBrush}" />
@@ -140,10 +134,7 @@
   </Style>
 
   <!-- Chip de estado de una jornada de trabajo -->
-  <Style x:Key="ChipJornadaStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
+  <Style x:Key="ChipJornadaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstaAbierta}" Value="True">
@@ -153,11 +144,7 @@
   </Style>
 
   <!-- Chip de estado de una liquidación de nómina -->
-  <Style x:Key="ChipEstadoLiquidacionStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipEstadoLiquidacionStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Borrador}">
         <Setter Property="Background" Value="{StaticResource WarningBrush}" />
@@ -176,11 +163,7 @@
 
   <!-- Chip de estado de una factura al ingenio. El disparador de vencida va al final:
        gana sobre el de Emitida cuando ya pasó el plazo. -->
-  <Style x:Key="ChipEstadoFacturaClienteStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipEstadoFacturaClienteStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Borrador}">
         <Setter Property="Background" Value="{StaticResource WarningBrush}" />
@@ -202,11 +185,7 @@
 
   <!-- Chip de estado de una factura de proveedor. El disparador de vencida va al final:
        gana sobre el de Pendiente cuando ya pasó el plazo. -->
-  <Style x:Key="ChipEstadoFacturaProveedorStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipEstadoFacturaProveedorStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Pendiente}">
         <Setter Property="Background" Value="{StaticResource InfoBrush}" />
@@ -224,11 +203,7 @@
   </Style>
 
   <!-- Chip de estado de un activo de flota -->
-  <Style x:Key="ChipEstadoActivoStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipEstadoActivoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.Operativo}">
         <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
@@ -243,11 +218,7 @@
   </Style>
 
   <!-- Chip de urgencia de una recomendación de revisión -->
-  <Style x:Key="ChipRecomendacionStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
-    <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{StaticResource TextMutedBrush}" />
+  <Style x:Key="ChipRecomendacionStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.Vencido}">
         <Setter Property="Background" Value="{StaticResource DangerBrush}" />

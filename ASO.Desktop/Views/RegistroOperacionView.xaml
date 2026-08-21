@@ -6,20 +6,6 @@
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
-  <UserControl.Resources>
-    <!-- Botón secundario de la barra de herramientas -->
-    <Style x:Key="BarraBotonStyle" TargetType="Button">
-      <Setter Property="Padding" Value="12,6" />
-      <Setter Property="Margin" Value="8,0,0,0" />
-      <Setter Property="Cursor" Value="Hand" />
-      <Setter Property="FontSize" Value="12" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
-      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-    </Style>
-
-    <!-- ChipEstadoStyle vive en Theme.xaml: lo comparte con Seguimiento. -->
-  </UserControl.Resources>
 
   <Grid>
     <Grid.RowDefinitions>
