@@ -7,6 +7,7 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Styles/Theme.xaml" />
         <ResourceDictionary Source="Styles/EditorTemplates.xaml" />
+        <ResourceDictionary Source="Styles/PantallaTemplates.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

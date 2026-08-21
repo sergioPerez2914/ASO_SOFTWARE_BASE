@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
@@ -100,33 +102,51 @@ public partial class MainWindow : Window
             : CrearVistaModulo(modulo);
     }
 
+    /// <summary>
+    /// Que ViewModel abre cada submodulo. La vista la resuelve WPF por DataTemplate
+    /// (ver <c>Styles/PantallaTemplates.xaml</c>), asi que aqui no se nombra ninguna.
+    ///
+    /// Antes esto era un switch de catorce casos que decian los tres mismos pasos con otros
+    /// nombres. Una pantalla nueva se da de alta con una linea aqui y su plantilla alla.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, Func<Modulo, Submodulo, IPantalla>> Pantallas =
+        new Dictionary<string, Func<Modulo, Submodulo, IPantalla>>
+        {
+            ["Operaciones.Registro"] = (m, s) => new RegistroOperacionViewModel(m, s),
+            ["Operaciones.Seguimiento"] = (m, s) => new SeguimientoViewModel(m, s),
+            ["Operaciones.FincasNucleos"] = (m, s) => new FincasYNucleosViewModel(m, s),
+            ["Flota.Gestion"] = (m, s) => new GestionFlotaViewModel(m, s),
+            ["Flota.Mantenimiento"] = (m, s) => new MantenimientoViewModel(m, s),
+            ["Inventario.Repuestos"] = (m, s) => new RepuestosViewModel(m, s),
+            ["Inventario.Combustible"] = (m, s) => new CombustibleViewModel(m, s),
+            ["Inventario.Producto"] = (m, s) => new ProductoViewModel(m, s),
+            ["Nomina.Empleados"] = (m, s) => new EmpleadosViewModel(m, s),
+            ["Nomina.Horarios"] = (m, s) => new HorariosViewModel(m, s),
+            ["Nomina.Liquidaciones"] = (m, s) => new LiquidacionesViewModel(m, s),
+            ["Finanzas.Tarifas"] = (m, s) => new TarifasViewModel(m, s),
+            ["Finanzas.CuentasPorCobrar"] = (m, s) => new CuentasPorCobrarViewModel(m, s),
+            ["Finanzas.CuentasPorPagar"] = (m, s) => new CuentasPorPagarViewModel(m, s),
+        };
+
     private object CrearVistaModulo(Modulo modulo)
     {
-        // Los módulos fijados (Peticiones, Usuarios) no tienen submódulos, así que la guarda
-        // de CrearVistaSubmodulo no los alcanza: se comprueban aquí.
+        // Los modulos fijados (Peticiones, Usuarios) no tienen submodulos, asi que la guarda
+        // de CrearVistaSubmodulo no los alcanza: se comprueban aqui.
         if (!SesionActual.Instancia.Ve(modulo))
-            return new InicioView { DataContext = CrearInicio() };
+            return CrearInicio();
 
         if (modulo.Clave == ModuloCatalogo.Administracion.Clave)
-        {
-            var administracion = new AdministracionViewModel(modulo);
-            administracion.VolverSolicitado += (_, _) => Navegar(ModuloCatalogo.Inicio, null);
-            return new AdministracionView { DataContext = administracion };
-        }
+            return Conectar(new AdministracionViewModel(modulo), ModuloCatalogo.Inicio);
 
         if (modulo.Clave == ModuloCatalogo.Peticiones.Clave)
-        {
-            var peticiones = new PeticionesViewModel(modulo);
-            peticiones.VolverSolicitado += (_, _) => Navegar(ModuloCatalogo.Inicio, null);
-            return new PeticionesView { DataContext = peticiones };
-        }
+            return Conectar(new PeticionesViewModel(modulo), ModuloCatalogo.Inicio);
 
         if (modulo.Clave == ModuloCatalogo.Inicio.Clave)
-            return new InicioView { DataContext = CrearInicio() };
+            return CrearInicio();
 
         var dashboard = new ModuloDashboardViewModel(modulo);
         dashboard.SubmoduloSolicitado += (_, s) => Navegar(modulo, s);
-        return new ModuloDashboardView { DataContext = dashboard };
+        return dashboard;
     }
 
     private InicioViewModel CrearInicio()
@@ -137,97 +157,28 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Los submódulos ya implementados se enrutan a su pantalla real; el resto cae en el
-    /// marcador de posición hasta que tengan la suya.
+    /// Los submodulos ya implementados se enrutan a su pantalla real; el resto cae en el
+    /// marcador de posicion hasta que tengan la suya.
     /// </summary>
     private object CrearVistaSubmodulo(Modulo modulo, Submodulo submodulo)
     {
-        // Última barrera: el menú ya oculta lo que el rol no ve, pero a una pantalla también
+        // Ultima barrera: el menu ya oculta lo que el rol no ve, pero a una pantalla tambien
         // se llega desde el lanzador de Inicio y desde las tarjetas del dashboard. Comprobarlo
-        // aquí, en el único punto por el que pasan las tres, cierra los tres caminos a la vez.
+        // aqui, en el unico punto por el que pasan las tres, cierra los tres caminos a la vez.
         if (!SesionActual.Instancia.Ve(submodulo))
-        {
-            var denegado = SubmoduloViewModel.SinPermiso(modulo, submodulo);
-            denegado.VolverSolicitado += (_, _) => Navegar(modulo, null);
-            return new SubmoduloView { DataContext = denegado };
-        }
+            return Conectar(SubmoduloViewModel.SinPermiso(modulo, submodulo), modulo);
 
-        switch (submodulo.Clave)
-        {
-            case "Operaciones.Registro":
-                var registro = new RegistroOperacionViewModel(modulo, submodulo);
-                registro.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new RegistroOperacionView { DataContext = registro };
+        var pantalla = Pantallas.TryGetValue(submodulo.Clave, out var crear)
+            ? crear(modulo, submodulo)
+            : new SubmoduloViewModel(modulo, submodulo);
 
-            case "Operaciones.Seguimiento":
-                var seguimiento = new SeguimientoViewModel(modulo, submodulo);
-                seguimiento.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new SeguimientoView { DataContext = seguimiento };
+        return Conectar(pantalla, modulo);
+    }
 
-            case "Operaciones.FincasNucleos":
-                var fincasNucleos = new FincasYNucleosViewModel(modulo, submodulo);
-                fincasNucleos.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new FincasYNucleosView { DataContext = fincasNucleos };
-
-            case "Flota.Gestion":
-                var gestion = new GestionFlotaViewModel(modulo, submodulo);
-                gestion.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new GestionFlotaView { DataContext = gestion };
-
-            case "Flota.Mantenimiento":
-                var mantenimiento = new MantenimientoViewModel(modulo, submodulo);
-                mantenimiento.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new MantenimientoView { DataContext = mantenimiento };
-
-            case "Nomina.Empleados":
-                var empleados = new EmpleadosViewModel(modulo, submodulo);
-                empleados.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new EmpleadosView { DataContext = empleados };
-
-            case "Finanzas.Tarifas":
-                var tarifas = new TarifasViewModel(modulo, submodulo);
-                tarifas.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new TarifasView { DataContext = tarifas };
-
-            case "Inventario.Repuestos":
-                var repuestos = new RepuestosViewModel(modulo, submodulo);
-                repuestos.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new RepuestosView { DataContext = repuestos };
-
-            case "Inventario.Combustible":
-                var combustible = new CombustibleViewModel(modulo, submodulo);
-                combustible.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new CombustibleView { DataContext = combustible };
-
-            case "Nomina.Horarios":
-                var horarios = new HorariosViewModel(modulo, submodulo);
-                horarios.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new HorariosView { DataContext = horarios };
-
-            case "Nomina.Liquidaciones":
-                var liquidaciones = new LiquidacionesViewModel(modulo, submodulo);
-                liquidaciones.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new LiquidacionesView { DataContext = liquidaciones };
-
-            case "Finanzas.CuentasPorCobrar":
-                var cxc = new CuentasPorCobrarViewModel(modulo, submodulo);
-                cxc.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new CuentasPorCobrarView { DataContext = cxc };
-
-            case "Finanzas.CuentasPorPagar":
-                var cxp = new CuentasPorPagarViewModel(modulo, submodulo);
-                cxp.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new CuentasPorPagarView { DataContext = cxp };
-
-            case "Inventario.Producto":
-                var producto = new ProductoViewModel(modulo, submodulo);
-                producto.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new ProductoView { DataContext = producto };
-
-            default:
-                var vm = new SubmoduloViewModel(modulo, submodulo);
-                vm.VolverSolicitado += (_, _) => Navegar(modulo, null);
-                return new SubmoduloView { DataContext = vm };
-        }
+    /// <summary>Deja la pantalla lista para devolver el control cuando el usuario pida volver.</summary>
+    private IPantalla Conectar(IPantalla pantalla, Modulo destinoAlVolver)
+    {
+        pantalla.VolverSolicitado += (_, _) => Navegar(destinoAlVolver, null);
+        return pantalla;
     }
 }

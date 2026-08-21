@@ -7,15 +7,31 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
+/// Lo que el shell necesita saber de una pantalla: donde esta en el catalogo y como avisar de
+/// que el usuario quiere volver. Es una interfaz y no solo una clase base porque las pantallas
+/// llegan por dos ramas de herencia distintas —<see cref="PantallaViewModelBase"/> y
+/// <see cref="PantallaCrudViewModel{T, TId}"/>—, y <c>MainWindow</c> las enruta a todas por igual.
+/// </summary>
+public interface IPantalla
+{
+    event EventHandler? VolverSolicitado;
+
+    Modulo Modulo { get; }
+    Submodulo? Submodulo { get; }
+    string Ruta { get; }
+    ICommand VolverCommand { get; }
+}
+
+/// <summary>
 /// Base de toda pantalla que ocupa el area de contenido del shell: sabe donde esta en el
 /// catalogo de modulos y sabe volver al resumen.
 ///
 /// Los 17 ViewModels de pantalla repetian este preambulo palabra por palabra. Tenerlo en un
-/// solo sitio tiene un segundo efecto, mas util que las lineas ahorradas: como todas las
-/// pantallas comparten tipo, <c>MainWindow</c> puede enrutarlas con una tabla en vez de con
-/// un switch de catorce casos identicos.
+/// solo sitio tiene un segundo efecto, mas util que las lineas ahorradas: junto con
+/// <see cref="IPantalla"/> le da a <c>MainWindow</c> un tipo comun con el que enrutarlas todas
+/// desde una tabla, en vez de un switch de catorce casos identicos.
 /// </summary>
-public abstract class PantallaViewModelBase : ViewModelBase
+public abstract class PantallaViewModelBase : ViewModelBase, IPantalla
 {
     /// <summary>Se dispara al pedir volver al resumen del modulo; la ventana principal navega.</summary>
     public event EventHandler? VolverSolicitado;
@@ -50,9 +66,10 @@ public abstract class PantallaViewModelBase : ViewModelBase
 /// se lo colgaria tambien a los siete ViewModels de padron que viven DENTRO de una pantalla
 /// conmutable (<see cref="FincaCrudViewModel"/> y companneros), que no tienen modulo ninguno.
 ///
-/// Dos copias de diez lineas, no diecisiete. Si un dia se toca una, tocar la otra.
+/// Son dos copias de diez lineas, no diecisiete, y no pueden desalinearse en silencio:
+/// <see cref="IPantalla"/> obliga a las dos a exponer lo mismo.
 /// </summary>
-public abstract class PantallaCrudViewModel<T, TId> : CrudViewModelBase<T, TId>
+public abstract class PantallaCrudViewModel<T, TId> : CrudViewModelBase<T, TId>, IPantalla
     where T : IEntidad<TId>
 {
     public event EventHandler? VolverSolicitado;

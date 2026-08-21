@@ -1,0 +1,88 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:ASO.Desktop.ViewModels"
+                    xmlns:views="clr-namespace:ASO.Desktop.Views">
+
+  <!-- Que pantalla dibuja cada ViewModel. MainWindow asigna el ViewModel al ContentControl y
+       WPF resuelve la vista por aqui, igual que CrudEditorWindow hace con los editores en
+       EditorTemplates.xaml. Una pantalla nueva se registra en dos sitios: la tabla Pantallas
+       de MainWindow.xaml.cs y esta lista. Si falta la plantilla se nota al instante: el area
+       de contenido muestra el nombre del tipo del ViewModel en vez de la pantalla. -->
+
+  <DataTemplate DataType="{x:Type vm:RegistroOperacionViewModel}">
+    <views:RegistroOperacionView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:SeguimientoViewModel}">
+    <views:SeguimientoView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:FincasYNucleosViewModel}">
+    <views:FincasYNucleosView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:GestionFlotaViewModel}">
+    <views:GestionFlotaView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:MantenimientoViewModel}">
+    <views:MantenimientoView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:RepuestosViewModel}">
+    <views:RepuestosView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:CombustibleViewModel}">
+    <views:CombustibleView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:ProductoViewModel}">
+    <views:ProductoView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:EmpleadosViewModel}">
+    <views:EmpleadosView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:HorariosViewModel}">
+    <views:HorariosView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:LiquidacionesViewModel}">
+    <views:LiquidacionesView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:TarifasViewModel}">
+    <views:TarifasView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:CuentasPorCobrarViewModel}">
+    <views:CuentasPorCobrarView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:CuentasPorPagarViewModel}">
+    <views:CuentasPorPagarView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:AdministracionViewModel}">
+    <views:AdministracionView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:PeticionesViewModel}">
+    <views:PeticionesView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:SubmoduloViewModel}">
+    <views:SubmoduloView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:InicioViewModel}">
+    <views:InicioView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:ModuloDashboardViewModel}">
+    <views:ModuloDashboardView />
+  </DataTemplate>
+
+</ResourceDictionary>
