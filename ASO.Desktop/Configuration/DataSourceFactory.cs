@@ -22,7 +22,6 @@ public static class DataSourceFactory
     private static IFincaDataSource? _fincas;
     private static INucleoDataSource? _nucleos;
     private static IPersonalCampoDataSource? _personalCampo;
-    private static IVehiculoDataSource? _vehiculos;
     private static IEventoOperacionDataSource? _eventosOperacion;
     private static IActivoFlotaDataSource? _activosFlota;
     private static IMantenimientoRegistroDataSource? _mantenimientos;
@@ -61,10 +60,6 @@ public static class DataSourceFactory
 
     public static IPersonalCampoDataSource CrearPersonalCampo() =>
         _personalCampo ??= new SqlPersonalCampoDataSource();
-
-    // Los vehiculos del combo de remesas son una proyeccion del catalogo unico de flota.
-    public static IVehiculoDataSource CrearVehiculos() =>
-        _vehiculos ??= new VehiculoDataSourceAdapter(CrearActivosFlota());
 
     public static IEventoOperacionDataSource CrearEventosOperacion() =>
         _eventosOperacion ??= new SqlEventoOperacionDataSource();

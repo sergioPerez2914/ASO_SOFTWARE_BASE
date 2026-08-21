@@ -26,14 +26,14 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
                                  IFincaDataSource fincas,
                                  INucleoDataSource nucleos,
                                  IPersonalCampoDataSource personal,
-                                 IVehiculoDataSource vehiculos)
+                                 IActivoFlotaDataSource flota)
     {
         _original = original;
         _esNuevo = original.Id == 0;
 
         Fincas = [.. fincas.GetAll()];
         Nucleos = [.. nucleos.GetAll()];
-        Vehiculos = [.. vehiculos.GetAll()];
+        Vehiculos = [.. flota.GetAll().Where(a => a.EsTransporte)];
 
         var todoElPersonal = personal.GetAll().ToList();
         Operadores = [.. todoElPersonal.Where(p => p.Rol == RolCampo.Operador)];
@@ -53,7 +53,8 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
     // --- Catálogos ---
     public IReadOnlyList<Finca> Fincas { get; }
     public IReadOnlyList<Nucleo> Nucleos { get; }
-    public IReadOnlyList<Vehiculo> Vehiculos { get; }
+    /// <summary>Solo camiones y chutos: el catalogo de flota tambien trae maquinas de campo.</summary>
+    public IReadOnlyList<ActivoFlota> Vehiculos { get; }
     public IReadOnlyList<PersonalCampo> Operadores { get; }
     public IReadOnlyList<PersonalCampo> Tractoristas { get; }
     public IReadOnlyList<PersonalCampo> Choferes { get; }
@@ -146,8 +147,8 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
         set => SetProperty(ref _chofer, value);
     }
 
-    private Vehiculo? _vehiculo;
-    public Vehiculo? VehiculoSeleccionado
+    private ActivoFlota? _vehiculo;
+    public ActivoFlota? VehiculoSeleccionado
     {
         get => _vehiculo;
         set => SetProperty(ref _vehiculo, value);

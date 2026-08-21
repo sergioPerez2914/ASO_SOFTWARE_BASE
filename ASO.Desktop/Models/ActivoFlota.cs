@@ -22,8 +22,8 @@ public enum EstadoActivo
 
 /// <summary>
 /// Activo de la flota: máquina de campo (cosechadora, tractor, alzadora) o unidad de transporte
-/// (camión, chuto). Es el catálogo único; las remesas ven los de transporte proyectados como
-/// <see cref="Vehiculo"/> a través de <see cref="Services.VehiculoDataSourceAdapter"/>.
+/// (camión, chuto). Es el catálogo único: el combo de unidades de la remesa lo lee filtrando
+/// por <see cref="EsTransporte"/>.
 ///
 /// El uso se mide con dos instrumentos distintos: horómetro (horas, máquinas) y odómetro
 /// (kilómetros, transporte); por eso son dos campos y no uno.

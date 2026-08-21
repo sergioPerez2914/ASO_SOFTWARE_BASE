@@ -26,7 +26,7 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
     private readonly IFincaDataSource _fincas;
     private readonly INucleoDataSource _nucleos;
     private readonly IPersonalCampoDataSource _personal;
-    private readonly IVehiculoDataSource _vehiculos;
+    private readonly IActivoFlotaDataSource _vehiculos;
 
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
     public event EventHandler? VolverSolicitado;
@@ -52,7 +52,7 @@ public sealed class RegistroOperacionViewModel : CrudViewModelBase<Remesa, int>
         _fincas = DataSourceFactory.CrearFincas();
         _nucleos = DataSourceFactory.CrearNucleos();
         _personal = DataSourceFactory.CrearPersonalCampo();
-        _vehiculos = DataSourceFactory.CrearVehiculos();
+        _vehiculos = DataSourceFactory.CrearActivosFlota();
 
         VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
 
