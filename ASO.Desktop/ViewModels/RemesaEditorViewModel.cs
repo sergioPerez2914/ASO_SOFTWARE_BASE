@@ -24,7 +24,6 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
 
     public RemesaEditorViewModel(Remesa original,
                                  IFincaDataSource fincas,
-                                 INucleoDataSource nucleos,
                                  IPersonalCampoDataSource personal,
                                  IActivoFlotaDataSource flota)
     {
@@ -32,7 +31,6 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
         _esNuevo = original.Id == 0;
 
         Fincas = [.. fincas.GetAll()];
-        Nucleos = [.. nucleos.GetAll()];
         Vehiculos = [.. flota.GetAll().Where(a => a.EsTransporte)];
 
         var todoElPersonal = personal.GetAll().ToList();
@@ -52,7 +50,6 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
 
     // --- Catálogos ---
     public IReadOnlyList<Finca> Fincas { get; }
-    public IReadOnlyList<Nucleo> Nucleos { get; }
     /// <summary>Solo camiones y chutos: el catalogo de flota tambien trae maquinas de campo.</summary>
     public IReadOnlyList<ActivoFlota> Vehiculos { get; }
     public IReadOnlyList<PersonalCampo> Operadores { get; }
@@ -161,27 +158,14 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
         set => SetProperty(ref _remesero, value);
     }
 
-    // --- Núcleos de pago ---
-    private Nucleo? _nucleoCorte;
-    public Nucleo? NucleoCorteSeleccionado
-    {
-        get => _nucleoCorte;
-        set => SetProperty(ref _nucleoCorte, value);
-    }
+    /// <summary>
+    /// C.O.D del núcleo, solo para mostrarlo. No se elige: una instalación atiende a un solo
+    /// núcleo y los tres servicios de la remesa (corte, alza y empuje, transporte) los presta
+    /// ese mismo núcleo.
+    /// </summary>
+    public string NucleoCodigo => Ambito.Actual?.CodigoCam ?? "—";
 
-    private Nucleo? _nucleoAlzaEmpuje;
-    public Nucleo? NucleoAlzaEmpujeSeleccionado
-    {
-        get => _nucleoAlzaEmpuje;
-        set => SetProperty(ref _nucleoAlzaEmpuje, value);
-    }
-
-    private Nucleo? _nucleoTransporte;
-    public Nucleo? NucleoTransporteSeleccionado
-    {
-        get => _nucleoTransporte;
-        set => SetProperty(ref _nucleoTransporte, value);
-    }
+    public string NucleoNombre => Ambito.Actual?.Nombre ?? string.Empty;
 
     // --- Tiempos de carga (WPF no trae selector de hora: fecha + "HH:mm") ---
     private DateTime? _inicioCargaFecha = DateTime.Today;
@@ -225,10 +209,6 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
         VehiculoSeleccionado = Vehiculos.FirstOrDefault(v => v.Id == remesa.VehiculoId);
         RemeseroSeleccionado = Remeseros.FirstOrDefault(p => p.Id == remesa.RemeseroId);
 
-        NucleoCorteSeleccionado = Nucleos.FirstOrDefault(n => n.Codigo == remesa.NucleoCorteCodigo);
-        NucleoAlzaEmpujeSeleccionado = Nucleos.FirstOrDefault(n => n.Codigo == remesa.NucleoAlzaEmpujeCodigo);
-        NucleoTransporteSeleccionado = Nucleos.FirstOrDefault(n => n.Codigo == remesa.NucleoTransporteCodigo);
-
         InicioCargaFecha = remesa.InicioCarga.Date;
         InicioCargaHora = remesa.InicioCarga.ToString(FormatoHora, CultureInfo.InvariantCulture);
         FinCargaFecha = remesa.FinCarga.Date;
@@ -247,9 +227,6 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
         if (ChoferSeleccionado is null) faltantes.Add("chofer");
         if (VehiculoSeleccionado is null) faltantes.Add("placa");
         if (RemeseroSeleccionado is null) faltantes.Add("remesero");
-        if (NucleoCorteSeleccionado is null) faltantes.Add("núcleo de corte");
-        if (NucleoAlzaEmpujeSeleccionado is null) faltantes.Add("núcleo de alza y empuje");
-        if (NucleoTransporteSeleccionado is null) faltantes.Add("núcleo de transporte");
         if (InicioCargaFecha is null) faltantes.Add("fecha de inicio de carga");
         if (FinCargaFecha is null) faltantes.Add("fecha de fin de carga");
 
@@ -317,9 +294,12 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
         remesa.RemeseroId = RemeseroSeleccionado!.Id;
         remesa.RemeseroNombre = RemeseroSeleccionado.Nombre;
 
-        remesa.NucleoCorteCodigo = NucleoCorteSeleccionado!.Codigo;
-        remesa.NucleoAlzaEmpujeCodigo = NucleoAlzaEmpujeSeleccionado!.Codigo;
-        remesa.NucleoTransporteCodigo = NucleoTransporteSeleccionado!.Codigo;
+        // Los tres servicios los presta el núcleo de la instalación; se estampan como texto
+        // para que la remesa conserve el C.O.D con el que se emitió.
+        var codigoCam = Ambito.ExigirCodigoCam();
+        remesa.NucleoCorteCodigo = codigoCam;
+        remesa.NucleoAlzaEmpujeCodigo = codigoCam;
+        remesa.NucleoTransporteCodigo = codigoCam;
 
         TryCombinar(InicioCargaFecha, InicioCargaHora, out var inicio);
         TryCombinar(FinCargaFecha, FinCargaHora, out var fin);

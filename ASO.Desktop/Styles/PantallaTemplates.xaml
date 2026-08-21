@@ -17,8 +17,8 @@
     <views:SeguimientoView />
   </DataTemplate>
 
-  <DataTemplate DataType="{x:Type vm:FincasYNucleosViewModel}">
-    <views:FincasYNucleosView />
+  <DataTemplate DataType="{x:Type vm:FincasViewModel}">
+    <views:FincasView />
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type vm:GestionFlotaViewModel}">

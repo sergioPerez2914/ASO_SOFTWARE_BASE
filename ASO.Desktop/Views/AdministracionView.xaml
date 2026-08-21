@@ -38,67 +38,50 @@
     </Grid>
 
     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
-      <RadioButton Content="Núcleos" GroupName="AdminAcceso"
-                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                   IsChecked="{Binding PuedeVerOrganizaciones, Mode=OneTime}"
-                   Visibility="{Binding PuedeVerOrganizaciones, Converter={StaticResource BoolToVis}}"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Organizaciones" />
       <RadioButton Content="Usuarios" GroupName="AdminAcceso"
-                   IsChecked="{Binding MostrarUsuarios, Mode=OneTime}"
+                   IsChecked="True"
                    Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
                    Command="{Binding CambiarVistaCommand}" CommandParameter="Usuarios" />
       <RadioButton Content="Ajustes de permisos" GroupName="AdminAcceso"
                    Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
                    Command="{Binding CambiarVistaCommand}" CommandParameter="Permisos" />
+      <RadioButton Content="Núcleo" GroupName="AdminAcceso"
+                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                   Command="{Binding CambiarVistaCommand}" CommandParameter="Nucleo" />
     </StackPanel>
 
-    <!-- Padron de nucleos (solo Desarrollador) -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarOrganizaciones, Converter={StaticResource BoolToVis}}">
-      <!-- El DataContext va en un Grid interno: si compartiera elemento con Visibility, esa
-           binding se resolvería contra el sub-VM (que no tiene MostrarOrganizaciones) en vez
-           del AdministracionViewModel, y se quedaría en su valor por defecto (Visible). -->
-      <Grid DataContext="{Binding Organizaciones}">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
+    <!-- Ficha del nucleo instalado: no es un padron, es la unica fila -->
+    <Grid Grid.Row="2" Visibility="{Binding MostrarNucleo, Converter={StaticResource BoolToVis}}">
+      <Border DataContext="{Binding Nucleo}" Style="{StaticResource CardStyle}"
+              VerticalAlignment="Top" HorizontalAlignment="Left" Width="460">
+        <StackPanel>
+          <TextBlock Text="Datos del núcleo" FontSize="15" FontWeight="Bold"
+                     Foreground="{StaticResource TextPrimaryBrush}" />
+          <TextBlock Text="Una instalación atiende a un solo núcleo. El C.O.D es el que estampan las remesas, las liquidaciones y las facturas."
+                     FontSize="11" TextWrapping="Wrap"
+                     Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,10" />
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
+          <TextBlock Text="Nombre" Style="{StaticResource FormLabelStyle}" />
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   IsEnabled="{Binding PuedeEditar}"
+                   Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
 
-          <TextBox Grid.Column="0" Width="260" VerticalAlignment="Center"
-                   Style="{StaticResource FormTextBoxStyle}"
-                   Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                   ToolTip="Buscar por código o nombre" />
+          <TextBlock Text="Código interno" Style="{StaticResource FormLabelStyle}" />
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   IsEnabled="{Binding PuedeEditar}"
+                   Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}" />
 
-          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Nuevo núcleo" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                    Background="{StaticResource PrimaryBrush}" Foreground="White"
-                    Command="{Binding AgregarCommand}" />
-            <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
-                    Command="{Binding EditarCommand}" />
-            <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
-                    Command="{Binding RefrescarCommand}" />
-          </StackPanel>
-        </Grid>
+          <TextBlock Text="C.O.D (código en el CAM)" Style="{StaticResource FormLabelStyle}" />
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   IsEnabled="{Binding PuedeEditar}"
+                   Text="{Binding CodigoCam, UpdateSourceTrigger=PropertyChanged}" />
+
+          <Button Content="Guardar" Margin="0,16,0,0" HorizontalAlignment="Left"
+                  Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
+                  Background="{StaticResource PrimaryBrush}" Foreground="White"
+                  Command="{Binding GuardarCommand}" />
+        </StackPanel>
       </Border>
-
-      <Border Grid.Row="1" Style="{StaticResource CardStyle}">
-        <DataGrid Style="{StaticResource DataGridStyle}"
-                  ItemsSource="{Binding ItemsView}"
-                  SelectedItem="{Binding SelectedItem}">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Código" Binding="{Binding Codigo}" Width="140" />
-            <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*" />
-            <DataGridTextColumn Header="Estado" Binding="{Binding EstadoTexto}" Width="120" />
-          </DataGrid.Columns>
-        </DataGrid>
-      </Border>
-      </Grid>
     </Grid>
 
     <!-- Padron de usuarios -->

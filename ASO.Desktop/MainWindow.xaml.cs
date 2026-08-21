@@ -26,9 +26,8 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Quién está dentro y sobre qué núcleo. El núcleo se muestra siempre — no solo al
-    /// Desarrollador — porque saber en qué organización se está escribiendo importa antes
-    /// de guardar nada.
+    /// Quién está dentro y sobre qué núcleo. El núcleo se muestra siempre porque saber
+    /// dónde se está escribiendo importa antes de guardar nada.
     /// </summary>
     private void MostrarCabecera()
     {
@@ -37,36 +36,11 @@ public partial class MainWindow : Window
         if (sesion.UsuarioActual is { } usuario)
             UsuarioActualLabel.Text = $"{usuario.NombreCompleto} · {usuario.RolTexto}";
 
-        if (Ambito.OrganizacionId is { } organizacionId)
+        if (Ambito.Actual is { } nucleo)
         {
-            var organizacion = DataSourceFactory.CrearOrganizaciones().GetById(organizacionId);
-            NucleoActualLabel.Text = organizacion?.Etiqueta ?? $"Núcleo {organizacionId}";
+            NucleoActualLabel.Text = nucleo.Etiqueta;
             NucleoChip.Visibility = Visibility.Visible;
         }
-
-        CambiarNucleoBoton.Visibility = sesion.Puede(Permisos.Organizaciones.Cambiar)
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-    }
-
-    /// <summary>
-    /// Cambiar de núcleo reconstruye la ventana entera, igual que al iniciar sesión: el menú,
-    /// los dashboards y las listas se arman en sus constructores leyendo el ámbito, así que
-    /// refrescarlos en sitio sería reimplementar ese arranque en otro camino.
-    /// </summary>
-    private void OnCambiarNucleo(object sender, RoutedEventArgs e)
-    {
-        if (!SesionActual.Instancia.Puede(Permisos.Organizaciones.Cambiar))
-            return;
-
-        var selector = new SeleccionOrganizacionView { Owner = this };
-        if (selector.ShowDialog() != true)
-            return;
-
-        var nuevaVentana = new MainWindow();
-        Application.Current.MainWindow = nuevaVentana;
-        nuevaVentana.Show();
-        Close();
     }
 
     private void OnCerrarSesion(object sender, RoutedEventArgs e)
@@ -114,7 +88,7 @@ public partial class MainWindow : Window
         {
             ["Operaciones.Registro"] = (m, s) => new RegistroOperacionViewModel(m, s),
             ["Operaciones.Seguimiento"] = (m, s) => new SeguimientoViewModel(m, s),
-            ["Operaciones.FincasNucleos"] = (m, s) => new FincasYNucleosViewModel(m, s),
+            ["Operaciones.Fincas"] = (m, s) => new FincasViewModel(m, s),
             ["Flota.Gestion"] = (m, s) => new GestionFlotaViewModel(m, s),
             ["Flota.Mantenimiento"] = (m, s) => new MantenimientoViewModel(m, s),
             ["Inventario.Repuestos"] = (m, s) => new RepuestosViewModel(m, s),

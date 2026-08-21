@@ -11,8 +11,8 @@ namespace ASO.Desktop.Configuration;
 /// sus dependencias sin conocer la implementacion, y donde se da de alta una entidad nueva.
 ///
 /// Las fuentes Sql son sin estado (abren un <see cref="AsoDbContext"/> por metodo), asi que
-/// se cachean con <c>??=</c> por ahorro, no por correccion: el ambito de organizacion lo lee
-/// el contexto al construirse, de modo que cambiar de nucleo no exige invalidar este cache.
+/// se cachean con <c>??=</c> por ahorro, no por correccion: el ambito lo lee el contexto al
+/// construirse, no la fuente.
 /// </summary>
 public static class DataSourceFactory
 {
@@ -20,7 +20,6 @@ public static class DataSourceFactory
     private static IInventoryDataSource? _inventario;
     private static IRemesaDataSource? _remesas;
     private static IFincaDataSource? _fincas;
-    private static INucleoDataSource? _nucleos;
     private static IPersonalCampoDataSource? _personalCampo;
     private static IEventoOperacionDataSource? _eventosOperacion;
     private static IActivoFlotaDataSource? _activosFlota;
@@ -54,9 +53,6 @@ public static class DataSourceFactory
 
     public static IFincaDataSource CrearFincas() =>
         _fincas ??= new SqlFincaDataSource();
-
-    public static INucleoDataSource CrearNucleos() =>
-        _nucleos ??= new SqlNucleoDataSource();
 
     public static IPersonalCampoDataSource CrearPersonalCampo() =>
         _personalCampo ??= new SqlPersonalCampoDataSource();

@@ -96,14 +96,6 @@
     <views:FincaEditorView />
   </DataTemplate>
 
-  <DataTemplate DataType="{x:Type vm:NucleoEditorViewModel}">
-    <views:NucleoEditorView />
-  </DataTemplate>
-
-  <DataTemplate DataType="{x:Type vm:OrganizacionEditorViewModel}">
-    <views:OrganizacionEditorView />
-  </DataTemplate>
-
   <DataTemplate DataType="{x:Type vm:UsuarioEditorViewModel}">
     <views:UsuarioEditorView />
   </DataTemplate>

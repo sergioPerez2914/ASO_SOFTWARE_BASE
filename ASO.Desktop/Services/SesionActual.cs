@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
+using ASO.Desktop.Configuration;
 using ASO.Desktop.Models;
 
 namespace ASO.Desktop.Services;
@@ -29,9 +30,15 @@ public class SesionActual : ISesionActual
         UsuarioActual = usuario;
         _permisos = Calcular(usuario, ajustes);
 
-        // La pertenencia del usuario es la que fija el ambito: nadie elige su organizacion
-        // al entrar. El Desarrollador puede cambiarla despues con Ambito.Cambiar.
-        Ambito.Fijar(usuario.OrganizacionId);
+        // La pertenencia del usuario es la que fija el ambito: nadie elige su nucleo al entrar
+        // y nadie lo cambia despues (una instalacion atiende a un solo nucleo). El padron de
+        // Organizaciones no lleva filtro de consulta, asi que se puede leer con el ambito
+        // todavia sin fijar.
+        var nucleo = DataSourceFactory.CrearOrganizaciones().GetById(usuario.OrganizacionId)
+            ?? throw new InvalidOperationException(
+                $"El usuario {usuario.NombreUsuario} apunta al nucleo {usuario.OrganizacionId}, que no existe.");
+
+        Ambito.Fijar(nucleo);
 
         CommandManager.InvalidateRequerySuggested();
     }

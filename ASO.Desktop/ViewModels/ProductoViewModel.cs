@@ -17,7 +17,6 @@ public sealed record EntregaProducto(
     DateTime Fecha,
     string FincaNombre,
     string Ubicacion,
-    string NucleoTransporte,
     decimal Toneladas,
     string FacturadaTexto,
     bool Facturada)
@@ -127,7 +126,6 @@ public sealed class ProductoViewModel : PantallaViewModelBase
                 r.LlegadaCentral ?? r.FechaConfirmacion ?? r.FechaCreacion,
                 r.FincaNombre,
                 r.UbicacionTexto,
-                r.NucleoTransporteCodigo,
                 r.PesoNetoT ?? 0m,
                 r.FacturadaTexto,
                 r.Facturada))
@@ -147,8 +145,7 @@ public sealed class ProductoViewModel : PantallaViewModelBase
         var texto = TextoBusqueda.Trim();
         var coincide = string.IsNullOrWhiteSpace(texto)
             || entrega.FincaNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
-            || entrega.Ubicacion.Contains(texto, StringComparison.OrdinalIgnoreCase)
-            || entrega.NucleoTransporte.Contains(texto, StringComparison.OrdinalIgnoreCase);
+            || entrega.Ubicacion.Contains(texto, StringComparison.OrdinalIgnoreCase);
 
         var enRango = _rango switch
         {

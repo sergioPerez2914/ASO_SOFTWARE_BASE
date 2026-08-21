@@ -36,6 +36,7 @@ public sealed class PrimerArranqueViewModel : ViewModelBase
         if (_existente is { } organizacion)
         {
             _codigoNucleo = organizacion.Codigo;
+            _codigoCam = organizacion.CodigoCam;
             _nombreNucleo = organizacion.Nombre;
         }
     }
@@ -51,6 +52,14 @@ public sealed class PrimerArranqueViewModel : ViewModelBase
     {
         get => _codigoNucleo;
         set => SetProperty(ref _codigoNucleo, value);
+    }
+
+    /// <summary>C.O.D: como identifica el CAM a este núcleo. Ver <see cref="Organizacion.CodigoCam"/>.</summary>
+    private string _codigoCam = string.Empty;
+    public string CodigoCam
+    {
+        get => _codigoCam;
+        set => SetProperty(ref _codigoCam, value);
     }
 
     private string _nombreNucleo = string.Empty;
@@ -95,6 +104,7 @@ public sealed class PrimerArranqueViewModel : ViewModelBase
             {
                 organizacion = actual.Clonar();
                 organizacion.Codigo = CodigoNucleo.Trim().ToUpperInvariant();
+                organizacion.CodigoCam = CodigoCam.Trim().ToUpperInvariant();
                 organizacion.Nombre = NombreNucleo.Trim();
                 organizacion.Activa = true;
                 _organizaciones.Update(organizacion);
@@ -104,6 +114,7 @@ public sealed class PrimerArranqueViewModel : ViewModelBase
                 organizacion = _organizaciones.Add(new Organizacion
                 {
                     Codigo = CodigoNucleo.Trim().ToUpperInvariant(),
+                    CodigoCam = CodigoCam.Trim().ToUpperInvariant(),
                     Nombre = NombreNucleo.Trim(),
                     Activa = true
                 });
@@ -139,6 +150,12 @@ public sealed class PrimerArranqueViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(CodigoNucleo))
         {
             MensajeError = "Indique el código del núcleo.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(CodigoCam))
+        {
+            MensajeError = "Indique el C.O.D del núcleo: es lo que estampan las remesas y las facturas.";
             return false;
         }
 

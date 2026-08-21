@@ -6,10 +6,6 @@
              mc:Ignorable="d"
              d:DesignWidth="380">
 
-  <UserControl.Resources>
-    <BooleanToVisibilityConverter x:Key="BoolToVisLocal" />
-  </UserControl.Resources>
-
   <StackPanel>
     <TextBlock Text="Nombre y apellido" Style="{StaticResource FormLabelStyle}" />
     <TextBox Style="{StaticResource FormTextBoxStyle}"
@@ -23,17 +19,6 @@
     <ComboBox Style="{StaticResource FormComboBoxStyle}"
               ItemsSource="{Binding Roles}"
               SelectedItem="{Binding Rol}" />
-
-    <StackPanel Visibility="{Binding NucleoObligatorio, Converter={StaticResource BoolToVisLocal}}">
-      <TextBlock Text="Núcleo (C.O.D)" Style="{StaticResource FormLabelStyle}" />
-      <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                ItemsSource="{Binding Nucleos}"
-                DisplayMemberPath="Etiqueta"
-                SelectedItem="{Binding NucleoSeleccionado}" />
-      <TextBlock Text="Determina a quién se paga el corte, el alza y el transporte de la remesa."
-                 FontSize="11" TextWrapping="Wrap"
-                 Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
-    </StackPanel>
 
     <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
               Foreground="{StaticResource TextPrimaryBrush}"

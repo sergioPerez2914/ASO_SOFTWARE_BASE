@@ -43,7 +43,7 @@ resumen y se despliega su lista de submódulos en el menú lateral.
 
 | Módulo | Submódulos | Estado |
 |---|---|---|
-| Operaciones | Registro de Operación · Seguimiento · Fincas y Núcleos | funcionales |
+| Operaciones | Registro de Operación · Seguimiento · Fincas | funcionales |
 | Flota | Gestión de Flota · Mantenimiento · **Telemetría** | funcionales, salvo Telemetría (pendiente) |
 | Inventario | Repuestos · Combustible · Producto | funcionales |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios | funcionales |
@@ -146,32 +146,56 @@ hay mocks: `Configuration/DataSourceFactory.cs` devuelve siempre la implementaci
 - **Migraciones** en `ASO.Desktop/Migrations/`, por fases:
   `Baseline00_EmpleadoInventario` → `Fase1_CatalogosSimples` → `Fase2_CatalogosConRelaciones` →
   `Fase3_DocumentosPlanos` → `Fase4_ColeccionesAnidadas` → `Fase5_EventoOperacion` →
-  `FixStockActualStockMinimoDecimal` → `Fase6_OrganizacionYSeguridad`.
+  `FixStockActualStockMinimoDecimal` → `Fase6_OrganizacionYSeguridad` → `Fase7_NucleoUnico`.
 - **La cadena de conexión vive solo en `appsettings.local.json`** (por máquina, en `.gitignore`).
 - **No hay claves foráneas reales** en las tablas planas: las relaciones son `int` sueltos y la
   integridad es de la aplicación, con snapshots de texto (`…Nombre`, `…Codigo`) en cada documento.
 
-## Núcleos: aislamiento por organización (2026-08-20)
+## Núcleos: un solo núcleo por instalación (2026-08-21)
 
-Cada **núcleo** que usa ASO es una `Organizacion` y no ve los datos de ningún otro. Es una entidad
-**nueva y distinta** de `Nucleo`, que sigue siendo el catálogo de **núcleos de productores** (C.O.D
-del CAM) usado para decidir a quién se le paga. No confundirlas: una `Remesa` cita **tres** núcleos
-de productores a la vez (corte, alza y transporte) y **una sola** organización.
+**Una instalación atiende a un solo núcleo.** El núcleo es la `Organizacion`: la empresa donde está
+instalado el sistema, y a la vez el ámbito de aislamiento. Lo que sí es de uno a muchos es
+**núcleo → fincas**, y cada finca tiene sus lotes y tablones.
 
-- **`Models/IDeOrganizacion.cs`** marca las entidades sujetas al ámbito. Las 21 persistidas lo
-  implementan, más `Usuario`, `PermisoUsuario` y `PeticionCambio`.
+Hasta el 2026-08-21 convivían dos entidades llamadas "núcleo": `Organizacion` y un catálogo `Nucleo`
+de núcleos **de productores**. Se fusionaron, porque dentro de un núcleo todas las referencias
+apuntan a ese mismo núcleo:
+
+- **`Nucleo` ya no existe** (entidad, fuente de datos, CRUD, editor y tabla). El **C.O.D** del CAM
+  vive ahora en **`Organizacion.CodigoCam`**, aparte de `Organizacion.Codigo`, que es la etiqueta
+  corta de uso interno.
+- **Ningún formulario pregunta por el núcleo.** Ni la remesa (que pedía tres), ni el personal de
+  campo, ni la liquidación: el C.O.D se estampa desde `Ambito.ExigirCodigoCam()`.
+- **Los tres servicios siguen vivos.** La remesa genera corte + alza y empuje + transporte porque
+  cada uno tiene su tarifa; lo que desapareció es la pregunta de a qué núcleo pertenece cada uno.
+- **Los campos de texto se conservan** (`Remesa.Nucleo*Codigo`, `PersonalCampo.NucleoCodigo`,
+  `JornadaTrabajo.NucleoCodigo`, `FacturaClienteLinea.NucleoCodigo`): un documento guarda lo que
+  decía el papel, así que un C.O.D renombrado no reescribe las remesas viejas.
+- **El multi-núcleo salió de la interfaz**: sin botón "Cambiar núcleo", sin padrón de Organizaciones
+  y sin elegir núcleo al crear un usuario. El núcleo nace en `Views/PrimerArranqueView`, que ahora
+  pide también el C.O.D, y sus datos se corrigen después en **Administración · Núcleo**
+  (`DatosNucleoViewModel`, permiso `Nucleo.Editar`) — que es una ficha de una sola fila, no un
+  padrón. Hace falta porque el C.O.D es lo que se estampa en cada documento: sin sitio donde
+  corregirlo, un código mal cargado se arrastraría para siempre.
+
+**El aislamiento por organización sigue intacto**, y es deliberado: es la barrera que impide que dos
+instalaciones que compartan base se vean entre sí.
+
+- **`Models/IDeOrganizacion.cs`** marca las entidades sujetas al ámbito: 23 en total, las 20
+  operativas más `Usuario`, `PermisoUsuario` y `PeticionCambio`.
 - **`BD/DbContext.cs` hace todo el trabajo, en dos sitios:**
   - `AplicarFiltroDeOrganizacion` recorre el modelo y pone un `HasQueryFilter` a cada
     `IDeOrganizacion`. Es **fail-closed**: sin ámbito fijado no se ve nada, en vez de verse todo.
   - `SaveChanges()` estampa `OrganizacionId` en toda fila nueva. Un solo sitio: olvidarlo en una
     fuente de datos crearía filas que después ninguna consulta devolvería.
-- **`Services/Ambito.cs`** guarda la organización activa. La fija `SesionActual.IniciarSesion` a
-  partir del usuario; solo el Desarrollador la cambia después (`Ambito.Cambiar`).
+- **`Services/Ambito.cs`** guarda el núcleo activo (la entidad entera, no solo su Id, porque de
+  ahí sale el C.O.D que estampan los documentos). La fija `SesionActual.IniciarSesion` a partir del
+  usuario y **no cambia mientras dure la sesión**.
 - **`IgnoreQueryFilters()` se usa en dos sitios y solo dos**: el login (al autenticar todavía no hay
   ámbito) y la lectura de los ajustes de permisos del usuario que entra. Ambos en
   `BD/SqlUsuarioDataSource.cs`.
-- **`Organizaciones` no lleva filtro** — es la tabla que define el ámbito. El permiso es toda la
-  barrera, y solo el Desarrollador lo tiene.
+- **`Organizaciones` no lleva filtro** — es la tabla que define el ámbito. Ya no se administra
+  desde la interfaz: la fila nace en el primer arranque.
 - **Añadir una entidad al ámbito** es implementar `IDeOrganizacion`: el filtro y el estampado la
   recogen solos.
 
@@ -183,8 +207,8 @@ administrador ajusta por usuario con `PermisoUsuario` (concede o revoca; **revoc
 | Rol | Alcance |
 |---|---|
 | **Remesero** | 24 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios y Combustible. Crea, edita y confirma; **no anula nada**, no entra a Finanzas, Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
-| **AdministradorNucleo** | Todo dentro de SU núcleo (88 permisos). No puede cambiar de núcleo ni administrar el padrón de organizaciones, ni crear usuarios Desarrollador |
-| **Desarrollador** | Los 91 permisos, y es el único que atraviesa organizaciones |
+| **AdministradorNucleo** | Todo dentro del núcleo (87 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
+| **Desarrollador** | Los 88 permisos, y es el único que reparte su propio rol |
 
 - **`Services/Permisos.cs`** es el catálogo de cadenas. Los de navegación llevan prefijo `Ver.` y se
   **derivan de la clave del submódulo**, así que no pueden desincronizarse al renombrar.
@@ -203,7 +227,7 @@ administrador ajusta por usuario con `PermisoUsuario` (concede o revoca; **revoc
 - **Contraseñas**: PBKDF2-SHA256 con salt por usuario y 210 000 iteraciones
   (`Services/Passwords.cs`), sin dependencias nuevas. No hay usuarios sembrados ni contraseñas por
   defecto: en la primera ejecución contra una base sin usuarios, `Views/PrimerArranqueView` pide el
-  nombre del núcleo y crea el usuario Desarrollador.
+  nombre del núcleo, su C.O.D y crea el usuario Desarrollador.
 
 ## Peticiones de cambio
 
@@ -291,9 +315,9 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
 
 ## Próximo paso sugerido
 
-1. **Aplicar `Fase6_OrganizacionYSeguridad` a la base** (`dotnet ef database update`) y hacer el
-   recorrido de verificación: primer arranque, un usuario por rol, y comprobar que con el núcleo 2
-   activo no se ve ni una fila del núcleo 1.
+1. **Rotar la contraseña de `sa`.** La cadena de conexión ya salió de `appsettings.json` (ahora es
+   LocalDB con un `.mdf` en `App_Data`), pero `ASO123` sigue en el historial de un repositorio
+   público: quitarla del HEAD no la revoca.
 2. **Llevar la comprobación de permisos a los servicios de dominio.** Hoy toda la autorización vive
    en el `CanExecute` de los comandos: quien llame a un servicio desde otro sitio se la salta.
 3. **Flota · Telemetría**, el único submódulo sin construir. Es también lo que permitiría desglosar el
@@ -301,9 +325,6 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
 4. **Resolver las decisiones provisionales** con el socio (tarifario, formatos, turnos): ahora que la
    BD está conectada y no hay mocks, cada supuesto sin confirmar se convierte en datos reales mal
    cargados.
-5. **Sacar la cadena de conexión de `appsettings.json`** y rotar la contraseña de `sa`: el repositorio
-   es público y esa credencial da acceso total al servidor, por debajo de todo el control de acceso
-   que se acaba de construir.
 
-El catálogo completo de permisos está en `Services/Permisos.cs` (91 en uso) y el reparto por rol en
+El catálogo completo de permisos está en `Services/Permisos.cs` (88 en uso) y el reparto por rol en
 `Services/MatrizPermisos.cs`.

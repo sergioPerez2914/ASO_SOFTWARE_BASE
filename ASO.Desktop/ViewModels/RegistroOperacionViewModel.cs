@@ -24,7 +24,6 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
     private readonly SolicitudesDeCambio _solicitudes = new();
     private readonly ISesionActual _sesionActual;
     private readonly IFincaDataSource _fincas;
-    private readonly INucleoDataSource _nucleos;
     private readonly IPersonalCampoDataSource _personal;
     private readonly IActivoFlotaDataSource _vehiculos;
 
@@ -46,7 +45,6 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
         _dialogos = dialogos;
         _sesionActual = sesion;
         _fincas = DataSourceFactory.CrearFincas();
-        _nucleos = DataSourceFactory.CrearNucleos();
         _personal = DataSourceFactory.CrearPersonalCampo();
         _vehiculos = DataSourceFactory.CrearActivosFlota();
 
@@ -90,10 +88,7 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
            || Contiene(item.OperadorNombre, texto)
            || Contiene(item.TractoristaNombre, texto)
            || Contiene(item.ChoferNombre, texto)
-           || Contiene(item.RemeseroNombre, texto)
-           || Contiene(item.NucleoCorteCodigo, texto)
-           || Contiene(item.NucleoAlzaEmpujeCodigo, texto)
-           || Contiene(item.NucleoTransporteCodigo, texto);
+           || Contiene(item.RemeseroNombre, texto);
 
     private static bool Contiene(string valor, string texto)
         => valor.Contains(texto, StringComparison.OrdinalIgnoreCase);
@@ -106,7 +101,7 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
     };
 
     protected override CrudEditorViewModelBase<Remesa> CrearEditor(Remesa item)
-        => new RemesaEditorViewModel(item, _fincas, _nucleos, _personal, _vehiculos);
+        => new RemesaEditorViewModel(item, _fincas, _personal, _vehiculos);
 
     // Una remesa deja de ser editable en cuanto se confirma.
     protected override bool PuedeEditar(Remesa item) => _servicio.PuedeEditar(item);

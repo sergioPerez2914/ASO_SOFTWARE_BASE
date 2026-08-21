@@ -1,8 +1,5 @@
-using System.Linq;
 using System.Windows;
 using ASO.Desktop.Configuration;
-using ASO.Desktop.Models;
-using ASO.Desktop.Services;
 using ASO.Desktop.Views;
 
 namespace ASO.Desktop;
@@ -23,14 +20,6 @@ public partial class App : Application
 
         var login = new LoginView();
         if (login.ShowDialog() != true)
-        {
-            Shutdown();
-            return;
-        }
-
-        // El Desarrollador elige núcleo antes de entrar; el resto trabaja en el suyo y no elige.
-        if (SesionActual.Instancia.UsuarioActual is { Rol: Rol.Desarrollador }
-            && !ElegirNucleo())
         {
             Shutdown();
             return;
@@ -65,14 +54,5 @@ public partial class App : Application
         }
 
         return new PrimerArranqueView().ShowDialog() == true;
-    }
-
-    private static bool ElegirNucleo()
-    {
-        // Si solo hay un núcleo no tiene sentido preguntar: ya está el suyo activo. Se cuenta
-        // antes de construir la ventana para no crear una que no se va a mostrar.
-        var hayVarios = DataSourceFactory.CrearOrganizaciones().GetAll().Count(o => o.Activa) > 1;
-
-        return !hayVarios || new SeleccionOrganizacionView().ShowDialog() == true;
     }
 }

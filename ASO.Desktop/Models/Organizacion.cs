@@ -1,20 +1,27 @@
 namespace ASO.Desktop.Models;
 
 /// <summary>
-/// Nucleo que usa ASO: la empresa o centro donde esta instalado el sistema.
-/// Es el ambito de aislamiento: cada fila de las entidades operativas pertenece a una
-/// organizacion y nadie ve las de otra (ver <see cref="IDeOrganizacion"/>).
+/// Nucleo: la empresa o centro donde esta instalado el sistema. Una instalacion atiende a un
+/// solo nucleo, y dentro de el todas las referencias apuntan a ese mismo nucleo; lo que si es
+/// de uno a muchos es nucleo -> <see cref="Finca"/>.
 ///
-/// NO confundir con <see cref="Nucleo"/>, que es el catalogo de nucleos de PRODUCTORES
-/// (codigo C.O.D del CAM) y sirve para decidir a quien se le paga el corte, el alza y el
-/// transporte. Una remesa cita tres de esos a la vez; de una organizacion solo tiene una.
+/// Es tambien el ambito de aislamiento: cada fila de las entidades operativas le pertenece y
+/// nadie ve las de otro (ver <see cref="IDeOrganizacion"/>).
 /// </summary>
 public class Organizacion : IEntidad<int>
 {
     public int Id { get; set; }
 
-    /// <summary>Codigo corto para el selector del desarrollador (p. ej. "MAJ").</summary>
+    /// <summary>Codigo corto de uso interno, para etiquetar la instalacion (p. ej. "MAJ").</summary>
     public string Codigo { get; set; } = string.Empty;
+
+    /// <summary>
+    /// C.O.D: el codigo con el que el CAM identifica al nucleo. Es la base del pago por corte,
+    /// alza y empuje, y transporte, y es lo que los documentos estampan como texto. Va aparte
+    /// de <see cref="Codigo"/> porque son dos identificadores distintos: uno es nuestro y el
+    /// otro lo asigna el central.
+    /// </summary>
+    public string CodigoCam { get; set; } = string.Empty;
 
     public string Nombre { get; set; } = string.Empty;
     public bool Activa { get; set; } = true;

@@ -192,7 +192,6 @@
             <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="240" />
             <DataGridTextColumn Header="Cédula" Binding="{Binding Cedula}" Width="120" />
             <DataGridTextColumn Header="Rol" Binding="{Binding RolTexto}" Width="130" />
-            <DataGridTextColumn Header="Núcleo (C.O.D)" Binding="{Binding NucleoCodigo}" Width="*" />
             <DataGridTemplateColumn Header="Estado" Width="110">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>

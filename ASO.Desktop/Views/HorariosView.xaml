@@ -105,7 +105,6 @@
           <DataGridTextColumn Header="Persona" Binding="{Binding PersonaNombre}" Width="200" />
           <DataGridTextColumn Header="Cargo / rol" Binding="{Binding CargoORol}" Width="150" />
           <DataGridTextColumn Header="Padrón" Binding="{Binding TipoPersonalTexto}" Width="120" />
-          <DataGridTextColumn Header="Núcleo" Binding="{Binding NucleoCodigo}" Width="80" />
           <DataGridTextColumn Header="Turno" Binding="{Binding TurnoTexto}" Width="90" />
           <DataGridTextColumn Header="Entrada" Binding="{Binding EntradaTexto}" Width="130" />
           <DataGridTextColumn Header="Salida" Binding="{Binding SalidaTexto}" Width="130" />

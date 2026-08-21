@@ -146,8 +146,7 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
 
     private void Generar()
     {
-        var editor = new GenerarLiquidacionEditorViewModel(
-            DataSourceFactory.CrearNucleos(), DataSourceFactory.CrearEmpleados());
+        var editor = new GenerarLiquidacionEditorViewModel(DataSourceFactory.CrearEmpleados());
 
         if (!_dialogos.MostrarEditor(editor))
             return;
@@ -156,8 +155,8 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
         {
             var generada = editor.SujetoTipo == SujetoLiquidacion.Nucleo
                 ? _servicio.GenerarParaNucleo(
-                    editor.NucleoSeleccionado!.Codigo,
-                    editor.NucleoSeleccionado!.Nombre,
+                    Ambito.ExigirCodigoCam(),
+                    Ambito.Actual!.Nombre,
                     editor.Desde, editor.Hasta,
                     _sesionActual.UsuarioActual?.Id ?? 0)
                 : _servicio.GenerarParaEmpleado(

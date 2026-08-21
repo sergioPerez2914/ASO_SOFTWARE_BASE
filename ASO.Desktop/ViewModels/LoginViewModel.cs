@@ -36,10 +36,19 @@ public class LoginViewModel : ViewModelBase
     /// <returns><c>true</c> si las credenciales son válidas e inicia la sesión.</returns>
     public bool IntentarIniciarSesion(string password)
     {
-        ResultadoAutenticacion? resultado;
         try
         {
-            resultado = _authService.ValidarCredenciales(NombreUsuario, password);
+            var resultado = _authService.ValidarCredenciales(NombreUsuario, password);
+
+            if (resultado is null)
+            {
+                MensajeError = "Usuario o contraseña incorrectos.";
+                return false;
+            }
+
+            // Dentro del try porque iniciar sesión también toca la base: resuelve el núcleo
+            // del usuario para fijar el ámbito.
+            _sesion.IniciarSesion(resultado.Usuario, resultado.Ajustes);
         }
         catch (Exception ex)
         {
@@ -49,13 +58,6 @@ public class LoginViewModel : ViewModelBase
             return false;
         }
 
-        if (resultado is null)
-        {
-            MensajeError = "Usuario o contraseña incorrectos.";
-            return false;
-        }
-
-        _sesion.IniciarSesion(resultado.Usuario, resultado.Ajustes);
         MensajeError = string.Empty;
         return true;
     }

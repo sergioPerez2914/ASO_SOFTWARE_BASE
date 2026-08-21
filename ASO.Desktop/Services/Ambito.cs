@@ -1,49 +1,65 @@
-using System.Windows.Input;
+using ASO.Desktop.Models;
 
 namespace ASO.Desktop.Services;
 
 /// <summary>
-/// Organizacion (nucleo) sobre la que trabaja la sesion actual.
+/// Nucleo sobre el que trabaja la sesion actual: la <see cref="Organizacion"/> donde esta
+/// instalado el sistema.
 ///
 /// Es estatico y global a proposito: <see cref="BD.AsoDbContext"/> se construye sin argumentos
 /// en cada metodo de las fuentes Sql, asi que necesita una fuente ambiental de la que leer el
-/// ambito. Lo fija <see cref="SesionActual.IniciarSesion"/> al autenticar y solo el rol
-/// Desarrollador puede cambiarlo despues.
+/// ambito. Lo fija <see cref="SesionActual.IniciarSesion"/> al autenticar, a partir de la
+/// pertenencia del usuario, y no cambia mientras dure la sesion: una instalacion atiende a un
+/// solo nucleo.
 ///
-/// Fail-closed: si <see cref="OrganizacionId"/> es null no se ve NADA, en vez de verse todo.
-/// Un ambito sin fijar es un error de programacion, no un permiso implicito.
+/// Fail-closed: si no hay nucleo fijado no se ve NADA, en vez de verse todo. Un ambito sin
+/// fijar es un error de programacion, no un permiso implicito.
 /// </summary>
 public static class Ambito
 {
-    /// <summary>Organizacion activa; null mientras no haya sesion iniciada.</summary>
-    public static int? OrganizacionId { get; private set; }
+    /// <summary>Nucleo activo; null mientras no haya sesion iniciada.</summary>
+    public static Organizacion? Actual { get; private set; }
 
-    public static bool EstaFijado => OrganizacionId is not null;
+    public static int? OrganizacionId => Actual?.Id;
 
-    /// <summary>Se dispara al cambiar de organizacion, para que el shell se reconstruya.</summary>
-    public static event EventHandler? Cambio;
+    public static bool EstaFijado => Actual is not null;
 
-    internal static void Fijar(int? organizacionId) => OrganizacionId = organizacionId;
+    internal static void Fijar(Organizacion? organizacion) => Actual = organizacion;
 
     /// <summary>
-    /// Cambia de nucleo sin cerrar sesion. Reservado al rol Desarrollador; quien llama
-    /// debe haber comprobado el permiso <c>Organizaciones.Cambiar</c>.
+    /// Refresca la copia cacheada despues de editar los datos del nucleo, para que los
+    /// documentos que se emitan a continuacion estampen el C.O.D nuevo y no el de antes.
     /// </summary>
-    public static void Cambiar(int organizacionId)
+    internal static void Actualizar(Organizacion organizacion)
     {
-        if (OrganizacionId == organizacionId)
-            return;
+        if (Actual is null || Actual.Id != organizacion.Id)
+            throw new InvalidOperationException(
+                "Solo se refrescan los datos del nucleo activo de la sesion.");
 
-        OrganizacionId = organizacionId;
-
-        // Los CanExecute que dependen del ambito no se refrescan solos: RequerySuggested
-        // reacciona a la entrada del usuario, no a un cambio de estado como este.
-        CommandManager.InvalidateRequerySuggested();
-        Cambio?.Invoke(null, EventArgs.Empty);
+        Actual = organizacion;
     }
 
-    /// <summary>Organizacion activa, o excepcion si no hay ninguna. Para escrituras.</summary>
+    /// <summary>Nucleo activo, o excepcion si no hay ninguno. Para escrituras.</summary>
     public static int Exigir() =>
-        OrganizacionId ?? throw new InvalidOperationException(
-            "No hay una organizacion activa en la sesion. Inicie sesion antes de operar sobre datos.");
+        Actual?.Id ?? throw new InvalidOperationException(
+            "No hay un nucleo activo en la sesion. Inicie sesion antes de operar sobre datos.");
+
+    /// <summary>
+    /// C.O.D del nucleo activo: el codigo con el que lo identifica el CAM. Es lo que los
+    /// documentos estampan como texto (remesa, personal de campo, jornada, factura), de modo
+    /// que un papel reimpreso conserve el codigo con el que se emitio aunque el nucleo se
+    /// renombre despues.
+    /// </summary>
+    public static string ExigirCodigoCam()
+    {
+        if (Actual is not { } nucleo)
+            throw new InvalidOperationException(
+                "No hay un nucleo activo en la sesion. Inicie sesion antes de operar sobre datos.");
+
+        if (string.IsNullOrWhiteSpace(nucleo.CodigoCam))
+            throw new InvalidOperationException(
+                $"El nucleo {nucleo.Nombre} no tiene C.O.D cargado. Registrelo antes de emitir documentos.");
+
+        return nucleo.CodigoCam;
+    }
 }

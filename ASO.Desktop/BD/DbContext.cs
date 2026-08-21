@@ -17,7 +17,6 @@ public class AsoDbContext : DbContext
     public DbSet<InventoryItem> Inventarios { get; set; }
 
     // Fase 1 (catálogos simples)
-    public DbSet<Nucleo> Nucleos { get; set; }
     public DbSet<Proveedor> Proveedores { get; set; }
     public DbSet<ConceptoNomina> ConceptosNomina { get; set; }
     public DbSet<TanqueCombustible> TanquesCombustible { get; set; }
@@ -120,15 +119,6 @@ public class AsoDbContext : DbContext
         });
 
         // --- Fase 1 (catálogos simples) ---
-
-        modelBuilder.Entity<Nucleo>(entity =>
-        {
-            entity.HasKey(n => n.Id);
-            entity.Property(n => n.Codigo).IsRequired().HasMaxLength(30);
-            entity.Property(n => n.Nombre).IsRequired().HasMaxLength(150);
-
-            entity.Ignore(n => n.Etiqueta);
-        });
 
         modelBuilder.Entity<Proveedor>(entity =>
         {
@@ -496,6 +486,7 @@ public class AsoDbContext : DbContext
         {
             entity.HasKey(o => o.Id);
             entity.Property(o => o.Codigo).IsRequired().HasMaxLength(20);
+            entity.Property(o => o.CodigoCam).IsRequired().HasMaxLength(30);
             entity.Property(o => o.Nombre).IsRequired().HasMaxLength(150);
             entity.HasIndex(o => o.Codigo).IsUnique();
 

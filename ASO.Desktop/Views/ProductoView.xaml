@@ -123,7 +123,6 @@
           <DataGridTextColumn Header="Entregada" Binding="{Binding FechaTexto}" Width="140" />
           <DataGridTextColumn Header="Finca" Binding="{Binding FincaNombre}" Width="200" />
           <DataGridTextColumn Header="Lote · Tablón" Binding="{Binding Ubicacion}" Width="180" />
-          <DataGridTextColumn Header="Núcleo transporte" Binding="{Binding NucleoTransporte}" Width="140" />
           <DataGridTextColumn Header="Toneladas" Binding="{Binding ToneladasTexto}" Width="*">
             <DataGridTextColumn.ElementStyle>
               <Style TargetType="TextBlock">

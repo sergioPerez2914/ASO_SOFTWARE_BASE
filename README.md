@@ -56,24 +56,26 @@ ASO/
 
 | Módulo | Submódulos |
 |---|---|
-| Operaciones | Registro de Operación · Seguimiento · Fincas y Núcleos |
+| Operaciones | Registro de Operación · Seguimiento · Fincas |
 | Flota | Gestión de Flota · Mantenimiento · Telemetría *(pendiente)* |
 | Inventario | Repuestos · Combustible · Producto |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios |
 | Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas |
 
-Más tres secciones fijas según el rol: **Inicio**, **Peticiones** y **Administración** (núcleos,
-usuarios y permisos).
+Más tres secciones fijas según el rol: **Inicio**, **Peticiones** y **Administración** (usuarios
+y permisos).
 
 ## Roles
 
 | Rol | Qué puede |
 |---|---|
 | **Remesero** | Lo del día a día en campo: remesas, seguimiento, flota, mantenimiento, horarios y combustible. Lo sensible (anular, recepción, alta de flota, recarga de cisterna) lo **solicita** al administrador |
-| **Administrador de núcleo** | Todo dentro de su núcleo, incluidos los usuarios y la bandeja de peticiones |
-| **Desarrollador** | Todo, y es el único que puede cambiar de núcleo sin cerrar sesión |
+| **Administrador de núcleo** | Todo en el núcleo, incluidos los usuarios y la bandeja de peticiones |
+| **Desarrollador** | Todo, y es el único que puede crear otros usuarios Desarrollador |
 
-Cada núcleo es una instalación aislada: sus datos no se cruzan con los de ningún otro.
+**Un solo núcleo trabaja por instalación.** Ningún formulario pregunta a qué núcleo pertenece algo:
+se estampa el C.O.D del núcleo instalado. Un núcleo tiene muchas **fincas**, y cada finca sus lotes
+y tablones.
 
 ## Estado del proyecto
 

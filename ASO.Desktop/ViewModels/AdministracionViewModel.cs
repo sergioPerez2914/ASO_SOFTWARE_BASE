@@ -6,16 +6,16 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Administración del sistema: el padrón de núcleos, los usuarios de cada uno y los ajustes de
-/// permisos que los apartan de lo que su rol trae por defecto.
+/// Administración del sistema: los usuarios del núcleo y los ajustes de permisos que los
+/// apartan de lo que su rol trae por defecto.
 ///
-/// Tres padrones en una vista conmutable, como <see cref="EmpleadosViewModel"/> y
-/// <see cref="FincasYNucleosViewModel"/>. El de núcleos solo aparece para el Desarrollador:
-/// un administrador manda en el suyo, no reparte núcleos.
+/// Dos padrones y la ficha del núcleo, en una vista conmutable como <see cref="EmpleadosViewModel"/>.
+/// No hay padrón de núcleos: una instalación atiende a uno solo, que nace en el primer arranque;
+/// lo que sí hace falta es poder corregir sus datos, sobre todo el C.O.D.
 /// </summary>
 public sealed class AdministracionViewModel : PantallaViewModelBase
 {
-    public const string VistaOrganizaciones = "Organizaciones";
+    public const string VistaNucleo = "Nucleo";
     public const string VistaUsuarios = "Usuarios";
     public const string VistaPermisos = "Permisos";
 
@@ -28,23 +28,18 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
         : base(modulo)
     {
         var usuarios = DataSourceFactory.CrearUsuarios();
-        Organizaciones = new OrganizacionCrudViewModel(
+        Nucleo = new DatosNucleoViewModel(
             DataSourceFactory.CrearOrganizaciones(), dialogos, sesion);
         Usuarios = new UsuariosCrudViewModel(usuarios, dialogos, sesion);
         Permisos = new PermisosUsuarioCrudViewModel(
             DataSourceFactory.CrearPermisosUsuario(), usuarios, dialogos, sesion);
 
-        PuedeVerOrganizaciones = sesion.Puede(Services.Permisos.Organizaciones.Crear);
-        VistaActual = PuedeVerOrganizaciones ? VistaOrganizaciones : VistaUsuarios;
-
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }
 
-    public OrganizacionCrudViewModel Organizaciones { get; }
+    public DatosNucleoViewModel Nucleo { get; }
     public UsuariosCrudViewModel Usuarios { get; }
     public PermisosUsuarioCrudViewModel Permisos { get; }
-
-    public bool PuedeVerOrganizaciones { get; }
 
     /// <summary>
     /// Los cambios de permisos se aplican al volver a entrar, no en caliente: el conjunto
@@ -67,7 +62,7 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
         }
     }
 
-    public bool MostrarOrganizaciones => VistaActual == VistaOrganizaciones;
+    public bool MostrarNucleo => VistaActual == VistaNucleo;
     public bool MostrarUsuarios => VistaActual == VistaUsuarios;
     public bool MostrarPermisos => VistaActual == VistaPermisos;
 

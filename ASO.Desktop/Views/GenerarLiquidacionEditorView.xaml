@@ -21,10 +21,8 @@
 
     <StackPanel Visibility="{Binding EsNucleo, Converter={StaticResource BoolToVis}}">
       <TextBlock Text="Núcleo" Style="{StaticResource FormLabelStyle}" />
-      <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                ItemsSource="{Binding Nucleos}"
-                DisplayMemberPath="Etiqueta"
-                SelectedItem="{Binding NucleoSeleccionado}" />
+      <TextBlock Text="{Binding NucleoTexto, Mode=OneWay}"
+                 Style="{StaticResource FormValorCalculadoStyle}" />
     </StackPanel>
 
     <StackPanel Visibility="{Binding EsEmpleado, Converter={StaticResource BoolToVis}}">

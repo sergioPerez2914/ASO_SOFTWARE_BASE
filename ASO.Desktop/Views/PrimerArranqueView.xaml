@@ -28,9 +28,16 @@
 
     <Border Grid.Row="1" Style="{StaticResource CardStyle}" VerticalAlignment="Top">
       <StackPanel>
-        <TextBlock Text="Código del núcleo" Style="{StaticResource FormLabelStyle}" />
+        <TextBlock Text="Código del núcleo (uso interno)" Style="{StaticResource FormLabelStyle}" />
         <TextBox Style="{StaticResource FormTextBoxStyle}"
                  Text="{Binding CodigoNucleo, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock Text="C.O.D (código del núcleo en el CAM)" Style="{StaticResource FormLabelStyle}" />
+        <TextBox Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding CodigoCam, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Text="Es el código que estampan las remesas, las liquidaciones y las facturas."
+                   FontSize="11" TextWrapping="Wrap"
+                   Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
 
         <TextBlock Text="Nombre del núcleo" Style="{StaticResource FormLabelStyle}" />
         <TextBox Style="{StaticResource FormTextBoxStyle}"

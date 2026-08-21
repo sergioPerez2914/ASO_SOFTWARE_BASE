@@ -38,24 +38,16 @@ public static class MatrizPermisos
             .Concat(ModuloCatalogo.Modulos.SelectMany(m => m.Submodulos).Select(s => s.Permiso))
             .ToHashSet();
 
-    /// <summary>
-    /// Permisos declarados que NO se conceden a ningún rol. Hoy solo el borrado de núcleos:
-    /// el comando existe en la base CRUD, pero la operación está prohibida por diseño.
-    /// </summary>
-    private static readonly HashSet<string> _nuncaSeConceden = [Permisos.Organizaciones.Eliminar];
-
     public static IReadOnlySet<string> Todos { get; } =
-        _acciones.Concat(_navegacion).Where(p => !_nuncaSeConceden.Contains(p)).ToHashSet();
+        _acciones.Concat(_navegacion).ToHashSet();
 
     /// <summary>
-    /// Reservado al Desarrollador: cambiar de nucleo y administrar el padron de organizaciones.
-    /// Un administrador manda en el suyo, no en el de al lado.
+    /// Reservado al Desarrollador: repartir su propio rol. Un administrador manda en el
+    /// nucleo, pero no fabrica usuarios con mas alcance del que el mismo tiene.
     /// </summary>
     private static readonly HashSet<string> _soloDesarrollador =
     [
-        Permisos.Organizaciones.Cambiar,
-        Permisos.Organizaciones.Crear,
-        Permisos.Organizaciones.Editar
+        Permisos.Usuarios.CrearDesarrollador
     ];
 
     /// <summary>

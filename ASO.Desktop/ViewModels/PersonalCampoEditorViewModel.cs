@@ -7,8 +7,8 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Alta/edición de personal de campo. El núcleo (C.O.D) es el que determina el pago de
-/// corte, alza y transporte en la remesa, por eso se elige del catálogo y no se escribe a mano.
+/// Alta/edición de personal de campo. El núcleo (C.O.D) no se pregunta: toda la gente
+/// pertenece al núcleo de la instalación, así que se estampa desde el ámbito.
 /// </summary>
 public sealed class PersonalCampoEditorViewModel : CrudEditorViewModelBase<PersonalCampo>
 {
@@ -16,25 +16,20 @@ public sealed class PersonalCampoEditorViewModel : CrudEditorViewModelBase<Perso
     private readonly IPersonalCampoDataSource _personal;
 
     public PersonalCampoEditorViewModel(PersonalCampo original,
-                                        IPersonalCampoDataSource personal,
-                                        INucleoDataSource nucleos)
+                                        IPersonalCampoDataSource personal)
     {
         _original = original;
         _personal = personal;
-
-        Nucleos = nucleos.GetAll().ToList();
 
         Nombre = original.Nombre;
         Cedula = original.Cedula;
         Rol = original.Rol;
         Activo = original.Activo;
-        NucleoSeleccionado = Nucleos.FirstOrDefault(n => n.Codigo == original.NucleoCodigo);
     }
 
     public override string Titulo =>
         _original.Id == 0 ? "Nuevo personal de campo" : $"Editar personal Nº {_original.Id}";
 
-    public IReadOnlyList<Nucleo> Nucleos { get; }
     public IReadOnlyList<RolCampo> Roles { get; } = Enum.GetValues<RolCampo>();
 
     private string _nombre = string.Empty;
@@ -55,18 +50,7 @@ public sealed class PersonalCampoEditorViewModel : CrudEditorViewModelBase<Perso
     public RolCampo Rol
     {
         get => _rol;
-        set
-        {
-            if (SetProperty(ref _rol, value))
-                OnPropertyChanged(nameof(NucleoObligatorio));
-        }
-    }
-
-    private Nucleo? _nucleoSeleccionado;
-    public Nucleo? NucleoSeleccionado
-    {
-        get => _nucleoSeleccionado;
-        set => SetProperty(ref _nucleoSeleccionado, value);
+        set => SetProperty(ref _rol, value);
     }
 
     private bool _activo = true;
@@ -75,12 +59,6 @@ public sealed class PersonalCampoEditorViewModel : CrudEditorViewModelBase<Perso
         get => _activo;
         set => SetProperty(ref _activo, value);
     }
-
-    /// <summary>
-    /// El chofer es el único que la remesa no asocia a un C.O.D.
-    /// PROVISIONAL: pendiente de confirmar con el socio si el chofer también lleva núcleo.
-    /// </summary>
-    public bool NucleoObligatorio => Rol != RolCampo.Chofer;
 
     protected override bool Validar(out string? error)
     {
@@ -93,12 +71,6 @@ public sealed class PersonalCampoEditorViewModel : CrudEditorViewModelBase<Perso
         if (string.IsNullOrWhiteSpace(Cedula))
         {
             error = "Indique la cédula.";
-            return false;
-        }
-
-        if (NucleoObligatorio && NucleoSeleccionado is null)
-        {
-            error = "Seleccione el núcleo (C.O.D) al que pertenece.";
             return false;
         }
 
@@ -122,7 +94,10 @@ public sealed class PersonalCampoEditorViewModel : CrudEditorViewModelBase<Perso
         Nombre = Nombre.Trim(),
         Cedula = Cedula.Trim(),
         Rol = Rol,
-        NucleoCodigo = NucleoObligatorio ? NucleoSeleccionado?.Codigo ?? string.Empty : string.Empty,
+        // Todo el personal pertenece al núcleo de la instalación; se estampa su C.O.D en vez
+        // de preguntarlo. Con esto se cierra la duda de si el chofer llevaba núcleo: lo lleva,
+        // porque no hay otro.
+        NucleoCodigo = Ambito.ExigirCodigoCam(),
         Activo = Activo
     };
 }

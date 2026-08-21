@@ -15,7 +15,6 @@ public sealed class PersonalCampoCrudViewModel : CrudViewModelBase<PersonalCampo
     private const string FiltroTodos = "Todos";
 
     private readonly IPersonalCampoDataSource _personal;
-    private readonly INucleoDataSource _nucleos;
     private string _filtroRol = FiltroTodos;
 
     public PersonalCampoCrudViewModel(IPersonalCampoDataSource personal,
@@ -24,7 +23,6 @@ public sealed class PersonalCampoCrudViewModel : CrudViewModelBase<PersonalCampo
         : base(personal, dialogos, sesion)
     {
         _personal = personal;
-        _nucleos = DataSourceFactory.CrearNucleos();
 
         CambiarFiltroRolCommand = new RelayCommand<string>(filtro =>
         {
@@ -40,7 +38,6 @@ public sealed class PersonalCampoCrudViewModel : CrudViewModelBase<PersonalCampo
     protected override bool CoincideBusqueda(PersonalCampo item, string texto) =>
         item.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
         || item.Cedula.Contains(texto, StringComparison.OrdinalIgnoreCase)
-        || item.NucleoCodigo.Contains(texto, StringComparison.OrdinalIgnoreCase)
         || item.RolTexto.Contains(texto, StringComparison.OrdinalIgnoreCase);
 
     protected override bool PasaFiltroExtra(PersonalCampo item) => _filtroRol switch
@@ -55,5 +52,5 @@ public sealed class PersonalCampoCrudViewModel : CrudViewModelBase<PersonalCampo
     protected override PersonalCampo CrearNuevo() => new() { Activo = true };
 
     protected override CrudEditorViewModelBase<PersonalCampo> CrearEditor(PersonalCampo item) =>
-        new PersonalCampoEditorViewModel(item, _personal, _nucleos);
+        new PersonalCampoEditorViewModel(item, _personal);
 }

@@ -105,7 +105,6 @@
           <DataGridTextColumn Header="Finca" Binding="{Binding FincaNombre}" Width="150" />
           <DataGridTextColumn Header="Lote · Tablón" Binding="{Binding UbicacionTexto}" Width="150" />
           <DataGridTextColumn Header="Cosecha" Binding="{Binding TipoCosechaTexto}" Width="90" />
-          <DataGridTextColumn Header="N. Corte" Binding="{Binding NucleoCorteCodigo}" Width="80" />
           <DataGridTextColumn Header="Placa" Binding="{Binding VehiculoPlaca}" Width="90" />
           <DataGridTextColumn Header="Neto (t)" Width="80"
                               Binding="{Binding PesoNetoT, StringFormat={}{0:N2}}">

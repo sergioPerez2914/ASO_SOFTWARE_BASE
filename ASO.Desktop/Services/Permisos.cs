@@ -39,13 +39,6 @@ public static class Permisos
         public const string Eliminar = "Fincas.Eliminar";
     }
 
-    public static class Nucleos
-    {
-        public const string Crear = "Nucleos.Crear";
-        public const string Editar = "Nucleos.Editar";
-        public const string Eliminar = "Nucleos.Eliminar";
-    }
-
     public static class Flota
     {
         public const string Crear = "Flota.Crear";
@@ -162,26 +155,26 @@ public static class Permisos
         public const string Resolver = "Peticiones.Resolver";
     }
 
+    /// <summary>
+    /// Los datos del propio nucleo (nombre, codigo interno y C.O.D). No hay padron ni alta:
+    /// el nucleo nace en el primer arranque y aqui solo se corrigen sus datos.
+    /// </summary>
+    public static class Nucleo
+    {
+        public const string Editar = "Nucleo.Editar";
+    }
+
     public static class Usuarios
     {
         public const string Crear = "Usuarios.Crear";
         public const string Editar = "Usuarios.Editar";
         public const string Eliminar = "Usuarios.Eliminar";
-    }
-
-    public static class Organizaciones
-    {
-        /// <summary>Cambiar de nucleo sin cerrar sesion. Solo el Desarrollador.</summary>
-        public const string Cambiar = "Organizaciones.Cambiar";
-        public const string Crear = "Organizaciones.Crear";
-        public const string Editar = "Organizaciones.Editar";
 
         /// <summary>
-        /// Existe porque <c>CrudViewModelBase</c> lo pide para su comando Eliminar, pero
-        /// <c>OrganizacionCrudViewModel.PuedeEliminar</c> devuelve siempre false: borrar un
-        /// núcleo dejaría sus filas sin dueño e invisibles bajo el filtro fail-closed.
-        /// Se declara para que no quede como permiso fantasma, y no se concede a nadie.
+        /// Repartir el rol Desarrollador, que es el que lo puede todo. Va aparte de
+        /// <see cref="Crear"/> para que un administrador de núcleo no se fabrique un usuario
+        /// con más alcance del que él mismo tiene.
         /// </summary>
-        public const string Eliminar = "Organizaciones.Eliminar";
+        public const string CrearDesarrollador = "Usuarios.CrearDesarrollador";
     }
 }

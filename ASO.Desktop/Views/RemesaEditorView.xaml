@@ -120,38 +120,16 @@
                 SelectedItem="{Binding RemeseroSeleccionado}" />
     </StackPanel>
 
-    <!-- Núcleos de pago -->
-    <TextBlock Text="Núcleos (determinan el pago)" Style="{StaticResource SeccionStyle}" />
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="12" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="12" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
-
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="Núcleo Corte" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Nucleos}" DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding NucleoCorteSeleccionado}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="2">
-        <TextBlock Text="Núcleo Alza y Empuje" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Nucleos}" DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding NucleoAlzaEmpujeSeleccionado}" />
-      </StackPanel>
-
-      <StackPanel Grid.Column="4">
-        <TextBlock Text="Núcleo Transporte" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Nucleos}" DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding NucleoTransporteSeleccionado}" />
-      </StackPanel>
-    </Grid>
+    <!-- Núcleo: no se elige, es el de la instalación -->
+    <TextBlock Text="Núcleo (determina el pago)" Style="{StaticResource SeccionStyle}" />
+    <StackPanel>
+      <TextBlock Text="Corte, alza y empuje, y transporte" Style="{StaticResource FormLabelStyle}" />
+      <TextBlock Style="{StaticResource FormValorCalculadoStyle}">
+        <Run Text="{Binding NucleoCodigo, Mode=OneWay}" />
+        <Run Text=" · " />
+        <Run Text="{Binding NucleoNombre, Mode=OneWay}" />
+      </TextBlock>
+    </StackPanel>
 
     <!-- Tiempos de carga -->
     <TextBlock Text="Tiempos de carga" Style="{StaticResource SeccionStyle}" />

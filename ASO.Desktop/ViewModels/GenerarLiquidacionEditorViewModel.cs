@@ -13,16 +13,14 @@ namespace ASO.Desktop.ViewModels;
 /// </summary>
 public sealed class GenerarLiquidacionEditorViewModel : CrudEditorViewModelBase
 {
-    public GenerarLiquidacionEditorViewModel(INucleoDataSource nucleos, IEmpleadoDataSource empleados)
+    public GenerarLiquidacionEditorViewModel(IEmpleadoDataSource empleados)
     {
-        Nucleos = nucleos.GetAll().OrderBy(n => n.Codigo).ToList();
         Empleados = empleados.GetAll().Where(e => e.Activo).OrderBy(e => e.Nombre).ToList();
 
         // Por defecto, la semana pasada completa: es el corte más habitual al liquidar.
         Hasta = DateTime.Today;
         Desde = DateTime.Today.AddDays(-7);
 
-        NucleoSeleccionado = Nucleos.FirstOrDefault();
         EmpleadoSeleccionado = Empleados.FirstOrDefault();
 
         CambiarSujetoCommand = new RelayCommand<string>(sujeto =>
@@ -34,8 +32,10 @@ public sealed class GenerarLiquidacionEditorViewModel : CrudEditorViewModelBase
 
     public ICommand CambiarSujetoCommand { get; }
 
-    public IReadOnlyList<Nucleo> Nucleos { get; }
     public IReadOnlyList<Empleado> Empleados { get; }
+
+    /// <summary>El núcleo a liquidar no se elige: es el de la instalación.</summary>
+    public string NucleoTexto => Ambito.Actual is { } n ? $"{n.CodigoCam} · {n.Nombre}" : "—";
 
     private SujetoLiquidacion _sujetoTipo = SujetoLiquidacion.Nucleo;
     public SujetoLiquidacion SujetoTipo
@@ -58,13 +58,6 @@ public sealed class GenerarLiquidacionEditorViewModel : CrudEditorViewModelBase
     public string AyudaSujeto => EsNucleo
         ? "Se liquidan las toneladas de las remesas confirmadas del período que aún no se hayan liquidado, por servicio (corte, alza y empuje, transporte)."
         : "Se liquidan las horas de las jornadas cerradas del período, según la tarifa horaria vigente.";
-
-    private Nucleo? _nucleoSeleccionado;
-    public Nucleo? NucleoSeleccionado
-    {
-        get => _nucleoSeleccionado;
-        set => SetProperty(ref _nucleoSeleccionado, value);
-    }
 
     private Empleado? _empleadoSeleccionado;
     public Empleado? EmpleadoSeleccionado
@@ -89,12 +82,6 @@ public sealed class GenerarLiquidacionEditorViewModel : CrudEditorViewModelBase
 
     protected override bool Validar(out string? error)
     {
-        if (EsNucleo && NucleoSeleccionado is null)
-        {
-            error = "Seleccione el núcleo a liquidar.";
-            return false;
-        }
-
         if (EsEmpleado && EmpleadoSeleccionado is null)
         {
             error = "Seleccione el empleado a liquidar.";
