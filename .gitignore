@@ -26,6 +26,9 @@ Thumbs.db
 # Configuración por máquina (cadena de conexión, etc.) — no se sube al repo
 appsettings.local.json
 
+# Base de datos LocalDB de cada máquina (archivo .mdf/.ldf) — cada quien tiene la suya
+ASO.Desktop/App_Data/
+
 # Documentación interna del equipo (reglamentos del CAM, análisis, especificaciones).
 # El repositorio es PÚBLICO: estos documentos son de uso interno y no se publican.
 docs/

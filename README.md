@@ -16,16 +16,23 @@ dotnet run
 
 O abrir `ASO.slnx` en Visual Studio 2022.
 
-Hace falta **SQL Server**: copia `ASO.Desktop/appsettings.local.example.json` como
-`appsettings.local.json` y pon ahí tu cadena de conexión. Luego aplica el esquema:
+La base de datos es un archivo **SQL Server LocalDB** (`ASO.Desktop/App_Data/ASO.mdf`), no un
+servidor aparte: no hace falta configurar nada para arrancar. Hace falta tener **LocalDB**
+instalado (viene con Visual Studio; si no, se instala aparte con el instalador liviano
+"SqlLocalDB.msi" de SQL Server Express). La primera vez, aplica el esquema:
 
 ```bash
 cd ASO.Desktop
 dotnet ef database update
 ```
 
-En el primer arranque contra una base sin usuarios, la aplicación pide el nombre del núcleo y crea
-el usuario desarrollador. No hay usuarios ni contraseñas por defecto.
+Esto crea `App_Data/ASO.mdf` (no se sube al repo — cada máquina tiene el suyo, ver
+`.gitignore`). En el primer arranque contra una base sin usuarios, la aplicación pide el nombre
+del núcleo y crea el usuario desarrollador. No hay usuarios ni contraseñas por defecto.
+
+Si en cambio quieres apuntar a un SQL Server real (compartido o remoto) en vez de tu LocalDB
+local, copia `ASO.Desktop/appsettings.local.example.json` como `appsettings.local.json` y pon ahí
+tu cadena de conexión — no se sube al repo, así que cada quien puede tener la suya.
 
 ## Estructura
 
