@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
 
@@ -13,16 +14,39 @@ namespace ASO.Desktop.ViewModels;
 /// </summary>
 public sealed class RecargaEditorViewModel : CrudEditorViewModelBase
 {
-    public RecargaEditorViewModel(ITanqueCombustibleDataSource tanques)
+    private readonly ITanqueCombustibleDataSource _tanques;
+    private readonly IServicioDialogo _dialogos;
+    private readonly ISesionActual _sesion;
+
+    public RecargaEditorViewModel(ITanqueCombustibleDataSource tanques, IServicioDialogo dialogos, ISesionActual sesion)
     {
-        Tanques = tanques.GetAll().Where(t => t.Activo).ToList();
+        _tanques = tanques;
+        _dialogos = dialogos;
+        _sesion = sesion;
+
+        Tanques = new ObservableCollection<TanqueCombustible>(tanques.GetAll().Where(t => t.Activo));
         TanqueSeleccionado = Tanques.FirstOrDefault();
+
+        NuevaCisternaCommand = new RelayCommand(NuevaCisterna, () => _sesion.Puede(Permisos.Combustible.CrearCisterna));
     }
 
     public override string Titulo => "Registrar recarga de cisterna";
     public override double AnchoEditor => 460;
 
-    public IReadOnlyList<TanqueCombustible> Tanques { get; }
+    public ObservableCollection<TanqueCombustible> Tanques { get; }
+
+    public ICommand NuevaCisternaCommand { get; }
+
+    private void NuevaCisterna()
+    {
+        var editor = new TanqueCombustibleEditorViewModel();
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        var nuevo = _tanques.Add(editor.ObtenerResultado());
+        Tanques.Add(nuevo);
+        TanqueSeleccionado = nuevo;
+    }
 
     private TanqueCombustible? _tanqueSeleccionado;
     public TanqueCombustible? TanqueSeleccionado

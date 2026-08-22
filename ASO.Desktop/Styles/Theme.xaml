@@ -23,6 +23,46 @@
     <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
   </Style>
 
+  <!-- Boton "Volver al modulo" del encabezado de cada submodulo. Antes era un boton transparente
+       con solo un borde gris (igual que cualquier boton secundario), y se perdia junto al titulo:
+       ahora lleva flecha, relleno e borde en azul de acento para que se note que vuelve al
+       dashboard. Repetido igual en los 15 encabezados de submodulo. -->
+  <Style x:Key="VolverModuloButtonStyle" TargetType="Button">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource AccentBlueBrush}" />
+    <Setter Property="Background" Value="#EAF0FE" />
+    <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="12,6" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Root" Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="6" Padding="{TemplateBinding Padding}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE72B;" FontFamily="{StaticResource IconFont}" FontSize="11"
+                         VerticalAlignment="Center" Margin="0,0,6,0"
+                         Foreground="{TemplateBinding Foreground}" />
+              <ContentPresenter VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
+            </StackPanel>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Root" Property="Background" Value="{StaticResource AccentBlueBrush}" />
+              <Setter Property="Foreground" Value="White" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <!-- Forma comun de los chips de estado: pastilla gris con el texto en blanco. Cada chip
        concreto solo aporta sus DataTrigger, que es lo unico en lo que se diferencian. -->
   <Style x:Key="ChipBaseStyle" TargetType="Border">

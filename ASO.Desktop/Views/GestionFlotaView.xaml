@@ -52,10 +52,8 @@
                    Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
 
-      <Button Grid.Column="1" Content="Volver al módulo" VerticalAlignment="Top"
-              Padding="12,6" Cursor="Hand" Background="Transparent"
-              BorderBrush="{StaticResource BorderBrush}"
-              Foreground="{StaticResource TextPrimaryBrush}"
+      <Button Grid.Column="1" Content="Volver al módulo"
+              Style="{StaticResource VolverModuloButtonStyle}"
               Command="{Binding VolverCommand}" />
     </Grid>
 

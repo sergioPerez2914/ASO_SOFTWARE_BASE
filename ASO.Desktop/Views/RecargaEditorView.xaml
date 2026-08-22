@@ -8,10 +8,21 @@
 
   <StackPanel>
     <TextBlock Text="Cisterna que se recarga" Style="{StaticResource FormLabelStyle}" />
-    <ComboBox Style="{StaticResource FormComboBoxStyle}"
-              ItemsSource="{Binding Tanques}"
-              DisplayMemberPath="Nombre"
-              SelectedItem="{Binding TanqueSeleccionado}" />
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <ComboBox Grid.Column="0" Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding Tanques}"
+                DisplayMemberPath="Nombre"
+                SelectedItem="{Binding TanqueSeleccionado}" />
+
+      <Button Grid.Column="1" Style="{StaticResource BarraBotonStyle}"
+              Content="+ Nueva" ToolTip="Nueva cisterna"
+              Command="{Binding NuevaCisternaCommand}" />
+    </Grid>
     <TextBlock Text="{Binding EspacioTexto}" FontSize="11" TextWrapping="Wrap"
                Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
 

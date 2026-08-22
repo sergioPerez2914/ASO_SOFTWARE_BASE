@@ -125,7 +125,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
     };
 
     protected override CrudEditorViewModelBase<ValeCombustible> CrearEditor(ValeCombustible item) =>
-        new ValeCombustibleEditorViewModel(item, _tanques, DataSourceFactory.CrearActivosFlota());
+        new ValeCombustibleEditorViewModel(item, _tanques, DataSourceFactory.CrearActivosFlota(), _dialogos, _sesionActual);
 
     // --- Transiciones ---
 
@@ -171,7 +171,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
             return;
         }
 
-        var editor = new RecargaEditorViewModel(_tanques);
+        var editor = new RecargaEditorViewModel(_tanques, _dialogos, _sesionActual);
         if (!_dialogos.MostrarEditor(editor))
             return;
 

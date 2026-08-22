@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
 
@@ -16,14 +18,22 @@ namespace ASO.Desktop.ViewModels;
 public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<ValeCombustible>
 {
     private readonly ValeCombustible _original;
+    private readonly ITanqueCombustibleDataSource _tanques;
+    private readonly IServicioDialogo _dialogos;
+    private readonly ISesionActual _sesion;
 
     public ValeCombustibleEditorViewModel(ValeCombustible original,
                                           ITanqueCombustibleDataSource tanques,
-                                          IActivoFlotaDataSource activos)
+                                          IActivoFlotaDataSource activos,
+                                          IServicioDialogo dialogos,
+                                          ISesionActual sesion)
     {
         _original = original;
+        _tanques = tanques;
+        _dialogos = dialogos;
+        _sesion = sesion;
 
-        Tanques = tanques.GetAll().Where(t => t.Activo).ToList();
+        Tanques = new ObservableCollection<TanqueCombustible>(tanques.GetAll().Where(t => t.Activo));
         Activos = activos.GetAll().OrderBy(a => a.Codigo).ToList();
 
         Fecha = original.Fecha == default ? DateTime.Today : original.Fecha;
@@ -34,13 +44,28 @@ public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<Val
 
         TanqueSeleccionado = Tanques.FirstOrDefault(t => t.Id == original.TanqueId) ?? Tanques.FirstOrDefault();
         ActivoSeleccionado = Activos.FirstOrDefault(a => a.Id == original.ActivoId);
+
+        NuevaCisternaCommand = new RelayCommand(NuevaCisterna, () => _sesion.Puede(Permisos.Combustible.CrearCisterna));
     }
 
     public override string Titulo => _original.Id == 0 ? "Nuevo vale de combustible" : $"Editar vale Nº {_original.Id}";
     public override double AnchoEditor => 520;
 
-    public IReadOnlyList<TanqueCombustible> Tanques { get; }
+    public ObservableCollection<TanqueCombustible> Tanques { get; }
     public IReadOnlyList<ActivoFlota> Activos { get; }
+
+    public ICommand NuevaCisternaCommand { get; }
+
+    private void NuevaCisterna()
+    {
+        var editor = new TanqueCombustibleEditorViewModel();
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        var nuevo = _tanques.Add(editor.ObtenerResultado());
+        Tanques.Add(nuevo);
+        TanqueSeleccionado = nuevo;
+    }
 
     private TanqueCombustible? _tanqueSeleccionado;
     public TanqueCombustible? TanqueSeleccionado

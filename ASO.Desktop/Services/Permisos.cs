@@ -75,6 +75,7 @@ public static class Permisos
         public const string Confirmar = "Combustible.Confirmar";
         public const string Anular = "Combustible.Anular";
         public const string Recargar = "Combustible.Recargar";
+        public const string CrearCisterna = "Combustible.CrearCisterna";
     }
 
     public static class Empleados
