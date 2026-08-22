@@ -9,7 +9,7 @@
   <UserControl.Resources>
     <Style x:Key="SeccionStyle" TargetType="TextBlock" BasedOn="{StaticResource CardTitleStyle}">
       <Setter Property="Margin" Value="0,16,0,4" />
-      <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
     </Style>
   </UserControl.Resources>
 
@@ -164,7 +164,7 @@
     </Grid>
 
     <TextBlock Text="La llegada al central y el pesaje los registra personal del CAM en la recepción."
-               FontSize="11" Foreground="{StaticResource TextMutedBrush}"
+               FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
                TextWrapping="Wrap" Margin="0,12,0,0" />
   </StackPanel>
 </UserControl>

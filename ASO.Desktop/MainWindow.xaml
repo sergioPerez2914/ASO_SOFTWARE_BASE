@@ -10,10 +10,16 @@
         Height="800" Width="1280"
         MinHeight="640" MinWidth="1024"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BackgroundBrush}"
+        Background="{DynamicResource BackgroundBrush}"
         FontFamily="Segoe UI">
 
+  <!-- La escala de la interfaz es un LayoutTransform sobre la raiz, no un FontSize global:
+       los estilos traen tamanos propios y subir solo la fuente descuadraria iconos, chips y
+       columnas. Escalando el arbol entero todo crece a la vez. -->
   <Grid>
+    <Grid.LayoutTransform>
+      <ScaleTransform x:Name="EscalaInterfaz" ScaleX="1" ScaleY="1" />
+    </Grid.LayoutTransform>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
@@ -25,7 +31,7 @@
 
     <!-- Barra de menú superior -->
     <Grid Grid.Row="0" Grid.ColumnSpan="2"
-          Background="{StaticResource SurfaceBrush}">
+          Background="{DynamicResource SurfaceBrush}">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="Auto" />
@@ -43,23 +49,23 @@
       <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
         <Border x:Name="NucleoChip" VerticalAlignment="Center" Margin="0,0,10,0"
                 CornerRadius="10" Padding="8,2" Visibility="Collapsed"
-                Background="{StaticResource PrimaryBrush}">
+                Background="{DynamicResource PrimaryBrush}">
           <TextBlock x:Name="NucleoActualLabel" FontSize="11" Foreground="White" />
         </Border>
         <TextBlock x:Name="UsuarioActualLabel" VerticalAlignment="Center" FontSize="12"
-                    Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,10,0" />
+                    Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" />
         <Button Content="Cerrar sesión" FontSize="11" Padding="8,4" Cursor="Hand"
-                Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
-                Foreground="{StaticResource TextPrimaryBrush}" Click="OnCerrarSesion" />
+                Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
+                Foreground="{DynamicResource TextPrimaryBrush}" Click="OnCerrarSesion" />
       </StackPanel>
 
       <Border Grid.ColumnSpan="2" VerticalAlignment="Bottom"
-              BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" />
+              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" />
     </Grid>
 
     <!-- Sidebar -->
     <controls:Sidebar x:Name="MainSidebar" Grid.Row="1" Grid.Column="0"
-                      BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="0,0,1,0" />
+                      BorderBrush="{DynamicResource SidebarBorderBrush}" BorderThickness="0,0,1,0" />
 
     <!-- Contenido principal (cambia según la sección seleccionada) -->
     <ContentControl x:Name="ContentArea" Grid.Row="1" Grid.Column="1" Margin="20" />

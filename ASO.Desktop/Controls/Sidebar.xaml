@@ -5,21 +5,22 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="240"
-             Background="{StaticResource SidebarBrush}">
+             Background="{DynamicResource SidebarBrush}">
 
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
     <!-- Logo / Marca -->
-    <Border Grid.Row="0" Padding="20,24,20,20" BorderBrush="{StaticResource SidebarBorderBrush}" BorderThickness="0,0,0,1">
+    <Border Grid.Row="0" Padding="20,24,20,20" BorderBrush="{DynamicResource SidebarBorderBrush}" BorderThickness="0,0,0,1">
       <StackPanel>
         <TextBlock Text="Software ASO" FontSize="18" FontWeight="Bold"
-                   Foreground="{StaticResource PrimaryBrush}" />
+                   Foreground="{DynamicResource PrimaryBrush}" />
         <TextBlock Text="Gestión de Zafra" FontSize="11"
-                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
     </Border>
 
@@ -85,5 +86,31 @@
         </ItemsControl.ItemTemplate>
       </ItemsControl>
     </ScrollViewer>
+
+    <!-- Configuración, anclada al pie y fuera del ScrollViewer: no se va con el scroll de los
+         módulos porque no es trabajo del día, es donde se va cuando hace falta ajustar algo.
+         El DataContext es su ModuloNavItem: NavItemStyle marca lo seleccionado con
+         DataTriggers sobre EstaSeleccionado y EstaActivo, y sin ellos no pintaría nada. -->
+    <Border Grid.Row="2" BorderBrush="{DynamicResource SidebarBorderBrush}" BorderThickness="0,1,0,0"
+            Padding="0,8" DataContext="{Binding Configuracion}"
+            Visibility="{Binding DataContext.VeConfiguracion,
+                                 RelativeSource={RelativeSource AncestorType=UserControl},
+                                 Converter={StaticResource BoolToVis}}">
+      <Button Style="{StaticResource NavItemStyle}"
+              AutomationProperties.Name="{Binding Nombre}"
+              ToolTip="{Binding Modulo.Descripcion}"
+              Command="{Binding DataContext.SeleccionarConfiguracionCommand,
+                                RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" Text="{Binding Icono}" Style="{StaticResource NavIconStyle}"
+                     FontSize="16" Width="20" TextAlignment="Center" Margin="0,0,10,0" />
+          <TextBlock Grid.Column="1" Text="{Binding Nombre}" VerticalAlignment="Center" />
+        </Grid>
+      </Button>
+    </Border>
   </Grid>
 </UserControl>

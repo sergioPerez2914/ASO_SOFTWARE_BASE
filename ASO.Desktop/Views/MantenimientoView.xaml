@@ -14,7 +14,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado con la ruta módulo · submódulo -->
+    <!-- Encabezado -->
     <Grid Grid.Row="0" Margin="0,0,0,16">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
@@ -22,12 +22,10 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Ruta}" FontSize="12"
-                   Foreground="{StaticResource TextMutedBrush}" />
         <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
         <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
 
       <Button Grid.Column="1" Content="Volver al módulo"
@@ -58,18 +56,18 @@
 
                   <StackPanel Grid.Column="1" Margin="10,0,0,0">
                     <TextBlock FontSize="12" TextWrapping="Wrap"
-                               Foreground="{StaticResource TextPrimaryBrush}">
+                               Foreground="{DynamicResource TextPrimaryBrush}">
                       <Run Text="{Binding Activo.Etiqueta, Mode=OneWay}" FontWeight="SemiBold" />
                       <Run Text=" — " /><Run Text="{Binding Regla.Revision, Mode=OneWay}" />
                     </TextBlock>
                     <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
-                               Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                   </StackPanel>
 
                   <Button Grid.Column="2" Content="Registrar" Padding="10,4" Margin="8,0,0,0"
                           Cursor="Hand" FontSize="11" VerticalAlignment="Top"
-                          Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
-                          Foreground="{StaticResource AccentBlueBrush}"
+                          Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
+                          Foreground="{DynamicResource AccentBlueBrush}"
                           Command="{Binding DataContext.RegistrarDesdeRecomendacionCommand,
                                             RelativeSource={RelativeSource AncestorType=UserControl}}"
                           CommandParameter="{Binding}" />
@@ -115,11 +113,11 @@
 
         <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
           <Button Content="Registrar mantenimiento" Padding="14,7" Cursor="Hand" FontSize="12"
-                  BorderThickness="0" Background="{StaticResource PrimaryBrush}" Foreground="White"
+                  BorderThickness="0" Background="{DynamicResource PrimaryBrush}" Foreground="White"
                   Command="{Binding RegistrarCommand}" />
           <Button Content="Actualizar" Padding="12,6" Margin="8,0,0,0" Cursor="Hand" FontSize="12"
-                  Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
-                  Foreground="{StaticResource TextPrimaryBrush}"
+                  Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
+                  Foreground="{DynamicResource TextPrimaryBrush}"
                   Command="{Binding RefrescarCommand}" />
         </StackPanel>
       </Grid>

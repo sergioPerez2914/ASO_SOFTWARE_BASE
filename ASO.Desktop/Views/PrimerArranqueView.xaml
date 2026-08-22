@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
-        Background="{StaticResource BackgroundBrush}"
+        Background="{DynamicResource BackgroundBrush}"
         FontFamily="Segoe UI">
 
   <Grid Margin="28">
@@ -20,9 +20,9 @@
 
     <StackPanel Grid.Row="0" Margin="0,0,0,16">
       <TextBlock Text="Configuración inicial" FontSize="20" FontWeight="Bold"
-                 Foreground="{StaticResource PrimaryBrush}" />
+                 Foreground="{DynamicResource PrimaryBrush}" />
       <TextBlock TextWrapping="Wrap" FontSize="12" Margin="0,4,0,0"
-                 Foreground="{StaticResource TextSecondaryBrush}"
+                 Foreground="{DynamicResource TextSecondaryBrush}"
                  Text="{Binding Explicacion}" />
     </StackPanel>
 
@@ -37,7 +37,7 @@
                  Text="{Binding CodigoCam, UpdateSourceTrigger=PropertyChanged}" />
         <TextBlock Text="Es el código que estampan las remesas, las liquidaciones y las facturas."
                    FontSize="11" TextWrapping="Wrap"
-                   Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+                   Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
         <TextBlock Text="Nombre del núcleo" Style="{StaticResource FormLabelStyle}" />
         <TextBox Style="{StaticResource FormTextBoxStyle}"
@@ -54,11 +54,11 @@
         <TextBlock Text="Contraseña" Style="{StaticResource FormLabelStyle}" />
         <PasswordBox x:Name="PasswordBox" Padding="8,6" />
 
-        <TextBlock Text="{Binding MensajeError}" Foreground="{StaticResource DangerBrush}"
+        <TextBlock Text="{Binding MensajeError}" Foreground="{DynamicResource DangerBrush}"
                    FontSize="12" TextWrapping="Wrap" Margin="0,10,0,0" />
 
         <Button Content="Crear y continuar" Margin="0,18,0,0" Padding="8,10"
-                Background="{StaticResource PrimaryBrush}" Foreground="White" BorderThickness="0"
+                Background="{DynamicResource PrimaryBrush}" Foreground="White" BorderThickness="0"
                 Cursor="Hand" Click="OnCrear" />
       </StackPanel>
     </Border>

@@ -18,7 +18,6 @@ public interface IPantalla
 
     Modulo Modulo { get; }
     Submodulo? Submodulo { get; }
-    string Ruta { get; }
     ICommand VolverCommand { get; }
 }
 
@@ -44,8 +43,6 @@ public abstract class PantallaViewModelBase : ViewModelBase, IPantalla
     /// </summary>
     public Submodulo? Submodulo { get; }
 
-    public string Ruta => Submodulo is null ? Modulo.Nombre : $"{Modulo.Nombre} · {Submodulo.Nombre}";
-
     public ICommand VolverCommand { get; }
 
     protected PantallaViewModelBase(Modulo modulo, Submodulo? submodulo = null)
@@ -60,13 +57,13 @@ public abstract class PantallaViewModelBase : ViewModelBase, IPantalla
 /// <summary>
 /// Pantalla que ADEMAS es el listado CRUD de un maestro (Tarifas, Repuestos, Liquidaciones…).
 ///
-/// Repite los cuatro miembros de <see cref="PantallaViewModelBase"/> en vez de heredarlos, y no
+/// Repite los tres miembros de <see cref="PantallaViewModelBase"/> en vez de heredarlos, y no
 /// es un descuido: C# no tiene herencia multiple y estas pantallas ya heredan de
 /// <see cref="CrudViewModelBase{T, TId}"/>. La alternativa —mover el preambulo a la base CRUD—
 /// se lo colgaria tambien a los siete ViewModels de padron que viven DENTRO de una pantalla
 /// conmutable (<see cref="FincaCrudViewModel"/> y companneros), que no tienen modulo ninguno.
 ///
-/// Son dos copias de diez lineas, no diecisiete, y no pueden desalinearse en silencio:
+/// Son dos copias de nueve lineas, no diecisiete, y no pueden desalinearse en silencio:
 /// <see cref="IPantalla"/> obliga a las dos a exponer lo mismo.
 /// </summary>
 public abstract class PantallaCrudViewModel<T, TId> : CrudViewModelBase<T, TId>, IPantalla
@@ -76,8 +73,6 @@ public abstract class PantallaCrudViewModel<T, TId> : CrudViewModelBase<T, TId>,
 
     public Modulo Modulo { get; }
     public Submodulo? Submodulo { get; }
-
-    public string Ruta => Submodulo is null ? Modulo.Nombre : $"{Modulo.Nombre} · {Submodulo.Nombre}";
 
     public ICommand VolverCommand { get; }
 

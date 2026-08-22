@@ -15,7 +15,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado con la ruta módulo · submódulo -->
+    <!-- Encabezado -->
     <Grid Grid.Row="0" Margin="0,0,0,16">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
@@ -23,12 +23,10 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Ruta}" FontSize="12"
-                   Foreground="{StaticResource TextMutedBrush}" />
         <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
         <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
 
       <Button Grid.Column="1" Content="Volver al módulo"
@@ -48,16 +46,16 @@
           <Border Style="{StaticResource CardStyle}" Width="280" Margin="0,0,12,0">
             <StackPanel>
               <TextBlock Text="{Binding Nombre}" FontSize="13" FontWeight="SemiBold"
-                         Foreground="{StaticResource TextPrimaryBrush}" />
+                         Foreground="{DynamicResource TextPrimaryBrush}" />
               <TextBlock Text="{Binding ExistenciaTexto}" FontSize="20" FontWeight="Bold"
-                         Foreground="{StaticResource PrimaryBrush}" Margin="0,4,0,0" />
+                         Foreground="{DynamicResource PrimaryBrush}" Margin="0,4,0,0" />
               <ProgressBar Height="6" Margin="0,8,0,0" Minimum="0" Maximum="100"
                            Value="{Binding PorcentajeLleno, Mode=OneWay}"
-                           Background="{StaticResource BorderBrush}"
-                           Foreground="{StaticResource AccentBlueBrush}"
+                           Background="{DynamicResource BorderBrush}"
+                           Foreground="{DynamicResource AccentBlueBrush}"
                            BorderThickness="0" />
               <TextBlock Text="{Binding PorcentajeTexto}" FontSize="11" Margin="0,4,0,0"
-                         Foreground="{StaticResource TextMutedBrush}" />
+                         Foreground="{DynamicResource TextMutedBrush}" />
             </StackPanel>
           </Border>
         </DataTemplate>
@@ -83,7 +81,7 @@
                    ToolTip="Buscar por activo, cisterna o responsable" />
           <TextBlock Text="{Binding RendimientoTexto}" FontSize="12" Margin="16,0,0,0"
                      VerticalAlignment="Center"
-                     Foreground="{StaticResource TextSecondaryBrush}" />
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
         </StackPanel>
 
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
@@ -108,7 +106,7 @@
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
                     HorizontalAlignment="Right" Margin="0,12,0,0">
           <Button Content="Nuevo vale" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{StaticResource PrimaryBrush}" Foreground="White"
+                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
                   Command="{Binding AgregarCommand}" />
           <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
                   Command="{Binding EditarCommand}" />
@@ -155,9 +153,9 @@
               <DataTemplate>
                 <StackPanel Orientation="Horizontal">
                   <TextBlock Text="{Binding ConsumoTexto}" FontSize="12"
-                             Foreground="{StaticResource TextPrimaryBrush}" />
+                             Foreground="{DynamicResource TextPrimaryBrush}" />
                   <TextBlock Text="Consumo alto" FontSize="11" Margin="8,0,0,0" FontWeight="SemiBold"
-                             Foreground="{StaticResource WarningBrush}" Visibility="Collapsed">
+                             Foreground="{DynamicResource WarningBrush}" Visibility="Collapsed">
                     <TextBlock.Style>
                       <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed" />

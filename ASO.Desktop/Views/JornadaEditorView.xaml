@@ -62,6 +62,6 @@
 
     <TextBlock Text="La jornada queda abierta hasta que se registre la salida. Una persona no puede tener dos jornadas abiertas a la vez."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

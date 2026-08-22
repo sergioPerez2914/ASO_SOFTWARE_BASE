@@ -26,7 +26,8 @@ public static class MatrizPermisos
 
     /// <summary>
     /// Los permisos "Ver.*" que de verdad se consultan, derivados del catalogo de navegacion:
-    /// los modulos fijados (Inicio, Peticiones, Administracion) y todos los submodulos.
+    /// los modulos fijados (Inicio, Peticiones, Administracion, Configuracion) y todos los
+    /// submodulos.
     ///
     /// Los cinco modulos del negocio NO entran: su visibilidad la deciden sus submodulos
     /// (ver <see cref="NavegacionPermitida"/>), asi que "Ver.Finanzas" no se lee nunca.
@@ -34,7 +35,7 @@ public static class MatrizPermisos
     /// pase nada.
     /// </summary>
     private static readonly HashSet<string> _navegacion =
-        ModuloCatalogo.Fijados.Select(m => m.Permiso)
+        ModuloCatalogo.TodosLosFijados.Select(m => m.Permiso)
             .Concat(ModuloCatalogo.Modulos.SelectMany(m => m.Submodulos).Select(s => s.Permiso))
             .ToHashSet();
 
@@ -58,6 +59,7 @@ public static class MatrizPermisos
     [
         Permisos.Ver(ModuloCatalogo.Inicio.Clave),
         Permisos.Ver(ModuloCatalogo.Peticiones.Clave),
+        Permisos.Ver(ModuloCatalogo.Configuracion.Clave),
         Permisos.Ver("Operaciones.Registro"),
         Permisos.Ver("Operaciones.Seguimiento"),
         Permisos.Ver("Flota.Gestion"),

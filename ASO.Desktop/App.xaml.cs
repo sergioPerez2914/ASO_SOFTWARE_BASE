@@ -1,5 +1,6 @@
 using System.Windows;
 using ASO.Desktop.Configuration;
+using ASO.Desktop.Services;
 using ASO.Desktop.Views;
 
 namespace ASO.Desktop;
@@ -9,6 +10,10 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // El tema antes de abrir nada: si se aplicara despues, la pantalla de login parpadearia
+        // en claro antes de pasar a oscuro.
+        Tema.Aplicar(Ajustes.Actual.Tema);
 
         // La base de datos se toca ya en el arranque (para saber si hay usuarios), así que un
         // problema de conexión se ve aquí y no a mitad de una navegación, disfrazado de otra cosa.

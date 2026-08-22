@@ -14,9 +14,9 @@
 
     <StackPanel Grid.Row="0" Margin="0,0,0,20">
       <TextBlock Text="Inicio" FontSize="20" FontWeight="Bold"
-                 Foreground="{StaticResource TextPrimaryBrush}" />
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
       <TextBlock Text="Elegí un módulo para ver su resumen y entrar a sus submódulos."
-                 FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                 FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
     </StackPanel>
 
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -37,20 +37,20 @@
               <StackPanel>
                 <StackPanel Orientation="Horizontal">
                   <TextBlock Text="{Binding Icono}" FontFamily="{StaticResource IconFont}" FontSize="20"
-                             Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" />
+                             Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" />
                   <TextBlock Text="{Binding Nombre}" FontSize="15" FontWeight="SemiBold"
-                             Foreground="{StaticResource TextPrimaryBrush}"
+                             Foreground="{DynamicResource TextPrimaryBrush}"
                              VerticalAlignment="Center" Margin="10,0,0,0" />
                 </StackPanel>
 
                 <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
-                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,10,0,0" />
+                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,0" />
 
                 <ItemsControl ItemsSource="{Binding Submodulos}" Margin="0,12,0,0">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
                       <TextBlock Text="{Binding Nombre}" FontSize="11" Margin="0,0,0,3"
-                                 Foreground="{StaticResource TextMutedBrush}" />
+                                 Foreground="{DynamicResource TextMutedBrush}" />
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>

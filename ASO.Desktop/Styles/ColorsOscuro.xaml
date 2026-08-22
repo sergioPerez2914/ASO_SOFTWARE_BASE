@@ -1,0 +1,55 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Paleta oscura de Software ASO.
+
+         Se superpone a Colors.xaml en tiempo de ejecucion: Services/Tema.cs la agrega al final
+         de Application.Resources.MergedDictionaries, que es lo ultimo que se consulta al buscar
+         una clave, asi que gana sobre la clara. Quitarla devuelve el tema claro.
+
+         Por eso NO mergea Colors.xaml y define las 29 claves de brush completas: una que faltara
+         se resolveria contra la paleta clara y saldria un recuadro blanco sobre fondo oscuro.
+
+         Los colores van escritos aqui, no derivados de los claros: no hay formula que convierta
+         una paleta clara en una oscura decente. Los acentos (exito, aviso, peligro) se aclaran
+         un escalon, porque el mismo rojo que resalta sobre blanco se apaga sobre azul marino. -->
+
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#0F172A" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#1E293B" />
+    <SolidColorBrush x:Key="SidebarBrush" Color="#111C2E" />
+    <SolidColorBrush x:Key="SidebarBorderBrush" Color="#2A3A52" />
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#3B82F6" />
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="#60A5FA" />
+    <SolidColorBrush x:Key="AccentBlueBrush" Color="#60A5FA" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E2E8F0" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#64748B" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#334155" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="#22C55E" />
+    <SolidColorBrush x:Key="WarningBrush" Color="#FBBF24" />
+    <SolidColorBrush x:Key="DangerBrush" Color="#EF4444" />
+    <SolidColorBrush x:Key="InfoBrush" Color="#60A5FA" />
+    <SolidColorBrush x:Key="FooterBrush" Color="#1E293B" />
+
+    <!-- Navegacion lateral: el hover sigue siendo neutro y el seleccionado azulado, para que
+         no se confundan entre si, igual que en la paleta clara. -->
+    <SolidColorBrush x:Key="NavHoverBrush" Color="#1B2942" />
+    <SolidColorBrush x:Key="NavSelectedBrush" Color="#22375C" />
+    <SolidColorBrush x:Key="NavPressedBrush" Color="#2B4470" />
+    <SolidColorBrush x:Key="NavIndicatorBrush" Color="#60A5FA" />
+    <SolidColorBrush x:Key="NavTextSecondaryBrush" Color="#CBD5E1" />
+
+    <SolidColorBrush x:Key="CardHoverBrush" Color="#243449" />
+    <SolidColorBrush x:Key="DangerHoverBrush" Color="#F87171" />
+    <SolidColorBrush x:Key="DangerPressedBrush" Color="#FCA5A5" />
+    <SolidColorBrush x:Key="ToggleHoverBrush" Color="#24354F" />
+    <SolidColorBrush x:Key="FilaAlternaBrush" Color="#18253C" />
+
+    <!-- Sobre fondo oscuro el velo del hover aclara, en vez de oscurecer como en el tema claro. -->
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="#1FFFFFFF" />
+    <SolidColorBrush x:Key="PressedOverlayBrush" Color="#33FFFFFF" />
+
+    <!-- Fondo suave del boton "Volver al modulo": tiene que dejar leer el azul del acento. -->
+    <SolidColorBrush x:Key="VolverFondoBrush" Color="#1B2B45" />
+
+</ResourceDictionary>

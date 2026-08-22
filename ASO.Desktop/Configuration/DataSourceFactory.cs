@@ -41,6 +41,7 @@ public static class DataSourceFactory
     private static IPermisoUsuarioDataSource? _permisosUsuario;
     private static IPeticionCambioDataSource? _peticiones;
     private static IAuthService? _auth;
+    private static IAjustesStore? _ajustesStore;
 
     public static IEmpleadoDataSource CrearEmpleados() =>
         _empleados ??= new SqlEmpleadoDataSource();
@@ -116,4 +117,11 @@ public static class DataSourceFactory
 
     public static IAuthService CrearAuth() =>
         _auth ??= new AuthService(CrearUsuarios());
+
+    /// <summary>
+    /// Preferencias de la maquina. No es una fuente de datos del negocio, pero se compone aqui
+    /// por el mismo motivo que las demas: es el unico sitio donde se decide la implementacion.
+    /// </summary>
+    public static IAjustesStore CrearAjustesStore() =>
+        _ajustesStore ??= new AjustesStoreJson();
 }

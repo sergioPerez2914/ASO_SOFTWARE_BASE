@@ -20,11 +20,11 @@
              Text="{Binding Cargo, UpdateSourceTrigger=PropertyChanged}" />
 
     <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
-              Foreground="{StaticResource TextPrimaryBrush}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
               IsChecked="{Binding Activo}" />
 
     <TextBlock Text="Un empleado inactivo se conserva para el histórico, pero no se ofrece en las pantallas de operación."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,6,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
   </StackPanel>
 </UserControl>

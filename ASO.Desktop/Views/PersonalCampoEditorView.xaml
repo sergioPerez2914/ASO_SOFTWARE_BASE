@@ -21,7 +21,7 @@
               SelectedItem="{Binding Rol}" />
 
     <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
-              Foreground="{StaticResource TextPrimaryBrush}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
               IsChecked="{Binding Activo}" />
   </StackPanel>
 </UserControl>

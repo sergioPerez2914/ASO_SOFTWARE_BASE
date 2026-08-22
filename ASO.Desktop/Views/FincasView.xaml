@@ -13,7 +13,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado con la ruta módulo · submódulo -->
+    <!-- Encabezado -->
     <Grid Grid.Row="0" Margin="0,0,0,16">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
@@ -21,12 +21,10 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Ruta}" FontSize="12"
-                   Foreground="{StaticResource TextMutedBrush}" />
         <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
         <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
 
       <Button Grid.Column="1" Content="Volver al módulo"
@@ -48,7 +46,7 @@
 
         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
           <Button Content="Nueva finca" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{StaticResource PrimaryBrush}" Foreground="White"
+                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
                   Command="{Binding AgregarCommand}" />
           <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
                   Command="{Binding EditarCommand}" />

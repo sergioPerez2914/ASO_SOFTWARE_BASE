@@ -8,9 +8,9 @@
 
   <StackPanel>
     <TextBlock Text="{Binding ResumenRemesa}" FontSize="12" TextWrapping="Wrap"
-               Foreground="{StaticResource TextSecondaryBrush}" />
+               Foreground="{DynamicResource TextSecondaryBrush}" />
     <TextBlock Text="{Binding FinCargaTexto}" FontSize="11" Margin="0,4,0,0"
-               Foreground="{StaticResource TextMutedBrush}" />
+               Foreground="{DynamicResource TextMutedBrush}" />
 
     <TextBlock Text="Llegada al central (fecha y hora)" Style="{StaticResource FormLabelStyle}" />
     <StackPanel Orientation="Horizontal">
@@ -42,11 +42,11 @@
     </Grid>
 
     <Border Style="{StaticResource AlertBoxStyle}" Margin="0,16,0,0"
-            Background="{StaticResource BackgroundBrush}"
-            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            Background="{DynamicResource BackgroundBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
       <StackPanel Orientation="Horizontal">
         <TextBlock Text="Peso neto (t):" FontSize="12" VerticalAlignment="Center"
-                   Foreground="{StaticResource TextSecondaryBrush}" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" />
         <TextBlock Text="{Binding PesoNetoTexto}" Style="{StaticResource FormValorCalculadoStyle}"
                    Margin="8,0,0,0" />
       </StackPanel>

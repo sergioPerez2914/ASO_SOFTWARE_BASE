@@ -8,7 +8,7 @@
 
   <StackPanel>
     <TextBlock Text="{Binding Resumen}" FontSize="12" TextWrapping="Wrap"
-               Foreground="{StaticResource TextSecondaryBrush}" />
+               Foreground="{DynamicResource TextSecondaryBrush}" />
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -33,6 +33,6 @@
 
     <TextBlock Text="Si el turno cruzó la medianoche, adelante también la fecha: la salida debe ser posterior a la entrada."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

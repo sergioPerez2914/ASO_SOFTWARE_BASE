@@ -49,9 +49,15 @@ resumen y se despliega su lista de submódulos en el menú lateral.
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios | funcionales |
 | Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas | funcionales |
 
-Además hay **tres módulos fijados** fuera de esa lista, sin submódulos, que se muestran en el menú
-según el permiso: **Inicio**, **Peticiones** (bandeja de solicitudes de cambio) y **Administración**
-(usuarios con sus permisos, y los datos del núcleo).
+Además hay **cuatro módulos fijados** fuera de esa lista, sin submódulos, que se muestran en el
+menú según el permiso: **Inicio**, **Peticiones** (bandeja de solicitudes de cambio),
+**Administración** (usuarios con sus permisos, y los datos del núcleo) y **Configuración**.
+
+Los tres primeros van arriba, en `ModuloCatalogo.Fijados`, que es el orden del menú. **Configuración
+va aparte** (`ModuloCatalogo.Configuracion`), anclada al pie del sidebar y fuera de su `ScrollViewer`:
+no es trabajo del día. La lista que sí las incluye a las cuatro es `TodosLosFijados`, y es la que hay
+que usar para permisos y resolución de claves — con `Fijados`, `Ver.Configuracion` no existiría en la
+matriz y no habría forma de quitarle la sección a nadie.
 
 **Los 14 submódulos están construidos; el único que falta es Flota · Telemetría.**
 Las reglas de Nómina y Finanzas se implementaron con supuestos provisionales (ver más abajo),
@@ -70,6 +76,8 @@ porque el socio todavía no aportó tarifario real ni formatos de liquidación y
 - `Views/SubmoduloView` — submódulo en construcción, con ruta `Módulo · Submódulo` y "Volver al módulo".
 - `Styles/Colors.xaml` + `Theme.xaml` — paleta y estilos (CardStyle, CardButtonStyle, NavItemStyle,
   NavSubItemStyle, DataGridStyle). Iconos = Segoe MDL2 Assets.
+- `Views/ConfiguracionView` — apariencia, la propia cuenta y las preferencias de la máquina
+  (ver "Configuración y preferencias").
 - Framework CRUD reutilizable (`CrudViewModelBase`, `CrudEditorViewModelBase`, `CrudEditorWindow`,
   `IServicioDialogo`), login/sesión y capa de datos (`Models`, `Services`, `BD`, `DataSourceFactory`):
   hoy los usan los 13 submódulos.
@@ -205,7 +213,7 @@ Tres roles (`Models/Rol.cs`), cada uno con un conjunto base en `Services/MatrizP
 administrador ajusta por usuario con `PermisoUsuario` (concede o revoca; **revocar gana**).
 
 Los ajustes se editan en **Administración · Usuarios**: al seleccionar un usuario, el panel de al
-lado (`PermisosDeUsuarioViewModel`) muestra los 87 permisos agrupados por módulo, marcados según lo
+lado (`PermisosDeUsuarioViewModel`) muestra los 90 permisos agrupados por módulo, marcados según lo
 que ya da su rol. La tabla `PermisosUsuario` sigue guardando **solo deltas**: al guardar, un permiso
 que vuelve a coincidir con el rol **borra** su ajuste en vez de dejar una fila que repita la matriz.
 Dos guardas: no se concede un permiso que quien edita no tiene (era una escalada real: un
@@ -214,9 +222,9 @@ propios.
 
 | Rol | Alcance |
 |---|---|
-| **Remesero** | 24 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios y Combustible. Crea, edita y confirma; **no anula nada**, no entra a Finanzas, Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
-| **AdministradorNucleo** | Todo dentro del núcleo (86 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
-| **Desarrollador** | Los 87 permisos, y es el único que reparte su propio rol |
+| **Remesero** | 25 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios, Combustible y Configuración. Crea, edita y confirma; **no anula nada**, no entra a Finanzas, Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
+| **AdministradorNucleo** | Todo dentro del núcleo (89 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
+| **Desarrollador** | Los 90 permisos, y es el único que reparte su propio rol |
 
 - **`Services/Permisos.cs`** es el catálogo de cadenas. Los de navegación llevan prefijo `Ver.` y se
   **derivan de la clave del submódulo**, así que no pueden desincronizarse al renombrar.
@@ -236,6 +244,90 @@ propios.
   (`Services/Passwords.cs`), sin dependencias nuevas. No hay usuarios sembrados ni contraseñas por
   defecto: en la primera ejecución contra una base sin usuarios, `Views/PrimerArranqueView` pide el
   nombre del núcleo, su C.O.D y crea el usuario Desarrollador.
+
+## Configuración y preferencias (2026-08-22)
+
+Sección propia, anclada **al pie del sidebar** y fuera de su scroll, con tres pestañas de tres
+alcances distintos — que es la razón de que estén separadas y de que no vivan en Administración
+(allí se administra a los demás; aquí cada quien ajusta lo suyo, y el remesero entra en la segunda
+pero no en la primera):
+
+| Pestaña | Alcance | Qué |
+|---|---|---|
+| **Apariencia** | esta máquina | Tema claro/oscuro y escala de la interfaz (100/110/125 %). Sin botón de guardar: se aplican al instante |
+| **Mi cuenta** | quien está dentro | Ficha de solo lectura, **cambiar la propia contraseña** y recordar el usuario en el login |
+| **Aplicación** | esta máquina, para todos | Abrir en la última sección · **umbral de alerta de consumo**, detrás de `Configuracion.Preferencias` |
+
+- **Las preferencias NO van a la base de datos.** Viven en `%AppData%\ASO\ajustes.json`
+  (`Models/AjustesApp.cs` + `Configuration/AjustesStoreJson.cs`, fachada `Services/Ajustes.cs`).
+  Son de quien está sentado delante, no del núcleo: meterlas en la base habría significado una
+  entidad `IDeOrganizacion` más y una migración, para algo que ni siquiera es dato del negocio.
+  `Leer()` **nunca lanza**: archivo ausente, corrupto o sin permisos caen en los valores por
+  defecto — corre en el arranque, antes del login, y ahí no hay dónde informar de nada.
+- **El tema cambia en caliente superponiendo un diccionario.** `Styles/ColorsOscuro.xaml` define
+  las 26 claves de brush de la paleta oscura, y `Services/Tema.cs` lo agrega o lo quita del final de
+  `Application.Resources.MergedDictionaries`: los diccionarios fusionados se recorren en orden
+  inverso, así que el último puesto tapa a `Colors.xaml`. `ColorsOscuro.xaml` **no** mergea
+  `Colors.xaml` y define las 26 completas — una clave que faltara se resolvería contra la paleta
+  clara y saldría un recuadro blanco sobre fondo oscuro.
+
+  **Todas las referencias a color del XAML son `DynamicResource`, y las nuevas también tienen que
+  serlo.** No es preferencia de estilo, es lo único que funciona, y costó un intento fallido
+  averiguarlo: la primera versión reasignaba el `.Color` de cada brush de `Colors.xaml` y **no
+  cambiaba nada**, porque **WPF congela los `Freezable` de un `ResourceDictionary` compilado al
+  cargarlo** — `IsFrozen` ya es `true` en el arranque y mutarlos lanza. Con `StaticResource` el
+  problema es el mismo por otra vía: resuelve una vez, se queda con el objeto y no se entera de que
+  se superpuso otra paleta.
+
+  De ahí dos reglas al escribir XAML: **un color va siempre por `DynamicResource` a una clave de la
+  paleta**, y **no se escriben hex a mano** (los seis que había en `Theme.xaml` se promovieron a
+  `CardHoverBrush`, `DangerHoverBrush`, `DangerPressedBrush`, `ToggleHoverBrush` y
+  `FilaAlternaBrush`). Los `Style` y los converters siguen con `StaticResource`: no cambian con el
+  tema.
+- **`Styles/Controles.xaml` reestiliza los controles de WPF**, y es lo que evita las cajas blancas.
+  La plantilla de fábrica (Aero2) pinta sus fondos con brushes escritos dentro del tema del
+  framework: no son `SystemColors` ni nada sustituible por clave, así que sobre el tema oscuro
+  quedaban cajas blancas con texto claro encima. Poner `Background` en el `Style` no basta para
+  `ComboBox`, `CheckBox`, `DatePicker` ni `ScrollBar` — hay que reemplazar la plantilla, y eso es
+  lo que hay ahí, junto con `DataGridColumnHeader`/`Cell`/`Row`, `ListBoxItem`, `Menu`, `ToolTip`,
+  `Calendar` y el `TextBox`/`PasswordBox` sin estilo.
+  - Los estilos **implícitos no alcanzan a un control que ya trae `Style=` con clave**: por eso
+    `FormTextBoxStyle`, `FormPasswordBoxStyle`, `FormComboBoxStyle` y `FormDatePickerStyle` llevan
+    `BasedOn="{StaticResource {x:Type …}}"`. Sin eso se quedan con la plantilla de fábrica.
+  - **Reestilar un control es hacerse cargo de lo que su plantilla resolvía sola.** El `ComboBox`
+    lo dejó claro: al sustituir su plantilla, la caja cerrada pasó a mostrar el `ToString()` del
+    objeto — en un `record` de C#, el volcado de todas sus propiedades
+    (`OpcionTema { Valor = Oscuro, Texto = Oscuro }`), en los ~32 combos de la app. La causa es que
+    `SelectionBoxItemTemplate` **se queda en null cuando la lista usa `DisplayMemberPath`** (medido,
+    y también en el ComboBox de fábrica), así que ni `TemplateBinding`, ni `Binding` con
+    `RelativeSource`, ni `ContentSource="SelectionBoxItem"` traen nada que pintar. La plantilla
+    resuelve ahora el `DisplayMemberPath` por su cuenta con `Controls/SeleccionATexto.cs`, y deja el
+    `ContentPresenter` solo para los combos que traen `ItemTemplate` propio (Salida de inventario).
+  - **El calendario no se estiliza con un estilo implícito.** `CalendarItem` crea los botones de día
+    enlazando su `Style` a `Calendar.CalendarDayButtonStyle`; ese enlace deja un **valor local** en
+    la propiedad `Style` aunque el origen sea nulo, y un `Style` local a nulo **impide** que WPF
+    busque el implícito — se queda con la plantilla de fábrica y su gris `#333333` a fuego. Hay que
+    dárselo por `Calendar.CalendarDayButtonStyle` / `CalendarButtonStyle`, que es el enganche que
+    WPF sí respeta.
+- **Los botones llevan estilo implícito propio** (`Button` en `Controles.xaml`). Sin él usaban la
+  plantilla de fábrica, cuyo hover es un azul claro escrito a fuego en el tema de WPF: en modo
+  oscuro el botón se volvía una pastilla clara. Solo Flota se libraba, porque define su propio
+  estilo. El realce va en un **velo translúcido** encima (`HoverOverlayBrush` /
+  `PressedOverlayBrush`) y no cambiando el `Background`, porque cada botón trae el suyo (azul
+  primario, transparente, rojo de emergencia) y sustituirlo lo perdería; el velo oscurece en el
+  tema claro y aclara en el oscuro.
+- **La escala es un `LayoutTransform` sobre la raíz de `MainWindow`**, no un `FontSize` global: los
+  estilos traen tamaños propios y subir solo la fuente descuadraría iconos, chips y columnas.
+- **Cambiar la propia contraseña exige la actual** aunque la sesión ya esté abierta: un equipo
+  desatendido es justo el caso en el que alguien cambiaría la clave ajena. Reutiliza `Passwords` y
+  el mismo largo mínimo que el alta de usuarios.
+- **El umbral de combustible tiene permiso propio** (`Configuracion.Preferencias`, que el remesero
+  no tiene) porque decide cuándo un vale se marca con alerta: quien pueda subirlo puede apagarse sus
+  propias alertas. La precedencia se resuelve en un solo sitio,
+  `Ajustes.UmbralAlertaConsumoEfectivo` = ajuste de la máquina, y si no, `appsettings.json`.
+- **`Sincronizar` del sidebar recorre `Items` *más* el ítem del pie.** Configuración está fuera de
+  `Items` por vivir anclada abajo; si el bucle mirara solo esa lista, entrar en ella no apagaría el
+  módulo anterior y salir no la apagaría a ella.
 
 ## Peticiones de cambio
 
@@ -334,5 +426,5 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
    BD está conectada y no hay mocks, cada supuesto sin confirmar se convierte en datos reales mal
    cargados.
 
-El catálogo completo de permisos está en `Services/Permisos.cs` (87 en uso) y el reparto por rol en
+El catálogo completo de permisos está en `Services/Permisos.cs` (90 en uso) y el reparto por rol en
 `Services/MatrizPermisos.cs`.

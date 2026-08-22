@@ -9,7 +9,7 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
-        Background="{StaticResource BackgroundBrush}"
+        Background="{DynamicResource BackgroundBrush}"
         FontFamily="Segoe UI">
 
   <Grid Margin="20">
@@ -21,22 +21,22 @@
     </Grid.RowDefinitions>
 
     <TextBlock Grid.Row="0" Text="{Binding Titulo}" FontSize="18" FontWeight="Bold"
-               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,16" />
+               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16" />
 
     <!-- El UserControl del formulario concreto se resuelve por DataTemplate implícito -->
     <ContentControl Grid.Row="1" Content="{Binding}" VerticalAlignment="Top" />
 
     <TextBlock Grid.Row="2" Text="{Binding ErrorValidacion}"
-               Foreground="{StaticResource DangerBrush}" FontSize="12"
+               Foreground="{DynamicResource DangerBrush}" FontSize="12"
                TextWrapping="Wrap" Margin="0,8,0,0" />
 
     <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
       <Button Content="Cancelar" Padding="14,8" Margin="0,0,8,0" Cursor="Hand"
-              Background="Transparent" BorderBrush="{StaticResource BorderBrush}"
-              Foreground="{StaticResource TextPrimaryBrush}"
+              Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
               Command="{Binding CancelarCommand}" />
       <Button Content="Guardar" Padding="14,8" Cursor="Hand" BorderThickness="0"
-              Background="{StaticResource PrimaryBrush}" Foreground="White"
+              Background="{DynamicResource PrimaryBrush}" Foreground="White"
               Command="{Binding GuardarCommand}" />
     </StackPanel>
   </Grid>

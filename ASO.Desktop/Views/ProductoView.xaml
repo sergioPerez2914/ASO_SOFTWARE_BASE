@@ -15,7 +15,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado con la ruta módulo · submódulo -->
+    <!-- Encabezado -->
     <Grid Grid.Row="0" Margin="0,0,0,16">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
@@ -23,12 +23,10 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Ruta}" FontSize="12"
-                   Foreground="{StaticResource TextMutedBrush}" />
         <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
         <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
 
       <Button Grid.Column="1" Content="Volver al módulo"
@@ -41,44 +39,44 @@
       <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0">
         <StackPanel>
           <TextBlock Text="Toneladas entregadas" FontSize="12"
-                     Foreground="{StaticResource TextSecondaryBrush}" />
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
           <TextBlock Text="{Binding ToneladasTexto}" FontSize="26" FontWeight="Bold"
-                     Foreground="{StaticResource PrimaryBrush}" />
+                     Foreground="{DynamicResource PrimaryBrush}" />
           <TextBlock Text="netas, en el período mostrado" FontSize="11"
-                     Foreground="{StaticResource TextMutedBrush}" />
+                     Foreground="{DynamicResource TextMutedBrush}" />
         </StackPanel>
       </Border>
 
       <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0">
         <StackPanel>
           <TextBlock Text="Entregas" FontSize="12"
-                     Foreground="{StaticResource TextSecondaryBrush}" />
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
           <TextBlock Text="{Binding EntregasTexto}" FontSize="26" FontWeight="Bold"
-                     Foreground="{StaticResource PrimaryBrush}" />
+                     Foreground="{DynamicResource PrimaryBrush}" />
           <TextBlock Text="remesas recibidas en el central" FontSize="11"
-                     Foreground="{StaticResource TextMutedBrush}" />
+                     Foreground="{DynamicResource TextMutedBrush}" />
         </StackPanel>
       </Border>
 
       <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0">
         <StackPanel>
           <TextBlock Text="Toneladas de hoy" FontSize="12"
-                     Foreground="{StaticResource TextSecondaryBrush}" />
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
           <TextBlock Text="{Binding ToneladasHoyTexto}" FontSize="26" FontWeight="Bold"
-                     Foreground="{StaticResource PrimaryBrush}" />
+                     Foreground="{DynamicResource PrimaryBrush}" />
           <TextBlock Text="entregadas en la jornada" FontSize="11"
-                     Foreground="{StaticResource TextMutedBrush}" />
+                     Foreground="{DynamicResource TextMutedBrush}" />
         </StackPanel>
       </Border>
 
       <Border Style="{StaticResource CardStyle}">
         <StackPanel>
           <TextBlock Text="Sin facturar" FontSize="12"
-                     Foreground="{StaticResource TextSecondaryBrush}" />
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
           <TextBlock Text="{Binding SinFacturarTexto}" FontSize="26" FontWeight="Bold"
-                     Foreground="{StaticResource WarningBrush}" />
+                     Foreground="{DynamicResource WarningBrush}" />
           <TextBlock Text="toneladas pendientes de cobro" FontSize="11"
-                     Foreground="{StaticResource TextMutedBrush}" />
+                     Foreground="{DynamicResource TextMutedBrush}" />
         </StackPanel>
       </Border>
     </UniformGrid>

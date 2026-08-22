@@ -29,6 +29,6 @@
 
     <TextBlock Text="El usuario queda en el núcleo activo y solo verá los datos de ese núcleo. La contraseña se guarda cifrada; no se puede consultar después, solo reemplazar."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,10,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,10,0,0" />
   </StackPanel>
 </UserControl>

@@ -8,7 +8,7 @@
 
   <StackPanel>
     <TextBlock Text="{Binding ResumenRemesa}" FontSize="12" TextWrapping="Wrap"
-               Foreground="{StaticResource TextSecondaryBrush}" />
+               Foreground="{DynamicResource TextSecondaryBrush}" />
 
     <TextBlock Text="Motivo de la anulación" Style="{StaticResource FormLabelStyle}" />
     <TextBox Style="{StaticResource FormTextBoxStyle}"
@@ -17,6 +17,6 @@
              Text="{Binding Motivo, UpdateSourceTrigger=PropertyChanged}" />
 
     <TextBlock Text="Queda registrado junto con la anulación."
-               FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,6,0,0" />
+               FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
   </StackPanel>
 </UserControl>

@@ -8,7 +8,7 @@
 
   <StackPanel>
     <TextBlock Text="{Binding ResumenRemesa}" FontSize="12" TextWrapping="Wrap"
-               Foreground="{StaticResource TextSecondaryBrush}" />
+               Foreground="{DynamicResource TextSecondaryBrush}" />
 
     <TextBlock Text="Nota" Style="{StaticResource FormLabelStyle}" />
     <TextBox Style="{StaticResource FormTextBoxStyle}"
@@ -17,6 +17,6 @@
              Text="{Binding Texto, UpdateSourceTrigger=PropertyChanged}" />
 
     <TextBlock Text="Queda registrada en la línea de tiempo con su autor y hora."
-               FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,6,0,0" />
+               FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
   </StackPanel>
 </UserControl>

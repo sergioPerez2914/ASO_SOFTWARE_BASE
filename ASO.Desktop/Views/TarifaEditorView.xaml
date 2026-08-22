@@ -33,7 +33,7 @@
 
     <TextBlock Text="Cobro = lo que se le factura al ingenio. Pago por destajo = lo que se le paga al núcleo o al trabajador."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -77,7 +77,7 @@
 
     <TextBlock Text="Sin fecha de fin, la tarifa rige indefinidamente. Las facturas y liquidaciones ya emitidas conservan el monto que se les aplicó."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" />
     <TextBox Style="{StaticResource FormTextBoxStyle}"
@@ -86,7 +86,7 @@
              Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
 
     <CheckBox Content="Activa" Margin="0,14,0,0" Cursor="Hand"
-              Foreground="{StaticResource TextPrimaryBrush}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
               IsChecked="{Binding Activa}" />
   </StackPanel>
 </UserControl>

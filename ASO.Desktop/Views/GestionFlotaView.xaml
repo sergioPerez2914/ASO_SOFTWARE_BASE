@@ -9,14 +9,14 @@
 
   <UserControl.Resources>
     <!-- Botón secundario de acciones del detalle -->
-    <Style x:Key="AccionSecundariaStyle" TargetType="Button">
+    <Style x:Key="AccionSecundariaStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
       <Setter Property="Padding" Value="12,6" />
       <Setter Property="Margin" Value="8,0,0,0" />
       <Setter Property="Cursor" Value="Hand" />
       <Setter Property="FontSize" Value="12" />
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
-      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
     <!-- Contenido visible solo en modo tarjetas -->
@@ -36,7 +36,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado con la ruta módulo · submódulo -->
+    <!-- Encabezado -->
     <Grid Grid.Row="0" Margin="0,0,0,16">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
@@ -44,12 +44,10 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Ruta}" FontSize="12"
-                   Foreground="{StaticResource TextMutedBrush}" />
         <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
         <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
 
       <Button Grid.Column="1" Content="Volver al módulo"
@@ -97,7 +95,7 @@
 
           <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
             <Button Content="Nuevo activo" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                    Background="{StaticResource PrimaryBrush}" Foreground="White"
+                    Background="{DynamicResource PrimaryBrush}" Foreground="White"
                     Command="{Binding NuevoActivoCommand}" />
             <Button Content="Actualizar" Style="{StaticResource AccionSecundariaStyle}"
                     Command="{Binding RefrescarCommand}" />
@@ -127,12 +125,12 @@
                       <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="{Binding Glifo}" Style="{StaticResource NavIconStyle}"
-                               FontSize="24" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,10,0" />
+                               FontSize="24" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,10,0" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                       <TextBlock Text="{Binding Codigo}" FontSize="14" FontWeight="SemiBold"
-                                 Foreground="{StaticResource TextPrimaryBrush}" />
+                                 Foreground="{DynamicResource TextPrimaryBrush}" />
                       <TextBlock Text="{Binding TipoTexto}" FontSize="11"
-                                 Foreground="{StaticResource TextMutedBrush}" />
+                                 Foreground="{DynamicResource TextMutedBrush}" />
                     </StackPanel>
                     <Border Grid.Column="2" Style="{StaticResource ChipEstadoActivoStyle}"
                             VerticalAlignment="Top">
@@ -141,7 +139,7 @@
                   </Grid>
 
                   <TextBlock Margin="0,10,0,0" FontSize="12"
-                             Foreground="{StaticResource TextSecondaryBrush}"
+                             Foreground="{DynamicResource TextSecondaryBrush}"
                              TextTrimming="CharacterEllipsis">
                     <Run Text="{Binding Marca, Mode=OneWay}" />
                     <Run Text="{Binding Modelo, Mode=OneWay}" />
@@ -153,9 +151,9 @@
                       <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="{Binding Placa}" FontSize="11"
-                               Foreground="{StaticResource TextMutedBrush}" />
+                               Foreground="{DynamicResource TextMutedBrush}" />
                     <TextBlock Grid.Column="1" Text="{Binding UsoTexto}" FontSize="11" FontWeight="SemiBold"
-                               Foreground="{StaticResource TextSecondaryBrush}" />
+                               Foreground="{DynamicResource TextSecondaryBrush}" />
                   </Grid>
                 </StackPanel>
               </Button>
@@ -180,11 +178,11 @@
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" DataContext="{Binding ActivoSeleccionado}">
               <TextBlock Text="{Binding Glifo}" Style="{StaticResource NavIconStyle}"
-                         FontSize="30" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,12,0" />
+                         FontSize="30" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,12,0" />
               <StackPanel VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
                   <TextBlock FontSize="18" FontWeight="Bold"
-                             Foreground="{StaticResource TextPrimaryBrush}">
+                             Foreground="{DynamicResource TextPrimaryBrush}">
                     <Run Text="{Binding Codigo, Mode=OneWay}" />
                     <Run Text=" — " /><Run Text="{Binding Marca, Mode=OneWay}" />
                     <Run Text="{Binding Modelo, Mode=OneWay}" />
@@ -195,13 +193,13 @@
                   </Border>
                 </StackPanel>
                 <TextBlock Text="{Binding TipoTexto}" FontSize="12"
-                           Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                           Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
               </StackPanel>
             </StackPanel>
 
             <WrapPanel Grid.Column="1" VerticalAlignment="Center">
               <Button Content="Registrar mantenimiento" Padding="14,7" Cursor="Hand" FontSize="12"
-                      BorderThickness="0" Background="{StaticResource PrimaryBrush}" Foreground="White"
+                      BorderThickness="0" Background="{DynamicResource PrimaryBrush}" Foreground="White"
                       Command="{Binding RegistrarMantenimientoCommand}" />
               <Button Content="Editar" Style="{StaticResource AccionSecundariaStyle}"
                       Command="{Binding EditarActivoCommand}" />
@@ -224,30 +222,30 @@
         <UniformGrid Rows="1" Columns="4" Margin="0,0,0,12">
           <Border Style="{StaticResource CardStyle}" Margin="0,0,6,0">
             <StackPanel>
-              <TextBlock Text="Uso actual" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+              <TextBlock Text="Uso actual" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
               <TextBlock Text="{Binding ActivoSeleccionado.UsoTexto}" FontSize="18" FontWeight="Bold"
-                         Foreground="{StaticResource TextPrimaryBrush}" Margin="0,4,0,0" />
+                         Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,4,0,0" />
             </StackPanel>
           </Border>
           <Border Style="{StaticResource CardStyle}" Margin="6,0,6,0">
             <StackPanel>
-              <TextBlock Text="Último mantenimiento" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+              <TextBlock Text="Último mantenimiento" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
               <TextBlock Text="{Binding UltimoMantenimientoTexto}" FontSize="14" FontWeight="SemiBold"
-                         Foreground="{StaticResource TextPrimaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                         Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
           <Border Style="{StaticResource CardStyle}" Margin="6,0,6,0">
             <StackPanel>
-              <TextBlock Text="Próxima revisión" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+              <TextBlock Text="Próxima revisión" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
               <TextBlock Text="{Binding ProximaRevisionTexto}" FontSize="14" FontWeight="SemiBold"
-                         Foreground="{StaticResource TextPrimaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                         Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
           <Border Style="{StaticResource CardStyle}" Margin="6,0,0,0">
             <StackPanel DataContext="{Binding ActivoSeleccionado}">
-              <TextBlock Text="Año · Placa" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+              <TextBlock Text="Año · Placa" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
               <TextBlock FontSize="14" FontWeight="SemiBold" Margin="0,6,0,0"
-                         Foreground="{StaticResource TextPrimaryBrush}">
+                         Foreground="{DynamicResource TextPrimaryBrush}">
                 <Run Text="{Binding Anio, Mode=OneWay}" />
                 <Run Text=" · " /><Run Text="{Binding Placa, Mode=OneWay}" />
               </TextBlock>
@@ -268,18 +266,18 @@
               <StackPanel DataContext="{Binding ActivoSeleccionado}">
                 <TextBlock Text="Ficha" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,8" />
                 <TextBlock Text="Tipo" Style="{StaticResource FormLabelStyle}" Margin="0,4,0,2" />
-                <TextBlock Text="{Binding TipoTexto}" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                <TextBlock Text="{Binding TipoTexto}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
                 <TextBlock Text="Marca y modelo" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
-                <TextBlock FontSize="12" Foreground="{StaticResource TextPrimaryBrush}">
+                <TextBlock FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}">
                   <Run Text="{Binding Marca, Mode=OneWay}" /> <Run Text="{Binding Modelo, Mode=OneWay}" />
                   <Run Text=" (" /><Run Text="{Binding Anio, Mode=OneWay}" /><Run Text=")" />
                 </TextBlock>
                 <TextBlock Text="Descripción" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
                 <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
-                           Foreground="{StaticResource TextPrimaryBrush}" />
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
                 <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
                 <TextBlock Text="{Binding Notas}" FontSize="12" TextWrapping="Wrap"
-                           Foreground="{StaticResource TextSecondaryBrush}" />
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
               </StackPanel>
             </Border>
 
@@ -300,9 +298,9 @@
                         </Border>
                         <StackPanel Grid.Column="1">
                           <TextBlock Text="{Binding Regla.Revision}" FontSize="12" FontWeight="SemiBold"
-                                     Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                                     Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" />
                           <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
-                                     Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                                     Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                         </StackPanel>
                       </Grid>
                     </DataTemplate>
@@ -320,13 +318,13 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
                       <StackPanel Margin="0,6">
-                        <TextBlock FontSize="11" Foreground="{StaticResource TextMutedBrush}">
+                        <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}">
                           <Run Text="{Binding Fecha, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy}}" />
                           <Run Text=" · " /><Run Text="{Binding TipoTexto, Mode=OneWay}" />
                         </TextBlock>
                         <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
-                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
-                        <TextBlock FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0">
+                                   Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0">
                           <Run Text="Costo: " /><Run Text="{Binding CostoTotalTexto, Mode=OneWay}" />
                           <Run Text=" · " /><Run Text="{Binding RealizadoPor, Mode=OneWay}" />
                         </TextBlock>
@@ -342,8 +340,8 @@
                 <TextBlock Text="Historial de uso" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,8" />
 
                 <Border Margin="0,0,0,8"
-                        Background="{StaticResource BackgroundBrush}"
-                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                        Background="{DynamicResource BackgroundBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                   <Border.Style>
                     <Style TargetType="Border" BasedOn="{StaticResource AlertBoxStyle}">
                       <Setter Property="Visibility" Value="Visible" />
@@ -355,7 +353,7 @@
                     </Style>
                   </Border.Style>
                   <TextBlock FontSize="11" TextWrapping="Wrap"
-                             Foreground="{StaticResource TextSecondaryBrush}"
+                             Foreground="{DynamicResource TextSecondaryBrush}"
                              Text="El uso de las máquinas se alimentará de Telemetría y de los vales de combustible; hoy se muestran las lecturas capturadas al registrar mantenimientos." />
                 </Border>
 
@@ -369,11 +367,11 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
                           <TextBlock Text="{Binding FechaTexto}" FontSize="11"
-                                     Foreground="{StaticResource TextMutedBrush}" />
+                                     Foreground="{DynamicResource TextMutedBrush}" />
                           <TextBlock Text="{Binding Titulo}" FontSize="12" FontWeight="SemiBold"
-                                     Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                                     Foreground="{DynamicResource TextPrimaryBrush}" />
                           <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
-                                     Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                                     Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                         </StackPanel>
                         <Border Grid.Column="1" VerticalAlignment="Top" Margin="8,0,0,0"
                                 DataContext="{Binding Remesa}"

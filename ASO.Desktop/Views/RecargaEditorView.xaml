@@ -24,7 +24,7 @@
               Command="{Binding NuevaCisternaCommand}" />
     </Grid>
     <TextBlock Text="{Binding EspacioTexto}" FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -66,6 +66,6 @@
 
     <TextBlock Text="La recarga suma los litros a la cisterna al guardarse: se registra cuando el combustible ya está descargado."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

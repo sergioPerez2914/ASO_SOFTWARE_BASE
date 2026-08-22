@@ -24,7 +24,7 @@
               Command="{Binding NuevaCisternaCommand}" />
     </Grid>
     <TextBlock Text="{Binding ExistenciaTexto}" FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <TextBlock Text="Activo que recibe el combustible" Style="{StaticResource FormLabelStyle}" />
     <ComboBox Style="{StaticResource FormComboBoxStyle}"
@@ -61,7 +61,7 @@
     </Grid>
 
     <TextBlock Text="{Binding AyudaLectura}" FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <TextBlock Text="Responsable del despacho" Style="{StaticResource FormLabelStyle}" />
     <TextBox Style="{StaticResource FormTextBoxStyle}"
@@ -75,6 +75,6 @@
 
     <TextBlock Text="Al confirmar el vale se descuenta la cisterna, se calcula el consumo del período y se actualiza la lectura del activo."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

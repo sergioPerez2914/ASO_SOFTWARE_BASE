@@ -54,10 +54,10 @@
     </Grid>
 
     <TextBlock Text="{Binding AyudaSujeto}" FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
 
     <TextBlock Text="Las remesas ya incluidas en otra liquidación no se vuelven a contar."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
   </StackPanel>
 </UserControl>

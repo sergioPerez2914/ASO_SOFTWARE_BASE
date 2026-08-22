@@ -20,9 +20,54 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         MainSidebar.NavegacionSolicitada += (_, e) => Navegar(e.Modulo, e.Submodulo);
-        Navegar(ModuloCatalogo.Inicio, null);
+
+        AplicarEscala();
+        Ajustes.Cambiaron += AplicarEscala;
+        Closed += OnCerrada;
+
+        Navegar(SeccionDeArranque(), null);
 
         MostrarCabecera();
+    }
+
+    /// <summary>
+    /// Al cerrar se anota dónde se quedó, y solo aquí: <see cref="Navegar"/> lo lleva en
+    /// memoria porque escribir el archivo en cada clic del menú sería un archivo por
+    /// navegación. Cerrar sesión también pasa por aquí — la ventana se cierra y se abre otra.
+    ///
+    /// La baja del evento va en el mismo sitio: <c>Ajustes.Cambiaron</c> es estático y vive más
+    /// que la ventana, así que una ventana cerrada que siguiera suscrita se quedaría colgando
+    /// de él intentando escalar un árbol que ya no existe.
+    /// </summary>
+    private void OnCerrada(object? sender, EventArgs e)
+    {
+        Ajustes.Cambiaron -= AplicarEscala;
+
+        if (Ajustes.Actual.AbrirEnUltimaSeccion)
+            Ajustes.Guardar();
+    }
+
+    /// <summary>
+    /// Escala de la interfaz. Se reaplica cada vez que cambian los ajustes, no solo al abrir,
+    /// para que el selector de Configuración se vea al instante.
+    /// </summary>
+    private void AplicarEscala()
+    {
+        var escala = Ajustes.Actual.EscalaInterfaz;
+        EscalaInterfaz.ScaleX = EscalaInterfaz.ScaleY = escala is >= 0.5 and <= 3 ? escala : 1;
+    }
+
+    /// <summary>
+    /// Dónde abrir. Por defecto Inicio; con la preferencia activada, donde se quedó la última
+    /// vez. Si esa sección ya no existe o el rol dejó de verla, se cae a Inicio en vez de
+    /// dejar la ventana en una pantalla vacía — de eso se encarga <see cref="CrearVistaModulo"/>.
+    /// </summary>
+    private static Modulo SeccionDeArranque()
+    {
+        if (!Ajustes.Actual.AbrirEnUltimaSeccion)
+            return ModuloCatalogo.Inicio;
+
+        return ModuloCatalogo.BuscarModulo(Ajustes.Actual.UltimaSeccion) ?? ModuloCatalogo.Inicio;
     }
 
     /// <summary>
@@ -71,6 +116,10 @@ public partial class MainWindow : Window
     {
         MainSidebar.Sincronizar(modulo, submodulo);
 
+        // Solo en memoria: el archivo se escribe al guardar desde Configuración, no una vez
+        // por clic del menú.
+        Ajustes.Actual.UltimaSeccion = modulo.Clave;
+
         ContentArea.Content = submodulo is not null
             ? CrearVistaSubmodulo(modulo, submodulo)
             : CrearVistaModulo(modulo);
@@ -114,6 +163,9 @@ public partial class MainWindow : Window
 
         if (modulo.Clave == ModuloCatalogo.Peticiones.Clave)
             return Conectar(new PeticionesViewModel(modulo), ModuloCatalogo.Inicio);
+
+        if (modulo.Clave == ModuloCatalogo.Configuracion.Clave)
+            return Conectar(new ConfiguracionViewModel(modulo), ModuloCatalogo.Inicio);
 
         if (modulo.Clave == ModuloCatalogo.Inicio.Clave)
             return CrearInicio();

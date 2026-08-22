@@ -106,7 +106,7 @@ public sealed class CombustibleService
         copia.PromedioHistorico = PromedioHistorico(vale.ActivoId);
         copia.AlertaConsumo = copia.ConsumoPorUnidad is { } consumo
                               && copia.PromedioHistorico is { } promedio and > 0
-                              && consumo > promedio * (1 + AppConfig.UmbralAlertaConsumo);
+                              && consumo > promedio * (1 + Ajustes.UmbralAlertaConsumoEfectivo);
 
         copia.Estado = EstadoVale.Confirmado;
         copia.FechaConfirmacion = DateTime.Now;

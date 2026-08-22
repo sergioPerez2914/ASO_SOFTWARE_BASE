@@ -16,12 +16,10 @@
 
     <!-- Encabezado -->
     <StackPanel Grid.Row="0" Margin="0,0,0,16">
-      <TextBlock Text="{Binding Ruta}" FontSize="12"
-                 Foreground="{StaticResource TextMutedBrush}" />
       <TextBlock Text="Peticiones de cambio" FontSize="20" FontWeight="Bold"
-                 Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
       <TextBlock Text="{Binding ResumenPendientes}" FontSize="12"
-                 Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                 Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
     </StackPanel>
 
     <!-- Barra: filtro por estado y acciones -->
@@ -50,7 +48,7 @@
 
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
           <Button Content="Aprobar" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{StaticResource PrimaryBrush}" Foreground="White"
+                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
                   Command="{Binding AprobarCommand}" />
           <Button Content="Rechazar" Style="{StaticResource BarraBotonStyle}"
                   Command="{Binding RechazarCommand}" />
@@ -60,7 +58,7 @@
 
         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
                    Text="{Binding NotaAprobacion}" TextWrapping="Wrap" FontSize="11"
-                   Foreground="{StaticResource TextMutedBrush}" />
+                   Foreground="{DynamicResource TextMutedBrush}" />
       </Grid>
     </Border>
 

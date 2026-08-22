@@ -1,0 +1,203 @@
+<UserControl x:Class="ASO.Desktop.Views.ConfiguracionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="640" d:DesignWidth="1100">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Encabezado -->
+    <Grid Grid.Row="0" Margin="0,0,0,16">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="Configuración" FontSize="20" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
+        <TextBlock Text="Cómo se ve la aplicación, tu cuenta, y cómo se comporta en esta máquina."
+                   FontSize="12" TextWrapping="Wrap"
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+      </StackPanel>
+
+      <Button Grid.Column="1" Content="Volver al inicio" VerticalAlignment="Top"
+              Padding="12,6" Cursor="Hand" Background="Transparent"
+              BorderBrush="{DynamicResource BorderBrush}"
+              Foreground="{DynamicResource TextPrimaryBrush}"
+              Command="{Binding VolverCommand}" />
+    </Grid>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+      <RadioButton Content="Apariencia" GroupName="ConfigVista"
+                   IsChecked="True"
+                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                   Command="{Binding CambiarVistaCommand}" CommandParameter="Apariencia" />
+      <RadioButton Content="Mi cuenta" GroupName="ConfigVista"
+                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                   Command="{Binding CambiarVistaCommand}" CommandParameter="Cuenta" />
+      <RadioButton Content="Aplicación" GroupName="ConfigVista"
+                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                   Command="{Binding CambiarVistaCommand}" CommandParameter="Aplicacion" />
+    </StackPanel>
+
+    <!-- Apariencia: se aplica al momento, sin botón de guardar -->
+    <Grid Grid.Row="2" DataContext="{Binding Apariencia}"
+          Visibility="{Binding DataContext.MostrarApariencia,
+                               RelativeSource={RelativeSource AncestorType=UserControl},
+                               Converter={StaticResource BoolToVis}}">
+      <Border Style="{StaticResource CardStyle}"
+              VerticalAlignment="Top" HorizontalAlignment="Left" Width="460">
+        <StackPanel>
+          <TextBlock Text="Apariencia" FontSize="15" FontWeight="Bold"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="Se aplica al instante y se recuerda en esta máquina. No afecta a nadie más."
+                     FontSize="11" TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+
+          <TextBlock Text="Tema" Style="{StaticResource FormLabelStyle}" />
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding TemasDisponibles}" DisplayMemberPath="Texto"
+                    SelectedItem="{Binding Tema}" />
+
+          <TextBlock Text="Escala de la interfaz" Style="{StaticResource FormLabelStyle}" />
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding EscalasDisponibles}" DisplayMemberPath="Texto"
+                    SelectedItem="{Binding Escala}" />
+          <TextBlock Text="Agranda toda la ventana, no solo el texto: iconos, tablas y botones crecen con ella."
+                     FontSize="11" TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- Mi cuenta -->
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Auto"
+                  DataContext="{Binding Cuenta}"
+                  Visibility="{Binding DataContext.MostrarCuenta,
+                                       RelativeSource={RelativeSource AncestorType=UserControl},
+                                       Converter={StaticResource BoolToVis}}">
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+
+        <Border Style="{StaticResource CardStyle}"
+                VerticalAlignment="Top" Width="380" Margin="0,0,12,0">
+          <StackPanel>
+            <TextBlock Text="Quién eres" FontSize="15" FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Text="El rol y los permisos los ajusta un administrador desde Administración · Usuarios."
+                       FontSize="11" TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+
+            <TextBlock Text="Usuario" Style="{StaticResource FormLabelStyle}" />
+            <TextBlock Text="{Binding NombreUsuario}" FontSize="13"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+
+            <TextBlock Text="Nombre completo" Style="{StaticResource FormLabelStyle}" />
+            <TextBlock Text="{Binding NombreCompleto}" FontSize="13" TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+
+            <TextBlock Text="Rol" Style="{StaticResource FormLabelStyle}" />
+            <TextBlock Text="{Binding RolTexto}" FontSize="13"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+
+            <TextBlock Text="Núcleo" Style="{StaticResource FormLabelStyle}" />
+            <TextBlock Text="{Binding NucleoTexto}" FontSize="13" TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+
+            <CheckBox Content="Recordar mi usuario en el inicio de sesión"
+                      Margin="0,16,0,0" Cursor="Hand" FontSize="12"
+                      Foreground="{DynamicResource TextPrimaryBrush}"
+                      IsChecked="{Binding RecordarUsuario}" />
+            <TextBlock Text="Solo el nombre de usuario. La contraseña nunca se guarda."
+                       FontSize="11" TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardStyle}" VerticalAlignment="Top" Width="380">
+          <StackPanel>
+            <TextBlock Text="Cambiar mi contraseña" FontSize="15" FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Text="{Binding AyudaPassword}" FontSize="11" TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+
+            <TextBlock Text="Contraseña actual" Style="{StaticResource FormLabelStyle}" />
+            <PasswordBox x:Name="PasswordActual" Style="{StaticResource FormPasswordBoxStyle}" />
+
+            <TextBlock Text="Contraseña nueva" Style="{StaticResource FormLabelStyle}" />
+            <PasswordBox x:Name="PasswordNueva" Style="{StaticResource FormPasswordBoxStyle}" />
+
+            <TextBlock Text="Repetir la nueva" Style="{StaticResource FormLabelStyle}" />
+            <PasswordBox x:Name="PasswordConfirmacion" Style="{StaticResource FormPasswordBoxStyle}"
+                         KeyDown="OnPasswordKeyDown" />
+
+            <Button Content="Cambiar contraseña" Margin="0,16,0,0" HorizontalAlignment="Left"
+                    Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
+                    Background="{DynamicResource PrimaryBrush}" Foreground="White"
+                    Click="OnCambiarPassword" />
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Aplicación: guarda con botón, porque el umbral se escribe a mano -->
+    <Grid Grid.Row="2" DataContext="{Binding Aplicacion}"
+          Visibility="{Binding DataContext.MostrarAplicacion,
+                               RelativeSource={RelativeSource AncestorType=UserControl},
+                               Converter={StaticResource BoolToVis}}">
+      <Border Style="{StaticResource CardStyle}"
+              VerticalAlignment="Top" HorizontalAlignment="Left" Width="460">
+        <StackPanel>
+          <TextBlock Text="Aplicación" FontSize="15" FontWeight="Bold"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="Cómo se comporta el sistema en esta máquina."
+                     FontSize="11" TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+
+          <CheckBox Content="Abrir en la última sección visitada" Cursor="Hand" FontSize="12"
+                    Foreground="{DynamicResource TextPrimaryBrush}"
+                    IsChecked="{Binding AbrirEnUltimaSeccion}" />
+          <TextBlock Text="Si no, la aplicación abre siempre en Inicio."
+                     FontSize="11" TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+
+          <Border Margin="0,16,0,0" Padding="0,14,0,0"
+                  BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+            <StackPanel>
+              <TextBlock Text="Operación" FontSize="13" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextPrimaryBrush}" />
+
+              <TextBlock Text="Umbral de alerta de consumo (%)" Style="{StaticResource FormLabelStyle}" />
+              <TextBox Style="{StaticResource FormTextBoxStyle}"
+                       IsEnabled="{Binding PuedeAjustarOperacion}"
+                       Text="{Binding UmbralTexto, UpdateSourceTrigger=PropertyChanged}" />
+              <TextBlock Text="{Binding AyudaUmbral}" FontSize="11" TextWrapping="Wrap"
+                         Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
+
+              <TextBlock Text="Solo un administrador puede cambiarlo: decide cuándo un vale de combustible se marca con alerta."
+                         FontSize="11" TextWrapping="Wrap"
+                         Foreground="{DynamicResource WarningBrush}" Margin="0,6,0,0"
+                         Visibility="{Binding MostrarAvisoSinPermiso,
+                                              Converter={StaticResource BoolToVis}}" />
+            </StackPanel>
+          </Border>
+
+          <Button Content="Guardar" Margin="0,18,0,0" HorizontalAlignment="Left"
+                  Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
+                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
+                  Command="{Binding GuardarCommand}" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+  </Grid>
+</UserControl>

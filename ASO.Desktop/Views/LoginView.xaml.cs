@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using ASO.Desktop.Services;
 using ASO.Desktop.ViewModels;
 
 namespace ASO.Desktop.Views;
@@ -12,6 +13,16 @@ public partial class LoginView : Window
     {
         InitializeComponent();
         DataContext = ViewModel;
+
+        // Se recuerda el nombre, nunca la contrasenna. Con el usuario ya puesto, el foco va
+        // directo a lo unico que queda por escribir.
+        if (Ajustes.Actual.RecordarUltimoUsuario && Ajustes.Actual.UltimoUsuario.Length > 0)
+        {
+            ViewModel.NombreUsuario = Ajustes.Actual.UltimoUsuario;
+            PasswordBox.Focus();
+            return;
+        }
+
         UsuarioBox.Focus();
     }
 
@@ -19,6 +30,13 @@ public partial class LoginView : Window
     {
         if (ViewModel.IntentarIniciarSesion(PasswordBox.Password))
         {
+            // Solo tras entrar de verdad: recordar un usuario que ni existe no ayudaria a nadie.
+            if (Ajustes.Actual.RecordarUltimoUsuario)
+            {
+                Ajustes.Actual.UltimoUsuario = ViewModel.NombreUsuario.Trim();
+                Ajustes.Guardar();
+            }
+
             DialogResult = true;
             return;
         }

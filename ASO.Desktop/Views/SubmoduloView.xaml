@@ -12,7 +12,7 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado con la ruta módulo · submódulo -->
+    <!-- Encabezado -->
     <Grid Grid.Row="0" Margin="0,0,0,16">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
@@ -20,12 +20,10 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Ruta}" FontSize="12"
-                   Foreground="{StaticResource TextMutedBrush}" />
         <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextPrimaryBrush}" />
         <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
 
       <Button Grid.Column="1" Content="Volver al módulo"
@@ -36,11 +34,11 @@
     <Border Grid.Row="1" Style="{StaticResource CardStyle}">
       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
         <TextBlock Text="{Binding Submodulo.Icono}" FontFamily="{StaticResource IconFont}" FontSize="40"
-                   Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" />
+                   Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
         <TextBlock Text="{Binding Titulo}" FontSize="16" FontWeight="SemiBold"
-                   Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,12,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,12,0,0" />
         <TextBlock Text="{Binding Detalle}"
-                   FontSize="12" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center"
+                   FontSize="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"
                    Margin="0,4,0,0" TextAlignment="Center" MaxWidth="380" TextWrapping="Wrap" />
       </StackPanel>
     </Border>

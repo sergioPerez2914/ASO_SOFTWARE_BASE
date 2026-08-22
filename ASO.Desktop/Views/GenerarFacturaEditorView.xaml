@@ -10,19 +10,19 @@
     <TextBlock Text="Remesas recibidas pendientes de facturar"
                Style="{StaticResource FormLabelStyle}" />
 
-    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4"
+    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4"
             MaxHeight="280">
       <ScrollViewer VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding Remesas}">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
-              <Border Padding="10,8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+              <Border Padding="10,8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
                 <CheckBox IsChecked="{Binding IsSeleccionada}" Cursor="Hand" VerticalContentAlignment="Center">
                   <StackPanel Margin="6,0,0,0">
                     <TextBlock Text="{Binding Descripcion}" FontSize="12" FontWeight="SemiBold"
-                               Foreground="{StaticResource TextPrimaryBrush}" />
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
                     <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
-                               Foreground="{StaticResource TextMutedBrush}" />
+                               Foreground="{DynamicResource TextMutedBrush}" />
                   </StackPanel>
                 </CheckBox>
               </Border>
@@ -33,10 +33,10 @@
     </Border>
 
     <TextBlock Text="{Binding TotalTexto}" FontSize="12" FontWeight="SemiBold" Margin="0,10,0,0"
-               Foreground="{StaticResource TextPrimaryBrush}" />
+               Foreground="{DynamicResource TextPrimaryBrush}" />
 
     <TextBlock Text="El estimado usa las tarifas de cobro vigentes hoy; la factura aplica la tarifa vigente a la fecha en que se recibió cada remesa."
                FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"
-               Foreground="{StaticResource TextMutedBrush}" />
+               Foreground="{DynamicResource TextMutedBrush}" />
   </StackPanel>
 </UserControl>

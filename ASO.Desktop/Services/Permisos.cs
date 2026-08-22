@@ -165,6 +165,18 @@ public static class Permisos
         public const string Editar = "Nucleo.Editar";
     }
 
+    /// <summary>
+    /// La pantalla de Configuracion no pide permiso para entrar: el tema, la escala y la
+    /// propia contrasenna son de quien esta sentado delante. Lo que si lo pide es tocar los
+    /// ajustes que cambian como se comporta la aplicacion para todos los que la usan en esa
+    /// maquina — hoy, el umbral de alerta de consumo. Sin esta separacion, un remesero podria
+    /// subir el umbral y apagarse sus propias alertas.
+    /// </summary>
+    public static class Configuracion
+    {
+        public const string Preferencias = "Configuracion.Preferencias";
+    }
+
     public static class Usuarios
     {
         public const string Crear = "Usuarios.Crear";

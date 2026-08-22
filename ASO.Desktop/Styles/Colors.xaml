@@ -27,6 +27,18 @@
     <Color x:Key="NavIndicatorColor">#2563EB</Color>
     <Color x:Key="NavTextSecondaryColor">#475569</Color>
 
+    <!-- Estados que antes vivian como hex sueltos dentro de Theme.xaml. Estan aqui para que
+         el cambio de tema los alcance: Services/Tema.cs recorre los brushes de la paleta, y
+         un color escrito a mano en un Setter se quedaria claro sobre fondo oscuro. -->
+    <Color x:Key="CardHoverColor">#F8FAFF</Color>
+    <Color x:Key="DangerHoverColor">#B91C1C</Color>
+    <Color x:Key="DangerPressedColor">#991B1B</Color>
+    <Color x:Key="ToggleHoverColor">#E8EDF4</Color>
+    <Color x:Key="FilaAlternaColor">#F8FAFC</Color>
+    <Color x:Key="HoverOverlayColor">#14000000</Color>
+    <Color x:Key="PressedOverlayColor">#26000000</Color>
+    <Color x:Key="VolverFondoColor">#EAF0FE</Color>
+
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
     <SolidColorBrush x:Key="SidebarBrush" Color="{StaticResource SidebarColor}" />
@@ -48,5 +60,13 @@
     <SolidColorBrush x:Key="NavPressedBrush" Color="{StaticResource NavPressedColor}" />
     <SolidColorBrush x:Key="NavIndicatorBrush" Color="{StaticResource NavIndicatorColor}" />
     <SolidColorBrush x:Key="NavTextSecondaryBrush" Color="{StaticResource NavTextSecondaryColor}" />
+    <SolidColorBrush x:Key="CardHoverBrush" Color="{StaticResource CardHoverColor}" />
+    <SolidColorBrush x:Key="DangerHoverBrush" Color="{StaticResource DangerHoverColor}" />
+    <SolidColorBrush x:Key="DangerPressedBrush" Color="{StaticResource DangerPressedColor}" />
+    <SolidColorBrush x:Key="ToggleHoverBrush" Color="{StaticResource ToggleHoverColor}" />
+    <SolidColorBrush x:Key="FilaAlternaBrush" Color="{StaticResource FilaAlternaColor}" />
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="{StaticResource HoverOverlayColor}" />
+    <SolidColorBrush x:Key="PressedOverlayBrush" Color="{StaticResource PressedOverlayColor}" />
+    <SolidColorBrush x:Key="VolverFondoBrush" Color="{StaticResource VolverFondoColor}" />
 
 </ResourceDictionary>

@@ -73,6 +73,10 @@
     <views:PeticionesView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:ConfiguracionViewModel}">
+    <views:ConfiguracionView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:SubmoduloViewModel}">
     <views:SubmoduloView />
   </DataTemplate>

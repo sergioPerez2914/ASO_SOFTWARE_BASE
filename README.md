@@ -62,8 +62,10 @@ ASO/
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios |
 | Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas |
 
-Más tres secciones fijas según el rol: **Inicio**, **Peticiones** y **Administración** (usuarios
-y permisos).
+Más cuatro secciones fijas según el rol: **Inicio**, **Peticiones**, **Administración** (usuarios
+y permisos) y **Configuración**, esta última anclada al pie del menú lateral: tema claro/oscuro,
+escala de la interfaz, cambio de la propia contraseña y las preferencias de la máquina. Se guardan
+en `%AppData%\ASO\ajustes.json`, no en la base de datos.
 
 ## Roles
 

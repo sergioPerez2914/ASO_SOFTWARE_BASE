@@ -145,11 +145,33 @@ public static class ModuloCatalogo
         [],
         []);
 
-    /// <summary>Todos los módulos fijados fuera de la lista de cinco, en orden de menú.</summary>
+    /// <summary>
+    /// Preferencias de quien usa la aplicación en esta máquina: apariencia, la propia cuenta y
+    /// los ajustes de la app. Es un módulo fijado más, pero NO entra en <see cref="Fijados"/>
+    /// porque esa lista es el orden del menú de arriba y este va anclado al pie del sidebar,
+    /// donde se busca lo que no forma parte del trabajo del día.
+    /// </summary>
+    public static Modulo Configuracion { get; } = new(
+        "Configuracion",
+        "Configuración",
+        "Apariencia, tu cuenta y las preferencias de la aplicación.",
+        "",
+        [],
+        []);
+
+    /// <summary>Los módulos fijados que se listan arriba, en orden de menú.</summary>
     public static IReadOnlyList<Modulo> Fijados { get; } = [Inicio, Peticiones, Administracion];
 
+    /// <summary>
+    /// Todo lo fijado, incluida <see cref="Configuracion"/>, que se pinta aparte. Es la lista
+    /// que hay que mirar para preguntas de permisos y de resolución de claves: si se usara
+    /// <see cref="Fijados"/>, "Ver.Configuracion" no existiría en la matriz y no habría forma
+    /// de quitarle la sección a nadie.
+    /// </summary>
+    public static IReadOnlyList<Modulo> TodosLosFijados { get; } = [.. Fijados, Configuracion];
+
     public static Modulo? BuscarModulo(string clave)
-        => Fijados.FirstOrDefault(m => m.Clave == clave)
+        => TodosLosFijados.FirstOrDefault(m => m.Clave == clave)
            ?? Modulos.FirstOrDefault(m => m.Clave == clave);
 
     /// <summary>Resuelve un submódulo por su clave completa ("Modulo.Submodulo").</summary>

@@ -91,8 +91,24 @@ public sealed class SidebarViewModel : ViewModelBase
 
     public IReadOnlyList<ModuloNavItem> Items { get; }
 
+    /// <summary>
+    /// El acceso a Configuración va anclado al pie del menú, fuera del scroll, así que no puede
+    /// vivir en <see cref="Items"/>. Null si el rol no lo ve.
+    /// </summary>
+    public ModuloNavItem? Configuracion { get; }
+
+    public bool VeConfiguracion => Configuracion is not null;
+
+    /// <summary>
+    /// Todo lo que se marca y se desmarca al navegar. Existe porque el ítem del pie está fuera
+    /// de <see cref="Items"/>: si <see cref="Sincronizar"/> recorriera solo esa lista, entrar a
+    /// Configuración no apagaría el módulo anterior y salir de ella no apagaría Configuración.
+    /// </summary>
+    private readonly IReadOnlyList<ModuloNavItem> _navegables;
+
     public ICommand SeleccionarModuloCommand { get; }
     public ICommand SeleccionarSubmoduloCommand { get; }
+    public ICommand SeleccionarConfiguracionCommand { get; }
     public ICommand AlternarExpansionCommand { get; }
 
     public SidebarViewModel() : this(SesionActual.Instancia) { }
@@ -107,11 +123,22 @@ public sealed class SidebarViewModel : ViewModelBase
             .. sesion.ModulosVisibles().Select(m => new ModuloNavItem(m, sesion))
         ];
 
+        Configuracion = sesion.Ve(ModuloCatalogo.Configuracion)
+            ? new ModuloNavItem(ModuloCatalogo.Configuracion, sesion)
+            : null;
+
+        _navegables = Configuracion is null ? Items : [.. Items, Configuracion];
+
         SeleccionarModuloCommand = new RelayCommand<ModuloNavItem>(item =>
             NavegacionSolicitada?.Invoke(this, new NavegacionEventArgs(item.Modulo, null)));
 
         SeleccionarSubmoduloCommand = new RelayCommand<SubmoduloNavItem>(item =>
             NavegacionSolicitada?.Invoke(this, new NavegacionEventArgs(item.Modulo, item.Submodulo)));
+
+        SeleccionarConfiguracionCommand = new RelayCommand(
+            () => NavegacionSolicitada?.Invoke(
+                this, new NavegacionEventArgs(ModuloCatalogo.Configuracion, null)),
+            () => VeConfiguracion);
 
         // Plegar/desplegar es solo visual: no cambia de sección ni pide navegar.
         AlternarExpansionCommand = new RelayCommand<ModuloNavItem>(
@@ -125,7 +152,7 @@ public sealed class SidebarViewModel : ViewModelBase
     /// </summary>
     public void Sincronizar(Modulo modulo, Submodulo? submodulo)
     {
-        foreach (var item in Items)
+        foreach (var item in _navegables)
         {
             var esModuloActivo = item.Modulo.Clave == modulo.Clave;
 

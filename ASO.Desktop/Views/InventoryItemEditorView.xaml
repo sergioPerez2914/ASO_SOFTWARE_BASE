@@ -86,6 +86,6 @@
 
     <TextBlock Text="Al bajar de la existencia mínima el artículo aparece como «Stock bajo» en el almacén y en el resumen del módulo."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,8,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

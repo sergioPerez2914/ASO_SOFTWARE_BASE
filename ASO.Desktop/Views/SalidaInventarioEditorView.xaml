@@ -15,15 +15,15 @@
         <DataTemplate>
           <TextBlock>
             <Run Text="{Binding Nombre, Mode=OneWay}" />
-            <Run Text=" — quedan " Foreground="{StaticResource TextMutedBrush}" />
-            <Run Text="{Binding StockTexto, Mode=OneWay}" Foreground="{StaticResource TextMutedBrush}" />
+            <Run Text=" — quedan " Foreground="{DynamicResource TextMutedBrush}" />
+            <Run Text="{Binding StockTexto, Mode=OneWay}" Foreground="{DynamicResource TextMutedBrush}" />
           </TextBlock>
         </DataTemplate>
       </ComboBox.ItemTemplate>
     </ComboBox>
 
     <TextBlock Text="{Binding ExistenciaTexto}" FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -60,9 +60,9 @@
           <TextBlock>
             <Run Text="Nº " />
             <Run Text="{Binding Id, Mode=OneWay}" />
-            <Run Text=" · " Foreground="{StaticResource TextMutedBrush}" />
+            <Run Text=" · " Foreground="{DynamicResource TextMutedBrush}" />
             <Run Text="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}, Mode=OneWay}" />
-            <Run Text=" · " Foreground="{StaticResource TextMutedBrush}" />
+            <Run Text=" · " Foreground="{DynamicResource TextMutedBrush}" />
             <Run Text="{Binding Descripcion, Mode=OneWay}" />
           </TextBlock>
         </DataTemplate>
@@ -71,7 +71,7 @@
 
     <TextBlock Text="Al confirmar la salida, su costo se suma al del mantenimiento elegido. Elija primero el activo para ver sus mantenimientos."
                FontSize="11" TextWrapping="Wrap"
-               Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <TextBlock Text="Motivo" Style="{StaticResource FormLabelStyle}" />
     <TextBox Style="{StaticResource FormTextBoxStyle}"
