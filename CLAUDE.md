@@ -1,4 +1,4 @@
-# ASO — Software ASO (Gestión de Zafra)
+﻿# ASO — Software ASO (Gestión de Zafra)
 
 Sistema de gestión para una empresa de **cosecha mecanizada y transporte de caña de azúcar** (zafra).
 Aplicación de escritorio **WPF · .NET 8** (`net8.0-windows`), instalación local en LAN, un solo centro.
@@ -51,7 +51,7 @@ resumen y se despliega su lista de submódulos en el menú lateral.
 
 Además hay **tres módulos fijados** fuera de esa lista, sin submódulos, que se muestran en el menú
 según el permiso: **Inicio**, **Peticiones** (bandeja de solicitudes de cambio) y **Administración**
-(núcleos, usuarios y permisos).
+(usuarios con sus permisos, y los datos del núcleo).
 
 **Los 14 submódulos están construidos; el único que falta es Flota · Telemetría.**
 Las reglas de Nómina y Finanzas se implementaron con supuestos provisionales (ver más abajo),
@@ -204,11 +204,19 @@ instalaciones que compartan base se vean entre sí.
 Tres roles (`Models/Rol.cs`), cada uno con un conjunto base en `Services/MatrizPermisos.cs` que el
 administrador ajusta por usuario con `PermisoUsuario` (concede o revoca; **revocar gana**).
 
+Los ajustes se editan en **Administración · Usuarios**: al seleccionar un usuario, el panel de al
+lado (`PermisosDeUsuarioViewModel`) muestra los 87 permisos agrupados por módulo, marcados según lo
+que ya da su rol. La tabla `PermisosUsuario` sigue guardando **solo deltas**: al guardar, un permiso
+que vuelve a coincidir con el rol **borra** su ajuste en vez de dejar una fila que repita la matriz.
+Dos guardas: no se concede un permiso que quien edita no tiene (era una escalada real: un
+administrador podía fabricar un usuario con más alcance que el suyo), y nadie ajusta los suyos
+propios.
+
 | Rol | Alcance |
 |---|---|
 | **Remesero** | 24 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios y Combustible. Crea, edita y confirma; **no anula nada**, no entra a Finanzas, Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
-| **AdministradorNucleo** | Todo dentro del núcleo (87 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
-| **Desarrollador** | Los 88 permisos, y es el único que reparte su propio rol |
+| **AdministradorNucleo** | Todo dentro del núcleo (86 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
+| **Desarrollador** | Los 87 permisos, y es el único que reparte su propio rol |
 
 - **`Services/Permisos.cs`** es el catálogo de cadenas. Los de navegación llevan prefijo `Ver.` y se
   **derivan de la clave del submódulo**, así que no pueden desincronizarse al renombrar.
@@ -326,5 +334,5 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
    BD está conectada y no hay mocks, cada supuesto sin confirmar se convierte en datos reales mal
    cargados.
 
-El catálogo completo de permisos está en `Services/Permisos.cs` (88 en uso) y el reparto por rol en
+El catálogo completo de permisos está en `Services/Permisos.cs` (87 en uso) y el reparto por rol en
 `Services/MatrizPermisos.cs`.

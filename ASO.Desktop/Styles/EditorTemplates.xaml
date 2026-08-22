@@ -100,8 +100,4 @@
     <views:UsuarioEditorView />
   </DataTemplate>
 
-  <DataTemplate DataType="{x:Type vm:PermisoUsuarioEditorViewModel}">
-    <views:PermisoUsuarioEditorView />
-  </DataTemplate>
-
 </ResourceDictionary>

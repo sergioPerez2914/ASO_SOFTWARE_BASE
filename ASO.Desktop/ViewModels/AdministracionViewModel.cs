@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
@@ -6,18 +7,27 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Administración del sistema: los usuarios del núcleo y los ajustes de permisos que los
-/// apartan de lo que su rol trae por defecto.
+/// Administración del sistema: los usuarios del núcleo con sus permisos, y la ficha del propio
+/// núcleo.
 ///
-/// Dos padrones y la ficha del núcleo, en una vista conmutable como <see cref="EmpleadosViewModel"/>.
-/// No hay padrón de núcleos: una instalación atiende a uno solo, que nace en el primer arranque;
-/// lo que sí hace falta es poder corregir sus datos, sobre todo el C.O.D.
+/// Los permisos NO son una pestaña aparte. Eran un CRUD de ajustes sueltos, y obligaba a trabajar
+/// al revés: para saber qué podía hacer alguien había que recordar qué trae su rol y cruzarlo con
+/// filas dispersas. Ahora al seleccionar un usuario se ven todos sus permisos al lado
+/// (<see cref="PermisosDeUsuarioViewModel"/>), que es como se piensa la pregunta.
 /// </summary>
 public sealed class AdministracionViewModel : PantallaViewModelBase
 {
     public const string VistaNucleo = "Nucleo";
     public const string VistaUsuarios = "Usuarios";
-    public const string VistaPermisos = "Permisos";
+
+    private readonly IServicioDialogo _dialogos;
+
+    /// <summary>
+    /// Para poder deshacer un cambio de selección: si el usuario declina descartar sus cambios,
+    /// hay que devolver la grilla a donde estaba, y para entonces ya se movió.
+    /// </summary>
+    private Models.Usuario? _usuarioMostrado;
+    private bool _restaurandoSeleccion;
 
     public AdministracionViewModel(Modulo modulo)
         : this(modulo, new ServicioDialogo(), SesionActual.Instancia)
@@ -27,27 +37,50 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
     private AdministracionViewModel(Modulo modulo, IServicioDialogo dialogos, ISesionActual sesion)
         : base(modulo)
     {
-        var usuarios = DataSourceFactory.CrearUsuarios();
+        _dialogos = dialogos;
+
         Nucleo = new DatosNucleoViewModel(
             DataSourceFactory.CrearOrganizaciones(), dialogos, sesion);
-        Usuarios = new UsuariosCrudViewModel(usuarios, dialogos, sesion);
-        Permisos = new PermisosUsuarioCrudViewModel(
-            DataSourceFactory.CrearPermisosUsuario(), usuarios, dialogos, sesion);
+        Usuarios = new UsuariosCrudViewModel(DataSourceFactory.CrearUsuarios(), dialogos, sesion);
+        PermisosDeUsuario = new PermisosDeUsuarioViewModel(
+            DataSourceFactory.CrearPermisosUsuario(), dialogos, sesion);
+
+        Usuarios.PropertyChanged += OnUsuarioSeleccionado;
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }
 
     public DatosNucleoViewModel Nucleo { get; }
     public UsuariosCrudViewModel Usuarios { get; }
-    public PermisosUsuarioCrudViewModel Permisos { get; }
+    public PermisosDeUsuarioViewModel PermisosDeUsuario { get; }
 
     /// <summary>
-    /// Los cambios de permisos se aplican al volver a entrar, no en caliente: el conjunto
-    /// efectivo se calcula una sola vez al iniciar sesión. Decirlo en pantalla evita que
-    /// alguien conceda un permiso y crea que no funcionó.
+    /// El panel de permisos sigue a la selección del padrón. Si hay cambios sin guardar se
+    /// pregunta antes de descartarlos; al declinar se devuelve la selección a su sitio.
     /// </summary>
-    public string NotaVigencia =>
-        "Los cambios de rol y de permisos se aplican la próxima vez que el usuario inicie sesión.";
+    private void OnUsuarioSeleccionado(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(Usuarios.SelectedItem) || _restaurandoSeleccion)
+            return;
+
+        var nuevo = Usuarios.SelectedItem;
+        if (ReferenceEquals(nuevo, _usuarioMostrado))
+            return;
+
+        if (PermisosDeUsuario.HayCambios
+            && !_dialogos.Confirmar(
+                "Cambios sin guardar",
+                $"Hay permisos modificados de {PermisosDeUsuario.Usuario?.NombreUsuario} que no se han guardado. ¿Descartarlos?"))
+        {
+            _restaurandoSeleccion = true;
+            Usuarios.SelectedItem = _usuarioMostrado;
+            _restaurandoSeleccion = false;
+            return;
+        }
+
+        _usuarioMostrado = nuevo;
+        PermisosDeUsuario.Cargar(nuevo);
+    }
 
     private string _vistaActual = VistaUsuarios;
     public string VistaActual
@@ -64,7 +97,6 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
 
     public bool MostrarNucleo => VistaActual == VistaNucleo;
     public bool MostrarUsuarios => VistaActual == VistaUsuarios;
-    public bool MostrarPermisos => VistaActual == VistaPermisos;
 
     public ICommand CambiarVistaCommand { get; }
 }

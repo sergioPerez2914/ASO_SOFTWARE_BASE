@@ -6,7 +6,6 @@
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
-
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -26,7 +25,8 @@
                    Foreground="{StaticResource TextMutedBrush}" />
         <TextBlock Text="Administración" FontSize="20" FontWeight="Bold"
                    Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0" />
-        <TextBlock Text="{Binding NotaVigencia}" FontSize="12" TextWrapping="Wrap"
+        <TextBlock Text="Los usuarios del núcleo, con sus permisos, y los datos del propio núcleo."
+                   FontSize="12" TextWrapping="Wrap"
                    Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
       </StackPanel>
 
@@ -42,9 +42,6 @@
                    IsChecked="True"
                    Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
                    Command="{Binding CambiarVistaCommand}" CommandParameter="Usuarios" />
-      <RadioButton Content="Ajustes de permisos" GroupName="AdminAcceso"
-                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Permisos" />
       <RadioButton Content="Núcleo" GroupName="AdminAcceso"
                    Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
                    Command="{Binding CambiarVistaCommand}" CommandParameter="Nucleo" />
@@ -84,101 +81,150 @@
       </Border>
     </Grid>
 
-    <!-- Padron de usuarios -->
+    <!-- Usuarios y sus permisos: maestro-detalle, se ve a quien se esta editando todo el tiempo -->
     <Grid Grid.Row="2" Visibility="{Binding MostrarUsuarios, Converter={StaticResource BoolToVis}}">
-      <Grid DataContext="{Binding Usuarios}">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="380" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <!-- Padron de usuarios -->
+      <Grid Grid.Column="0" DataContext="{Binding Usuarios}">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBox Style="{StaticResource FormTextBoxStyle}" Margin="0"
+                     Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Buscar por usuario, nombre o rol" />
+
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+              <Button Content="Nuevo" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
+                      Background="{StaticResource PrimaryBrush}" Foreground="White"
+                      Command="{Binding AgregarCommand}" />
+              <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
+                      Command="{Binding EditarCommand}" />
+              <Button Content="Eliminar" Style="{StaticResource BarraBotonStyle}"
+                      Command="{Binding EliminarCommand}" />
+              <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
+                      Command="{Binding RefrescarCommand}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+          <DataGrid Style="{StaticResource DataGridStyle}"
+                    ItemsSource="{Binding ItemsView}"
+                    SelectedItem="{Binding SelectedItem}">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="*" />
+              <DataGridTextColumn Header="Rol" Binding="{Binding RolTexto}" Width="140" />
+              <DataGridTextColumn Header="Estado" Binding="{Binding EstadoTexto}" Width="80" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </Border>
+      </Grid>
+
+      <!-- Permisos del usuario seleccionado -->
+      <Border Grid.Column="2" Style="{StaticResource CardStyle}"
+              DataContext="{Binding PermisosDeUsuario}">
         <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
 
-          <TextBox Grid.Column="0" Width="260" VerticalAlignment="Center"
-                   Style="{StaticResource FormTextBoxStyle}"
-                   Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                   ToolTip="Buscar por usuario, nombre o rol" />
+          <!-- Sin usuario seleccionado no hay nada que mostrar -->
+          <TextBlock Grid.Row="0" Grid.RowSpan="3"
+                     Text="Selecciona un usuario para ver y ajustar sus permisos."
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Foreground="{StaticResource TextMutedBrush}" FontSize="13">
+            <TextBlock.Style>
+              <Style TargetType="TextBlock">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding HayUsuario}" Value="False">
+                    <Setter Property="Visibility" Value="Visible" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </TextBlock.Style>
+          </TextBlock>
 
-          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Nuevo usuario" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
+          <StackPanel Grid.Row="0" Margin="0,0,0,10"
+                      Visibility="{Binding HayUsuario, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding Encabezado}" FontSize="15" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimaryBrush}" />
+            <TextBlock Text="Marcado = lo puede hacer. Lo que se aparta de su rol queda señalado como concedido o revocado."
+                       FontSize="11" TextWrapping="Wrap"
+                       Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+            <TextBlock Text="{Binding NotaBloqueo}" FontSize="11" TextWrapping="Wrap"
+                       Foreground="{StaticResource DangerBrush}" Margin="0,4,0,0"
+                       Visibility="{Binding HayBloqueo, Converter={StaticResource BoolToVis}}" />
+          </StackPanel>
+
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                        Visibility="{Binding HayUsuario, Converter={StaticResource BoolToVis}}">
+            <ItemsControl ItemsSource="{Binding FilasView}">
+              <ItemsControl.GroupStyle>
+                <GroupStyle>
+                  <GroupStyle.HeaderTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="Bold"
+                                 Foreground="{StaticResource TextSecondaryBrush}"
+                                 Margin="0,12,0,4" />
+                    </DataTemplate>
+                  </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+              </ItemsControl.GroupStyle>
+
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid Margin="8,2,0,2">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <CheckBox Grid.Column="0" Cursor="Hand"
+                              Content="{Binding Etiqueta}"
+                              IsChecked="{Binding Concedido}"
+                              IsEnabled="{Binding Editable}"
+                              Foreground="{StaticResource TextPrimaryBrush}">
+                      <CheckBox.ToolTip>
+                        <TextBlock>
+                          <Run Text="{Binding Permiso, Mode=OneWay}" />
+                          <LineBreak />
+                          <Run Text="{Binding MotivoBloqueo, Mode=OneWay}" />
+                        </TextBlock>
+                      </CheckBox.ToolTip>
+                    </CheckBox>
+
+                    <TextBlock Grid.Column="1" Text="{Binding OrigenTexto}" FontSize="10"
+                               VerticalAlignment="Center" Margin="8,0,4,0"
+                               Foreground="{StaticResource TextMutedBrush}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+
+          <StackPanel Grid.Row="2" Margin="0,12,0,0"
+                      Visibility="{Binding HayUsuario, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding NotaVigencia}" FontSize="11" TextWrapping="Wrap"
+                       Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,8" />
+            <Button Content="Guardar permisos" HorizontalAlignment="Left"
+                    Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
                     Background="{StaticResource PrimaryBrush}" Foreground="White"
-                    Command="{Binding AgregarCommand}" />
-            <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
-                    Command="{Binding EditarCommand}" />
-            <Button Content="Eliminar" Style="{StaticResource BarraBotonStyle}"
-                    Command="{Binding EliminarCommand}" />
-            <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
-                    Command="{Binding RefrescarCommand}" />
+                    Command="{Binding GuardarCommand}" />
           </StackPanel>
         </Grid>
       </Border>
-
-      <Border Grid.Row="1" Style="{StaticResource CardStyle}">
-        <DataGrid Style="{StaticResource DataGridStyle}"
-                  ItemsSource="{Binding ItemsView}"
-                  SelectedItem="{Binding SelectedItem}">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="180" />
-            <DataGridTextColumn Header="Nombre completo" Binding="{Binding NombreCompleto}" Width="*" />
-            <DataGridTextColumn Header="Rol" Binding="{Binding RolTexto}" Width="200" />
-            <DataGridTextColumn Header="Estado" Binding="{Binding EstadoTexto}" Width="100" />
-          </DataGrid.Columns>
-        </DataGrid>
-      </Border>
-      </Grid>
-    </Grid>
-
-    <!-- Ajustes de permisos -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarPermisos, Converter={StaticResource BoolToVis}}">
-      <Grid DataContext="{Binding Permisos}">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="*" />
-      </Grid.RowDefinitions>
-
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-
-          <TextBox Grid.Column="0" Width="260" VerticalAlignment="Center"
-                   Style="{StaticResource FormTextBoxStyle}"
-                   Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                   ToolTip="Buscar por permiso o usuario" />
-
-          <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Nuevo ajuste" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                    Background="{StaticResource PrimaryBrush}" Foreground="White"
-                    Command="{Binding AgregarCommand}" />
-            <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
-                    Command="{Binding EditarCommand}" />
-            <Button Content="Eliminar" Style="{StaticResource BarraBotonStyle}"
-                    Command="{Binding EliminarCommand}" />
-            <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
-                    Command="{Binding RefrescarCommand}" />
-          </StackPanel>
-        </Grid>
-      </Border>
-
-      <Border Grid.Row="1" Style="{StaticResource CardStyle}">
-        <DataGrid Style="{StaticResource DataGridStyle}"
-                  ItemsSource="{Binding ItemsView}"
-                  SelectedItem="{Binding SelectedItem}">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Usuario" Binding="{Binding UsuarioNombre}" Width="180" />
-            <DataGridTextColumn Header="Permiso" Binding="{Binding Permiso}" Width="*" />
-            <DataGridTextColumn Header="Efecto" Binding="{Binding EfectoTexto}" Width="120" />
-          </DataGrid.Columns>
-        </DataGrid>
-      </Border>
-      </Grid>
     </Grid>
   </Grid>
 </UserControl>
