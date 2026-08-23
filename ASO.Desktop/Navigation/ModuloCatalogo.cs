@@ -17,7 +17,6 @@ public sealed record Modulo(
     string Nombre,
     string Descripcion,
     string Icono,
-    IReadOnlyList<string> Indicadores,
     IReadOnlyList<Submodulo> Submodulos)
 {
     /// <summary>Permiso propio. Solo decide por sí mismo en los módulos SIN submódulos
@@ -38,7 +37,6 @@ public static class ModuloCatalogo
         "Inicio",
         "Punto de entrada a los cinco módulos del sistema.",
         "",
-        [],
         []);
 
     /// <summary>
@@ -51,7 +49,6 @@ public static class ModuloCatalogo
         "Peticiones",
         "Solicitudes de cambio pendientes de aprobación.",
         "",
-        [],
         []);
 
     public static IReadOnlyList<Modulo> Modulos { get; } =
@@ -61,7 +58,6 @@ public static class ModuloCatalogo
             "Operaciones",
             "Registro y seguimiento de la operación diaria de cosecha y transporte.",
             "",
-            ["Toneladas del día", "Operaciones abiertas", "Frentes activos", "Tiempo muerto"],
             [
                 new Submodulo("Operaciones.Registro", "Registro de Operación",
                     "Remesas de caña: finca, núcleos, carga y pesaje en el central.", ""),
@@ -76,7 +72,6 @@ public static class ModuloCatalogo
             "Flota",
             "Máquinas y vehículos: disponibilidad, mantenimiento y datos de campo.",
             "",
-            ["Unidades activas", "En taller", "Disponibilidad", "Mantenimientos vencidos"],
             [
                 new Submodulo("Flota.Gestion", "Gestión de Flota",
                     "Ficha e historial de cada máquina y vehículo.", ""),
@@ -91,7 +86,6 @@ public static class ModuloCatalogo
             "Inventario",
             "Existencias de repuestos, combustible y producto.",
             "",
-            ["Artículos", "Bajo mínimo", "Agotados", "Valor de inventario"],
             [
                 new Submodulo("Inventario.Repuestos", "Repuestos",
                     "Stock de repuestos y consumibles de taller.", ""),
@@ -106,7 +100,6 @@ public static class ModuloCatalogo
             "Nómina",
             "Personal, jornadas y liquidación por destajo.",
             "",
-            ["Empleados activos", "Liquidaciones pendientes", "Horas del período", "Monto del período"],
             [
                 new Submodulo("Nomina.Liquidaciones", "Liquidaciones",
                     "Cálculo y cierre de nómina por período.", ""),
@@ -121,7 +114,6 @@ public static class ModuloCatalogo
             "Finanzas",
             "Cobranza, pagos a proveedores y tarifas del servicio.",
             "",
-            ["Por cobrar", "Por pagar", "Vencido", "Saldo neto"],
             [
                 new Submodulo("Finanzas.CuentasPorCobrar", "Cuentas por Cobrar",
                     "Facturación al ingenio y seguimiento de cobros.", ""),
@@ -144,7 +136,6 @@ public static class ModuloCatalogo
         // Era , el mismo glifo que Nomina - Empleados: dos entradas del menu con el
         // mismo icono. Este (Permissions) dice ademas de que va la seccion.
         "",
-        [],
         []);
 
     /// <summary>
@@ -158,7 +149,6 @@ public static class ModuloCatalogo
         "Configuración",
         "Apariencia, tu cuenta y las preferencias de la aplicación.",
         "",
-        [],
         []);
 
     /// <summary>Los módulos fijados que se listan arriba, en orden de menú.</summary>
