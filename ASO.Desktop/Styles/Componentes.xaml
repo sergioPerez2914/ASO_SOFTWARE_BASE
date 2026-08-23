@@ -301,4 +301,58 @@
     </Setter>
   </Style>
 
+  <!-- ============================ Ruta de navegacion ============================ -->
+
+  <Style TargetType="{x:Type controls:Breadcrumb}">
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type controls:Breadcrumb}">
+          <ItemsControl ItemsSource="{TemplateBinding Segmentos}" Focusable="False">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock x:Name="Separador" Text="&#x203A;" Margin="6,0,6,0"
+                             VerticalAlignment="Center"
+                             FontFamily="{StaticResource AppFont}"
+                             FontSize="{StaticResource FsBody}"
+                             Foreground="{DynamicResource TextMutedBrush}" />
+
+                  <!-- Cada tramo anterior es un boton; el ultimo, donde se esta, se queda como
+                       texto (Comando nulo, IsHitTestVisible en falso). -->
+                  <Button x:Name="Tramo" Content="{Binding Texto}"
+                          Command="{Binding Comando}"
+                          Padding="2,1" BorderThickness="0" Background="Transparent"
+                          Cursor="Hand"
+                          FontFamily="{StaticResource AppFont}"
+                          FontSize="{StaticResource FsBody}"
+                          Foreground="{DynamicResource TextSecondaryBrush}" />
+                </StackPanel>
+
+                <DataTemplate.Triggers>
+                  <DataTrigger Binding="{Binding EsPrimero}" Value="True">
+                    <Setter TargetName="Separador" Property="Visibility" Value="Collapsed" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding EsNavegable}" Value="False">
+                    <Setter TargetName="Tramo" Property="IsHitTestVisible" Value="False" />
+                    <Setter TargetName="Tramo" Property="Focusable" Value="False" />
+                    <Setter TargetName="Tramo" Property="Cursor" Value="Arrow" />
+                    <Setter TargetName="Tramo" Property="FontWeight" Value="{StaticResource FwMedium}" />
+                    <Setter TargetName="Tramo" Property="Foreground"
+                            Value="{DynamicResource TextPrimaryBrush}" />
+                  </DataTrigger>
+                </DataTemplate.Triggers>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
 </ResourceDictionary>

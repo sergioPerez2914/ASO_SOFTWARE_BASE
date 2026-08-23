@@ -13,6 +13,7 @@ public partial class LoginView : Window
     {
         InitializeComponent();
         DataContext = ViewModel;
+        EscalaVentana.Aplicar(this);
 
         // Se recuerda el nombre, nunca la contrasenna. Con el usuario ya puesto, el foco va
         // directo a lo unico que queda por escribir.

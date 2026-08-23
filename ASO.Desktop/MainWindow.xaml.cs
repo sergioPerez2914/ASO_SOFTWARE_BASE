@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
 using ASO.Desktop.Services;
@@ -52,10 +53,7 @@ public partial class MainWindow : Window
     /// para que el selector de Configuración se vea al instante.
     /// </summary>
     private void AplicarEscala()
-    {
-        var escala = Ajustes.Actual.EscalaInterfaz;
-        EscalaInterfaz.ScaleX = EscalaInterfaz.ScaleY = escala is >= 0.5 and <= 3 ? escala : 1;
-    }
+        => EscalaInterfaz.ScaleX = EscalaInterfaz.ScaleY = EscalaVentana.Factor;
 
     /// <summary>
     /// Dónde abrir. Por defecto Inicio; con la preferencia activada, donde se quedó la última
@@ -115,6 +113,7 @@ public partial class MainWindow : Window
     private void Navegar(Modulo modulo, Submodulo? submodulo)
     {
         MainSidebar.Sincronizar(modulo, submodulo);
+        Ruta.Segmentos = ArmarRuta(modulo, submodulo);
 
         // Solo en memoria: el archivo se escribe al guardar desde Configuración, no una vez
         // por clic del menú.
@@ -206,5 +205,40 @@ public partial class MainWindow : Window
     {
         pantalla.VolverSolicitado += (_, _) => Navegar(destinoAlVolver, null);
         return pantalla;
+    }
+
+    /// <summary>
+    /// La ruta que se ve arriba: "Inicio > Operaciones > Registro de Operacion", con todo lo
+    /// anterior al ultimo tramo clicable.
+    ///
+    /// Es lo que sustituye a los quince botones "Volver al modulo" de las pantallas, que ademas
+    /// venian en tres estilos distintos y faltaban en Peticiones. Un boton de volver solo ofrece
+    /// un salto; la ruta ofrece todos los del camino y ademas dice donde se esta, que era la otra
+    /// mitad del problema: el titulo de la seccion se repetia tres veces (el menu lo marcaba, el
+    /// resumen del modulo lo titulaba y la pantalla lo volvia a titular).
+    /// </summary>
+    private List<SegmentoRuta> ArmarRuta(Modulo modulo, Submodulo? submodulo)
+    {
+        var esInicio = modulo.Clave == ModuloCatalogo.Inicio.Clave;
+        var ruta = new List<SegmentoRuta>
+        {
+            new(ModuloCatalogo.Inicio.Nombre,
+                esInicio ? null : new RelayCommand(() => Navegar(ModuloCatalogo.Inicio, null)),
+                esPrimero: true),
+        };
+
+        if (esInicio)
+            return ruta;
+
+        // El modulo solo es clicable si hay un submodulo despues; si no, es donde se esta.
+        ruta.Add(new SegmentoRuta(
+            modulo.Nombre,
+            submodulo is null ? null : new RelayCommand(() => Navegar(modulo, null)),
+            esPrimero: false));
+
+        if (submodulo is not null)
+            ruta.Add(new SegmentoRuta(submodulo.Nombre, null, esPrimero: false));
+
+        return ruta;
     }
 }

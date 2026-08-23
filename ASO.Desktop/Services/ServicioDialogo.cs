@@ -20,6 +20,10 @@ public class ServicioDialogo : IServicioDialogo
 
         editor.SolicitarCierre += (_, guardo) => ventana.DialogResult = guardo;
 
+        // La escala de la interfaz no llegaba aqui: el LayoutTransform vivia solo en MainWindow,
+        // asi que a 125 % el shell crecia y los formularios se quedaban a 100 %.
+        EscalaVentana.Aplicar(ventana);
+
         return ventana.ShowDialog() == true;
     }
 

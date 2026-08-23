@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace ASO.Desktop.Navigation;
@@ -141,7 +141,9 @@ public static class ModuloCatalogo
         "Administracion",
         "Administración",
         "Núcleos, usuarios, roles y permisos.",
-        "",
+        // Era , el mismo glifo que Nomina - Empleados: dos entradas del menu con el
+        // mismo icono. Este (Permissions) dice ademas de que va la seccion.
+        "",
         [],
         []);
 

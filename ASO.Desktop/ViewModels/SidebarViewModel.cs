@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
 using ASO.Desktop.Services;
 
@@ -19,6 +21,7 @@ public sealed class SubmoduloNavItem(Modulo modulo, Submodulo submodulo) : ViewM
     public Submodulo Submodulo { get; } = submodulo;
     public string Nombre => Submodulo.Nombre;
     public string Icono => Submodulo.Icono;
+    public string Descripcion => Submodulo.Descripcion;
 
     private bool _estaSeleccionado;
     public bool EstaSeleccionado
@@ -40,6 +43,7 @@ public sealed class ModuloNavItem : ViewModelBase
     public IReadOnlyList<SubmoduloNavItem> Submodulos { get; }
     public string Nombre => Modulo.Nombre;
     public string Icono => Modulo.Icono;
+    public string Descripcion => Modulo.Descripcion;
     public bool TieneSubmodulos => Submodulos.Count > 0;
 
     private bool _estaSeleccionado;
@@ -74,10 +78,40 @@ public sealed class ModuloNavItem : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Cuántas cosas esperan en esta sección. Hoy solo lo usa Peticiones: la bandeja del
+    /// administrador no decía cuántas solicitudes tenía sin resolver, así que había que entrar
+    /// para saber si había trabajo.
+    /// </summary>
+    private int _contador;
+    public int Contador
+    {
+        get => _contador;
+        set
+        {
+            if (SetProperty(ref _contador, value))
+                OnPropertyChanged(nameof(TieneContador));
+        }
+    }
+
+    public bool TieneContador => Contador > 0;
+
     /// <summary>Etiqueta del chevron para lectores de pantalla y tooltip.</summary>
     public string TextoChevron => EstaExpandido ? $"Contraer {Nombre}" : $"Expandir {Nombre}";
 
     public string GlifoChevron => EstaExpandido ? "" : "";
+}
+
+/// <summary>
+/// Un bloque del menú con su encabezado. Existe porque Administración quedaba intercalada entre
+/// Inicio/Peticiones y los cinco módulos del negocio sin ningún separador: ocho entradas planas
+/// seguidas, sin decir que las tres primeras son otra cosa que las cinco siguientes.
+/// </summary>
+public sealed class GrupoNav(string titulo, IReadOnlyList<ModuloNavItem> items)
+{
+    public string Titulo { get; } = titulo;
+    public IReadOnlyList<ModuloNavItem> Items { get; } = items;
+    public bool TieneItems => Items.Count > 0;
 }
 
 /// <summary>
@@ -89,6 +123,10 @@ public sealed class SidebarViewModel : ViewModelBase
 {
     public event EventHandler<NavegacionEventArgs>? NavegacionSolicitada;
 
+    /// <summary>Lo que se pinta: dos bloques con encabezado.</summary>
+    public IReadOnlyList<GrupoNav> Grupos { get; }
+
+    /// <summary>Todos los ítems de <see cref="Grupos"/>, en plano.</summary>
     public IReadOnlyList<ModuloNavItem> Items { get; }
 
     /// <summary>
@@ -117,11 +155,14 @@ public sealed class SidebarViewModel : ViewModelBase
     {
         // El menu se arma una vez por ventana y la ventana se reconstruye al entrar, al salir
         // y al cambiar de nucleo, asi que aqui basta con filtrar al construir.
-        Items =
-        [
-            .. ModuloCatalogo.Fijados.Where(sesion.Ve).Select(m => new ModuloNavItem(m, sesion)),
-            .. sesion.ModulosVisibles().Select(m => new ModuloNavItem(m, sesion))
-        ];
+        List<ModuloNavItem> secciones =
+            [.. ModuloCatalogo.Fijados.Where(sesion.Ve).Select(m => new ModuloNavItem(m, sesion))];
+
+        List<ModuloNavItem> modulos =
+            [.. sesion.ModulosVisibles().Select(m => new ModuloNavItem(m, sesion))];
+
+        Grupos = [new GrupoNav("Secciones", secciones), new GrupoNav("Módulos", modulos)];
+        Items = [.. secciones, .. modulos];
 
         Configuracion = sesion.Ve(ModuloCatalogo.Configuracion)
             ? new ModuloNavItem(ModuloCatalogo.Configuracion, sesion)
@@ -144,6 +185,33 @@ public sealed class SidebarViewModel : ViewModelBase
         AlternarExpansionCommand = new RelayCommand<ModuloNavItem>(
             item => item.EstaExpandido = !item.EstaExpandido,
             item => item.TieneSubmodulos);
+
+        if (secciones.FirstOrDefault(i => i.Modulo.Clave == ModuloCatalogo.Peticiones.Clave)
+            is { } peticiones)
+            _ = ContarPendientes(peticiones);
+    }
+
+    /// <summary>
+    /// Pone el contador de la bandeja de peticiones, fuera del hilo de interfaz.
+    ///
+    /// Va en segundo plano a propósito: el menú se construye durante el arranque de la ventana, y
+    /// una consulta a SQL Server ahí dejaría la aplicación en blanco hasta que respondiera. El
+    /// contador es informativo, así que si la consulta falla se queda en cero y el menú no se
+    /// entera — no hay dónde informar de un error en un adorno, y desde luego no a costa de
+    /// impedir que se abra la ventana.
+    /// </summary>
+    private static async Task ContarPendientes(ModuloNavItem peticiones)
+    {
+        try
+        {
+            var fuente = DataSourceFactory.CrearPeticiones();
+            peticiones.Contador = await Task.Run(
+                () => fuente.GetAll().Count(p => p.EstaPendiente));
+        }
+        catch
+        {
+            // Sin contador. Ver el resumen de la propia bandeja.
+        }
     }
 
     /// <summary>

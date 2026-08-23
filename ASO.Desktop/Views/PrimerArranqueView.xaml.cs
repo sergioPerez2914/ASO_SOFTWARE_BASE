@@ -1,4 +1,5 @@
 using System.Windows;
+using ASO.Desktop.Services;
 using ASO.Desktop.ViewModels;
 
 namespace ASO.Desktop.Views;
@@ -11,6 +12,7 @@ public partial class PrimerArranqueView : Window
     {
         InitializeComponent();
         DataContext = ViewModel;
+        EscalaVentana.Aplicar(this);
         UsuarioBox.Focus();
     }
 

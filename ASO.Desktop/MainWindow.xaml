@@ -29,46 +29,64 @@
       <ColumnDefinition Width="*" />
     </Grid.ColumnDefinitions>
 
-    <!-- Barra de menú superior -->
-    <Grid Grid.Row="0" Grid.ColumnSpan="2"
-          Background="{DynamicResource SurfaceBrush}">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
+    <!-- Barra superior.
 
-      <Menu Grid.Column="0"
-            Background="Transparent"
-            FontSize="12" Padding="4,2">
-        <MenuItem Header="_Archivo" />
-        <MenuItem Header="_Ver" />
-        <MenuItem Header="_Herramientas" />
-        <MenuItem Header="A_yuda" />
-      </Menu>
+         Antes la ocupaba un Menu con cuatro entradas (_Archivo, _Ver, _Herramientas, A_yuda)
+         sin hijos, sin Click y sin Command: decoracion inerte en el sitio mas visible de la
+         ventana. Ese espacio es ahora la ruta de la seccion abierta, que es lo unico que hacia
+         falta y no estaba: donde estoy y como vuelvo. -->
+    <Border Grid.Row="0" Grid.ColumnSpan="2"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+            Padding="20,8">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
-        <Border x:Name="NucleoChip" VerticalAlignment="Center" Margin="0,0,10,0"
-                CornerRadius="10" Padding="8,2" Visibility="Collapsed"
-                Background="{DynamicResource PrimaryBrush}">
-          <TextBlock x:Name="NucleoActualLabel" FontSize="11" Foreground="White" />
-        </Border>
-        <TextBlock x:Name="UsuarioActualLabel" VerticalAlignment="Center" FontSize="12"
-                    Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" />
-        <Button Content="Cerrar sesión" FontSize="11" Padding="8,4" Cursor="Hand"
-                Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
-                Foreground="{DynamicResource TextPrimaryBrush}" Click="OnCerrarSesion" />
-      </StackPanel>
+        <controls:Breadcrumb x:Name="Ruta" Grid.Column="0" />
 
-      <Border Grid.ColumnSpan="2" VerticalAlignment="Bottom"
-              BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" />
-    </Grid>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+          <!-- Saber sobre que nucleo se esta escribiendo importa antes de guardar nada. -->
+          <Border x:Name="NucleoChip" VerticalAlignment="Center" Margin="0,0,12,0"
+                  CornerRadius="{StaticResource RadPill}" Padding="{StaticResource TkChip}"
+                  Visibility="Collapsed"
+                  BorderThickness="{StaticResource BdFino}"
+                  Background="{DynamicResource InfoSoftBrush}"
+                  BorderBrush="{DynamicResource InfoTextBrush}">
+            <TextBlock x:Name="NucleoActualLabel"
+                       FontSize="{StaticResource FsMicro}"
+                       FontWeight="{StaticResource FwMedium}"
+                       Foreground="{DynamicResource InfoTextBrush}" />
+          </Border>
+
+          <TextBlock x:Name="UsuarioActualLabel" VerticalAlignment="Center"
+                     FontSize="{StaticResource FsBody}"
+                     Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" />
+
+          <Button Content="Cerrar sesión" Style="{StaticResource SecondaryButtonStyle}"
+                  ToolTip="Salir de la sesión y volver al inicio de sesión"
+                  Click="OnCerrarSesion" />
+        </StackPanel>
+      </Grid>
+    </Border>
 
     <!-- Sidebar -->
     <controls:Sidebar x:Name="MainSidebar" Grid.Row="1" Grid.Column="0"
                       BorderBrush="{DynamicResource SidebarBorderBrush}" BorderThickness="0,0,1,0" />
 
-    <!-- Contenido principal (cambia según la sección seleccionada) -->
-    <ContentControl x:Name="ContentArea" Grid.Row="1" Grid.Column="1" Margin="20" />
+    <!-- Contenido principal (cambia según la sección seleccionada).
+
+         El ScrollViewer es del shell y no de cada pantalla: 36 de las 56 vistas no traen uno, y
+         sin el, a escala 125 % con la ventana en su minimo (1024x640) el contenido se recortaba
+         sin barra de desplazamiento y no habia forma de llegar a lo de abajo. Ponerlo aqui lo
+         resuelve para todas a la vez. -->
+    <ScrollViewer Grid.Row="1" Grid.Column="1"
+                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                  Padding="20">
+      <ContentControl x:Name="ContentArea" />
+    </ScrollViewer>
 
   </Grid>
 </Window>
