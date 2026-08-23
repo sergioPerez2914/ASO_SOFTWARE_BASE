@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1100">
 
@@ -15,27 +16,12 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-      </StackPanel>
-
-      <Button Grid.Column="1" Content="Volver al módulo"
-              Style="{StaticResource VolverModuloButtonStyle}"
-              Command="{Binding VolverCommand}" />
-    </Grid>
+    <controls:PageHeader Grid.Row="0"
+                         Titulo="{Binding Submodulo.Nombre}"
+                         Descripcion="{Binding Submodulo.Descripcion}" />
 
     <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -46,95 +32,100 @@
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TextBox Grid.Row="0" Grid.Column="0" Width="260" VerticalAlignment="Center"
-                 Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Buscar por núcleo o empleado" />
+        <controls:SearchBox Grid.Row="0" Grid.Column="0" Width="280" VerticalAlignment="Center"
+                              Sugerencia="Buscar por núcleo o empleado"
+                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
                     HorizontalAlignment="Right" VerticalAlignment="Center">
           <RadioButton Content="Todas" GroupName="FiltroLiquidacion" IsChecked="True"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
           <RadioButton Content="Borrador" GroupName="FiltroLiquidacion"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
           <RadioButton Content="Cerrada" GroupName="FiltroLiquidacion"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Cerrada" />
           <RadioButton Content="Pagada" GroupName="FiltroLiquidacion"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Pagada" />
           <RadioButton Content="Anulada" GroupName="FiltroLiquidacion"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
                     HorizontalAlignment="Right" Margin="0,12,0,0">
-          <Button Content="Generar liquidación" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
+          <Button Content="Generar liquidación" Style="{StaticResource PrimaryButtonStyle}"
                   Command="{Binding GenerarCommand}" />
-          <Button Content="Agregar concepto" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Agregar concepto" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding AgregarConceptoCommand}" />
-          <Button Content="Quitar línea" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Quitar línea" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding QuitarLineaCommand}" />
-          <Button Content="Cerrar" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Cerrar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding CerrarCommand}" />
-          <Button Content="Registrar pago" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Registrar pago" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding PagarCommand}" />
-          <Button Content="Anular" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding AnularCommand}" />
-          <Button Content="Eliminar" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding EliminarCommand}" />
         </StackPanel>
       </Grid>
     </Border>
 
-    <Border Grid.Row="2" Style="{StaticResource CardStyle}">
-      <DataGrid Style="{StaticResource DataGridStyle}"
-                ItemsSource="{Binding ItemsView}"
-                SelectedItem="{Binding SelectedItem}">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-          <DataGridTextColumn Header="Tipo" Binding="{Binding SujetoTipoTexto}" Width="90" />
-          <DataGridTextColumn Header="Sujeto" Binding="{Binding SujetoTexto}" Width="240" />
-          <DataGridTextColumn Header="Período" Binding="{Binding PeriodoTexto}" Width="180" />
-          <DataGridTextColumn Header="Devengos" Width="110"
-                              Binding="{Binding TotalDevengos, StringFormat={}{0:N2}}">
-            <DataGridTextColumn.ElementStyle>
-              <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-              </Style>
-            </DataGridTextColumn.ElementStyle>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="Deducciones" Width="110"
-                              Binding="{Binding TotalDeducciones, StringFormat={}{0:N2}}">
-            <DataGridTextColumn.ElementStyle>
-              <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-              </Style>
-            </DataGridTextColumn.ElementStyle>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="Neto" Binding="{Binding NetoTexto}" Width="*">
-            <DataGridTextColumn.ElementStyle>
-              <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-                <Setter Property="FontWeight" Value="SemiBold" />
-              </Style>
-            </DataGridTextColumn.ElementStyle>
-          </DataGridTextColumn>
-          <DataGridTemplateColumn Header="Estado" Width="110">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <Border Style="{StaticResource ChipEstadoLiquidacionStyle}">
-                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
-                </Border>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-        </DataGrid.Columns>
-      </DataGrid>
+    <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
+      <Grid>
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
+                  ItemsSource="{Binding ItemsView}"
+                  SelectedItem="{Binding SelectedItem}">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
+            <DataGridTextColumn Header="Tipo" Binding="{Binding SujetoTipoTexto}" Width="90" />
+            <DataGridTextColumn Header="Sujeto" Binding="{Binding SujetoTexto}" Width="240" />
+            <DataGridTextColumn Header="Período" Binding="{Binding PeriodoTexto}" Width="180" />
+            <DataGridTextColumn Header="Devengos" Width="110"
+                                Binding="{Binding TotalDevengos, StringFormat={}{0:N2}}">
+              <DataGridTextColumn.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                </Style>
+              </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+            <DataGridTextColumn Header="Deducciones" Width="110"
+                                Binding="{Binding TotalDeducciones, StringFormat={}{0:N2}}">
+              <DataGridTextColumn.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                </Style>
+              </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+            <DataGridTextColumn Header="Neto" Binding="{Binding NetoTexto}" Width="*">
+              <DataGridTextColumn.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                  <Setter Property="FontWeight" Value="SemiBold" />
+                </Style>
+              </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+            <DataGridTemplateColumn Header="Estado" Width="110">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Border Style="{StaticResource ChipEstadoLiquidacionStyle}">
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
+                  </Border>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <controls:EmptyState Icono="&#xE9F9;"
+                             Titulo="No hay liquidaciones"
+                             Detalle="Se generan a partir de las remesas y jornadas del período."
+                             Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
+      </Grid>
     </Border>
 
     <!-- Detalle: las líneas de la liquidación seleccionada -->
@@ -149,7 +140,7 @@
 
           <TextBlock Grid.Column="0" Text="Detalle de la liquidación"
                      Style="{StaticResource CardTitleStyle}" />
-          <TextBlock Grid.Column="1" Text="{Binding TotalesTexto}" FontSize="12"
+          <TextBlock Grid.Column="1" Text="{Binding TotalesTexto}" FontSize="{StaticResource FsBody}"
                      VerticalAlignment="Center"
                      Foreground="{DynamicResource TextSecondaryBrush}" />
         </Grid>
@@ -185,7 +176,7 @@
         </DataGrid>
 
         <TextBlock Text="Las líneas de destajo y de horas se calculan desde las remesas y las jornadas: para corregirlas hay que corregir el documento de origen."
-                   FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0"
+                   FontSize="{StaticResource FsCaption}" TextWrapping="Wrap" Margin="0,8,0,0"
                    Foreground="{DynamicResource TextMutedBrush}" />
       </StackPanel>
     </Border>

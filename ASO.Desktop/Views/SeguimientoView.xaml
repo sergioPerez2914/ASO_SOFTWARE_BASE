@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              xmlns:models="clr-namespace:ASO.Desktop.Models"
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
@@ -52,24 +53,9 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-      </StackPanel>
-
-      <Button Grid.Column="1" Content="Volver al módulo"
-              Style="{StaticResource VolverModuloButtonStyle}"
-              Command="{Binding VolverCommand}" />
-    </Grid>
+    <controls:PageHeader Grid.Row="0"
+                         Titulo="{Binding Submodulo.Nombre}"
+                         Descripcion="{Binding Submodulo.Descripcion}" />
 
     <Grid Grid.Row="1">
       <Grid.ColumnDefinitions>
@@ -79,7 +65,7 @@
       </Grid.ColumnDefinitions>
 
       <!-- MAESTRO: listado de remesas -->
-      <Border Grid.Column="0" Style="{StaticResource CardStyle}">
+      <Border Grid.Column="0" Style="{StaticResource ToolbarStyle}">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -87,26 +73,26 @@
             <RowDefinition Height="*" />
           </Grid.RowDefinitions>
 
-          <TextBox Grid.Row="0" Style="{StaticResource FormTextBoxStyle}"
-                   Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                   ToolTip="Buscar por Nº, finca o placa" />
+          <controls:SearchBox Grid.Row="0" Width="280" VerticalAlignment="Center"
+                              Sugerencia="Buscar por Nº, finca o placa"
+                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <Grid Grid.Row="1" Margin="0,10,0,10">
             <WrapPanel>
               <RadioButton Content="Todas" GroupName="FiltroSeguimiento" IsChecked="True"
-                           Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,6"
+                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
                            Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
               <RadioButton Content="Borrador" GroupName="FiltroSeguimiento"
-                           Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,6"
+                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
                            Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
               <RadioButton Content="Confirmada" GroupName="FiltroSeguimiento"
-                           Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,6"
+                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
                            Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmada" />
               <RadioButton Content="Recibida" GroupName="FiltroSeguimiento"
-                           Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,6"
+                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
                            Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Recibida" />
               <RadioButton Content="Anulada" GroupName="FiltroSeguimiento"
-                           Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,6"
+                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
                            Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
             </WrapPanel>
           </Grid>
@@ -125,13 +111,13 @@
                   </Grid.ColumnDefinitions>
 
                   <StackPanel Grid.Column="0">
-                    <TextBlock FontSize="13" FontWeight="SemiBold"
+                    <TextBlock FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
                                TextTrimming="CharacterEllipsis">
                       <Run Text="Nº" /><Run Text="{Binding Id, Mode=OneWay}" />
                       <Run Text=" · " /><Run Text="{Binding FincaNombre, Mode=OneWay}" />
                     </TextBlock>
-                    <TextBlock FontSize="11" Margin="0,2,0,0"
+                    <TextBlock FontSize="{StaticResource FsCaption}" Margin="0,2,0,0"
                                Foreground="{DynamicResource TextMutedBrush}">
                       <Run Text="{Binding InicioCarga, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
                       <Run Text=" · " /><Run Text="{Binding VehiculoPlaca, Mode=OneWay}" />
@@ -140,7 +126,7 @@
 
                   <Border Grid.Column="1" Style="{StaticResource ChipEstadoStyle}"
                           VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
                   </Border>
                 </Grid>
               </DataTemplate>
@@ -171,10 +157,10 @@
                   <Run Text="Remesa Nº" /><Run Text="{Binding Id, Mode=OneWay}" />
                 </TextBlock>
                 <Border Style="{StaticResource ChipEstadoStyle}" Margin="10,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
+                  <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
                 </Border>
               </StackPanel>
-              <TextBlock FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"
+              <TextBlock FontSize="{StaticResource FsBody}" Margin="0,4,0,0" TextWrapping="Wrap"
                          Foreground="{DynamicResource TextSecondaryBrush}">
                 <Run Text="{Binding FincaCodigoCam, Mode=OneWay}" />
                 <Run Text=" · " /><Run Text="{Binding FincaNombre, Mode=OneWay}" />
@@ -184,10 +170,9 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
-              <Button Content="Agregar nota" Padding="14,7" Cursor="Hand" FontSize="12"
-                      BorderThickness="0" Background="{DynamicResource PrimaryBrush}" Foreground="White"
+              <Button Content="Agregar nota" Style="{StaticResource PrimaryButtonStyle}"
                       Command="{Binding AgregarNotaCommand}" />
-              <Button Content="Actualizar" Padding="12,6" Margin="8,0,0,0" Cursor="Hand" FontSize="12"
+              <Button Content="Actualizar" Padding="12,6" Margin="8,0,0,0" Cursor="Hand" FontSize="{StaticResource FsBody}"
                       Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
                       Foreground="{DynamicResource TextPrimaryBrush}"
                       Command="{Binding RefrescarCommand}" />
@@ -209,7 +194,7 @@
             <TextBlock Text="&#xEADF;" Style="{StaticResource NavIconStyle}" FontSize="40"
                        Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
             <TextBlock Text="Seleccione una remesa para ver su línea de tiempo."
-                       FontSize="12" Margin="0,12,0,0" HorizontalAlignment="Center"
+                       FontSize="{StaticResource FsBody}" Margin="0,12,0,0" HorizontalAlignment="Center"
                        Foreground="{DynamicResource TextMutedBrush}" />
           </StackPanel>
 
@@ -249,7 +234,7 @@
 
                       <Border Grid.Row="1" Style="{StaticResource PuntoTimelineStyle}">
                         <TextBlock Text="{Binding Evento.Glifo}" Style="{StaticResource NavIconStyle}"
-                                   FontSize="12" Foreground="White"
+                                   FontSize="{StaticResource FsBody}" Foreground="White"
                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Border>
 
@@ -268,13 +253,13 @@
                     </Grid>
 
                     <StackPanel Grid.Column="1" Margin="12,6,0,18">
-                      <TextBlock Text="{Binding Evento.FechaHoraTexto}" FontSize="11"
+                      <TextBlock Text="{Binding Evento.FechaHoraTexto}" FontSize="{StaticResource FsCaption}"
                                  Foreground="{DynamicResource TextMutedBrush}" />
-                      <TextBlock Text="{Binding Evento.EtiquetaTipo}" FontSize="13" FontWeight="SemiBold"
+                      <TextBlock Text="{Binding Evento.EtiquetaTipo}" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
                                  Foreground="{DynamicResource TextPrimaryBrush}" />
-                      <TextBlock Text="{Binding Evento.Descripcion}" FontSize="12" TextWrapping="Wrap"
+                      <TextBlock Text="{Binding Evento.Descripcion}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                                  Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-                      <TextBlock FontSize="11" Margin="0,4,0,0"
+                      <TextBlock FontSize="{StaticResource FsCaption}" Margin="0,4,0,0"
                                  Foreground="{DynamicResource TextMutedBrush}"
                                  Visibility="{Binding TieneAutor, Converter={StaticResource BoolToVis}}"
                                  Text="{Binding Evento.Autor, StringFormat=Registrado por {0}}" />

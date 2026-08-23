@@ -328,6 +328,12 @@
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
 
+    <!-- La fila bajo el raton. No existia: en las diecinueve tablas de la aplicacion, pasar el
+         raton por encima no cambiaba nada, asi que en una fila de ocho columnas no habia forma
+         de seguir con la vista cual se estaba senalando antes de hacer clic. Va en la celda y no
+         en la fila porque la celda es quien trae ControlTemplate propia, y su fondo taparia
+         cualquier cosa que pintara la fila debajo. -->
+
     <Style TargetType="DataGridCell">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
@@ -341,6 +347,13 @@
                         <ContentPresenter VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
+                        <DataTrigger Value="True"
+                                     Binding="{Binding IsMouseOver,
+                                                       RelativeSource={RelativeSource AncestorType=DataGridRow}}">
+                            <Setter TargetName="Bd" Property="Background"
+                                    Value="{DynamicResource CardHoverBrush}" />
+                        </DataTrigger>
+                        <!-- Despues del hover: la seleccion gana sobre el senalado. -->
                         <DataTrigger Value="True"
                                      Binding="{Binding IsSelected,
                                                        RelativeSource={RelativeSource AncestorType=DataGridRow}}">

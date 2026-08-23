@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
@@ -14,24 +15,9 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-      </StackPanel>
-
-      <Button Grid.Column="1" Content="Volver al módulo"
-              Style="{StaticResource VolverModuloButtonStyle}"
-              Command="{Binding VolverCommand}" />
-    </Grid>
+    <controls:PageHeader Grid.Row="0"
+                         Titulo="{Binding Submodulo.Nombre}"
+                         Descripcion="{Binding Submodulo.Descripcion}" />
 
     <!-- Revisiones recomendadas -->
     <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12"
@@ -51,21 +37,21 @@
 
                   <Border Grid.Column="0" Style="{StaticResource ChipRecomendacionStyle}"
                           VerticalAlignment="Top" Margin="0,2,0,0">
-                    <TextBlock Text="{Binding EstadoTexto}" FontSize="10" />
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsMicro}" />
                   </Border>
 
                   <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                    <TextBlock FontSize="12" TextWrapping="Wrap"
+                    <TextBlock FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                                Foreground="{DynamicResource TextPrimaryBrush}">
                       <Run Text="{Binding Activo.Etiqueta, Mode=OneWay}" FontWeight="SemiBold" />
                       <Run Text=" — " /><Run Text="{Binding Regla.Revision, Mode=OneWay}" />
                     </TextBlock>
-                    <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
+                    <TextBlock Text="{Binding Detalle}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                                Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                   </StackPanel>
 
                   <Button Grid.Column="2" Content="Registrar" Padding="10,4" Margin="8,0,0,0"
-                          Cursor="Hand" FontSize="11" VerticalAlignment="Top"
+                          Cursor="Hand" FontSize="{StaticResource FsCaption}" VerticalAlignment="Top"
                           Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
                           Foreground="{DynamicResource AccentBlueBrush}"
                           Command="{Binding DataContext.RegistrarDesdeRecomendacionCommand,
@@ -80,7 +66,7 @@
     </Border>
 
     <!-- Barra de herramientas -->
-    <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="2" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
@@ -96,26 +82,24 @@
 
         <WrapPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
           <RadioButton Content="Todos" GroupName="FiltroMantenimiento" IsChecked="True"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Todos" />
           <RadioButton Content="Preventivo" GroupName="FiltroMantenimiento"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Preventivo" />
           <RadioButton Content="Correctivo" GroupName="FiltroMantenimiento"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Correctivo" />
         </WrapPanel>
 
-        <TextBox Grid.Column="2" Width="220" HorizontalAlignment="Left" VerticalAlignment="Center"
-                 Margin="12,0,0,0" Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Buscar por activo, descripción o quién lo realizó" />
+        <controls:SearchBox Grid.Column="2" Margin="12,0,0,0" Width="280" VerticalAlignment="Center"
+                              Sugerencia="Buscar por activo, descripción o quién lo realizó"
+                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
         <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-          <Button Content="Registrar mantenimiento" Padding="14,7" Cursor="Hand" FontSize="12"
-                  BorderThickness="0" Background="{DynamicResource PrimaryBrush}" Foreground="White"
+          <Button Content="Registrar mantenimiento" Style="{StaticResource PrimaryButtonStyle}"
                   Command="{Binding RegistrarCommand}" />
-          <Button Content="Actualizar" Padding="12,6" Margin="8,0,0,0" Cursor="Hand" FontSize="12"
+          <Button Content="Actualizar" Padding="12,6" Margin="8,0,0,0" Cursor="Hand" FontSize="{StaticResource FsBody}"
                   Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
                   Foreground="{DynamicResource TextPrimaryBrush}"
                   Command="{Binding RefrescarCommand}" />
@@ -124,33 +108,40 @@
     </Border>
 
     <!-- Historial -->
-    <Border Grid.Row="3" Style="{StaticResource CardStyle}">
-      <DataGrid Style="{StaticResource DataGridStyle}"
-                ItemsSource="{Binding RegistrosView}">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Fecha" Width="130"
-                              Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
-          <DataGridTextColumn Header="Activo" Binding="{Binding ActivoEtiqueta}" Width="180" />
-          <DataGridTextColumn Header="Tipo" Binding="{Binding TipoTexto}" Width="90" />
-          <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*" />
-          <DataGridTextColumn Header="Lectura" Binding="{Binding LecturaTexto}" Width="90">
-            <DataGridTextColumn.ElementStyle>
-              <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-              </Style>
-            </DataGridTextColumn.ElementStyle>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="Costo" Binding="{Binding CostoTotalTexto}" Width="80">
-            <DataGridTextColumn.ElementStyle>
-              <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-              </Style>
-            </DataGridTextColumn.ElementStyle>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="Realizado por" Binding="{Binding RealizadoPor}" Width="160" />
-          <DataGridTextColumn Header="Remesa" Binding="{Binding RemesaTexto}" Width="70" />
-        </DataGrid.Columns>
-      </DataGrid>
+    <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0">
+      <Grid>
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
+                  ItemsSource="{Binding RegistrosView}">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Fecha" Width="130"
+                                Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
+            <DataGridTextColumn Header="Activo" Binding="{Binding ActivoEtiqueta}" Width="180" />
+            <DataGridTextColumn Header="Tipo" Binding="{Binding TipoTexto}" Width="90" />
+            <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*" />
+            <DataGridTextColumn Header="Lectura" Binding="{Binding LecturaTexto}" Width="90">
+              <DataGridTextColumn.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                </Style>
+              </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+            <DataGridTextColumn Header="Costo" Binding="{Binding CostoTotalTexto}" Width="80">
+              <DataGridTextColumn.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                </Style>
+              </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+            <DataGridTextColumn Header="Realizado por" Binding="{Binding RealizadoPor}" Width="160" />
+            <DataGridTextColumn Header="Remesa" Binding="{Binding RemesaTexto}" Width="70" />
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <controls:EmptyState Icono="&#xE90F;"
+                             Titulo="No hay mantenimientos registrados"
+                             Detalle="Registra el primero para empezar la hoja de vida de la unidad."
+                             Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
+      </Grid>
     </Border>
   </Grid>
 </UserControl>

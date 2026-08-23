@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1100">
 
@@ -15,27 +16,12 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-      </StackPanel>
-
-      <Button Grid.Column="1" Content="Volver al módulo"
-              Style="{StaticResource VolverModuloButtonStyle}"
-              Command="{Binding VolverCommand}" />
-    </Grid>
+    <controls:PageHeader Grid.Row="0"
+                         Titulo="{Binding Submodulo.Nombre}"
+                         Descripcion="{Binding Submodulo.Descripcion}" />
 
     <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -47,93 +33,98 @@
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TextBox Grid.Row="0" Grid.Column="0" Width="260" VerticalAlignment="Center"
-                 Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Buscar por número de factura, cliente o finca" />
+        <controls:SearchBox Grid.Row="0" Grid.Column="0" Width="280" VerticalAlignment="Center"
+                              Sugerencia="Buscar por número de factura, cliente o finca"
+                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
                     HorizontalAlignment="Right" VerticalAlignment="Center">
           <RadioButton Content="Todas" GroupName="FiltroFacturaCliente" IsChecked="True"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
           <RadioButton Content="Borrador" GroupName="FiltroFacturaCliente"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
           <RadioButton Content="Emitida" GroupName="FiltroFacturaCliente"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Emitida" />
           <RadioButton Content="Vencida" GroupName="FiltroFacturaCliente"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Vencida" />
           <RadioButton Content="Cobrada" GroupName="FiltroFacturaCliente"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Cobrada" />
           <RadioButton Content="Anulada" GroupName="FiltroFacturaCliente"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
         </StackPanel>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,0"
-                   Text="{Binding ResumenCartera}" FontSize="12"
+                   Text="{Binding ResumenCartera}" FontSize="{StaticResource FsBody}"
                    Foreground="{DynamicResource TextSecondaryBrush}" />
 
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
                     HorizontalAlignment="Right" Margin="0,12,0,0">
-          <Button Content="Generar factura" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
+          <Button Content="Generar factura" Style="{StaticResource PrimaryButtonStyle}"
                   Command="{Binding GenerarCommand}" />
-          <Button Content="Emitir" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Emitir" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding EmitirCommand}" />
-          <Button Content="Registrar cobro" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Registrar cobro" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding RegistrarCobroCommand}" />
-          <Button Content="Anular" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding AnularCommand}" />
-          <Button Content="Eliminar" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding EliminarCommand}" />
-          <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding RefrescarCommand}" />
         </StackPanel>
       </Grid>
     </Border>
 
-    <Border Grid.Row="2" Style="{StaticResource CardStyle}">
-      <DataGrid Style="{StaticResource DataGridStyle}"
-                ItemsSource="{Binding ItemsView}"
-                SelectedItem="{Binding SelectedItem}">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Factura" Binding="{Binding NumeroTexto}" Width="90" />
-          <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="250" />
-          <DataGridTextColumn Header="Remesas" Binding="{Binding RemesasTexto}" Width="100" />
-          <DataGridTextColumn Header="Toneladas" Width="100"
-                              Binding="{Binding Toneladas, StringFormat={}{0:N2}}">
-            <DataGridTextColumn.ElementStyle>
-              <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-              </Style>
-            </DataGridTextColumn.ElementStyle>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="Emisión" Binding="{Binding EmisionTexto}" Width="100" />
-          <DataGridTextColumn Header="Vencimiento" Binding="{Binding VencimientoTexto}" Width="110" />
-          <DataGridTextColumn Header="Total" Binding="{Binding TotalTexto}" Width="*">
-            <DataGridTextColumn.ElementStyle>
-              <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-                <Setter Property="FontWeight" Value="SemiBold" />
-              </Style>
-            </DataGridTextColumn.ElementStyle>
-          </DataGridTextColumn>
-          <DataGridTemplateColumn Header="Estado" Width="110">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <Border Style="{StaticResource ChipEstadoFacturaClienteStyle}">
-                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
-                </Border>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-        </DataGrid.Columns>
-      </DataGrid>
+    <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
+      <Grid>
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
+                  ItemsSource="{Binding ItemsView}"
+                  SelectedItem="{Binding SelectedItem}">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Factura" Binding="{Binding NumeroTexto}" Width="90" />
+            <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="250" />
+            <DataGridTextColumn Header="Remesas" Binding="{Binding RemesasTexto}" Width="100" />
+            <DataGridTextColumn Header="Toneladas" Width="100"
+                                Binding="{Binding Toneladas, StringFormat={}{0:N2}}">
+              <DataGridTextColumn.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                </Style>
+              </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+            <DataGridTextColumn Header="Emisión" Binding="{Binding EmisionTexto}" Width="100" />
+            <DataGridTextColumn Header="Vencimiento" Binding="{Binding VencimientoTexto}" Width="110" />
+            <DataGridTextColumn Header="Total" Binding="{Binding TotalTexto}" Width="*">
+              <DataGridTextColumn.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                  <Setter Property="FontWeight" Value="SemiBold" />
+                </Style>
+              </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+            <DataGridTemplateColumn Header="Estado" Width="110">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Border Style="{StaticResource ChipEstadoFacturaClienteStyle}">
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
+                  </Border>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <controls:EmptyState Icono="&#xEB11;"
+                             Titulo="No hay facturas al ingenio"
+                             Detalle="Se generan a partir de las remesas recibidas y no facturadas."
+                             Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
+      </Grid>
     </Border>
 
     <!-- Detalle: las líneas de la factura seleccionada -->
@@ -148,7 +139,7 @@
 
           <TextBlock Grid.Column="0" Text="Detalle de la factura"
                      Style="{StaticResource CardTitleStyle}" />
-          <TextBlock Grid.Column="1" Text="{Binding TotalesTexto}" FontSize="12"
+          <TextBlock Grid.Column="1" Text="{Binding TotalesTexto}" FontSize="{StaticResource FsBody}"
                      VerticalAlignment="Center"
                      Foreground="{DynamicResource TextSecondaryBrush}" />
         </Grid>
@@ -185,7 +176,7 @@
         </DataGrid>
 
         <TextBlock Text="Cada remesa se factura por sus tres servicios (corte, alza y empuje, transporte), atribuidos al núcleo que los prestó. La tarifa queda copiada en la línea: reimprimir la factura no la cambia."
-                   FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0"
+                   FontSize="{StaticResource FsCaption}" TextWrapping="Wrap" Margin="0,8,0,0"
                    Foreground="{DynamicResource TextMutedBrush}" />
       </StackPanel>
     </Border>

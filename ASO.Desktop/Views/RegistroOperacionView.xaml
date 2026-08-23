@@ -3,125 +3,128 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
+  <!-- Pantalla piloto del patron de listado. Las otras trece siguen esta misma forma:
+
+         PageHeader con la accion principal a la derecha   (sin boton de volver: lo es la ruta)
+         Barra de herramientas: busqueda + filtros          (sin tarjeta: no contiene datos)
+         Acciones sobre la fila seleccionada
+         Tarjeta con la tabla y su estado vacio encima      -->
 
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
+    <controls:PageHeader Grid.Row="0"
+                         Titulo="{Binding Submodulo.Nombre}"
+                         Descripcion="{Binding Submodulo.Descripcion}">
+      <Button Content="Nueva remesa" Style="{StaticResource PrimaryButtonStyle}"
+              Command="{Binding AgregarCommand}" />
+    </controls:PageHeader>
+
+    <!-- Busqueda y filtros. Sin tarjeta: una barra de herramientas no contiene datos, los
+         filtra, y envolverla en la misma caja blanca que la tabla borraba esa diferencia. -->
+    <Grid Grid.Row="1" Margin="{StaticResource TkEtiqueta}">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
         <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-      </StackPanel>
+      <controls:SearchBox Grid.Column="0" Width="280" VerticalAlignment="Center"
+                          Sugerencia="Buscar por Nº, finca, placa, personal o núcleo"
+                          Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-      <Button Grid.Column="1" Content="Volver al módulo"
-              Style="{StaticResource VolverModuloButtonStyle}"
-              Command="{Binding VolverCommand}" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal"
+                  HorizontalAlignment="Right" VerticalAlignment="Center">
+        <RadioButton Content="Todas" GroupName="FiltroEstado" IsChecked="True"
+                     Style="{StaticResource FilterChipStyle}"
+                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
+        <RadioButton Content="Borrador" GroupName="FiltroEstado"
+                     Style="{StaticResource FilterChipStyle}"
+                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
+        <RadioButton Content="Confirmada" GroupName="FiltroEstado"
+                     Style="{StaticResource FilterChipStyle}"
+                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmada" />
+        <RadioButton Content="Recibida" GroupName="FiltroEstado"
+                     Style="{StaticResource FilterChipStyle}"
+                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Recibida" />
+        <RadioButton Content="Anulada" GroupName="FiltroEstado"
+                     Style="{StaticResource FilterChipStyle}"
+                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+      </StackPanel>
     </Grid>
 
-    <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <!-- Acciones sobre la remesa seleccionada. Anular va en rojo: es lo unico de aqui que no
+         tiene vuelta atras. -->
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                Margin="{StaticResource TkEtiqueta}">
+      <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
+              Command="{Binding EditarCommand}" />
+      <Button Content="Confirmar" Style="{StaticResource SecondaryButtonStyle}"
+              Command="{Binding ConfirmarCommand}" />
+      <Button Content="Registrar recepción" Style="{StaticResource SecondaryButtonStyle}"
+              Command="{Binding RegistrarRecepcionCommand}" />
+      <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
+              Foreground="{DynamicResource DangerTextBrush}"
+              Command="{Binding AnularCommand}" />
+      <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+              Foreground="{DynamicResource DangerTextBrush}"
+              Command="{Binding EliminarCommand}" />
+      <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
+              Command="{Binding RefrescarCommand}" />
+    </StackPanel>
+
+    <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0">
       <Grid>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
+                  ItemsSource="{Binding ItemsView}"
+                  SelectedItem="{Binding SelectedItem}">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
+            <DataGridTextColumn Header="Inicio de carga" Width="130"
+                                Binding="{Binding InicioCarga, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
+            <DataGridTextColumn Header="Finca" Binding="{Binding FincaNombre}" Width="*" />
+            <DataGridTextColumn Header="Lote · Tablón" Binding="{Binding UbicacionTexto}" Width="*" />
+            <DataGridTextColumn Header="Cosecha" Binding="{Binding TipoCosechaTexto}" Width="90" />
+            <DataGridTextColumn Header="Placa" Binding="{Binding VehiculoPlaca}" Width="90" />
+            <DataGridTextColumn Header="Neto (t)" Width="80"
+                                Binding="{Binding PesoNetoT, StringFormat={}{0:N2}}">
+              <DataGridTextColumn.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                </Style>
+              </DataGridTextColumn.ElementStyle>
+            </DataGridTextColumn>
+            <DataGridTextColumn Header="Facturada" Binding="{Binding FacturadaTexto}" Width="110" />
+            <DataGridTemplateColumn Header="Estado" Width="120">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Border Style="{StaticResource ChipEstadoStyle}">
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsMicro}" />
+                  </Border>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
 
-        <TextBox Grid.Row="0" Grid.Column="0" Width="260" VerticalAlignment="Center"
-                 Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Buscar por Nº, finca, placa, personal o núcleo" />
-
-        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
-                    HorizontalAlignment="Right" VerticalAlignment="Center">
-          <RadioButton Content="Todas" GroupName="FiltroEstado" IsChecked="True"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-          <RadioButton Content="Borrador" GroupName="FiltroEstado"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-          <RadioButton Content="Confirmada" GroupName="FiltroEstado"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmada" />
-          <RadioButton Content="Recibida" GroupName="FiltroEstado"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Recibida" />
-          <RadioButton Content="Anulada" GroupName="FiltroEstado"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
-        </StackPanel>
-
-        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
-                    HorizontalAlignment="Right" Margin="0,12,0,0">
-          <Button Content="Nueva remesa" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
+        <!-- Una tabla sin filas se veia como un encabezado de columnas y espacio en blanco
+             debajo, sin distinguir "todavia no hay nada" de "el filtro no encontro nada". -->
+        <controls:EmptyState Icono="&#xE7C3;"
+                             Titulo="No hay remesas que mostrar"
+                             Detalle="Cambia el filtro o la búsqueda, o registra la primera remesa del día."
+                             Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}">
+          <Button Content="Nueva remesa" Style="{StaticResource PrimaryButtonStyle}"
                   Command="{Binding AgregarCommand}" />
-          <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
-                  Command="{Binding EditarCommand}" />
-          <Button Content="Confirmar" Style="{StaticResource BarraBotonStyle}"
-                  Command="{Binding ConfirmarCommand}" />
-          <Button Content="Registrar recepción" Style="{StaticResource BarraBotonStyle}"
-                  Command="{Binding RegistrarRecepcionCommand}" />
-          <Button Content="Anular" Style="{StaticResource BarraBotonStyle}"
-                  Command="{Binding AnularCommand}" />
-          <Button Content="Eliminar" Style="{StaticResource BarraBotonStyle}"
-                  Command="{Binding EliminarCommand}" />
-          <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
-                  Command="{Binding RefrescarCommand}" />
-        </StackPanel>
+        </controls:EmptyState>
       </Grid>
-    </Border>
-
-    <Border Grid.Row="2" Style="{StaticResource CardStyle}">
-      <DataGrid Style="{StaticResource DataGridStyle}"
-                ItemsSource="{Binding ItemsView}"
-                SelectedItem="{Binding SelectedItem}">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-          <DataGridTextColumn Header="Inicio de carga" Width="130"
-                              Binding="{Binding InicioCarga, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
-          <DataGridTextColumn Header="Finca" Binding="{Binding FincaNombre}" Width="150" />
-          <DataGridTextColumn Header="Lote · Tablón" Binding="{Binding UbicacionTexto}" Width="150" />
-          <DataGridTextColumn Header="Cosecha" Binding="{Binding TipoCosechaTexto}" Width="90" />
-          <DataGridTextColumn Header="Placa" Binding="{Binding VehiculoPlaca}" Width="90" />
-          <DataGridTextColumn Header="Neto (t)" Width="80"
-                              Binding="{Binding PesoNetoT, StringFormat={}{0:N2}}">
-            <DataGridTextColumn.ElementStyle>
-              <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-              </Style>
-            </DataGridTextColumn.ElementStyle>
-          </DataGridTextColumn>
-          <DataGridTextColumn Header="Facturada" Binding="{Binding FacturadaTexto}" Width="110" />
-          <DataGridTemplateColumn Header="Estado" Width="110">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <Border Style="{StaticResource ChipEstadoStyle}">
-                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
-                </Border>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-        </DataGrid.Columns>
-      </DataGrid>
     </Border>
   </Grid>
 </UserControl>

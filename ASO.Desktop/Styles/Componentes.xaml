@@ -21,6 +21,7 @@
   </ResourceDictionary.MergedDictionaries>
 
   <controls:TextoAVisibilidad x:Key="TextoAVis" />
+  <controls:SinItemsAVisibilidad x:Key="SinItemsAVis" />
 
   <!-- ========================= Encabezado de pantalla ========================= -->
 

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
@@ -62,30 +63,37 @@
       </Grid>
     </Border>
 
-    <Border Grid.Row="2" Style="{StaticResource CardStyle}">
-      <DataGrid Style="{StaticResource DataGridStyle}"
-                ItemsSource="{Binding PeticionesView}"
-                SelectedItem="{Binding Seleccionada}">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-          <DataGridTextColumn Header="Solicitada" Width="130"
-                              Binding="{Binding SolicitadoEn, StringFormat=\{0:dd/MM/yyyy HH:mm\}}" />
-          <DataGridTextColumn Header="Quién" Binding="{Binding SolicitadoPorNombre}" Width="150" />
-          <DataGridTextColumn Header="Acción" Binding="{Binding Accion}" Width="180" />
-          <DataGridTextColumn Header="Sobre" Binding="{Binding EntidadDescripcion}" Width="200" />
-          <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*" />
-          <DataGridTemplateColumn Header="Estado" Width="110">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <Border Style="{StaticResource ChipEstadoPeticionStyle}">
-                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
-                </Border>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <DataGridTextColumn Header="Resuelta por" Binding="{Binding ResueltoPorNombre}" Width="150" />
-        </DataGrid.Columns>
-      </DataGrid>
+    <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
+      <Grid>
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
+                  ItemsSource="{Binding PeticionesView}"
+                  SelectedItem="{Binding Seleccionada}">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
+            <DataGridTextColumn Header="Solicitada" Width="130"
+                                Binding="{Binding SolicitadoEn, StringFormat=\{0:dd/MM/yyyy HH:mm\}}" />
+            <DataGridTextColumn Header="Quién" Binding="{Binding SolicitadoPorNombre}" Width="150" />
+            <DataGridTextColumn Header="Acción" Binding="{Binding Accion}" Width="180" />
+            <DataGridTextColumn Header="Sobre" Binding="{Binding EntidadDescripcion}" Width="200" />
+            <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*" />
+            <DataGridTemplateColumn Header="Estado" Width="110">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Border Style="{StaticResource ChipEstadoPeticionStyle}">
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
+                  </Border>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn Header="Resuelta por" Binding="{Binding ResueltoPorNombre}" Width="150" />
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <controls:EmptyState Icono="&#xE715;"
+                             Titulo="No hay peticiones que mostrar"
+                             Detalle="Aquí llegan las solicitudes de cambio del personal de campo."
+                             Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
+      </Grid>
     </Border>
   </Grid>
 </UserControl>

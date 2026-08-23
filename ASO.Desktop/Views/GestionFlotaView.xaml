@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              xmlns:models="clr-namespace:ASO.Desktop.Models"
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
@@ -25,24 +26,9 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="{Binding Submodulo.Nombre}" FontSize="20" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock Text="{Binding Submodulo.Descripcion}" FontSize="12" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-      </StackPanel>
-
-      <Button Grid.Column="1" Content="Volver al módulo"
-              Style="{StaticResource VolverModuloButtonStyle}"
-              Command="{Binding VolverCommand}" />
-    </Grid>
+    <controls:PageHeader Grid.Row="0"
+                         Titulo="{Binding Submodulo.Nombre}"
+                         Descripcion="{Binding Submodulo.Descripcion}" />
 
     <!-- ================= MODO TARJETAS ================= -->
     <Grid Grid.Row="1" Style="{StaticResource SoloTarjetasStyle}">
@@ -51,7 +37,7 @@
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -59,34 +45,32 @@
             <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
 
-          <TextBox Grid.Column="0" Width="220" VerticalAlignment="Center"
-                   Style="{StaticResource FormTextBoxStyle}"
-                   Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                   ToolTip="Buscar por código, placa, marca o modelo" />
+          <controls:SearchBox Grid.Column="0" Width="280" VerticalAlignment="Center"
+                              Sugerencia="Buscar por código, placa, marca o modelo"
+                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <WrapPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
             <RadioButton Content="Todos" GroupName="FiltroFlota" IsChecked="True"
-                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                          Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Todos" />
             <RadioButton Content="Cosechadoras" GroupName="FiltroFlota"
-                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                          Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Cosechadora" />
             <RadioButton Content="Tractores" GroupName="FiltroFlota"
-                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                          Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Tractor" />
             <RadioButton Content="Alzadoras" GroupName="FiltroFlota"
-                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                          Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Alzadora" />
             <RadioButton Content="Transporte" GroupName="FiltroFlota"
-                         Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                          Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Transporte" />
           </WrapPanel>
 
           <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-            <Button Content="Nuevo activo" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                    Background="{DynamicResource PrimaryBrush}" Foreground="White"
+            <Button Content="Nuevo activo" Style="{StaticResource PrimaryButtonStyle}"
                     Command="{Binding NuevoActivoCommand}" />
-            <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
+            <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding RefrescarCommand}" />
           </StackPanel>
         </Grid>
@@ -114,20 +98,20 @@
                       <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="{Binding Glifo}" Style="{StaticResource NavIconStyle}"
-                               FontSize="24" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,10,0" />
+                               FontSize="{StaticResource FsMetric}" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,10,0" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Codigo}" FontSize="14" FontWeight="SemiBold"
+                      <TextBlock Text="{Binding Codigo}" FontSize="{StaticResource FsTitle}" FontWeight="SemiBold"
                                  Foreground="{DynamicResource TextPrimaryBrush}" />
-                      <TextBlock Text="{Binding TipoTexto}" FontSize="11"
+                      <TextBlock Text="{Binding TipoTexto}" FontSize="{StaticResource FsCaption}"
                                  Foreground="{DynamicResource TextMutedBrush}" />
                     </StackPanel>
                     <Border Grid.Column="2" Style="{StaticResource ChipEstadoActivoStyle}"
                             VerticalAlignment="Top">
-                      <TextBlock Text="{Binding EstadoTexto}" FontSize="10" />
+                      <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsMicro}" />
                     </Border>
                   </Grid>
 
-                  <TextBlock Margin="0,10,0,0" FontSize="12"
+                  <TextBlock Margin="0,10,0,0" FontSize="{StaticResource FsBody}"
                              Foreground="{DynamicResource TextSecondaryBrush}"
                              TextTrimming="CharacterEllipsis">
                     <Run Text="{Binding Marca, Mode=OneWay}" />
@@ -139,9 +123,9 @@
                       <ColumnDefinition Width="*" />
                       <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding Placa}" FontSize="11"
+                    <TextBlock Grid.Column="0" Text="{Binding Placa}" FontSize="{StaticResource FsCaption}"
                                Foreground="{DynamicResource TextMutedBrush}" />
-                    <TextBlock Grid.Column="1" Text="{Binding UsoTexto}" FontSize="11" FontWeight="SemiBold"
+                    <TextBlock Grid.Column="1" Text="{Binding UsoTexto}" FontSize="{StaticResource FsCaption}" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextSecondaryBrush}" />
                   </Grid>
                 </StackPanel>
@@ -170,7 +154,7 @@
                          FontSize="30" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,12,0" />
               <StackPanel VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal">
-                  <TextBlock FontSize="18" FontWeight="Bold"
+                  <TextBlock FontSize="{StaticResource FsTitle}" FontWeight="Bold"
                              Foreground="{DynamicResource TextPrimaryBrush}">
                     <Run Text="{Binding Codigo, Mode=OneWay}" />
                     <Run Text=" — " /><Run Text="{Binding Marca, Mode=OneWay}" />
@@ -178,30 +162,29 @@
                   </TextBlock>
                   <Border Style="{StaticResource ChipEstadoActivoStyle}" Margin="10,0,0,0"
                           VerticalAlignment="Center">
-                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
                   </Border>
                 </StackPanel>
-                <TextBlock Text="{Binding TipoTexto}" FontSize="12"
+                <TextBlock Text="{Binding TipoTexto}" FontSize="{StaticResource FsBody}"
                            Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
               </StackPanel>
             </StackPanel>
 
             <WrapPanel Grid.Column="1" VerticalAlignment="Center">
-              <Button Content="Registrar mantenimiento" Padding="14,7" Cursor="Hand" FontSize="12"
-                      BorderThickness="0" Background="{DynamicResource PrimaryBrush}" Foreground="White"
+              <Button Content="Registrar mantenimiento" Style="{StaticResource PrimaryButtonStyle}"
                       Command="{Binding RegistrarMantenimientoCommand}" />
-              <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
+              <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
                       Command="{Binding EditarActivoCommand}" />
-              <Button Content="Operativo" Style="{StaticResource BarraBotonStyle}"
+              <Button Content="Operativo" Style="{StaticResource SecondaryButtonStyle}"
                       Command="{Binding CambiarEstadoCommand}"
                       CommandParameter="{x:Static models:EstadoActivo.Operativo}" />
-              <Button Content="A taller" Style="{StaticResource BarraBotonStyle}"
+              <Button Content="A taller" Style="{StaticResource SecondaryButtonStyle}"
                       Command="{Binding CambiarEstadoCommand}"
                       CommandParameter="{x:Static models:EstadoActivo.EnTaller}" />
-              <Button Content="Fuera de servicio" Style="{StaticResource BarraBotonStyle}"
+              <Button Content="Fuera de servicio" Style="{StaticResource SecondaryButtonStyle}"
                       Command="{Binding CambiarEstadoCommand}"
                       CommandParameter="{x:Static models:EstadoActivo.FueraDeServicio}" />
-              <Button Content="Volver a la flota" Style="{StaticResource BarraBotonStyle}"
+              <Button Content="Volver a la flota" Style="{StaticResource SecondaryButtonStyle}"
                       Command="{Binding CerrarDetalleCommand}" />
             </WrapPanel>
           </Grid>
@@ -211,29 +194,29 @@
         <UniformGrid Rows="1" Columns="4" Margin="0,0,0,12">
           <Border Style="{StaticResource CardStyle}" Margin="0,0,6,0">
             <StackPanel>
-              <TextBlock Text="Uso actual" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
-              <TextBlock Text="{Binding ActivoSeleccionado.UsoTexto}" FontSize="18" FontWeight="Bold"
+              <TextBlock Text="Uso actual" FontSize="{StaticResource FsCaption}" Foreground="{DynamicResource TextMutedBrush}" />
+              <TextBlock Text="{Binding ActivoSeleccionado.UsoTexto}" FontSize="{StaticResource FsTitle}" FontWeight="Bold"
                          Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,4,0,0" />
             </StackPanel>
           </Border>
           <Border Style="{StaticResource CardStyle}" Margin="6,0,6,0">
             <StackPanel>
-              <TextBlock Text="Último mantenimiento" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
-              <TextBlock Text="{Binding UltimoMantenimientoTexto}" FontSize="14" FontWeight="SemiBold"
+              <TextBlock Text="Último mantenimiento" FontSize="{StaticResource FsCaption}" Foreground="{DynamicResource TextMutedBrush}" />
+              <TextBlock Text="{Binding UltimoMantenimientoTexto}" FontSize="{StaticResource FsTitle}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
           <Border Style="{StaticResource CardStyle}" Margin="6,0,6,0">
             <StackPanel>
-              <TextBlock Text="Próxima revisión" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
-              <TextBlock Text="{Binding ProximaRevisionTexto}" FontSize="14" FontWeight="SemiBold"
+              <TextBlock Text="Próxima revisión" FontSize="{StaticResource FsCaption}" Foreground="{DynamicResource TextMutedBrush}" />
+              <TextBlock Text="{Binding ProximaRevisionTexto}" FontSize="{StaticResource FsTitle}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
           <Border Style="{StaticResource CardStyle}" Margin="6,0,0,0">
             <StackPanel DataContext="{Binding ActivoSeleccionado}">
-              <TextBlock Text="Año · Placa" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
-              <TextBlock FontSize="14" FontWeight="SemiBold" Margin="0,6,0,0"
+              <TextBlock Text="Año · Placa" FontSize="{StaticResource FsCaption}" Foreground="{DynamicResource TextMutedBrush}" />
+              <TextBlock FontSize="{StaticResource FsTitle}" FontWeight="SemiBold" Margin="0,6,0,0"
                          Foreground="{DynamicResource TextPrimaryBrush}">
                 <Run Text="{Binding Anio, Mode=OneWay}" />
                 <Run Text=" · " /><Run Text="{Binding Placa, Mode=OneWay}" />
@@ -255,17 +238,17 @@
               <StackPanel DataContext="{Binding ActivoSeleccionado}">
                 <TextBlock Text="Ficha" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,8" />
                 <TextBlock Text="Tipo" Style="{StaticResource FormLabelStyle}" Margin="0,4,0,2" />
-                <TextBlock Text="{Binding TipoTexto}" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" />
+                <TextBlock Text="{Binding TipoTexto}" FontSize="{StaticResource FsBody}" Foreground="{DynamicResource TextPrimaryBrush}" />
                 <TextBlock Text="Marca y modelo" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
-                <TextBlock FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}">
+                <TextBlock FontSize="{StaticResource FsBody}" Foreground="{DynamicResource TextPrimaryBrush}">
                   <Run Text="{Binding Marca, Mode=OneWay}" /> <Run Text="{Binding Modelo, Mode=OneWay}" />
                   <Run Text=" (" /><Run Text="{Binding Anio, Mode=OneWay}" /><Run Text=")" />
                 </TextBlock>
                 <TextBlock Text="Descripción" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
-                <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
+                <TextBlock Text="{Binding Descripcion}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                            Foreground="{DynamicResource TextPrimaryBrush}" />
                 <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,2" />
-                <TextBlock Text="{Binding Notas}" FontSize="12" TextWrapping="Wrap"
+                <TextBlock Text="{Binding Notas}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                            Foreground="{DynamicResource TextSecondaryBrush}" />
               </StackPanel>
             </Border>
@@ -283,12 +266,12 @@
                         </Grid.ColumnDefinitions>
                         <Border Grid.Column="0" Style="{StaticResource ChipRecomendacionStyle}"
                                 VerticalAlignment="Top" Margin="0,2,10,0">
-                          <TextBlock Text="{Binding EstadoTexto}" FontSize="10" />
+                          <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsMicro}" />
                         </Border>
                         <StackPanel Grid.Column="1">
-                          <TextBlock Text="{Binding Regla.Revision}" FontSize="12" FontWeight="SemiBold"
+                          <TextBlock Text="{Binding Regla.Revision}" FontSize="{StaticResource FsBody}" FontWeight="SemiBold"
                                      Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" />
-                          <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
+                          <TextBlock Text="{Binding Detalle}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                                      Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                         </StackPanel>
                       </Grid>
@@ -307,13 +290,13 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
                       <StackPanel Margin="0,6">
-                        <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}">
+                        <TextBlock FontSize="{StaticResource FsCaption}" Foreground="{DynamicResource TextMutedBrush}">
                           <Run Text="{Binding Fecha, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy}}" />
                           <Run Text=" · " /><Run Text="{Binding TipoTexto, Mode=OneWay}" />
                         </TextBlock>
-                        <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
+                        <TextBlock Text="{Binding Descripcion}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                                    Foreground="{DynamicResource TextPrimaryBrush}" />
-                        <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0">
+                        <TextBlock FontSize="{StaticResource FsCaption}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0">
                           <Run Text="Costo: " /><Run Text="{Binding CostoTotalTexto, Mode=OneWay}" />
                           <Run Text=" · " /><Run Text="{Binding RealizadoPor, Mode=OneWay}" />
                         </TextBlock>
@@ -341,7 +324,7 @@
                       </Style.Triggers>
                     </Style>
                   </Border.Style>
-                  <TextBlock FontSize="11" TextWrapping="Wrap"
+                  <TextBlock FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                              Foreground="{DynamicResource TextSecondaryBrush}"
                              Text="El uso de las máquinas se alimentará de Telemetría y de los vales de combustible; hoy se muestran las lecturas capturadas al registrar mantenimientos." />
                 </Border>
@@ -355,11 +338,11 @@
                           <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                          <TextBlock Text="{Binding FechaTexto}" FontSize="11"
+                          <TextBlock Text="{Binding FechaTexto}" FontSize="{StaticResource FsCaption}"
                                      Foreground="{DynamicResource TextMutedBrush}" />
-                          <TextBlock Text="{Binding Titulo}" FontSize="12" FontWeight="SemiBold"
+                          <TextBlock Text="{Binding Titulo}" FontSize="{StaticResource FsBody}" FontWeight="SemiBold"
                                      Foreground="{DynamicResource TextPrimaryBrush}" />
-                          <TextBlock Text="{Binding Detalle}" FontSize="11" TextWrapping="Wrap"
+                          <TextBlock Text="{Binding Detalle}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                                      Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                         </StackPanel>
                         <Border Grid.Column="1" VerticalAlignment="Top" Margin="8,0,0,0"
@@ -368,7 +351,7 @@
                                              RelativeSource={RelativeSource AncestorType=Grid},
                                              Converter={StaticResource BoolToVis}}"
                                 Style="{StaticResource ChipEstadoStyle}">
-                          <TextBlock Text="{Binding EstadoTexto}" FontSize="10" />
+                          <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsMicro}" />
                         </Border>
                       </Grid>
                     </DataTemplate>
