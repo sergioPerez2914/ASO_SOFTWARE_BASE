@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.RepuestosView"
+﻿<UserControl x:Class="ASO.Desktop.Views.RepuestosView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -146,7 +146,7 @@
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipStockStyle}">
-                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" Foreground="White" />
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
                   </Border>
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>
@@ -241,7 +241,7 @@
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipEstadoSalidaStyle}">
-                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" Foreground="White" />
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
                   </Border>
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>

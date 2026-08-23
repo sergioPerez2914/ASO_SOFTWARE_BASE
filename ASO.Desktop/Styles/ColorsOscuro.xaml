@@ -7,7 +7,7 @@
          de Application.Resources.MergedDictionaries, que es lo ultimo que se consulta al buscar
          una clave, asi que gana sobre la clara. Quitarla devuelve el tema claro.
 
-         Por eso NO mergea Colors.xaml y define las 29 claves de brush completas: una que faltara
+         Por eso NO mergea Colors.xaml y define las 39 claves de brush completas: una que faltara
          se resolveria contra la paleta clara y saldria un recuadro blanco sobre fondo oscuro.
 
          Los colores van escritos aqui, no derivados de los claros: no hay formula que convierta
@@ -23,13 +23,14 @@
     <SolidColorBrush x:Key="AccentBlueBrush" Color="#60A5FA" />
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E2E8F0" />
     <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8" />
-    <SolidColorBrush x:Key="TextMutedBrush" Color="#64748B" />
+    <!-- Era #64748B, que sobre el fondo (#0F172A) daba 3,75:1 y sobre la superficie (#1E293B)
+         3,08:1: fallaba AA en las dos. #9CA3AF pasa de 4,5:1 en ambas. -->
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#9CA3AF" />
     <SolidColorBrush x:Key="BorderBrush" Color="#334155" />
     <SolidColorBrush x:Key="SuccessBrush" Color="#22C55E" />
     <SolidColorBrush x:Key="WarningBrush" Color="#FBBF24" />
     <SolidColorBrush x:Key="DangerBrush" Color="#EF4444" />
     <SolidColorBrush x:Key="InfoBrush" Color="#60A5FA" />
-    <SolidColorBrush x:Key="FooterBrush" Color="#1E293B" />
 
     <!-- Navegacion lateral: el hover sigue siendo neutro y el seleccionado azulado, para que
          no se confundan entre si, igual que en la paleta clara. -->
@@ -51,5 +52,21 @@
 
     <!-- Fondo suave del boton "Volver al modulo": tiene que dejar leer el azul del acento. -->
     <SolidColorBrush x:Key="VolverFondoBrush" Color="#1B2B45" />
+
+    <!-- Pares suave/texto de los estados. Aqui el "suave" es un tinte oscuro del tono, no un
+         pastel: sobre fondo oscuro un pastel claro seria una mancha mas brillante que el propio
+         dato. El texto va claro y saturado, y es el que lleva el contraste. -->
+    <SolidColorBrush x:Key="SuccessSoftBrush" Color="#14321F" />
+    <SolidColorBrush x:Key="SuccessTextBrush" Color="#4ADE80" />
+    <SolidColorBrush x:Key="WarningSoftBrush" Color="#3A2A10" />
+    <SolidColorBrush x:Key="WarningTextBrush" Color="#FCD34D" />
+    <SolidColorBrush x:Key="DangerSoftBrush" Color="#3B1A1A" />
+    <SolidColorBrush x:Key="DangerTextBrush" Color="#FCA5A5" />
+    <SolidColorBrush x:Key="InfoSoftBrush" Color="#172A47" />
+    <SolidColorBrush x:Key="InfoTextBrush" Color="#93C5FD" />
+    <SolidColorBrush x:Key="NeutralSoftBrush" Color="#1E293B" />
+    <SolidColorBrush x:Key="NeutralTextBrush" Color="#CBD5E1" />
+
+    <SolidColorBrush x:Key="FocusRingBrush" Color="#60A5FA" />
 
 </ResourceDictionary>

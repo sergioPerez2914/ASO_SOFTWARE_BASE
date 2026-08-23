@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.SeguimientoView"
+﻿<UserControl x:Class="ASO.Desktop.Views.SeguimientoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -140,7 +140,7 @@
 
                   <Border Grid.Column="1" Style="{StaticResource ChipEstadoStyle}"
                           VerticalAlignment="Center" Margin="8,0,0,0">
-                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" Foreground="White" />
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
                   </Border>
                 </Grid>
               </DataTemplate>
@@ -171,7 +171,7 @@
                   <Run Text="Remesa Nº" /><Run Text="{Binding Id, Mode=OneWay}" />
                 </TextBlock>
                 <Border Style="{StaticResource ChipEstadoStyle}" Margin="10,0,0,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" Foreground="White" />
+                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
                 </Border>
               </StackPanel>
               <TextBlock FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"

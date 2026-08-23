@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.CuentasPorCobrarView"
+﻿<UserControl x:Class="ASO.Desktop.Views.CuentasPorCobrarView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -127,7 +127,7 @@
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate>
                 <Border Style="{StaticResource ChipEstadoFacturaClienteStyle}">
-                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" Foreground="White" />
+                  <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
                 </Border>
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>

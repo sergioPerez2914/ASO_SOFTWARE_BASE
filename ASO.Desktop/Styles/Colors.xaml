@@ -11,13 +11,15 @@
     <Color x:Key="AccentBlueColor">#2563EB</Color>
     <Color x:Key="TextPrimaryColor">#1E293B</Color>
     <Color x:Key="TextSecondaryColor">#64748B</Color>
-    <Color x:Key="TextMutedColor">#94A3B8</Color>
+    <!-- Era #94A3B8, que sobre blanco daba 2,56:1 y fallaba AA (4,5:1). Es el segundo token mas
+         usado de la app (103 usos, casi todo texto de ayuda), asi que era el fallo de contraste
+         de mayor superficie. #6B7280 da 4,83:1 y se sigue leyendo como texto secundario. -->
+    <Color x:Key="TextMutedColor">#6B7280</Color>
     <Color x:Key="BorderColor">#E2E8F0</Color>
     <Color x:Key="SuccessColor">#16A34A</Color>
     <Color x:Key="WarningColor">#F59E0B</Color>
     <Color x:Key="DangerColor">#DC2626</Color>
     <Color x:Key="InfoColor">#3B82F6</Color>
-    <Color x:Key="FooterColor">#E2E8F0</Color>
 
     <!-- Navegación lateral: el hover es gris neutro y el seleccionado azulado,
          para que no se confundan entre sí. -->
@@ -39,6 +41,29 @@
     <Color x:Key="PressedOverlayColor">#26000000</Color>
     <Color x:Key="VolverFondoColor">#EAF0FE</Color>
 
+    <!-- Pares suave/texto para los estados.
+
+         Los chips eran fondo saturado + texto blanco, y ese patron fallaba contraste en cinco de
+         los seis colores: blanco sobre ambar daba 2,15:1 en claro y 1,67:1 en oscuro, con la
+         letra a 10-11 px. El patron correcto en una interfaz densa es el contrario (fondo
+         tenido y texto fuerte del mismo tono), que ademas pesa menos en una tabla llena de
+         filas, donde media docena de pastillas saturadas compiten con los datos.
+
+         Cada par se usa junto: …SoftBrush de fondo, …TextBrush de letra y de borde. -->
+    <Color x:Key="SuccessSoftColor">#DCFCE7</Color>
+    <Color x:Key="SuccessTextColor">#15803D</Color>
+    <Color x:Key="WarningSoftColor">#FEF3C7</Color>
+    <Color x:Key="WarningTextColor">#B45309</Color>
+    <Color x:Key="DangerSoftColor">#FEE2E2</Color>
+    <Color x:Key="DangerTextColor">#B91C1C</Color>
+    <Color x:Key="InfoSoftColor">#DBEAFE</Color>
+    <Color x:Key="InfoTextColor">#1D4ED8</Color>
+    <Color x:Key="NeutralSoftColor">#F1F5F9</Color>
+    <Color x:Key="NeutralTextColor">#475569</Color>
+
+    <!-- Anillo de foco. No existia: ningun campo de captura mostraba donde estaba el teclado. -->
+    <Color x:Key="FocusRingColor">#2563EB</Color>
+
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
     <SolidColorBrush x:Key="SidebarBrush" Color="{StaticResource SidebarColor}" />
@@ -54,7 +79,6 @@
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
     <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
     <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}" />
-    <SolidColorBrush x:Key="FooterBrush" Color="{StaticResource FooterColor}" />
     <SolidColorBrush x:Key="NavHoverBrush" Color="{StaticResource NavHoverColor}" />
     <SolidColorBrush x:Key="NavSelectedBrush" Color="{StaticResource NavSelectedColor}" />
     <SolidColorBrush x:Key="NavPressedBrush" Color="{StaticResource NavPressedColor}" />
@@ -68,5 +92,16 @@
     <SolidColorBrush x:Key="HoverOverlayBrush" Color="{StaticResource HoverOverlayColor}" />
     <SolidColorBrush x:Key="PressedOverlayBrush" Color="{StaticResource PressedOverlayColor}" />
     <SolidColorBrush x:Key="VolverFondoBrush" Color="{StaticResource VolverFondoColor}" />
+    <SolidColorBrush x:Key="SuccessSoftBrush" Color="{StaticResource SuccessSoftColor}" />
+    <SolidColorBrush x:Key="SuccessTextBrush" Color="{StaticResource SuccessTextColor}" />
+    <SolidColorBrush x:Key="WarningSoftBrush" Color="{StaticResource WarningSoftColor}" />
+    <SolidColorBrush x:Key="WarningTextBrush" Color="{StaticResource WarningTextColor}" />
+    <SolidColorBrush x:Key="DangerSoftBrush" Color="{StaticResource DangerSoftColor}" />
+    <SolidColorBrush x:Key="DangerTextBrush" Color="{StaticResource DangerTextColor}" />
+    <SolidColorBrush x:Key="InfoSoftBrush" Color="{StaticResource InfoSoftColor}" />
+    <SolidColorBrush x:Key="InfoTextBrush" Color="{StaticResource InfoTextColor}" />
+    <SolidColorBrush x:Key="NeutralSoftBrush" Color="{StaticResource NeutralSoftColor}" />
+    <SolidColorBrush x:Key="NeutralTextBrush" Color="{StaticResource NeutralTextColor}" />
+    <SolidColorBrush x:Key="FocusRingBrush" Color="{StaticResource FocusRingColor}" />
 
 </ResourceDictionary>

@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.MantenimientoView"
+﻿<UserControl x:Class="ASO.Desktop.Views.MantenimientoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -51,7 +51,7 @@
 
                   <Border Grid.Column="0" Style="{StaticResource ChipRecomendacionStyle}"
                           VerticalAlignment="Top" Margin="0,2,0,0">
-                    <TextBlock Text="{Binding EstadoTexto}" FontSize="10" Foreground="White" />
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="10" />
                   </Border>
 
                   <StackPanel Grid.Column="1" Margin="10,0,0,0">

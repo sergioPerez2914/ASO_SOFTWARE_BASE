@@ -3,6 +3,7 @@
                     xmlns:models="clr-namespace:ASO.Desktop.Models">
 
   <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="Tokens.xaml" />
     <ResourceDictionary Source="Colors.xaml" />
     <ResourceDictionary Source="Controles.xaml" />
   </ResourceDictionary.MergedDictionaries>
@@ -64,13 +65,26 @@
     </Setter>
   </Style>
 
-  <!-- Forma comun de los chips de estado: pastilla gris con el texto en blanco. Cada chip
-       concreto solo aporta sus DataTrigger, que es lo unico en lo que se diferencian. -->
+  <!-- Forma comun de los chips de estado: fondo tenido + texto fuerte del mismo tono.
+
+       Antes era fondo saturado + texto blanco, y ese patron fallaba contraste en cinco de los seis
+       colores: blanco sobre ambar daba 2,15:1 en el tema claro y 1,67:1 en el oscuro, con la letra
+       a 11 px. Ademas pesaba de mas: media docena de pastillas saturadas en una tabla competian
+       con los propios datos.
+
+       El color de la letra va por TextElement.Foreground en el Border, que hereda al TextBlock de
+       dentro. Por eso los TextBlock de los chips NO deben traer Foreground propio: un valor local
+       gana sobre el heredado y volveria a dejar el texto blanco.
+
+       Cada chip concreto solo aporta sus DataTrigger, que es lo unico en lo que se diferencian. -->
   <Style x:Key="ChipBaseStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="8,2" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadPill}" />
+    <Setter Property="Padding" Value="{StaticResource TkChip}" />
     <Setter Property="HorizontalAlignment" Value="Left" />
-    <Setter Property="Background" Value="{DynamicResource TextMutedBrush}" />
+    <Setter Property="BorderThickness" Value="{StaticResource BdFino}" />
+    <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
   </Style>
 
   <!-- Chip de estado de una remesa. El color lo decide el enum, no el texto.
@@ -78,16 +92,24 @@
   <Style x:Key="ChipEstadoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Borrador}">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Confirmada}">
-        <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Recibida}">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Anulada}">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -96,7 +118,9 @@
   <Style x:Key="ChipActivoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Activo}" Value="True">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -105,13 +129,19 @@
   <Style x:Key="ChipVigenciaTarifaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Vigente">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Futura">
-        <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Inactiva">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -120,26 +150,38 @@
   <Style x:Key="ChipEstadoPeticionStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Pendiente">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Aprobada">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Rechazada">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
 
   <!-- Chip de existencia de un artículo de almacén -->
   <Style x:Key="ChipStockStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
-    <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+    <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:StockStatus.Bajo}">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:StockStatus.Agotado}">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -148,13 +190,19 @@
   <Style x:Key="ChipEstadoSalidaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoSalida.Borrador}">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoSalida.Confirmada}">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoSalida.Anulada}">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -163,23 +211,33 @@
   <Style x:Key="ChipEstadoValeStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoVale.Borrador}">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoVale.Confirmado}">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoVale.Anulado}">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
 
   <!-- Chip de estado de una jornada de trabajo -->
   <Style x:Key="ChipJornadaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
-    <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+    <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstaAbierta}" Value="True">
-        <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -188,16 +246,24 @@
   <Style x:Key="ChipEstadoLiquidacionStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Borrador}">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Cerrada}">
-        <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Pagada}">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Anulada}">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -207,19 +273,29 @@
   <Style x:Key="ChipEstadoFacturaClienteStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Borrador}">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Emitida}">
-        <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Cobrada}">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Anulada}">
-        <Setter Property="Background" Value="{DynamicResource TextMutedBrush}" />
+        <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstaVencida}" Value="True">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -229,16 +305,24 @@
   <Style x:Key="ChipEstadoFacturaProveedorStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Pendiente}">
-        <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Pagada}">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Anulada}">
-        <Setter Property="Background" Value="{DynamicResource TextMutedBrush}" />
+        <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstaVencida}" Value="True">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -247,13 +331,19 @@
   <Style x:Key="ChipEstadoActivoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.Operativo}">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.EnTaller}">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.FueraDeServicio}">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
@@ -262,29 +352,35 @@
   <Style x:Key="ChipRecomendacionStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.Vencido}">
-        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.Proximo}">
-        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.AlDia}">
-        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
 
-  <!-- Tarjeta base -->
+  <!-- Tarjeta base.
+
+       Sin sombra: la que habia era un DropShadowEffect con Color="#000000" a fuego, el unico hex
+       del archivo, y sobre el fondo oscuro (#0F172A) quedaba una mancha sucia en vez de una
+       elevacion. En una interfaz densa el borde de 1 px separa mejor que la sombra, cuesta menos
+       de pintar y si respeta el tema. -->
   <Style x:Key="CardStyle" TargetType="Border">
     <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="8" />
-    <Setter Property="Padding" Value="16" />
-    <Setter Property="Effect">
-      <Setter.Value>
-        <DropShadowEffect BlurRadius="8" ShadowDepth="1" Opacity="0.06" Color="#000000" />
-      </Setter.Value>
-    </Setter>
+    <Setter Property="BorderThickness" Value="{StaticResource BdFino}" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadMd}" />
+    <Setter Property="Padding" Value="{StaticResource TkTarjeta}" />
   </Style>
 
   <!-- Título de sección en tarjeta -->
@@ -293,15 +389,6 @@
     <Setter Property="FontSize" Value="14" />
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-  </Style>
-
-  <!-- Enlace secundario -->
-  <Style x:Key="LinkStyle" TargetType="TextBlock">
-    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
-    <Setter Property="Foreground" Value="{DynamicResource AccentBlueBrush}" />
-    <Setter Property="Cursor" Value="Hand" />
-    <Setter Property="TextDecorations" Value="Underline" />
   </Style>
 
   <!-- Formularios: etiqueta + controles de captura. Solo setters, sin ControlTemplate,
@@ -537,35 +624,6 @@
             <Trigger Property="IsMouseOver" Value="True">
               <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentBlueBrush}" />
               <Setter TargetName="Root" Property="Background" Value="{DynamicResource CardHoverBrush}" />
-            </Trigger>
-          </ControlTemplate.Triggers>
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
-
-  <!-- Botón de emergencia -->
-  <Style x:Key="EmergencyButtonStyle" TargetType="Button">
-    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
-    <Setter Property="FontWeight" Value="Bold" />
-    <Setter Property="Foreground" Value="White" />
-    <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
-    <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="Padding" Value="12,14" />
-    <Setter Property="Cursor" Value="Hand" />
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="Button">
-          <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
-            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-          </Border>
-          <ControlTemplate.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-              <Setter Property="Background" Value="{DynamicResource DangerHoverBrush}" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-              <Setter Property="Background" Value="{DynamicResource DangerPressedBrush}" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
