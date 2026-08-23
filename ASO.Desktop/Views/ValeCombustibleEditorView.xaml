@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.ValeCombustibleEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.ValeCombustibleEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="480">
 
@@ -26,11 +27,12 @@
     <TextBlock Text="{Binding ExistenciaTexto}" FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
-    <TextBlock Text="Activo que recibe el combustible" Style="{StaticResource FormLabelStyle}" />
-    <ComboBox Style="{StaticResource FormComboBoxStyle}"
-              ItemsSource="{Binding Activos}"
-              DisplayMemberPath="Etiqueta"
-              SelectedItem="{Binding ActivoSeleccionado}" />
+    <controls:FormField Etiqueta="Activo que recibe el combustible">
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding Activos}"
+                DisplayMemberPath="Etiqueta"
+                SelectedItem="{Binding ActivoSeleccionado}" />
+    </controls:FormField>
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -42,36 +44,41 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Litros" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Litros, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Litros">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Litros, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="{Binding EtiquetaLectura}" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Lectura, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="{Binding EtiquetaLectura}">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Lectura, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="4">
-        <TextBlock Text="Fecha" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding Fecha}" />
+        <controls:FormField Etiqueta="Fecha">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding Fecha}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
     <TextBlock Text="{Binding AyudaLectura}" FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
-    <TextBlock Text="Responsable del despacho" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding ResponsableNombre, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Responsable del despacho">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding ResponsableNombre, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
-    <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Notas">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
     <TextBlock Text="Al confirmar el vale se descuenta la cisterna, se calcula el consumo del período y se actualiza la lectura del activo."
                FontSize="11" TextWrapping="Wrap"

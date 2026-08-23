@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.RecargaEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.RecargaEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="420">
 
@@ -36,33 +37,38 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Litros recibidos" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding LitrosTexto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Litros recibidos">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding LitrosTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Costo total (opcional)" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding CostoTexto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Costo total (opcional)">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding CostoTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="4">
-        <TextBlock Text="Fecha" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding Fecha}" />
+        <controls:FormField Etiqueta="Fecha">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding Fecha}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="Proveedor" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding ProveedorNombre, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Proveedor">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding ProveedorNombre, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
-    <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Notas">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
     <TextBlock Text="La recarga suma los litros a la cisterna al guardarse: se registra cuando el combustible ya está descargado."
                FontSize="11" TextWrapping="Wrap"

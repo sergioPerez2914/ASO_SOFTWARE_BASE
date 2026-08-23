@@ -18,16 +18,29 @@ public sealed class CuentaViewModel : ViewModelBase
     public const int LargoMinimoPassword = 8;
 
     private readonly IUsuarioDataSource _usuarios;
-    private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesion;
 
-    public CuentaViewModel(IUsuarioDataSource usuarios, IServicioDialogo dialogos, ISesionActual sesion)
+    public CuentaViewModel(IUsuarioDataSource usuarios, ISesionActual sesion)
     {
         _usuarios = usuarios;
-        _dialogos = dialogos;
         _sesion = sesion;
 
         _recordarUsuario = Ajustes.Actual.RecordarUltimoUsuario;
+    }
+
+    public AvisoGuardado Aviso { get; } = new();
+
+    private string _errorPassword = string.Empty;
+
+    /// <summary>
+    /// Por que no se cambio la contrasena. Va bajo los campos y no en un MessageBox del sistema:
+    /// el cuadro de dialogo tapaba el formulario, no seguia el tema de la aplicacion y obligaba a
+    /// leerlo y descartarlo antes de poder corregir lo que senalaba.
+    /// </summary>
+    public string ErrorPassword
+    {
+        get => _errorPassword;
+        private set => SetProperty(ref _errorPassword, value);
     }
 
     public string NombreUsuario => _sesion.UsuarioActual?.NombreUsuario ?? "—";
@@ -57,7 +70,8 @@ public sealed class CuentaViewModel : ViewModelBase
             if (!value)
                 Ajustes.Actual.UltimoUsuario = string.Empty;
 
-            Ajustes.Guardar();
+            if (Ajustes.Guardar())
+                Aviso.Mostrar();
         }
     }
 
@@ -71,34 +85,32 @@ public sealed class CuentaViewModel : ViewModelBase
     /// <returns><c>true</c> si se cambió, para que la vista sepa si limpiar los campos.</returns>
     public bool CambiarPassword(string actual, string nueva, string confirmacion)
     {
+        ErrorPassword = string.Empty;
+
         if (_sesion.UsuarioActual is not { } usuario)
             return false;
 
         if (!Passwords.Verificar(actual, usuario.PasswordHash, usuario.PasswordSalt))
         {
-            _dialogos.Informar("Contraseña incorrecta",
-                "La contraseña actual no coincide. No se cambió nada.");
+            ErrorPassword = "La contraseña actual no coincide. No se cambió nada.";
             return false;
         }
 
         if (nueva.Length < LargoMinimoPassword)
         {
-            _dialogos.Informar("Contraseña demasiado corta",
-                $"La contraseña nueva debe tener al menos {LargoMinimoPassword} caracteres.");
+            ErrorPassword = $"La contraseña nueva debe tener al menos {LargoMinimoPassword} caracteres.";
             return false;
         }
 
         if (nueva != confirmacion)
         {
-            _dialogos.Informar("No coinciden",
-                "La contraseña nueva y su confirmación no son iguales.");
+            ErrorPassword = "La contraseña nueva y su confirmación no son iguales.";
             return false;
         }
 
         if (nueva == actual)
         {
-            _dialogos.Informar("Es la misma",
-                "La contraseña nueva es igual a la actual. Elige otra.");
+            ErrorPassword = "La contraseña nueva es igual a la actual. Elige otra.";
             return false;
         }
 
@@ -114,7 +126,7 @@ public sealed class CuentaViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            _dialogos.Informar("No se pudo cambiar", ex.Message);
+            ErrorPassword = ex.Message;
             return false;
         }
 
@@ -123,8 +135,8 @@ public sealed class CuentaViewModel : ViewModelBase
         usuario.PasswordHash = hash;
         usuario.PasswordSalt = salt;
 
-        _dialogos.Informar("Contraseña cambiada",
-            "Ya está activa. La próxima vez que inicies sesión usa la nueva.");
+        ErrorPassword = string.Empty;
+        Aviso.Mostrar("Contraseña cambiada. La próxima vez que entres, usa la nueva.");
         return true;
     }
 }

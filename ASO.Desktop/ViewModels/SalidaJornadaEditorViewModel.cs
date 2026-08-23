@@ -20,6 +20,7 @@ public sealed class SalidaJornadaEditorViewModel : CrudEditorViewModelBase
     }
 
     public override string Titulo => $"Registrar salida — {_jornada.PersonaNombre}";
+    public override string TextoAccion => "Registrar la salida";
 
     public string Resumen =>
         $"{_jornada.CargoORol} · turno {_jornada.TurnoTexto.ToLowerInvariant()} · entrada {_jornada.EntradaTexto}";

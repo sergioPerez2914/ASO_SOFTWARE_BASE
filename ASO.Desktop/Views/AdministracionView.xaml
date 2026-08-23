@@ -14,47 +14,30 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
+    <controls:PageHeader Grid.Row="0" Titulo="Administración"
+                         Descripcion="Los usuarios del núcleo, con sus permisos, y los datos del propio núcleo." />
 
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="Administración" FontSize="20" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock Text="Los usuarios del núcleo, con sus permisos, y los datos del propio núcleo."
-                   FontSize="12" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-      </StackPanel>
-
-      <Button Grid.Column="1" Content="Volver al inicio" VerticalAlignment="Top"
-              Padding="12,6" Cursor="Hand" Background="Transparent"
-              BorderBrush="{DynamicResource BorderBrush}"
-              Foreground="{DynamicResource TextPrimaryBrush}"
-              Command="{Binding VolverCommand}" />
-    </Grid>
-
-    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
       <RadioButton Content="Usuarios" GroupName="AdminAcceso"
-                   IsChecked="True"
-                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Usuarios" />
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsUsuarios, Mode=TwoWay}" />
       <RadioButton Content="Núcleo" GroupName="AdminAcceso"
-                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Nucleo" />
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsNucleo, Mode=TwoWay}" />
     </StackPanel>
 
+    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+            Background="{DynamicResource BorderBrush}" />
+
     <!-- Ficha del nucleo instalado: no es un padron, es la unica fila -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarNucleo, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,20,0,0" Visibility="{Binding MostrarNucleo, Converter={StaticResource BoolToVis}}">
       <Border DataContext="{Binding Nucleo}" Style="{StaticResource CardStyle}"
               VerticalAlignment="Top" HorizontalAlignment="Left" Width="460">
         <StackPanel>
-          <TextBlock Text="Datos del núcleo" FontSize="15" FontWeight="Bold"
+          <TextBlock Text="Datos del núcleo" FontSize="{StaticResource FsTitle}" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}" />
           <TextBlock Text="Una instalación atiende a un solo núcleo. El C.O.D es el que estampan las remesas, las liquidaciones y las facturas."
-                     FontSize="11" TextWrapping="Wrap"
+                     FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                      Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
 
           <TextBlock Text="Nombre" Style="{StaticResource FormLabelStyle}" />
@@ -72,16 +55,13 @@
                    IsEnabled="{Binding PuedeEditar}"
                    Text="{Binding CodigoCam, UpdateSourceTrigger=PropertyChanged}" />
 
-          <Button Content="Guardar" Margin="0,16,0,0" HorizontalAlignment="Left"
-                  Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
-                  Command="{Binding GuardarCommand}" />
+          <Button Content="Guardar" Style="{StaticResource PrimaryButtonStyle}" Margin="0,16,0,0" HorizontalAlignment="Left" Command="{Binding GuardarCommand}" />
         </StackPanel>
       </Border>
     </Grid>
 
     <!-- Usuarios y sus permisos: maestro-detalle, se ve a quien se esta editando todo el tiempo -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarUsuarios, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,20,0,0" Visibility="{Binding MostrarUsuarios, Converter={StaticResource BoolToVis}}">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="380" />
         <ColumnDefinition Width="12" />
@@ -102,14 +82,12 @@
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
             <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-              <Button Content="Nuevo" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                      Background="{DynamicResource PrimaryBrush}" Foreground="White"
-                      Command="{Binding AgregarCommand}" />
-              <Button Content="Editar" Style="{StaticResource BarraBotonStyle}"
+              <Button Content="Nuevo" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AgregarCommand}" />
+              <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
                       Command="{Binding EditarCommand}" />
-              <Button Content="Eliminar" Style="{StaticResource BarraBotonStyle}"
+              <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
                       Command="{Binding EliminarCommand}" />
-              <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
+              <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
                       Command="{Binding RefrescarCommand}" />
             </StackPanel>
           </StackPanel>
@@ -149,7 +127,7 @@
           <TextBlock Grid.Row="0" Grid.RowSpan="3"
                      Text="Selecciona un usuario para ver y ajustar sus permisos."
                      HorizontalAlignment="Center" VerticalAlignment="Center"
-                     Foreground="{DynamicResource TextMutedBrush}" FontSize="13">
+                     Foreground="{DynamicResource TextMutedBrush}" FontSize="{StaticResource FsSubtitle}">
             <TextBlock.Style>
               <Style TargetType="TextBlock">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -164,12 +142,12 @@
 
           <StackPanel Grid.Row="0" Margin="0,0,0,10"
                       Visibility="{Binding HayUsuario, Converter={StaticResource BoolToVis}}">
-            <TextBlock Text="{Binding Encabezado}" FontSize="15" FontWeight="Bold"
+            <TextBlock Text="{Binding Encabezado}" FontSize="{StaticResource FsTitle}" FontWeight="Bold"
                        Foreground="{DynamicResource TextPrimaryBrush}" />
             <TextBlock Text="Marcado = lo puede hacer. Lo que se aparta de su rol queda señalado como concedido o revocado."
-                       FontSize="11" TextWrapping="Wrap"
+                       FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
-            <TextBlock Text="{Binding NotaBloqueo}" FontSize="11" TextWrapping="Wrap"
+            <TextBlock Text="{Binding NotaBloqueo}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                        Foreground="{DynamicResource DangerBrush}" Margin="0,4,0,0"
                        Visibility="{Binding HayBloqueo, Converter={StaticResource BoolToVis}}" />
           </StackPanel>
@@ -181,7 +159,7 @@
                 <GroupStyle>
                   <GroupStyle.HeaderTemplate>
                     <DataTemplate>
-                      <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="Bold"
+                      <TextBlock Text="{Binding Name}" FontSize="{StaticResource FsBody}" FontWeight="Bold"
                                  Foreground="{DynamicResource TextSecondaryBrush}"
                                  Margin="0,12,0,4" />
                     </DataTemplate>
@@ -211,7 +189,7 @@
                       </CheckBox.ToolTip>
                     </CheckBox>
 
-                    <TextBlock Grid.Column="1" Text="{Binding OrigenTexto}" FontSize="10"
+                    <TextBlock Grid.Column="1" Text="{Binding OrigenTexto}" FontSize="{StaticResource FsMicro}"
                                VerticalAlignment="Center" Margin="8,0,4,0"
                                Foreground="{DynamicResource TextMutedBrush}" />
                   </Grid>
@@ -222,12 +200,9 @@
 
           <StackPanel Grid.Row="2" Margin="0,12,0,0"
                       Visibility="{Binding HayUsuario, Converter={StaticResource BoolToVis}}">
-            <TextBlock Text="{Binding NotaVigencia}" FontSize="11" TextWrapping="Wrap"
+            <TextBlock Text="{Binding NotaVigencia}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8" />
-            <Button Content="Guardar permisos" HorizontalAlignment="Left"
-                    Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                    Background="{DynamicResource PrimaryBrush}" Foreground="White"
-                    Command="{Binding GuardarCommand}" />
+            <Button Content="Guardar permisos" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left" Command="{Binding GuardarCommand}" />
           </StackPanel>
         </Grid>
       </Border>

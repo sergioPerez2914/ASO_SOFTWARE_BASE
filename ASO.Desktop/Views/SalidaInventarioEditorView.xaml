@@ -1,26 +1,28 @@
-<UserControl x:Class="ASO.Desktop.Views.SalidaInventarioEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.SalidaInventarioEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="480">
 
   <StackPanel>
-    <TextBlock Text="Artículo" Style="{StaticResource FormLabelStyle}" />
-    <ComboBox Style="{StaticResource FormComboBoxStyle}"
-              ItemsSource="{Binding Articulos}"
-              SelectedItem="{Binding ArticuloSeleccionado}">
-      <ComboBox.ItemTemplate>
-        <DataTemplate>
-          <TextBlock>
-            <Run Text="{Binding Nombre, Mode=OneWay}" />
-            <Run Text=" — quedan " Foreground="{DynamicResource TextMutedBrush}" />
-            <Run Text="{Binding StockTexto, Mode=OneWay}" Foreground="{DynamicResource TextMutedBrush}" />
-          </TextBlock>
-        </DataTemplate>
-      </ComboBox.ItemTemplate>
-    </ComboBox>
+    <controls:FormField Etiqueta="Artículo">
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding Articulos}"
+                SelectedItem="{Binding ArticuloSeleccionado}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock>
+              <Run Text="{Binding Nombre, Mode=OneWay}" />
+              <Run Text=" — quedan " Foreground="{DynamicResource TextMutedBrush}" />
+              <Run Text="{Binding StockTexto, Mode=OneWay}" Foreground="{DynamicResource TextMutedBrush}" />
+            </TextBlock>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </controls:FormField>
 
     <TextBlock Text="{Binding ExistenciaTexto}" FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
@@ -33,50 +35,55 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Cantidad" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Cantidad, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Cantidad">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Cantidad, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Fecha" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding Fecha}" />
+        <controls:FormField Etiqueta="Fecha">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding Fecha}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="Activo al que se carga (opcional)" Style="{StaticResource FormLabelStyle}" />
-    <ComboBox Style="{StaticResource FormComboBoxStyle}"
-              ItemsSource="{Binding Activos}"
-              DisplayMemberPath="Etiqueta"
-              SelectedItem="{Binding ActivoSeleccionado}" />
+    <controls:FormField Etiqueta="Activo al que se carga (opcional)">
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding Activos}"
+                DisplayMemberPath="Etiqueta"
+                SelectedItem="{Binding ActivoSeleccionado}" />
+    </controls:FormField>
 
-    <TextBlock Text="Mantenimiento al que se imputa (opcional)" Style="{StaticResource FormLabelStyle}" />
-    <ComboBox Style="{StaticResource FormComboBoxStyle}"
-              ItemsSource="{Binding Mantenimientos}"
-              SelectedItem="{Binding MantenimientoSeleccionado}">
-      <ComboBox.ItemTemplate>
-        <DataTemplate>
-          <TextBlock>
-            <Run Text="Nº " />
-            <Run Text="{Binding Id, Mode=OneWay}" />
-            <Run Text=" · " Foreground="{DynamicResource TextMutedBrush}" />
-            <Run Text="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}, Mode=OneWay}" />
-            <Run Text=" · " Foreground="{DynamicResource TextMutedBrush}" />
-            <Run Text="{Binding Descripcion, Mode=OneWay}" />
-          </TextBlock>
-        </DataTemplate>
-      </ComboBox.ItemTemplate>
-    </ComboBox>
+    <controls:FormField Etiqueta="Mantenimiento al que se imputa (opcional)">
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding Mantenimientos}"
+                SelectedItem="{Binding MantenimientoSeleccionado}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock>
+              <Run Text="Nº " />
+              <Run Text="{Binding Id, Mode=OneWay}" />
+              <Run Text=" · " Foreground="{DynamicResource TextMutedBrush}" />
+              <Run Text="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}, Mode=OneWay}" />
+              <Run Text=" · " Foreground="{DynamicResource TextMutedBrush}" />
+              <Run Text="{Binding Descripcion, Mode=OneWay}" />
+            </TextBlock>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+    </controls:FormField>
 
     <TextBlock Text="Al confirmar la salida, su costo se suma al del mantenimiento elegido. Elija primero el activo para ver sus mantenimientos."
                FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
-    <TextBlock Text="Motivo" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding Motivo, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Motivo">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Motivo, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
   </StackPanel>
 </UserControl>

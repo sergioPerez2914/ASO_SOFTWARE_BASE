@@ -31,7 +31,7 @@ public sealed class RecargaEditorViewModel : CrudEditorViewModelBase
     }
 
     public override string Titulo => "Registrar recarga de cisterna";
-    public override double AnchoEditor => 460;
+    public override double AnchoEditor => Ancho.Estandar;
 
     public ObservableCollection<TanqueCombustible> Tanques { get; }
 

@@ -1,23 +1,27 @@
-<UserControl x:Class="ASO.Desktop.Views.EmpleadoEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.EmpleadoEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="380">
 
   <StackPanel>
-    <TextBlock Text="Nombre y apellido" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Nombre y apellido">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
-    <TextBlock Text="Cédula" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding Cedula, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Cédula">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding Cedula, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
-    <TextBlock Text="Cargo" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding Cargo, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Cargo">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding Cargo, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
     <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
               Foreground="{DynamicResource TextPrimaryBrush}"

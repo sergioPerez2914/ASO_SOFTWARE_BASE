@@ -1,3 +1,4 @@
+using System.Linq;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Services;
 
@@ -24,6 +25,72 @@ public class LoginViewModel : ViewModelBase
     {
         get => _nombreUsuario;
         set => SetProperty(ref _nombreUsuario, value);
+    }
+
+    /// <summary>
+    /// Recordar el nombre de usuario, nunca la contraseña.
+    ///
+    /// La preferencia existía, pero solo se podía cambiar desde Configuración, que está detrás
+    /// del inicio de sesión: para llegar a la casilla había que entrar antes. Aquí es donde se
+    /// usa, así que aquí es donde tiene que poder cambiarse.
+    /// </summary>
+    public bool RecordarUsuario
+    {
+        get => Ajustes.Actual.RecordarUltimoUsuario;
+        set
+        {
+            if (Ajustes.Actual.RecordarUltimoUsuario == value)
+                return;
+
+            Ajustes.Actual.RecordarUltimoUsuario = value;
+
+            // Al apagarlo se borra el que ya estaba guardado: dejarlo escrito haria que la
+            // casilla dijera una cosa y el disco otra.
+            if (!value)
+                Ajustes.Actual.UltimoUsuario = string.Empty;
+
+            Ajustes.Guardar();
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// A qué base se está conectando, en una línea y sin credenciales.
+    ///
+    /// Antes no se decía en ninguna parte, y con la instalación pudiendo apuntar a un archivo
+    /// LocalDB propio o a un SQL Server compartido (<c>appsettings.local.json</c>), entrar sin
+    /// saber cuál de las dos es entrar a ciegas: los datos que se ven después dependen de eso.
+    /// </summary>
+    public static string OrigenDatos
+    {
+        get
+        {
+            try
+            {
+                var cadena = AppConfig.ConnectionString;
+
+                var origen = cadena
+                    .Split(';')
+                    .Select(t => t.Trim())
+                    .FirstOrDefault(t => t.StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase)
+                                      || t.StartsWith("Server=", StringComparison.OrdinalIgnoreCase));
+
+                if (origen is null)
+                    return string.Empty;
+
+                var valor = origen[(origen.IndexOf('=') + 1)..].Trim();
+
+                return valor.Contains("localdb", StringComparison.OrdinalIgnoreCase)
+                    ? "Base local de esta máquina (LocalDB)"
+                    : $"Base en {valor}";
+            }
+            catch
+            {
+                // El pie de la ventana es informativo: si la configuracion no se puede leer, el
+                // fallo real saldra al intentar entrar, con su mensaje.
+                return string.Empty;
+            }
+        }
     }
 
     private string _mensajeError = string.Empty;

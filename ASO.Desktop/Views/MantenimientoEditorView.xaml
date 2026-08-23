@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.MantenimientoEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.MantenimientoEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="520">
 
@@ -20,17 +21,19 @@
       </Grid.RowDefinitions>
 
       <StackPanel Grid.Row="0" Grid.Column="0">
-        <TextBlock Text="Activo" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Activos}" DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding ActivoSeleccionado}" />
+        <controls:FormField Etiqueta="Activo">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Activos}" DisplayMemberPath="Etiqueta"
+                    SelectedItem="{Binding ActivoSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="0" Grid.Column="2">
-        <TextBlock Text="Tipo de trabajo" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Tipos}"
-                  SelectedItem="{Binding TipoSeleccionado}" />
+        <controls:FormField Etiqueta="Tipo de trabajo">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Tipos}"
+                    SelectedItem="{Binding TipoSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="1" Grid.Column="0">
@@ -45,37 +48,42 @@
       </StackPanel>
 
       <StackPanel Grid.Row="1" Grid.Column="2">
-        <TextBlock Text="{Binding EtiquetaLectura}" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding LecturaTexto, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Lectura del instrumento al momento del trabajo (opcional)" />
+        <controls:FormField Etiqueta="{Binding EtiquetaLectura}">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding LecturaTexto, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Lectura del instrumento al momento del trabajo (opcional)" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="2" Grid.Column="0">
-        <TextBlock Text="Costo de repuestos" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding CostoRepuestosTexto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Costo de repuestos">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding CostoRepuestosTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="2" Grid.Column="2">
-        <TextBlock Text="Costo de mano de obra" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding CostoManoObraTexto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Costo de mano de obra">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding CostoManoObraTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="Descripción del trabajo" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding Descripcion, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Descripción del trabajo">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Descripcion, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
-    <TextBlock Text="Repuestos usados" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding RepuestosUsados, UpdateSourceTrigger=PropertyChanged}"
-             ToolTip="Un repuesto por línea. Se descontará de Inventario cuando exista el módulo." />
+    <controls:FormField Etiqueta="Repuestos usados">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding RepuestosUsados, UpdateSourceTrigger=PropertyChanged}"
+               ToolTip="Un repuesto por línea. Se descontará de Inventario cuando exista el módulo." />
+    </controls:FormField>
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -85,18 +93,20 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Realizado por" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding RealizadoPor, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Se vinculará al padrón de Nómina cuando exista el módulo" />
+        <controls:FormField Etiqueta="Realizado por">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding RealizadoPor, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Se vinculará al padrón de Nómina cuando exista el módulo" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Remesa vinculada (opcional)" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding RemesasVinculables}" DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding OpcionRemesaSeleccionada}"
-                  ToolTip="El trabajo aparecerá en la línea de tiempo de esa remesa" />
+        <controls:FormField Etiqueta="Remesa vinculada (opcional)">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding RemesasVinculables}" DisplayMemberPath="Etiqueta"
+                    SelectedItem="{Binding OpcionRemesaSeleccionada}"
+                    ToolTip="El trabajo aparecerá en la línea de tiempo de esa remesa" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
   </StackPanel>

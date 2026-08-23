@@ -55,8 +55,36 @@ public sealed class AparienciaViewModel : ViewModelBase
 
             Services.Tema.Aplicar(value.Valor);
             Ajustes.Actual.Tema = value.Valor;
-            Ajustes.Guardar();
+
+            if (Ajustes.Guardar())
+                Aviso.Mostrar();
+
+            OnPropertyChanged(nameof(EsClaro));
+            OnPropertyChanged(nameof(EsOscuro));
         }
+    }
+
+    public AvisoGuardado Aviso { get; } = new();
+
+    /// <summary>
+    /// El tema, como dos interruptores en vez de una lista desplegable.
+    ///
+    /// Elegir entre dos cosas no necesita abrir un menu: se ven las dos y se pulsa una. Y como el
+    /// tema se aplica al marcar, la aplicacion entera es la vista previa.
+    ///
+    /// El setter solo actua al marcar, igual que las pestanas: al desmarcar ya hay otro boton del
+    /// grupo encendiendose.
+    /// </summary>
+    public bool EsClaro
+    {
+        get => Tema.Valor == TemaApp.Claro;
+        set { if (value) Tema = TemasDisponibles.First(o => o.Valor == TemaApp.Claro); }
+    }
+
+    public bool EsOscuro
+    {
+        get => Tema.Valor == TemaApp.Oscuro;
+        set { if (value) Tema = TemasDisponibles.First(o => o.Valor == TemaApp.Oscuro); }
     }
 
     private OpcionEscala _escala;
@@ -71,7 +99,9 @@ public sealed class AparienciaViewModel : ViewModelBase
             // La ventana escucha Ajustes.Cambiaron y reaplica el LayoutTransform: guardar es
             // lo que dispara el cambio, no hay que avisar a nadie más.
             Ajustes.Actual.EscalaInterfaz = value.Valor;
-            Ajustes.Guardar();
+
+            if (Ajustes.Guardar())
+                Aviso.Mostrar();
         }
     }
 }

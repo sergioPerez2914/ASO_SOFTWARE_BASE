@@ -24,6 +24,7 @@ public sealed class RecepcionRemesaEditorViewModel : CrudEditorViewModelBase
     }
 
     public override string Titulo => $"Registrar recepción · Remesa Nº {_remesa.Id}";
+    public override string TextoAccion => "Registrar la recepción";
 
     public string ResumenRemesa =>
         $"{_remesa.FincaCodigoCam} · {_remesa.FincaNombre} — {_remesa.UbicacionTexto} — Placa {_remesa.VehiculoPlaca}";

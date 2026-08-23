@@ -31,7 +31,7 @@ public sealed class InventoryItemEditorViewModel : CrudEditorViewModelBase<Inven
     }
 
     public override string Titulo => EsNuevo ? "Nuevo artículo" : $"Editar artículo {_original.Codigo}";
-    public override double AnchoEditor => 460;
+    public override double AnchoEditor => Ancho.Estandar;
 
     /// <summary>El código solo es editable en el alta (la vista lo bloquea con esta bandera).</summary>
     public bool EsNuevo { get; }

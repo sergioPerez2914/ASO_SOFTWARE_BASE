@@ -15,13 +15,8 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <StackPanel Grid.Row="0" Margin="0,0,0,16">
-      <TextBlock Text="Peticiones de cambio" FontSize="20" FontWeight="Bold"
-                 Foreground="{DynamicResource TextPrimaryBrush}" />
-      <TextBlock Text="{Binding ResumenPendientes}" FontSize="12"
-                 Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-    </StackPanel>
+    <controls:PageHeader Grid.Row="0" Titulo="Peticiones de cambio"
+                         Descripcion="{Binding ResumenPendientes}" />
 
     <!-- Barra: filtro por estado y acciones -->
     <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
@@ -37,28 +32,26 @@
 
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
           <RadioButton Content="Pendientes" GroupName="FiltroPeticion" IsChecked="True"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroCommand}" CommandParameter="Pendientes" />
           <RadioButton Content="Resueltas" GroupName="FiltroPeticion"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroCommand}" CommandParameter="Resueltas" />
           <RadioButton Content="Todas" GroupName="FiltroPeticion"
-                       Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroCommand}" CommandParameter="Todas" />
         </StackPanel>
 
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-          <Button Content="Aprobar" Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
-                  Command="{Binding AprobarCommand}" />
-          <Button Content="Rechazar" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Aprobar" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AprobarCommand}" />
+          <Button Content="Rechazar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding RechazarCommand}" />
-          <Button Content="Actualizar" Style="{StaticResource BarraBotonStyle}"
+          <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding RefrescarCommand}" />
         </StackPanel>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
-                   Text="{Binding NotaAprobacion}" TextWrapping="Wrap" FontSize="11"
+                   Text="{Binding NotaAprobacion}" TextWrapping="Wrap" FontSize="{StaticResource FsCaption}"
                    Foreground="{DynamicResource TextMutedBrush}" />
       </Grid>
     </Border>
@@ -80,7 +73,7 @@
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipEstadoPeticionStyle}">
-                    <TextBlock Text="{Binding EstadoTexto}" FontSize="11" />
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
                   </Border>
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>

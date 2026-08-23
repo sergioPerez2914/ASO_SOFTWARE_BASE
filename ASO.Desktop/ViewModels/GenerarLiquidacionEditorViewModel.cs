@@ -28,7 +28,8 @@ public sealed class GenerarLiquidacionEditorViewModel : CrudEditorViewModelBase
     }
 
     public override string Titulo => "Generar liquidación";
-    public override double AnchoEditor => 480;
+    public override string TextoAccion => "Generar la liquidación";
+    public override double AnchoEditor => Ancho.Estandar;
 
     public ICommand CambiarSujetoCommand { get; }
 

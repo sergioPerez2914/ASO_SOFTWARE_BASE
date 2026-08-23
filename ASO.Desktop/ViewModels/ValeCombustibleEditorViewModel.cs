@@ -49,7 +49,7 @@ public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<Val
     }
 
     public override string Titulo => _original.Id == 0 ? "Nuevo vale de combustible" : $"Editar vale Nº {_original.Id}";
-    public override double AnchoEditor => 520;
+    public override double AnchoEditor => Ancho.Estandar;
 
     public ObservableCollection<TanqueCombustible> Tanques { get; }
     public IReadOnlyList<ActivoFlota> Activos { get; }

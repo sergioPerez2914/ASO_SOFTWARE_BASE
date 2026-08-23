@@ -1,4 +1,3 @@
-using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
 using ASO.Desktop.Services;
@@ -31,10 +30,9 @@ public sealed class ConfiguracionViewModel : PantallaViewModelBase
         : base(modulo)
     {
         Apariencia = new AparienciaViewModel();
-        Cuenta = new CuentaViewModel(DataSourceFactory.CrearUsuarios(), dialogos, sesion);
+        Cuenta = new CuentaViewModel(DataSourceFactory.CrearUsuarios(), sesion);
         Aplicacion = new PreferenciasAppViewModel(dialogos, sesion);
 
-        CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }
 
     public AparienciaViewModel Apariencia { get; }
@@ -58,5 +56,32 @@ public sealed class ConfiguracionViewModel : PantallaViewModelBase
     public bool MostrarCuenta => VistaActual == VistaCuenta;
     public bool MostrarAplicacion => VistaActual == VistaAplicacion;
 
-    public ICommand CambiarVistaCommand { get; }
+    /// <summary>
+    /// Las tres pestanas, enlazadas en DOS VIAS al IsChecked de su boton.
+    ///
+    /// Antes iban de una sola: la seleccion viajaba de la vista al ViewModel por Command, y el
+    /// primer boton llevaba IsChecked="True" escrito a fuego. Si algo cambiaba VistaActual desde
+    /// el codigo, los botones seguian marcando la pestana anterior. Escrito asi, el estado vive
+    /// en un solo sitio y los dos lados lo leen de ahi.
+    ///
+    /// El setter solo actua al marcar: al desmarcar ya hay otro boton del grupo encendiendose, y
+    /// atender los dos avisos apagaria la pestana recien elegida.
+    /// </summary>
+    public bool EsApariencia
+    {
+        get => MostrarApariencia;
+        set { if (value) VistaActual = VistaApariencia; }
+    }
+
+    public bool EsCuenta
+    {
+        get => MostrarCuenta;
+        set { if (value) VistaActual = VistaCuenta; }
+    }
+
+    public bool EsAplicacion
+    {
+        get => MostrarAplicacion;
+        set { if (value) VistaActual = VistaAplicacion; }
+    }
 }

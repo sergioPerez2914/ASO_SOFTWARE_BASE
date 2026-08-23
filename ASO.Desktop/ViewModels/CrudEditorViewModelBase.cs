@@ -24,8 +24,36 @@ public abstract class CrudEditorViewModelBase : ViewModelBase
     public ICommand GuardarCommand { get; }
     public ICommand CancelarCommand { get; }
 
-    /// <summary>Ancho de la ventana modal. Los formularios largos lo suben (p. ej. la remesa).</summary>
-    public virtual double AnchoEditor => 420;
+    /// <summary>
+    /// Los tres anchos de ventana que existen. Antes habia ocho (420, 460, 480, 500, 520, 560,
+    /// 640 y 760), elegidos uno a uno segun lo que ocupara cada formulario: dos editores con el
+    /// mismo numero de campos salian de distinto tamano, y abrir uno detras de otro hacia saltar
+    /// la ventana.
+    /// </summary>
+    public static class Ancho
+    {
+        /// <summary>Una o dos preguntas: un motivo, una confirmacion.</summary>
+        public const double Compacto = 440;
+
+        /// <summary>Un formulario normal, de una columna.</summary>
+        public const double Estandar = 560;
+
+        /// <summary>Formularios de dos columnas o con una lista dentro.</summary>
+        public const double Amplio = 760;
+    }
+
+    /// <summary>Ancho de la ventana modal. Uno de los tres de <see cref="Ancho"/>.</summary>
+    public virtual double AnchoEditor => Ancho.Compacto;
+
+    /// <summary>
+    /// Lo que dice el boton de confirmar.
+    ///
+    /// Por defecto "Guardar", que es lo que hacen los editores de alta y edicion. Pero la misma
+    /// ventana la usan acciones que no guardan nada: "Anular remesa Nº 12", "Registrar salida",
+    /// "Generar factura al ingenio", "Registrar recepcion". Un boton que dice Guardar delante de
+    /// una anulacion describe mal lo que va a pasar al pulsarlo.
+    /// </summary>
+    public virtual string TextoAccion => "Guardar";
 
     protected CrudEditorViewModelBase()
     {

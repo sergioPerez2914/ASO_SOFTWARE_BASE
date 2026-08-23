@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.SalidaJornadaEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.SalidaJornadaEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="380">
 
@@ -18,16 +19,18 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Fecha de salida" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding FechaSalida}" />
+        <controls:FormField Etiqueta="Fecha de salida">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding FechaSalida}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Hora de salida" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding HoraSalida, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Formato HH:mm" />
+        <controls:FormField Etiqueta="Hora de salida">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding HoraSalida, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Formato HH:mm" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 

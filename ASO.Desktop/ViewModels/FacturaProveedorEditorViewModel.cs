@@ -39,7 +39,7 @@ public sealed class FacturaProveedorEditorViewModel : CrudEditorViewModelBase<Fa
     public override string Titulo =>
         _original.Id == 0 ? "Registrar factura de proveedor" : $"Editar factura Nº {_original.Id}";
 
-    public override double AnchoEditor => 500;
+    public override double AnchoEditor => Ancho.Estandar;
 
     public IReadOnlyList<Proveedor> Proveedores { get; }
 

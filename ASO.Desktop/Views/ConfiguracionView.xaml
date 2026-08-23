@@ -3,8 +3,39 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
+
+  <UserControl.Resources>
+    <!-- Fila de un ajuste: el interruptor a la izquierda y su explicacion debajo, sangrada bajo
+         la etiqueta. Se repite en las tres pestanas. -->
+    <Style x:Key="AyudaAjusteStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource FsCaption}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="44,4,0,0" />
+    </Style>
+
+    <Style x:Key="TituloTarjetaStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource FsTitle}" />
+      <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="SubtituloTarjetaStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource FsCaption}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="0,4,0,14" />
+    </Style>
+
+    <Style x:Key="DatoStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource FsSubtitle}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+  </UserControl.Resources>
 
   <Grid>
     <Grid.RowDefinitions>
@@ -13,191 +44,213 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Encabezado -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
+    <controls:PageHeader Grid.Row="0" Titulo="Configuración"
+                         Descripcion="Cómo se ve la aplicación, tu cuenta, y cómo se comporta en esta máquina." />
 
-      <StackPanel Grid.Column="0">
-        <TextBlock Text="Configuración" FontSize="20" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock Text="Cómo se ve la aplicación, tu cuenta, y cómo se comporta en esta máquina."
-                   FontSize="12" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-      </StackPanel>
-
-      <Button Grid.Column="1" Content="Volver al inicio" VerticalAlignment="Top"
-              Padding="12,6" Cursor="Hand" Background="Transparent"
-              BorderBrush="{DynamicResource BorderBrush}"
-              Foreground="{DynamicResource TextPrimaryBrush}"
-              Command="{Binding VolverCommand}" />
-    </Grid>
-
-    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+    <!-- Pestanas de verdad, subrayadas. Antes eran tres pastillas azules rellenas con el estilo
+         del filtro de rango, asi que una pestana pesaba lo mismo que el boton primario de la
+         pantalla; y el enlace iba de una sola via, con IsChecked="True" a fuego en la primera. -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
       <RadioButton Content="Apariencia" GroupName="ConfigVista"
-                   IsChecked="True"
-                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Apariencia" />
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsApariencia, Mode=TwoWay}" />
       <RadioButton Content="Mi cuenta" GroupName="ConfigVista"
-                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Cuenta" />
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsCuenta, Mode=TwoWay}" />
       <RadioButton Content="Aplicación" GroupName="ConfigVista"
-                   Style="{StaticResource RangeToggleStyle}" Margin="0,0,6,0"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Aplicacion" />
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsAplicacion, Mode=TwoWay}" />
     </StackPanel>
 
-    <!-- Apariencia: se aplica al momento, sin botón de guardar -->
-    <Grid Grid.Row="2" DataContext="{Binding Apariencia}"
+    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+            Background="{DynamicResource BorderBrush}" />
+
+    <!-- ============================= Apariencia ============================= -->
+    <Grid Grid.Row="2" Margin="0,20,0,0" DataContext="{Binding Apariencia}"
           Visibility="{Binding DataContext.MostrarApariencia,
                                RelativeSource={RelativeSource AncestorType=UserControl},
                                Converter={StaticResource BoolToVis}}">
-      <Border Style="{StaticResource CardStyle}"
-              VerticalAlignment="Top" HorizontalAlignment="Left" Width="460">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MaxWidth="520" />
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" MaxWidth="520" />
+      </Grid.ColumnDefinitions>
+
+      <Border Grid.Column="0" Style="{StaticResource SectionCardStyle}" VerticalAlignment="Top">
         <StackPanel>
-          <TextBlock Text="Apariencia" FontSize="15" FontWeight="Bold"
-                     Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="Tema" Style="{StaticResource TituloTarjetaStyle}" />
           <TextBlock Text="Se aplica al instante y se recuerda en esta máquina. No afecta a nadie más."
-                     FontSize="11" TextWrapping="Wrap"
-                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+                     Style="{StaticResource SubtituloTarjetaStyle}" />
 
-          <TextBlock Text="Tema" Style="{StaticResource FormLabelStyle}" />
-          <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                    ItemsSource="{Binding TemasDisponibles}" DisplayMemberPath="Texto"
-                    SelectedItem="{Binding Tema}" />
+          <!-- La aplicacion entera es la vista previa: el tema cambia al marcar. -->
+          <StackPanel Orientation="Horizontal">
+            <RadioButton Content="Claro" GroupName="Tema"
+                         Style="{StaticResource FilterChipStyle}"
+                         IsChecked="{Binding EsClaro, Mode=TwoWay}" />
+            <RadioButton Content="Oscuro" GroupName="Tema"
+                         Style="{StaticResource FilterChipStyle}"
+                         IsChecked="{Binding EsOscuro, Mode=TwoWay}" />
+          </StackPanel>
 
-          <TextBlock Text="Escala de la interfaz" Style="{StaticResource FormLabelStyle}" />
+          <TextBlock Text="{Binding Aviso.Texto}" Margin="0,14,0,0"
+                     FontSize="{StaticResource FsCaption}"
+                     Foreground="{DynamicResource SuccessTextBrush}" />
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="2" Style="{StaticResource SectionCardStyle}" VerticalAlignment="Top">
+        <StackPanel>
+          <TextBlock Text="Escala de la interfaz" Style="{StaticResource TituloTarjetaStyle}" />
+          <TextBlock Text="Agranda toda la ventana, no solo el texto: iconos, tablas y botones crecen con ella."
+                     Style="{StaticResource SubtituloTarjetaStyle}" />
+
           <ComboBox Style="{StaticResource FormComboBoxStyle}"
                     ItemsSource="{Binding EscalasDisponibles}" DisplayMemberPath="Texto"
                     SelectedItem="{Binding Escala}" />
-          <TextBlock Text="Agranda toda la ventana, no solo el texto: iconos, tablas y botones crecen con ella."
-                     FontSize="11" TextWrapping="Wrap"
-                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
         </StackPanel>
       </Border>
     </Grid>
 
-    <!-- Mi cuenta -->
-    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Auto"
-                  DataContext="{Binding Cuenta}"
-                  Visibility="{Binding DataContext.MostrarCuenta,
-                                       RelativeSource={RelativeSource AncestorType=UserControl},
-                                       Converter={StaticResource BoolToVis}}">
-      <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+    <!-- ============================== Mi cuenta ============================== -->
+    <Grid Grid.Row="2" Margin="0,20,0,0" DataContext="{Binding Cuenta}"
+          Visibility="{Binding DataContext.MostrarCuenta,
+                               RelativeSource={RelativeSource AncestorType=UserControl},
+                               Converter={StaticResource BoolToVis}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MaxWidth="520" />
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" MaxWidth="520" />
+      </Grid.ColumnDefinitions>
 
-        <Border Style="{StaticResource CardStyle}"
-                VerticalAlignment="Top" Width="380" Margin="0,0,12,0">
-          <StackPanel>
-            <TextBlock Text="Quién eres" FontSize="15" FontWeight="Bold"
-                       Foreground="{DynamicResource TextPrimaryBrush}" />
-            <TextBlock Text="El rol y los permisos los ajusta un administrador desde Administración · Usuarios."
-                       FontSize="11" TextWrapping="Wrap"
-                       Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+      <Border Grid.Column="0" Style="{StaticResource SectionCardStyle}" VerticalAlignment="Top">
+        <StackPanel>
+          <TextBlock Text="Quién eres" Style="{StaticResource TituloTarjetaStyle}" />
+          <TextBlock Text="El rol y los permisos los ajusta un administrador desde Administración · Usuarios."
+                     Style="{StaticResource SubtituloTarjetaStyle}" />
 
-            <TextBlock Text="Usuario" Style="{StaticResource FormLabelStyle}" />
-            <TextBlock Text="{Binding NombreUsuario}" FontSize="13"
-                       Foreground="{DynamicResource TextPrimaryBrush}" />
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" MinWidth="120" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <TextBlock Text="Nombre completo" Style="{StaticResource FormLabelStyle}" />
-            <TextBlock Text="{Binding NombreCompleto}" FontSize="13" TextWrapping="Wrap"
-                       Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Usuario" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,6" />
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding NombreUsuario}" Style="{StaticResource DatoStyle}" Margin="0,0,0,6" />
 
-            <TextBlock Text="Rol" Style="{StaticResource FormLabelStyle}" />
-            <TextBlock Text="{Binding RolTexto}" FontSize="13"
-                       Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Nombre completo" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,6" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding NombreCompleto}" Style="{StaticResource DatoStyle}" Margin="0,0,0,6" />
 
-            <TextBlock Text="Núcleo" Style="{StaticResource FormLabelStyle}" />
-            <TextBlock Text="{Binding NucleoTexto}" FontSize="13" TextWrapping="Wrap"
-                       Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Rol" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,6" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RolTexto}" Style="{StaticResource DatoStyle}" Margin="0,0,0,6" />
 
-            <CheckBox Content="Recordar mi usuario en el inicio de sesión"
-                      Margin="0,16,0,0" Cursor="Hand" FontSize="12"
-                      Foreground="{DynamicResource TextPrimaryBrush}"
-                      IsChecked="{Binding RecordarUsuario}" />
-            <TextBlock Text="Solo el nombre de usuario. La contraseña nunca se guarda."
-                       FontSize="11" TextWrapping="Wrap"
-                       Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
-          </StackPanel>
-        </Border>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Núcleo" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,6" />
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding NucleoTexto}" Style="{StaticResource DatoStyle}" Margin="0,0,0,6" />
+          </Grid>
 
-        <Border Style="{StaticResource CardStyle}" VerticalAlignment="Top" Width="380">
-          <StackPanel>
-            <TextBlock Text="Cambiar mi contraseña" FontSize="15" FontWeight="Bold"
-                       Foreground="{DynamicResource TextPrimaryBrush}" />
-            <TextBlock Text="{Binding AyudaPassword}" FontSize="11" TextWrapping="Wrap"
-                       Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+          <Border Margin="0,14,0,0" Padding="0,14,0,0" BorderThickness="0,1,0,0"
+                  BorderBrush="{DynamicResource BorderBrush}">
+            <StackPanel>
+              <CheckBox Style="{StaticResource ToggleSwitchStyle}"
+                        Content="Recordar mi usuario en el inicio de sesión"
+                        IsChecked="{Binding RecordarUsuario}" />
+              <TextBlock Style="{StaticResource AyudaAjusteStyle}"
+                         Text="Se recuerda el nombre, nunca la contraseña." />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Border>
 
-            <TextBlock Text="Contraseña actual" Style="{StaticResource FormLabelStyle}" />
+      <Border Grid.Column="2" Style="{StaticResource SectionCardStyle}" VerticalAlignment="Top">
+        <StackPanel>
+          <TextBlock Text="Cambiar mi contraseña" Style="{StaticResource TituloTarjetaStyle}" />
+          <TextBlock Text="{Binding AyudaPassword}" Style="{StaticResource SubtituloTarjetaStyle}" />
+
+          <!-- Se pide la actual aunque la sesion ya este abierta: un equipo desatendido es justo
+               el caso en el que alguien cambiaria la clave ajena. -->
+          <controls:FormField Etiqueta="Contraseña actual" Requerido="True">
             <PasswordBox x:Name="PasswordActual" Style="{StaticResource FormPasswordBoxStyle}" />
+          </controls:FormField>
 
-            <TextBlock Text="Contraseña nueva" Style="{StaticResource FormLabelStyle}" />
+          <controls:FormField Etiqueta="Contraseña nueva" Requerido="True">
             <PasswordBox x:Name="PasswordNueva" Style="{StaticResource FormPasswordBoxStyle}" />
+          </controls:FormField>
 
-            <TextBlock Text="Repetir la nueva" Style="{StaticResource FormLabelStyle}" />
+          <controls:FormField Etiqueta="Repetir la nueva" Requerido="True"
+                              Error="{Binding ErrorPassword}">
             <PasswordBox x:Name="PasswordConfirmacion" Style="{StaticResource FormPasswordBoxStyle}"
                          KeyDown="OnPasswordKeyDown" />
+          </controls:FormField>
 
-            <Button Content="Cambiar contraseña" Margin="0,16,0,0" HorizontalAlignment="Left"
-                    Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                    Background="{DynamicResource PrimaryBrush}" Foreground="White"
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <Button Content="Cambiar contraseña" Style="{StaticResource PrimaryButtonStyle}"
                     Click="OnCambiarPassword" />
+            <TextBlock Text="{Binding Aviso.Texto}" VerticalAlignment="Center" Margin="12,0,0,0"
+                       FontSize="{StaticResource FsCaption}"
+                       Foreground="{DynamicResource SuccessTextBrush}" />
           </StackPanel>
-        </Border>
+        </StackPanel>
+      </Border>
+    </Grid>
 
-      </StackPanel>
-    </ScrollViewer>
-
-    <!-- Aplicación: guarda con botón, porque el umbral se escribe a mano -->
-    <Grid Grid.Row="2" DataContext="{Binding Aplicacion}"
+    <!-- ============================== Aplicación ============================== -->
+    <Grid Grid.Row="2" Margin="0,20,0,0" DataContext="{Binding Aplicacion}"
           Visibility="{Binding DataContext.MostrarAplicacion,
                                RelativeSource={RelativeSource AncestorType=UserControl},
                                Converter={StaticResource BoolToVis}}">
-      <Border Style="{StaticResource CardStyle}"
-              VerticalAlignment="Top" HorizontalAlignment="Left" Width="460">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MaxWidth="520" />
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" MaxWidth="520" />
+      </Grid.ColumnDefinitions>
+
+      <Border Grid.Column="0" Style="{StaticResource SectionCardStyle}" VerticalAlignment="Top">
         <StackPanel>
-          <TextBlock Text="Aplicación" FontSize="15" FontWeight="Bold"
-                     Foreground="{DynamicResource TextPrimaryBrush}" />
-          <TextBlock Text="Cómo se comporta el sistema en esta máquina."
-                     FontSize="11" TextWrapping="Wrap"
-                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+          <TextBlock Text="Al abrir" Style="{StaticResource TituloTarjetaStyle}" />
+          <TextBlock Text="Vale para todos los que usen esta máquina."
+                     Style="{StaticResource SubtituloTarjetaStyle}" />
 
-          <CheckBox Content="Abrir en la última sección visitada" Cursor="Hand" FontSize="12"
-                    Foreground="{DynamicResource TextPrimaryBrush}"
+          <CheckBox Style="{StaticResource ToggleSwitchStyle}"
+                    Content="Abrir en la última sección visitada"
                     IsChecked="{Binding AbrirEnUltimaSeccion}" />
-          <TextBlock Text="Si no, la aplicación abre siempre en Inicio."
-                     FontSize="11" TextWrapping="Wrap"
-                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+          <TextBlock Style="{StaticResource AyudaAjusteStyle}"
+                     Text="Si está apagado, la aplicación siempre abre en Inicio." />
 
-          <Border Margin="0,16,0,0" Padding="0,14,0,0"
-                  BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
-            <StackPanel>
-              <TextBlock Text="Operación" FontSize="13" FontWeight="SemiBold"
-                         Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="{Binding Aviso.Texto}" Margin="0,14,0,0"
+                     FontSize="{StaticResource FsCaption}"
+                     Foreground="{DynamicResource SuccessTextBrush}" />
+        </StackPanel>
+      </Border>
 
-              <TextBlock Text="Umbral de alerta de consumo (%)" Style="{StaticResource FormLabelStyle}" />
-              <TextBox Style="{StaticResource FormTextBoxStyle}"
-                       IsEnabled="{Binding PuedeAjustarOperacion}"
-                       Text="{Binding UmbralTexto, UpdateSourceTrigger=PropertyChanged}" />
-              <TextBlock Text="{Binding AyudaUmbral}" FontSize="11" TextWrapping="Wrap"
-                         Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
+      <Border Grid.Column="2" Style="{StaticResource SectionCardStyle}" VerticalAlignment="Top">
+        <StackPanel>
+          <TextBlock Text="Operación" Style="{StaticResource TituloTarjetaStyle}" />
+          <TextBlock Text="Decide cuándo un vale de combustible se marca con alerta."
+                     Style="{StaticResource SubtituloTarjetaStyle}" />
 
-              <TextBlock Text="Solo un administrador puede cambiarlo: decide cuándo un vale de combustible se marca con alerta."
-                         FontSize="11" TextWrapping="Wrap"
-                         Foreground="{DynamicResource WarningBrush}" Margin="0,6,0,0"
-                         Visibility="{Binding MostrarAvisoSinPermiso,
-                                              Converter={StaticResource BoolToVis}}" />
-            </StackPanel>
+          <controls:FormField Etiqueta="Umbral de alerta de consumo (%)"
+                              Ayuda="{Binding AyudaUmbral}"
+                              Error="{Binding ErrorUmbral}">
+            <TextBox Style="{StaticResource FormTextBoxStyle}" MaxWidth="160"
+                     HorizontalAlignment="Left"
+                     IsEnabled="{Binding PuedeAjustarOperacion}"
+                     Text="{Binding UmbralTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+
+          <!-- Explica por que el campo esta gris, en vez de dejarlo apagado sin motivo. -->
+          <Border Style="{StaticResource AlertBoxStyle}"
+                  Visibility="{Binding MostrarAvisoSinPermiso, Converter={StaticResource BoolToVis}}">
+            <TextBlock TextWrapping="Wrap" FontSize="{StaticResource FsCaption}"
+                       Foreground="{DynamicResource WarningTextBrush}"
+                       Text="Necesitas el permiso Configuración · Preferencias para cambiar el umbral. Pídeselo a un administrador del núcleo." />
           </Border>
-
-          <Button Content="Guardar" Margin="0,18,0,0" HorizontalAlignment="Left"
-                  Padding="14,7" Cursor="Hand" FontSize="12" BorderThickness="0"
-                  Background="{DynamicResource PrimaryBrush}" Foreground="White"
-                  Command="{Binding GuardarCommand}" />
         </StackPanel>
       </Border>
     </Grid>
-
   </Grid>
 </UserControl>

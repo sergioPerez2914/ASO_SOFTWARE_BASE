@@ -37,7 +37,7 @@ public sealed class ActivoEditorViewModel : CrudEditorViewModelBase<ActivoFlota>
 
     public override string Titulo => _esNuevo ? "Nuevo activo de flota" : $"Editar {_original.Codigo}";
 
-    public override double AnchoEditor => 560;
+    public override double AnchoEditor => Ancho.Estandar;
 
     public IReadOnlyList<TipoActivo> Tipos { get; } =
         [TipoActivo.Cosechadora, TipoActivo.Tractor, TipoActivo.Alzadora, TipoActivo.Camion, TipoActivo.Chuto];

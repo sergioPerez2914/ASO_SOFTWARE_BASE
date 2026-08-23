@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.RecepcionRemesaEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.RecepcionRemesaEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="380">
 
@@ -29,15 +30,17 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Peso bruto (t)" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding PesoBrutoTexto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Peso bruto (t)">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding PesoBrutoTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Tara (t)" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding TaraTexto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Tara (t)">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding TaraTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 

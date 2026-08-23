@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.InventoryItemEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.InventoryItemEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="420">
 
@@ -15,16 +16,18 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Código" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 IsReadOnly="{Binding CodigoBloqueado}"
-                 Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Código">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   IsReadOnly="{Binding CodigoBloqueado}"
+                   Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Nombre" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Nombre">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
@@ -36,15 +39,17 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Categoría" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Categoria, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Categoría">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Categoria, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Ubicación" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Ubicacion, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Ubicación">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Ubicacion, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
@@ -60,27 +65,31 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Unidad" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Unidad, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Unidad">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Unidad, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Existencia" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding StockActual, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Existencia">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding StockActual, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="4">
-        <TextBlock Text="Mínimo" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding StockMinimo, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Mínimo">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding StockMinimo, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="6">
-        <TextBlock Text="Costo unitario" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding CostoUnitario, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Costo unitario">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding CostoUnitario, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 

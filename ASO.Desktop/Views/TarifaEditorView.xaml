@@ -1,15 +1,17 @@
-<UserControl x:Class="ASO.Desktop.Views.TarifaEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.TarifaEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="440">
 
   <StackPanel>
-    <TextBlock Text="Concepto" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding Concepto, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Concepto">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding Concepto, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
     <Grid Margin="0,0,0,0">
       <Grid.ColumnDefinitions>
@@ -19,15 +21,17 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Servicio" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Servicios}" SelectedItem="{Binding Servicio}" />
+        <controls:FormField Etiqueta="Servicio">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Servicios}" SelectedItem="{Binding Servicio}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Ámbito" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Ambitos}" SelectedItem="{Binding Ambito}" />
+        <controls:FormField Etiqueta="Ámbito">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Ambitos}" SelectedItem="{Binding Ambito}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
@@ -43,15 +47,17 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Unidad" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Unidades}" SelectedItem="{Binding Unidad}" />
+        <controls:FormField Etiqueta="Unidad">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Unidades}" SelectedItem="{Binding Unidad}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Monto por unidad" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Monto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Monto por unidad">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Monto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
@@ -63,15 +69,17 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Vigente desde" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding VigenteDesde}" />
+        <controls:FormField Etiqueta="Vigente desde">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding VigenteDesde}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Vigente hasta (opcional)" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding VigenteHasta}" />
+        <controls:FormField Etiqueta="Vigente hasta (opcional)">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding VigenteHasta}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
@@ -79,11 +87,12 @@
                FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
-    <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Notas">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
     <CheckBox Content="Activa" Margin="0,14,0,0" Cursor="Hand"
               Foreground="{DynamicResource TextPrimaryBrush}"

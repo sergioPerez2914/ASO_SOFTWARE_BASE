@@ -56,7 +56,7 @@ public sealed class MantenimientoEditorViewModel : CrudEditorViewModelBase<Mante
 
     public override string Titulo => "Registrar mantenimiento";
 
-    public override double AnchoEditor => 560;
+    public override double AnchoEditor => Ancho.Estandar;
 
     public IReadOnlyList<ActivoFlota> Activos { get; }
     public IReadOnlyList<TipoMantenimiento> Tipos { get; } =

@@ -46,7 +46,7 @@ public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
     public override string Titulo => _esNuevo ? "Nueva remesa de caña" : $"Editar remesa Nº {_original.Id}";
 
     /// <summary>Son ~18 campos en dos columnas; con 420 px no entran.</summary>
-    public override double AnchoEditor => 760;
+    public override double AnchoEditor => Ancho.Amplio;
 
     // --- Catálogos ---
     public IReadOnlyList<Finca> Fincas { get; }

@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
@@ -97,6 +97,25 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
 
     public bool MostrarNucleo => VistaActual == VistaNucleo;
     public bool MostrarUsuarios => VistaActual == VistaUsuarios;
+
+    /// <summary>
+    /// Las dos pestanas, enlazadas en DOS VIAS al IsChecked de su boton. Antes la seleccion
+    /// viajaba solo de la vista al ViewModel por Command, con IsChecked="True" a fuego en la
+    /// primera: si algo cambiaba VistaActual desde el codigo, los botones no se enteraban.
+    ///
+    /// El setter solo actua al marcar: al desmarcar ya hay otro boton del grupo encendiendose.
+    /// </summary>
+    public bool EsUsuarios
+    {
+        get => MostrarUsuarios;
+        set { if (value) VistaActual = VistaUsuarios; }
+    }
+
+    public bool EsNucleo
+    {
+        get => MostrarNucleo;
+        set { if (value) VistaActual = VistaNucleo; }
+    }
 
     public ICommand CambiarVistaCommand { get; }
 }

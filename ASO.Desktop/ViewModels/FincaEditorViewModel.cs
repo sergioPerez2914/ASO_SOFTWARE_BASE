@@ -87,7 +87,7 @@ public sealed class FincaEditorViewModel : CrudEditorViewModelBase<Finca>
 
     public override string Titulo => _original.Id == 0 ? "Nueva finca" : $"Editar finca Nº {_original.Id}";
 
-    public override double AnchoEditor => 640;
+    public override double AnchoEditor => Ancho.Amplio;
 
     private string _codigoCam = string.Empty;
     public string CodigoCam

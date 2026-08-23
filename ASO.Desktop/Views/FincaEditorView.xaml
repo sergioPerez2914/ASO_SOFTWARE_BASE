@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.FincaEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.FincaEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="600">
 
@@ -18,13 +19,15 @@
   </UserControl.Resources>
 
   <StackPanel>
-    <TextBlock Text="Código CAM" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding CodigoCam, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Código CAM">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding CodigoCam, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
-    <TextBlock Text="Nombre" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Nombre">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
     <Grid Margin="0,18,0,0">
       <Grid.ColumnDefinitions>

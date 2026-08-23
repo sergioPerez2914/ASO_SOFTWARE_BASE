@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.GenerarLiquidacionEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.GenerarLiquidacionEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="440">
 
@@ -26,11 +27,12 @@
     </StackPanel>
 
     <StackPanel Visibility="{Binding EsEmpleado, Converter={StaticResource BoolToVis}}">
-      <TextBlock Text="Empleado" Style="{StaticResource FormLabelStyle}" />
-      <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                ItemsSource="{Binding Empleados}"
-                DisplayMemberPath="Nombre"
-                SelectedItem="{Binding EmpleadoSeleccionado}" />
+      <controls:FormField Etiqueta="Empleado">
+        <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                  ItemsSource="{Binding Empleados}"
+                  DisplayMemberPath="Nombre"
+                  SelectedItem="{Binding EmpleadoSeleccionado}" />
+      </controls:FormField>
     </StackPanel>
 
     <Grid>
@@ -41,15 +43,17 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Desde" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding Desde}" />
+        <controls:FormField Etiqueta="Desde">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding Desde}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Hasta" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding Hasta}" />
+        <controls:FormField Etiqueta="Hasta">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding Hasta}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 

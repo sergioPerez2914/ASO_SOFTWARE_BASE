@@ -1,28 +1,33 @@
-<UserControl x:Class="ASO.Desktop.Views.UsuarioEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.UsuarioEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="380">
 
   <StackPanel>
-    <TextBlock Text="Nombre de usuario" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding NombreUsuario, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Nombre de usuario">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding NombreUsuario, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
-    <TextBlock Text="Nombre completo" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding NombreCompleto, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Nombre completo">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding NombreCompleto, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
-    <TextBlock Text="Rol" Style="{StaticResource FormLabelStyle}" />
-    <ComboBox Style="{StaticResource FormComboBoxStyle}"
-              ItemsSource="{Binding RolesDisponibles}"
-              SelectedItem="{Binding RolSeleccionado}"
-              DisplayMemberPath="Texto" />
+    <controls:FormField Etiqueta="Rol">
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding RolesDisponibles}"
+                SelectedItem="{Binding RolSeleccionado}"
+                DisplayMemberPath="Texto" />
+    </controls:FormField>
 
-    <TextBlock Text="{Binding EtiquetaPassword}" Style="{StaticResource FormLabelStyle}" />
-    <PasswordBox x:Name="PasswordBox" Padding="8,6" PasswordChanged="OnPasswordChanged" />
+    <controls:FormField Etiqueta="{Binding EtiquetaPassword}">
+      <PasswordBox x:Name="PasswordBox" Padding="8,6" PasswordChanged="OnPasswordChanged" />
+    </controls:FormField>
 
     <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
               IsChecked="{Binding Activo}" />

@@ -1,17 +1,19 @@
-<UserControl x:Class="ASO.Desktop.Views.FacturaProveedorEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.FacturaProveedorEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="460">
 
   <StackPanel>
-    <TextBlock Text="Proveedor" Style="{StaticResource FormLabelStyle}" />
-    <ComboBox Style="{StaticResource FormComboBoxStyle}"
-              ItemsSource="{Binding Proveedores}"
-              DisplayMemberPath="Etiqueta"
-              SelectedItem="{Binding ProveedorSeleccionado}" />
+    <controls:FormField Etiqueta="Proveedor">
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding Proveedores}"
+                DisplayMemberPath="Etiqueta"
+                SelectedItem="{Binding ProveedorSeleccionado}" />
+    </controls:FormField>
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -21,24 +23,27 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Nº de documento" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding NumeroDocumento, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="El número que trae la factura del proveedor" />
+        <controls:FormField Etiqueta="Nº de documento">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding NumeroDocumento, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="El número que trae la factura del proveedor" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Monto" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Monto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Monto">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Monto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="Descripción" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding Descripcion, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Descripción">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Descripcion, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -48,15 +53,17 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Fecha de emisión" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding FechaEmision}" />
+        <controls:FormField Etiqueta="Fecha de emisión">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding FechaEmision}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Vencimiento" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding FechaVencimiento}" />
+        <controls:FormField Etiqueta="Vencimiento">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding FechaVencimiento}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 

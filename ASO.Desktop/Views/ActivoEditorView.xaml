@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.ActivoEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.ActivoEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="520">
 
@@ -21,62 +22,71 @@
       </Grid.RowDefinitions>
 
       <StackPanel Grid.Row="0" Grid.Column="0">
-        <TextBlock Text="Código interno" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Ej.: COS-01, TRA-02, CHU-01" />
+        <controls:FormField Etiqueta="Código interno">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Ej.: COS-01, TRA-02, CHU-01" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="0" Grid.Column="2">
-        <TextBlock Text="Tipo de activo" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Tipos}"
-                  SelectedItem="{Binding TipoSeleccionado}"
-                  IsEnabled="{Binding PuedeCambiarTipo}"
-                  ToolTip="El tipo queda fijo después del alta" />
+        <controls:FormField Etiqueta="Tipo de activo">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Tipos}"
+                    SelectedItem="{Binding TipoSeleccionado}"
+                    IsEnabled="{Binding PuedeCambiarTipo}"
+                    ToolTip="El tipo queda fijo después del alta" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="1" Grid.Column="0">
-        <TextBlock Text="Marca" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Marca, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Marca">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Marca, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="1" Grid.Column="2">
-        <TextBlock Text="Modelo" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Modelo, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Modelo">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Modelo, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="2" Grid.Column="0">
-        <TextBlock Text="Año" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding AnioTexto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Año">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding AnioTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="2" Grid.Column="2"
                   Visibility="{Binding EsTransporte, Converter={StaticResource BoolToVis}}">
-        <TextBlock Text="Placa" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding Placa, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="Placa">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Placa, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="3" Grid.Column="0">
-        <TextBlock Text="{Binding EtiquetaLectura}" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding LecturaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        <controls:FormField Etiqueta="{Binding EtiquetaLectura}">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding LecturaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="Descripción" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             Text="{Binding Descripcion, UpdateSourceTrigger=PropertyChanged}"
-             ToolTip="En transporte, este texto es el que muestra el formulario de remesas" />
+    <controls:FormField Etiqueta="Descripción">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding Descripcion, UpdateSourceTrigger=PropertyChanged}"
+               ToolTip="En transporte, este texto es el que muestra el formulario de remesas" />
+    </controls:FormField>
 
-    <TextBlock Text="Notas" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Notas">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
   </StackPanel>
 </UserControl>

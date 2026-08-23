@@ -47,7 +47,7 @@ public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrab
     public ICommand CambiarPadronCommand { get; }
 
     public override string Titulo => "Registrar entrada";
-    public override double AnchoEditor => 460;
+    public override double AnchoEditor => Ancho.Estandar;
 
     public IReadOnlyList<TurnoJornada> Turnos { get; } = Enum.GetValues<TurnoJornada>();
 

@@ -31,7 +31,7 @@ public sealed class TarifaEditorViewModel : CrudEditorViewModelBase<Tarifa>
     }
 
     public override string Titulo => _original.Id == 0 ? "Nueva tarifa" : $"Editar tarifa Nº {_original.Id}";
-    public override double AnchoEditor => 480;
+    public override double AnchoEditor => Ancho.Estandar;
 
     public IReadOnlyList<ServicioZafra> Servicios { get; } = Enum.GetValues<ServicioZafra>();
     public IReadOnlyList<AmbitoTarifa> Ambitos { get; } = Enum.GetValues<AmbitoTarifa>();

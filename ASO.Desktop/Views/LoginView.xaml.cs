@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Input;
 using ASO.Desktop.Services;
 using ASO.Desktop.ViewModels;
 
@@ -44,11 +43,5 @@ public partial class LoginView : Window
 
         PasswordBox.Clear();
         PasswordBox.Focus();
-    }
-
-    private void OnPasswordKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Enter)
-            OnIniciarSesion(sender, e);
     }
 }

@@ -27,7 +27,8 @@ public sealed class GenerarFacturaEditorViewModel : CrudEditorViewModelBase
     }
 
     public override string Titulo => "Generar factura al ingenio";
-    public override double AnchoEditor => 560;
+    public override string TextoAccion => "Generar la factura";
+    public override double AnchoEditor => Ancho.Estandar;
 
     public ObservableCollection<SeleccionRemesa> Remesas { get; }
 

@@ -13,6 +13,7 @@ public sealed class AnularRemesaEditorViewModel : CrudEditorViewModelBase
     public AnularRemesaEditorViewModel(Remesa remesa) => _remesa = remesa;
 
     public override string Titulo => $"Anular remesa Nº {_remesa.Id}";
+    public override string TextoAccion => "Anular la remesa";
 
     public string ResumenRemesa =>
         $"{_remesa.FincaCodigoCam} · {_remesa.FincaNombre} — {_remesa.UbicacionTexto} — Placa {_remesa.VehiculoPlaca}";

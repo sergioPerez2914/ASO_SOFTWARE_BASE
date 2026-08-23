@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.JornadaEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.JornadaEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="420">
 
@@ -19,11 +20,12 @@
                    Command="{Binding CambiarPadronCommand}" CommandParameter="Campo" />
     </StackPanel>
 
-    <TextBlock Text="Persona" Style="{StaticResource FormLabelStyle}" />
-    <ComboBox Style="{StaticResource FormComboBoxStyle}"
-              ItemsSource="{Binding Personas}"
-              DisplayMemberPath="Nombre"
-              SelectedItem="{Binding PersonaSeleccionada}" />
+    <controls:FormField Etiqueta="Persona">
+      <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                ItemsSource="{Binding Personas}"
+                DisplayMemberPath="Nombre"
+                SelectedItem="{Binding PersonaSeleccionada}" />
+    </controls:FormField>
 
     <Grid>
       <Grid.ColumnDefinitions>
@@ -35,30 +37,34 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <TextBlock Text="Fecha" Style="{StaticResource FormLabelStyle}" />
-        <DatePicker Style="{StaticResource FormDatePickerStyle}"
-                    SelectedDate="{Binding Fecha}" />
+        <controls:FormField Etiqueta="Fecha">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding Fecha}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <TextBlock Text="Hora de entrada" Style="{StaticResource FormLabelStyle}" />
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding HoraEntrada, UpdateSourceTrigger=PropertyChanged}"
-                 ToolTip="Formato HH:mm" />
+        <controls:FormField Etiqueta="Hora de entrada">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding HoraEntrada, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Formato HH:mm" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="4">
-        <TextBlock Text="Turno" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Turnos}" SelectedItem="{Binding Turno}" />
+        <controls:FormField Etiqueta="Turno">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Turnos}" SelectedItem="{Binding Turno}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="Observación" Style="{StaticResource FormLabelStyle}" />
-    <TextBox Style="{StaticResource FormTextBoxStyle}"
-             AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
-             VerticalContentAlignment="Top"
-             Text="{Binding Observacion, UpdateSourceTrigger=PropertyChanged}" />
+    <controls:FormField Etiqueta="Observación">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Observacion, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
 
     <TextBlock Text="La jornada queda abierta hasta que se registre la salida. Una persona no puede tener dos jornadas abiertas a la vez."
                FontSize="11" TextWrapping="Wrap"

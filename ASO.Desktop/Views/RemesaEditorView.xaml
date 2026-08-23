@@ -1,8 +1,9 @@
-<UserControl x:Class="ASO.Desktop.Views.RemesaEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.RemesaEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
              d:DesignWidth="700">
 
@@ -29,31 +30,35 @@
       </Grid.RowDefinitions>
 
       <StackPanel Grid.Row="0" Grid.Column="0">
-        <TextBlock Text="Finca (código y nombre)" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Fincas}" DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding FincaSeleccionada}" />
+        <controls:FormField Etiqueta="Finca (código y nombre)">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Fincas}" DisplayMemberPath="Etiqueta"
+                    SelectedItem="{Binding FincaSeleccionada}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="0" Grid.Column="2">
-        <TextBlock Text="Tipo de cosecha" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding TiposCosecha}"
-                  SelectedItem="{Binding TipoCosechaSeleccionado}" />
+        <controls:FormField Etiqueta="Tipo de cosecha">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding TiposCosecha}"
+                    SelectedItem="{Binding TipoCosechaSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="1" Grid.Column="0">
-        <TextBlock Text="Lote" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Lotes}" DisplayMemberPath="Nombre"
-                  SelectedItem="{Binding LoteSeleccionado}" />
+        <controls:FormField Etiqueta="Lote">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Lotes}" DisplayMemberPath="Nombre"
+                    SelectedItem="{Binding LoteSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="1" Grid.Column="2">
-        <TextBlock Text="Tablón" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Tablones}" DisplayMemberPath="Nombre"
-                  SelectedItem="{Binding TablonSeleccionado}" />
+        <controls:FormField Etiqueta="Tablón">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Tablones}" DisplayMemberPath="Nombre"
+                    SelectedItem="{Binding TablonSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
@@ -72,10 +77,11 @@
       </Grid.RowDefinitions>
 
       <StackPanel Grid.Row="0" Grid.Column="0">
-        <TextBlock Text="Operador (conduce la máquina de corte)" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Operadores}" DisplayMemberPath="Nombre"
-                  SelectedItem="{Binding OperadorSeleccionado}" />
+        <controls:FormField Etiqueta="Operador (conduce la máquina de corte)">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Operadores}" DisplayMemberPath="Nombre"
+                    SelectedItem="{Binding OperadorSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="0" Grid.Column="2">
@@ -85,10 +91,11 @@
       </StackPanel>
 
       <StackPanel Grid.Row="1" Grid.Column="0">
-        <TextBlock Text="Tractorista" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Tractoristas}" DisplayMemberPath="Nombre"
-                  SelectedItem="{Binding TractoristaSeleccionado}" />
+        <controls:FormField Etiqueta="Tractorista">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Tractoristas}" DisplayMemberPath="Nombre"
+                    SelectedItem="{Binding TractoristaSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="1" Grid.Column="2">
@@ -98,17 +105,19 @@
       </StackPanel>
 
       <StackPanel Grid.Row="2" Grid.Column="0">
-        <TextBlock Text="Chofer" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Choferes}" DisplayMemberPath="Nombre"
-                  SelectedItem="{Binding ChoferSeleccionado}" />
+        <controls:FormField Etiqueta="Chofer">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Choferes}" DisplayMemberPath="Nombre"
+                    SelectedItem="{Binding ChoferSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Row="2" Grid.Column="2">
-        <TextBlock Text="Placa de la unidad" Style="{StaticResource FormLabelStyle}" />
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Vehiculos}" DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding VehiculoSeleccionado}" />
+        <controls:FormField Etiqueta="Placa de la unidad">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Vehiculos}" DisplayMemberPath="Etiqueta"
+                    SelectedItem="{Binding VehiculoSeleccionado}" />
+        </controls:FormField>
       </StackPanel>
     </Grid>
 
