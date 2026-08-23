@@ -13,6 +13,12 @@
        Este diccionario se mergea el PRIMERO en Theme.xaml, antes que Colors.xaml y Controles.xaml,
        porque los dos consumen estas claves en sus Setter. -->
 
+  <!-- Familias. Viven aqui y no en Theme.xaml porque un diccionario fusionado no ve las claves
+       de su padre: Componentes.xaml las necesita y solo puede llegar a ellas mergeando este
+       archivo por su cuenta. -->
+  <FontFamily x:Key="AppFont">Segoe UI</FontFamily>
+  <FontFamily x:Key="IconFont">Segoe MDL2 Assets</FontFamily>
+
   <!-- ============================ Tipografia ============================
        Siete tamanos sustituyen a los quince que habia sueltos por el XAML. La escala es corta a
        proposito: es software de gestion denso, donde la jerarquia la marcan el peso y el color,

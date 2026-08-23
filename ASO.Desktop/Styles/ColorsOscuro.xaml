@@ -67,6 +67,11 @@
     <SolidColorBrush x:Key="NeutralSoftBrush" Color="#1E293B" />
     <SolidColorBrush x:Key="NeutralTextBrush" Color="#CBD5E1" />
 
+    <!-- Mas oscuros que PrimaryBrush/DangerBrush: el texto blanco de encima da 5,0:1 y 6,5:1,
+         donde con los tonos de la paleta general daria 3,68:1 y 3,5:1. -->
+    <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#2563EB" />
+    <SolidColorBrush x:Key="DangerButtonBrush" Color="#B91C1C" />
+
     <SolidColorBrush x:Key="FocusRingBrush" Color="#60A5FA" />
 
 </ResourceDictionary>

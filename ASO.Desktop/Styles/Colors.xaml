@@ -61,6 +61,12 @@
     <Color x:Key="NeutralSoftColor">#F1F5F9</Color>
     <Color x:Key="NeutralTextColor">#475569</Color>
 
+    <!-- Fondo de los botones solidos. Existe aparte de PrimaryBrush porque el texto que va
+         encima es blanco y tiene que aguantar AA en las dos paletas: en la oscura PrimaryBrush
+         es #3B82F6, y blanco sobre el da 3,68:1. Este token la sustituye solo bajo el texto. -->
+    <Color x:Key="PrimaryButtonColor">#1E3A5F</Color>
+    <Color x:Key="DangerButtonColor">#DC2626</Color>
+
     <!-- Anillo de foco. No existia: ningun campo de captura mostraba donde estaba el teclado. -->
     <Color x:Key="FocusRingColor">#2563EB</Color>
 
@@ -102,6 +108,8 @@
     <SolidColorBrush x:Key="InfoTextBrush" Color="{StaticResource InfoTextColor}" />
     <SolidColorBrush x:Key="NeutralSoftBrush" Color="{StaticResource NeutralSoftColor}" />
     <SolidColorBrush x:Key="NeutralTextBrush" Color="{StaticResource NeutralTextColor}" />
+    <SolidColorBrush x:Key="PrimaryButtonBrush" Color="{StaticResource PrimaryButtonColor}" />
+    <SolidColorBrush x:Key="DangerButtonBrush" Color="{StaticResource DangerButtonColor}" />
     <SolidColorBrush x:Key="FocusRingBrush" Color="{StaticResource FocusRingColor}" />
 
 </ResourceDictionary>
