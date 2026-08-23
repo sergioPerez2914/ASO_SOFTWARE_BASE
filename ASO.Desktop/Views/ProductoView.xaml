@@ -101,19 +101,18 @@
         <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}" IsReadOnly="True"
                   ItemsSource="{Binding EntregasView}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Remesa" Binding="{Binding RemesaId}" Width="80" />
-            <DataGridTextColumn Header="Entregada" Binding="{Binding FechaTexto}" Width="140" />
-            <DataGridTextColumn Header="Finca" Binding="{Binding FincaNombre}" Width="200" />
-            <DataGridTextColumn Header="Lote · Tablón" Binding="{Binding Ubicacion}" Width="180" />
-            <DataGridTextColumn Header="Toneladas" Binding="{Binding ToneladasTexto}" Width="*">
-              <DataGridTextColumn.ElementStyle>
+            <controls:ColumnaTexto Header="Remesa" Binding="{Binding RemesaId}" Width="8*" MinWidth="72" />
+            <controls:ColumnaTexto Header="Entregada" Binding="{Binding FechaTexto}" Width="14*" MinWidth="96" />
+            <controls:ColumnaTexto Header="Finca" Binding="{Binding FincaNombre}" Width="20*" MinWidth="130" />
+            <controls:ColumnaTexto Header="Lote · Tablón" Binding="{Binding Ubicacion}" Width="18*" MinWidth="120" />
+            <controls:ColumnaNumero Header="Toneladas" Binding="{Binding ToneladasTexto}" Width="12*" MinWidth="88">
+              <controls:ColumnaNumero.ElementStyle>
                 <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
                   <Setter Property="FontWeight" Value="SemiBold" />
                 </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Facturación" Binding="{Binding FacturadaTexto}" Width="130" />
+              </controls:ColumnaNumero.ElementStyle>
+            </controls:ColumnaNumero>
+            <controls:ColumnaTexto Header="Facturación" Binding="{Binding FacturadaTexto}" Width="13*" MinWidth="96" />
           </DataGrid.Columns>
         </DataGrid>
 

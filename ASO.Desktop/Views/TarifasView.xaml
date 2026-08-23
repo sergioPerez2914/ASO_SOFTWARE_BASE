@@ -71,21 +71,15 @@
                   ItemsSource="{Binding ItemsView}"
                   SelectedItem="{Binding SelectedItem}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-            <DataGridTextColumn Header="Concepto" Binding="{Binding Concepto}" Width="200" />
-            <DataGridTextColumn Header="Servicio" Binding="{Binding ServicioTexto}" Width="120" />
-            <DataGridTextColumn Header="Ámbito" Binding="{Binding AmbitoTexto}" Width="140" />
-            <DataGridTextColumn Header="Unidad" Binding="{Binding UnidadTexto}" Width="90" />
-            <DataGridTextColumn Header="Monto" Width="110"
-                                Binding="{Binding MontoPorUnidad, StringFormat={}{0:N2}}">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Vigencia" Binding="{Binding VigenciaTexto}" Width="*" />
-            <DataGridTemplateColumn Header="Estado" Width="100">
+            <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+            <controls:ColumnaTexto Header="Concepto" Binding="{Binding Concepto}" Width="20*" MinWidth="130" />
+            <controls:ColumnaTexto Header="Servicio" Binding="{Binding ServicioTexto}" Width="12*" MinWidth="90" />
+            <controls:ColumnaTexto Header="Ámbito" Binding="{Binding AmbitoTexto}" Width="14*" MinWidth="100" />
+            <controls:ColumnaTexto Header="Unidad" Binding="{Binding UnidadTexto}" Width="9*" MinWidth="72" />
+            <controls:ColumnaNumero Header="Monto" Width="11*" MinWidth="84"
+                                    Binding="{Binding MontoPorUnidad, StringFormat={}{0:N2}}" />
+            <controls:ColumnaTexto Header="Vigencia" Binding="{Binding VigenciaTexto}" Width="16*" MinWidth="110" />
+            <DataGridTemplateColumn Header="Estado" Width="92">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipVigenciaTarifaStyle}">

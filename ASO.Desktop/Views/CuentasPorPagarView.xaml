@@ -102,22 +102,21 @@
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Documento" Binding="{Binding NumeroDocumento}" Width="110" />
-              <DataGridTextColumn Header="Proveedor" Binding="{Binding ProveedorNombre}" Width="240" />
-              <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*" />
-              <DataGridTextColumn Header="Emisión" Width="100"
-                                  Binding="{Binding FechaEmision, StringFormat={}{0:dd/MM/yyyy}}" />
-              <DataGridTextColumn Header="Vencimiento" Binding="{Binding VencimientoTexto}" Width="110" />
-              <DataGridTextColumn Header="Plazo" Binding="{Binding PlazoTexto}" Width="160" />
-              <DataGridTextColumn Header="Monto" Binding="{Binding MontoTexto}" Width="110">
-                <DataGridTextColumn.ElementStyle>
+              <controls:ColumnaTexto Header="Documento" Binding="{Binding NumeroDocumento}" Width="11*" MinWidth="78" />
+              <controls:ColumnaTexto Header="Proveedor" Binding="{Binding ProveedorNombre}" Width="24*" MinWidth="120" />
+              <controls:ColumnaTexto Header="Descripción" Binding="{Binding Descripcion}" Width="20*" MinWidth="100" />
+              <controls:ColumnaTexto Header="Emisión" Width="10*" MinWidth="78"
+                                     Binding="{Binding FechaEmision, StringFormat={}{0:dd/MM/yyyy}}" />
+              <controls:ColumnaTexto Header="Vencimiento" Binding="{Binding VencimientoTexto}" Width="11*" MinWidth="78" />
+              <controls:ColumnaTexto Header="Plazo" Binding="{Binding PlazoTexto}" Width="16*" MinWidth="90" />
+              <controls:ColumnaNumero Header="Monto" Binding="{Binding MontoTexto}" Width="11*" MinWidth="80">
+                <controls:ColumnaNumero.ElementStyle>
                   <Style TargetType="TextBlock">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
                     <Setter Property="FontWeight" Value="SemiBold" />
                   </Style>
-                </DataGridTextColumn.ElementStyle>
-              </DataGridTextColumn>
-              <DataGridTemplateColumn Header="Estado" Width="110">
+                </controls:ColumnaNumero.ElementStyle>
+              </controls:ColumnaNumero>
+              <DataGridTemplateColumn Header="Estado" Width="96">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Border Style="{StaticResource ChipEstadoFacturaProveedorStyle}">
@@ -177,12 +176,12 @@
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-              <DataGridTextColumn Header="Proveedor" Binding="{Binding Nombre}" Width="260" />
-              <DataGridTextColumn Header="RIF" Binding="{Binding Rif}" Width="140" />
-              <DataGridTextColumn Header="Teléfono" Binding="{Binding Telefono}" Width="140" />
-              <DataGridTextColumn Header="Notas" Binding="{Binding Notas}" Width="*" />
-              <DataGridTemplateColumn Header="Estado" Width="110">
+              <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+              <controls:ColumnaTexto Header="Proveedor" Binding="{Binding Nombre}" Width="26*" MinWidth="140" />
+              <controls:ColumnaTexto Header="RIF" Binding="{Binding Rif}" Width="14*" MinWidth="100" />
+              <controls:ColumnaTexto Header="Teléfono" Binding="{Binding Telefono}" Width="14*" MinWidth="100" />
+              <controls:ColumnaTexto Header="Notas" Binding="{Binding Notas}" Width="20*" MinWidth="110" />
+              <DataGridTemplateColumn Header="Estado" Width="96">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Border Style="{StaticResource ChipActivoStyle}">

@@ -100,34 +100,16 @@
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Código" Binding="{Binding Codigo}" Width="90" />
-              <DataGridTextColumn Header="Artículo" Binding="{Binding Nombre}" Width="240" />
-              <DataGridTextColumn Header="Categoría" Binding="{Binding Categoria}" Width="160" />
-              <DataGridTextColumn Header="Ubicación" Binding="{Binding Ubicacion}" Width="110" />
-              <DataGridTextColumn Header="Existencia" Binding="{Binding StockTexto}" Width="110">
-                <DataGridTextColumn.ElementStyle>
-                  <Style TargetType="TextBlock">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                  </Style>
-                </DataGridTextColumn.ElementStyle>
-              </DataGridTextColumn>
-              <DataGridTextColumn Header="Mínimo" Width="80"
-                                  Binding="{Binding StockMinimo, StringFormat={}{0:N2}}">
-                <DataGridTextColumn.ElementStyle>
-                  <Style TargetType="TextBlock">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                  </Style>
-                </DataGridTextColumn.ElementStyle>
-              </DataGridTextColumn>
-              <DataGridTextColumn Header="Valor" Width="*"
-                                  Binding="{Binding ValorTotal, StringFormat={}{0:N2}}">
-                <DataGridTextColumn.ElementStyle>
-                  <Style TargetType="TextBlock">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                  </Style>
-                </DataGridTextColumn.ElementStyle>
-              </DataGridTextColumn>
-              <DataGridTemplateColumn Header="Estado" Width="110">
+              <controls:ColumnaTexto Header="Código" Binding="{Binding Codigo}" Width="9*" MinWidth="76" />
+              <controls:ColumnaTexto Header="Artículo" Binding="{Binding Nombre}" Width="24*" MinWidth="130" />
+              <controls:ColumnaTexto Header="Categoría" Binding="{Binding Categoria}" Width="16*" MinWidth="94" />
+              <controls:ColumnaTexto Header="Ubicación" Binding="{Binding Ubicacion}" Width="11*" MinWidth="84" />
+              <controls:ColumnaNumero Header="Existencia" Binding="{Binding StockTexto}" Width="11*" MinWidth="84" />
+              <controls:ColumnaNumero Header="Mínimo" Width="8*" MinWidth="70"
+                                      Binding="{Binding StockMinimo, StringFormat={}{0:N2}}" />
+              <controls:ColumnaNumero Header="Valor" Width="12*" MinWidth="84"
+                                      Binding="{Binding ValorTotal, StringFormat={}{0:N2}}" />
+              <DataGridTemplateColumn Header="Estado" Width="96">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Border Style="{StaticResource ChipStockStyle}">
@@ -207,27 +189,15 @@
                     ItemsSource="{Binding SalidasView}"
                     SelectedItem="{Binding SalidaSeleccionada}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-              <DataGridTextColumn Header="Fecha" Width="100"
-                                  Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" />
-              <DataGridTextColumn Header="Artículo" Binding="{Binding ArticuloNombre}" Width="220" />
-              <DataGridTextColumn Header="Cantidad" Binding="{Binding CantidadTexto}" Width="110">
-                <DataGridTextColumn.ElementStyle>
-                  <Style TargetType="TextBlock">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                  </Style>
-                </DataGridTextColumn.ElementStyle>
-              </DataGridTextColumn>
-              <DataGridTextColumn Header="Destino" Binding="{Binding DestinoTexto}" Width="*" />
-              <DataGridTextColumn Header="Mant." Binding="{Binding MantenimientoTexto}" Width="70" />
-              <DataGridTextColumn Header="Costo" Binding="{Binding CostoTotalTexto}" Width="90">
-                <DataGridTextColumn.ElementStyle>
-                  <Style TargetType="TextBlock">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                  </Style>
-                </DataGridTextColumn.ElementStyle>
-              </DataGridTextColumn>
-              <DataGridTemplateColumn Header="Estado" Width="110">
+              <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+              <controls:ColumnaTexto Header="Fecha" Width="10*" MinWidth="82"
+                                     Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" />
+              <controls:ColumnaTexto Header="Artículo" Binding="{Binding ArticuloNombre}" Width="22*" MinWidth="130" />
+              <controls:ColumnaNumero Header="Cantidad" Binding="{Binding CantidadTexto}" Width="11*" MinWidth="84" />
+              <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="18*" MinWidth="110" />
+              <controls:ColumnaTexto Header="Mant." Binding="{Binding MantenimientoTexto}" Width="7*" MinWidth="64" />
+              <controls:ColumnaNumero Header="Costo" Binding="{Binding CostoTotalTexto}" Width="9*" MinWidth="74" />
+              <DataGridTemplateColumn Header="Estado" Width="96">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Border Style="{StaticResource ChipEstadoSalidaStyle}">

@@ -87,28 +87,21 @@
                   ItemsSource="{Binding ItemsView}"
                   SelectedItem="{Binding SelectedItem}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Factura" Binding="{Binding NumeroTexto}" Width="90" />
-            <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="250" />
-            <DataGridTextColumn Header="Remesas" Binding="{Binding RemesasTexto}" Width="100" />
-            <DataGridTextColumn Header="Toneladas" Width="100"
-                                Binding="{Binding Toneladas, StringFormat={}{0:N2}}">
-              <DataGridTextColumn.ElementStyle>
+            <controls:ColumnaTexto Header="Factura" Binding="{Binding NumeroTexto}" Width="9*" MinWidth="76" />
+            <controls:ColumnaTexto Header="Cliente" Binding="{Binding ClienteNombre}" Width="25*" MinWidth="140" />
+            <controls:ColumnaTexto Header="Remesas" Binding="{Binding RemesasTexto}" Width="10*" MinWidth="76" />
+            <controls:ColumnaNumero Header="Toneladas" Width="10*" MinWidth="76"
+                                    Binding="{Binding Toneladas, StringFormat={}{0:N2}}" />
+            <controls:ColumnaTexto Header="Emisión" Binding="{Binding EmisionTexto}" Width="10*" MinWidth="82" />
+            <controls:ColumnaTexto Header="Vencimiento" Binding="{Binding VencimientoTexto}" Width="11*" MinWidth="82" />
+            <controls:ColumnaNumero Header="Total" Binding="{Binding TotalTexto}" Width="13*" MinWidth="92">
+              <controls:ColumnaNumero.ElementStyle>
                 <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Emisión" Binding="{Binding EmisionTexto}" Width="100" />
-            <DataGridTextColumn Header="Vencimiento" Binding="{Binding VencimientoTexto}" Width="110" />
-            <DataGridTextColumn Header="Total" Binding="{Binding TotalTexto}" Width="*">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
                   <Setter Property="FontWeight" Value="SemiBold" />
                 </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTemplateColumn Header="Estado" Width="110">
+              </controls:ColumnaNumero.ElementStyle>
+            </controls:ColumnaNumero>
+            <DataGridTemplateColumn Header="Estado" Width="96">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipEstadoFacturaClienteStyle}">
@@ -147,31 +140,13 @@
         <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="180" Margin="0,8,0,0"
                   ItemsSource="{Binding SelectedItem.Lineas}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Remesa" Binding="{Binding RemesaTexto}" Width="80" />
-            <DataGridTextColumn Header="Finca" Binding="{Binding FincaNombre}" Width="180" />
-            <DataGridTextColumn Header="Servicio" Binding="{Binding ServicioTexto}" Width="140" />
-            <DataGridTextColumn Header="Toneladas" Binding="{Binding ToneladasTexto}" Width="110">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Tarifa" Width="90"
-                                Binding="{Binding TarifaMonto, StringFormat={}{0:N2}}">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Monto" Binding="{Binding MontoTexto}" Width="*">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
+            <controls:ColumnaTexto Header="Remesa" Binding="{Binding RemesaTexto}" Width="8*" MinWidth="72" />
+            <controls:ColumnaTexto Header="Finca" Binding="{Binding FincaNombre}" Width="18*" MinWidth="120" />
+            <controls:ColumnaTexto Header="Servicio" Binding="{Binding ServicioTexto}" Width="14*" MinWidth="100" />
+            <controls:ColumnaNumero Header="Toneladas" Binding="{Binding ToneladasTexto}" Width="11*" MinWidth="76" />
+            <controls:ColumnaNumero Header="Tarifa" Width="9*" MinWidth="72"
+                                    Binding="{Binding TarifaMonto, StringFormat={}{0:N2}}" />
+            <controls:ColumnaNumero Header="Monto" Binding="{Binding MontoTexto}" Width="12*" MinWidth="88" />
           </DataGrid.Columns>
         </DataGrid>
 

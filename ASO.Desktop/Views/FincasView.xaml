@@ -48,10 +48,10 @@
                   ItemsSource="{Binding ItemsView}"
                   SelectedItem="{Binding SelectedItem}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-            <DataGridTextColumn Header="Código CAM" Binding="{Binding CodigoCam}" Width="140" />
-            <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*" />
-            <DataGridTextColumn Header="Lotes" Binding="{Binding Lotes.Count}" Width="90" />
+            <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+            <controls:ColumnaTexto Header="Código CAM" Binding="{Binding CodigoCam}" Width="14*" MinWidth="110" />
+            <controls:ColumnaTexto Header="Nombre" Binding="{Binding Nombre}" Width="30*" MinWidth="160" />
+            <controls:ColumnaTexto Header="Lotes" Binding="{Binding Lotes.Count}" Width="9*" MinWidth="72" />
           </DataGrid.Columns>
         </DataGrid>
 

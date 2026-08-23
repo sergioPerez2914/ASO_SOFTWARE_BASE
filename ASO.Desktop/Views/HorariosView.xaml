@@ -82,21 +82,15 @@
                   ItemsSource="{Binding ItemsView}"
                   SelectedItem="{Binding SelectedItem}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-            <DataGridTextColumn Header="Persona" Binding="{Binding PersonaNombre}" Width="200" />
-            <DataGridTextColumn Header="Cargo / rol" Binding="{Binding CargoORol}" Width="150" />
-            <DataGridTextColumn Header="Padrón" Binding="{Binding TipoPersonalTexto}" Width="120" />
-            <DataGridTextColumn Header="Turno" Binding="{Binding TurnoTexto}" Width="90" />
-            <DataGridTextColumn Header="Entrada" Binding="{Binding EntradaTexto}" Width="130" />
-            <DataGridTextColumn Header="Salida" Binding="{Binding SalidaTexto}" Width="130" />
-            <DataGridTextColumn Header="Horas" Binding="{Binding HorasTexto}" Width="*">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTemplateColumn Header="Estado" Width="100">
+            <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+            <controls:ColumnaTexto Header="Persona" Binding="{Binding PersonaNombre}" Width="20*" MinWidth="110" />
+            <controls:ColumnaTexto Header="Cargo / rol" Binding="{Binding CargoORol}" Width="15*" MinWidth="90" />
+            <controls:ColumnaTexto Header="Padrón" Binding="{Binding TipoPersonalTexto}" Width="12*" MinWidth="78" />
+            <controls:ColumnaTexto Header="Turno" Binding="{Binding TurnoTexto}" Width="9*" MinWidth="66" />
+            <controls:ColumnaTexto Header="Entrada" Binding="{Binding EntradaTexto}" Width="13*" MinWidth="90" />
+            <controls:ColumnaTexto Header="Salida" Binding="{Binding SalidaTexto}" Width="13*" MinWidth="90" />
+            <controls:ColumnaNumero Header="Horas" Binding="{Binding HorasTexto}" Width="9*" MinWidth="64" />
+            <DataGridTemplateColumn Header="Estado" Width="88">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipJornadaStyle}">

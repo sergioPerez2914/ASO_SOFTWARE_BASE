@@ -81,9 +81,17 @@
          El ScrollViewer es del shell y no de cada pantalla: 36 de las 56 vistas no traen uno, y
          sin el, a escala 125 % con la ventana en su minimo (1024x640) el contenido se recortaba
          sin barra de desplazamiento y no habia forma de llegar a lo de abajo. Ponerlo aqui lo
-         resuelve para todas a la vez. -->
+         resuelve para todas a la vez.
+
+         El desplazamiento horizontal va DESACTIVADO, y no es solo por quitar una barra: un
+         ScrollViewer que puede desplazarse a lo ancho mide a su hijo con ancho INFINITO, y un
+         DataGrid medido asi no puede repartir los anchos en estrella — los deja en su minimo.
+         Esa era la causa de que "Finca" o "Lote · Tablon" se leyeran como dos letras incluso con
+         la ventana ancha. Desactivado, el contenido se mide contra el ancho real de la ventana y
+         las columnas se reparten. Lo que aun no quepa lo resuelve la tabla con su propia barra,
+         dentro del recuadro y sin arrastrar la pantalla entera. -->
     <ScrollViewer Grid.Row="1" Grid.Column="1"
-                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                   Padding="20">
       <ContentControl x:Name="ContentArea" />
     </ScrollViewer>

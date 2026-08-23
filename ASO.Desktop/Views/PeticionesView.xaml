@@ -62,14 +62,14 @@
                   ItemsSource="{Binding PeticionesView}"
                   SelectedItem="{Binding Seleccionada}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-            <DataGridTextColumn Header="Solicitada" Width="130"
-                                Binding="{Binding SolicitadoEn, StringFormat=\{0:dd/MM/yyyy HH:mm\}}" />
-            <DataGridTextColumn Header="Quién" Binding="{Binding SolicitadoPorNombre}" Width="150" />
-            <DataGridTextColumn Header="Acción" Binding="{Binding Accion}" Width="180" />
-            <DataGridTextColumn Header="Sobre" Binding="{Binding EntidadDescripcion}" Width="200" />
-            <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="*" />
-            <DataGridTemplateColumn Header="Estado" Width="110">
+            <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+            <controls:ColumnaTexto Header="Solicitada" Width="13*" MinWidth="84"
+                                   Binding="{Binding SolicitadoEn, StringFormat=\{0:dd/MM/yyyy HH:mm\}}" />
+            <controls:ColumnaTexto Header="Quién" Binding="{Binding SolicitadoPorNombre}" Width="15*" MinWidth="90" />
+            <controls:ColumnaTexto Header="Acción" Binding="{Binding Accion}" Width="18*" MinWidth="100" />
+            <controls:ColumnaTexto Header="Sobre" Binding="{Binding EntidadDescripcion}" Width="20*" MinWidth="100" />
+            <controls:ColumnaTexto Header="Motivo" Binding="{Binding Motivo}" Width="20*" MinWidth="100" />
+            <DataGridTemplateColumn Header="Estado" Width="92">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipEstadoPeticionStyle}">
@@ -78,7 +78,7 @@
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            <DataGridTextColumn Header="Resuelta por" Binding="{Binding ResueltoPorNombre}" Width="150" />
+            <controls:ColumnaTexto Header="Resuelta por" Binding="{Binding ResueltoPorNombre}" Width="15*" MinWidth="90" />
           </DataGrid.Columns>
         </DataGrid>
 

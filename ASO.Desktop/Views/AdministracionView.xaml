@@ -99,9 +99,9 @@
                       ItemsSource="{Binding ItemsView}"
                       SelectedItem="{Binding SelectedItem}">
               <DataGrid.Columns>
-                <DataGridTextColumn Header="Usuario" Binding="{Binding NombreUsuario}" Width="*" />
-                <DataGridTextColumn Header="Rol" Binding="{Binding RolTexto}" Width="140" />
-                <DataGridTextColumn Header="Estado" Binding="{Binding EstadoTexto}" Width="80" />
+                <controls:ColumnaTexto Header="Usuario" Binding="{Binding NombreUsuario}" Width="30*" MinWidth="160" />
+                <controls:ColumnaTexto Header="Rol" Binding="{Binding RolTexto}" Width="14*" MinWidth="100" />
+                <controls:ColumnaTexto Header="Estado" Binding="{Binding EstadoTexto}" Width="90" />
               </DataGrid.Columns>
             </DataGrid>
 

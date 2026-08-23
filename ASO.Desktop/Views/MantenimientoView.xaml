@@ -113,27 +113,15 @@
         <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
                   ItemsSource="{Binding RegistrosView}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Fecha" Width="130"
-                                Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
-            <DataGridTextColumn Header="Activo" Binding="{Binding ActivoEtiqueta}" Width="180" />
-            <DataGridTextColumn Header="Tipo" Binding="{Binding TipoTexto}" Width="90" />
-            <DataGridTextColumn Header="Descripción" Binding="{Binding Descripcion}" Width="*" />
-            <DataGridTextColumn Header="Lectura" Binding="{Binding LecturaTexto}" Width="90">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Costo" Binding="{Binding CostoTotalTexto}" Width="80">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Realizado por" Binding="{Binding RealizadoPor}" Width="160" />
-            <DataGridTextColumn Header="Remesa" Binding="{Binding RemesaTexto}" Width="70" />
+            <controls:ColumnaTexto Header="Fecha" Width="13*" MinWidth="84"
+                                   Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
+            <controls:ColumnaTexto Header="Activo" Binding="{Binding ActivoEtiqueta}" Width="18*" MinWidth="120" />
+            <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoTexto}" Width="9*" MinWidth="72" />
+            <controls:ColumnaTexto Header="Descripción" Binding="{Binding Descripcion}" Width="20*" MinWidth="110" />
+            <controls:ColumnaNumero Header="Lectura" Binding="{Binding LecturaTexto}" Width="9*" MinWidth="72" />
+            <controls:ColumnaNumero Header="Costo" Binding="{Binding CostoTotalTexto}" Width="8*" MinWidth="70" />
+            <controls:ColumnaTexto Header="Realizado por" Binding="{Binding RealizadoPor}" Width="16*" MinWidth="110" />
+            <controls:ColumnaTexto Header="Remesa" Binding="{Binding RemesaTexto}" Width="7*" MinWidth="66" />
           </DataGrid.Columns>
         </DataGrid>
 

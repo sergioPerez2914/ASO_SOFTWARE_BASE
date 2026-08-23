@@ -87,23 +87,17 @@
                   ItemsSource="{Binding ItemsView}"
                   SelectedItem="{Binding SelectedItem}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-            <DataGridTextColumn Header="Inicio de carga" Width="130"
-                                Binding="{Binding InicioCarga, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
-            <DataGridTextColumn Header="Finca" Binding="{Binding FincaNombre}" Width="*" />
-            <DataGridTextColumn Header="Lote · Tablón" Binding="{Binding UbicacionTexto}" Width="*" />
-            <DataGridTextColumn Header="Cosecha" Binding="{Binding TipoCosechaTexto}" Width="90" />
-            <DataGridTextColumn Header="Placa" Binding="{Binding VehiculoPlaca}" Width="90" />
-            <DataGridTextColumn Header="Neto (t)" Width="80"
-                                Binding="{Binding PesoNetoT, StringFormat={}{0:N2}}">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Facturada" Binding="{Binding FacturadaTexto}" Width="110" />
-            <DataGridTemplateColumn Header="Estado" Width="120">
+            <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+            <controls:ColumnaTexto Header="Inicio de carga" Width="13*" MinWidth="90"
+                                   Binding="{Binding InicioCarga, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
+            <controls:ColumnaTexto Header="Finca" Binding="{Binding FincaNombre}" Width="20*" MinWidth="110" />
+            <controls:ColumnaTexto Header="Lote · Tablón" Binding="{Binding UbicacionTexto}" Width="18*" MinWidth="100" />
+            <controls:ColumnaTexto Header="Cosecha" Binding="{Binding TipoCosechaTexto}" Width="9*" MinWidth="66" />
+            <controls:ColumnaTexto Header="Placa" Binding="{Binding VehiculoPlaca}" Width="9*" MinWidth="70" />
+            <controls:ColumnaNumero Header="Neto (t)" Width="8*" MinWidth="64"
+                                    Binding="{Binding PesoNetoT, StringFormat={}{0:N2}}" />
+            <controls:ColumnaTexto Header="Facturada" Binding="{Binding FacturadaTexto}" Width="11*" MinWidth="78" />
+            <DataGridTemplateColumn Header="Estado" Width="96">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipEstadoStyle}">

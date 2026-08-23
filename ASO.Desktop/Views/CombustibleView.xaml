@@ -114,26 +114,14 @@
                   ItemsSource="{Binding ItemsView}"
                   SelectedItem="{Binding SelectedItem}">
           <DataGrid.Columns>
-            <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-            <DataGridTextColumn Header="Fecha" Width="100"
-                                Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" />
-            <DataGridTextColumn Header="Activo" Binding="{Binding ActivoEtiqueta}" Width="200" />
-            <DataGridTextColumn Header="Cisterna" Binding="{Binding TanqueNombre}" Width="150" />
-            <DataGridTextColumn Header="Litros" Binding="{Binding LitrosTexto}" Width="90">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTextColumn Header="Lectura" Binding="{Binding LecturaTexto}" Width="100">
-              <DataGridTextColumn.ElementStyle>
-                <Style TargetType="TextBlock">
-                  <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-              </DataGridTextColumn.ElementStyle>
-            </DataGridTextColumn>
-            <DataGridTemplateColumn Header="Consumo" Width="*">
+            <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+            <controls:ColumnaTexto Header="Fecha" Width="10*" MinWidth="82"
+                                   Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" />
+            <controls:ColumnaTexto Header="Activo" Binding="{Binding ActivoEtiqueta}" Width="20*" MinWidth="120" />
+            <controls:ColumnaTexto Header="Cisterna" Binding="{Binding TanqueNombre}" Width="15*" MinWidth="100" />
+            <controls:ColumnaNumero Header="Litros" Binding="{Binding LitrosTexto}" Width="9*" MinWidth="72" />
+            <controls:ColumnaNumero Header="Lectura" Binding="{Binding LecturaTexto}" Width="10*" MinWidth="76" />
+            <DataGridTemplateColumn Header="Consumo" Width="14*" MinWidth="110">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <StackPanel Orientation="Horizontal">
@@ -156,7 +144,7 @@
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            <DataGridTemplateColumn Header="Estado" Width="110">
+            <DataGridTemplateColumn Header="Estado" Width="96">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Border Style="{StaticResource ChipEstadoValeStyle}">

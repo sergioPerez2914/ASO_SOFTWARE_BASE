@@ -87,11 +87,11 @@
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-              <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="240" />
-              <DataGridTextColumn Header="Cédula" Binding="{Binding Cedula}" Width="120" />
-              <DataGridTextColumn Header="Cargo" Binding="{Binding Cargo}" Width="*" />
-              <DataGridTemplateColumn Header="Estado" Width="110">
+              <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+              <controls:ColumnaTexto Header="Nombre" Binding="{Binding Nombre}" Width="24*" MinWidth="150" />
+              <controls:ColumnaTexto Header="Cédula" Binding="{Binding Cedula}" Width="12*" MinWidth="92" />
+              <controls:ColumnaTexto Header="Cargo" Binding="{Binding Cargo}" Width="18*" MinWidth="120" />
+              <DataGridTemplateColumn Header="Estado" Width="96">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Border Style="{StaticResource ChipActivoStyle}">
@@ -174,11 +174,11 @@
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Nº" Binding="{Binding Id}" Width="50" />
-              <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="240" />
-              <DataGridTextColumn Header="Cédula" Binding="{Binding Cedula}" Width="120" />
-              <DataGridTextColumn Header="Rol" Binding="{Binding RolTexto}" Width="130" />
-              <DataGridTemplateColumn Header="Estado" Width="110">
+              <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+              <controls:ColumnaTexto Header="Nombre" Binding="{Binding Nombre}" Width="24*" MinWidth="150" />
+              <controls:ColumnaTexto Header="Cédula" Binding="{Binding Cedula}" Width="12*" MinWidth="92" />
+              <controls:ColumnaTexto Header="Rol" Binding="{Binding RolTexto}" Width="13*" MinWidth="100" />
+              <DataGridTemplateColumn Header="Estado" Width="96">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Border Style="{StaticResource ChipActivoStyle}">

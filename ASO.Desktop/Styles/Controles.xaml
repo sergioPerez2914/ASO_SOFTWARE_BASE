@@ -316,11 +316,27 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
                             Padding="{TemplateBinding Padding}">
-                        <ContentPresenter VerticalAlignment="Center" />
+                        <!-- HorizontalAlignment enlazado y no fijo: el Setter de arriba pone
+                             Left, pero la plantilla lo ignoraba y ninguna cabecera podia
+                             alinearse de otra forma aunque su columna lo pidiera. Es lo que deja
+                             que las columnas de cifras lleven el rotulo sobre el valor. -->
+                        <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- Cabecera de una columna de cifras.
+
+         Unica diferencia con la corriente: el rotulo cae del mismo lado que los digitos. Lo
+         consume ColumnaNumero por clave, y no por tipo, para que el estilo implicito de arriba
+         siga valiendo para las demas columnas. -->
+
+    <Style x:Key="CabeceraNumeroStyle" TargetType="p:DataGridColumnHeader"
+           BasedOn="{StaticResource {x:Type p:DataGridColumnHeader}}">
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
     </Style>
 
     <Style TargetType="DataGridRow">
