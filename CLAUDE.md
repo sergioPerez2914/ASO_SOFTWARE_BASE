@@ -47,7 +47,7 @@ resumen y se despliega su lista de submódulos en el menú lateral.
 | Flota | Gestión de Flota · Mantenimiento · **Telemetría** | funcionales, salvo Telemetría (pendiente) |
 | Inventario | Repuestos · Combustible · Producto | funcionales |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios | funcionales |
-| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas | funcionales |
+| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas · **Banco** | funcionales, salvo Banco (pendiente) |
 
 Además hay **cuatro módulos fijados** fuera de esa lista, sin submódulos, que se muestran en el
 menú según el permiso: **Inicio**, **Peticiones** (bandeja de solicitudes de cambio),
@@ -59,7 +59,10 @@ no es trabajo del día. La lista que sí las incluye a las cuatro es `TodosLosFi
 que usar para permisos y resolución de claves — con `Fijados`, `Ver.Configuracion` no existiría en la
 matriz y no habría forma de quitarle la sección a nadie.
 
-**Los 14 submódulos están construidos; el único que falta es Flota · Telemetría.**
+**De los 15 submódulos hay 14 construidos; faltan Flota · Telemetría y Finanzas · Banco.**
+Banco está dado de alta en el catálogo pero cae en el marcador de posición: mostrará el estado de
+la cuenta según lo cobrado y pagado en la aplicación, y queda por decidir cómo llega el dato real
+del banco (importar el extracto, teclearlo o una interfaz contratada de banca empresas).
 Las reglas de Nómina y Finanzas se implementaron con supuestos provisionales (ver más abajo),
 porque el socio todavía no aportó tarifario real ni formatos de liquidación y factura.
 

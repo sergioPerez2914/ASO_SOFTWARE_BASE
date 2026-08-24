@@ -60,7 +60,7 @@ ASO/
 | Flota | Gestión de Flota · Mantenimiento · Telemetría *(pendiente)* |
 | Inventario | Repuestos · Combustible · Producto |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios |
-| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas |
+| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas · Banco *(pendiente)* |
 
 Más cuatro secciones fijas según el rol: **Inicio**, **Peticiones**, **Administración** (usuarios
 y permisos) y **Configuración**, esta última anclada al pie del menú lateral: tema claro/oscuro,
@@ -81,7 +81,7 @@ y tablones.
 
 ## Estado del proyecto
 
-Los 14 submódulos están construidos; falta **Flota · Telemetría**. Las entidades de dominio
+De los 15 submódulos hay 14 construidos; faltan **Flota · Telemetría** y **Finanzas · Banco**. Las entidades de dominio
 persisten en SQL Server (EF Core Migrations) y los datos están aislados por núcleo. La matriz de
 roles y permisos está conectada: los comandos que piden un permiso ahora lo exigen de verdad.
 

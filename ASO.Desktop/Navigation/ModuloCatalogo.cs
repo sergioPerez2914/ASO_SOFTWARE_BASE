@@ -120,7 +120,9 @@ public static class ModuloCatalogo
                 new Submodulo("Finanzas.CuentasPorPagar", "Cuentas por Pagar",
                     "Obligaciones con proveedores y su vencimiento.", ""),
                 new Submodulo("Finanzas.Tarifas", "Tarifas",
-                    "Precios por tonelada, kilómetro y servicio.", "")
+                    "Precios por tonelada, kilómetro y servicio.", ""),
+                new Submodulo("Finanzas.Banco", "Banco",
+                    "Estado de la cuenta según lo cobrado y pagado en la aplicación.", "")
             ])
     ];
 
