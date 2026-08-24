@@ -358,6 +358,58 @@
     </Style.Triggers>
   </Style>
 
+  <!-- Chip de estado de una requisición -->
+  <Style x:Key="ChipEstadoRequisicionStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRequisicion.Borrador}">
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRequisicion.Enviada}">
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRequisicion.Atendida}">
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRequisicion.Anulada}">
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Chip de estado de una orden de compra -->
+  <Style x:Key="ChipEstadoOrdenCompraStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoOrdenCompra.Borrador}">
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoOrdenCompra.Aprobada}">
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoOrdenCompra.Cerrada}">
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoOrdenCompra.Anulada}">
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
   <!-- Chip de estado de un activo de flota -->
   <Style x:Key="ChipEstadoActivoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>
@@ -662,7 +714,7 @@
        boton primario de la pantalla y compite con el.
 
        Se parten. La pestana se marca con una linea inferior, que es como se marca una pestana; el
-       filtro se queda con la pastilla, que es como se marca un filtro. -->
+       filtro se queda con el chip tenido, que es como se marca un filtro. -->
 
   <!-- Pestana de seccion. Sin relleno: la subraya. -->
   <Style x:Key="SegmentedTabStyle" TargetType="ToggleButton">
@@ -704,8 +756,9 @@
     </Setter>
   </Style>
 
-  <!-- Filtro de listado. Pastilla tenida, no rellena de azul: en una barra con cinco filtros y un
-       boton primario, cinco pastillas azules dejan de senalar nada. -->
+  <!-- Filtro de listado. Chip tenido, no relleno de azul: en una barra con cinco filtros y un
+       boton primario, cinco chips azules dejan de senalar nada. Esquina RadSm, igual que el resto
+       de los botones del sistema: RadPill (pastilla) lo hacia destacar de mas frente a ellos. -->
   <Style x:Key="FilterChipStyle" TargetType="ToggleButton">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
     <Setter Property="FontSize" Value="{StaticResource FsCaption}" />
@@ -722,7 +775,7 @@
           <Border x:Name="Bd" Background="{TemplateBinding Background}"
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}"
-                  CornerRadius="{StaticResource RadPill}"
+                  CornerRadius="{StaticResource RadSm}"
                   Padding="{TemplateBinding Padding}">
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
           </Border>

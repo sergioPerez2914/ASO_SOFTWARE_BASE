@@ -65,6 +65,10 @@
     <views:CuentasPorPagarView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:ComprasViewModel}">
+    <views:ComprasView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:AdministracionViewModel}">
     <views:AdministracionView />
   </DataTemplate>

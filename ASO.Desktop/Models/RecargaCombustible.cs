@@ -3,10 +3,10 @@ using System;
 namespace ASO.Desktop.Models;
 
 /// <summary>
-/// Recarga de una cisterna: el combustible que entra al centro desde el proveedor.
+/// Recarga de un stock de combustible: el combustible que entra al centro desde el proveedor.
 ///
 /// Es de solo inserción y aplica su efecto al registrarse (no tiene borrador ni confirmación):
-/// cuando el camión del proveedor descarga, el combustible ya está en el tanque. Si el socio
+/// cuando el camión del proveedor descarga, el combustible ya está contado. Si el socio
 /// define un formato con recepción y verificación, pasará a documento con estados como el vale.
 ///
 /// PROVISIONAL: el proveedor se guarda como texto. Pasará a ProveedorId cuando exista Cuentas
@@ -23,8 +23,8 @@ public class RecargaCombustible : IEntidad<int>, IDeOrganizacion
 
     public DateTime Fecha { get; set; }
 
-    public int TanqueId { get; set; }
-    public string TanqueNombre { get; set; } = string.Empty;  // snapshot
+    public int StockCombustibleId { get; set; }
+    public string StockCombustibleNombre { get; set; } = string.Empty;  // snapshot
 
     public decimal Litros { get; set; }
     public decimal? CostoTotal { get; set; }

@@ -4,6 +4,7 @@ using ASO.Desktop.BD;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASO.Desktop.Migrations
 {
     [DbContext(typeof(AsoDbContext))]
-    partial class AsoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260824055307_Fase10_RequisicionCombustibleYUnidad")]
+    partial class Fase10_RequisicionCombustibleYUnidad
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -614,9 +617,6 @@ namespace ASO.Desktop.Migrations
 
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal>("MontoCotizado")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("MotivoAnulacion")
                         .HasMaxLength(500)

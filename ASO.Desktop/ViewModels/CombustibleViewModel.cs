@@ -10,18 +10,18 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Inventario · Combustible: los vales despachados y el estado de las cisternas.
+/// Inventario · Combustible: los vales despachados y el estado del stock de combustible.
 ///
 /// Las reglas viven en <see cref="CombustibleService"/>; aquí solo se pide la acción y se
-/// refleja el resultado. Tras cada transición se recargan las cisternas porque su existencia
-/// cambió: la tarjeta de arriba y la grilla miran el mismo hecho desde dos ángulos.
+/// refleja el resultado. Tras cada transición se recarga el stock porque su existencia cambió: la
+/// tarjeta de arriba y la grilla miran el mismo hecho desde dos ángulos.
 /// </summary>
 public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible, int>
 {
     private const string FiltroTodos = "Todos";
 
     private readonly IValeCombustibleDataSource _vales;
-    private readonly ITanqueCombustibleDataSource _tanques;
+    private readonly IStockCombustibleDataSource _stockCombustible;
     private readonly IServicioDialogo _dialogos;
     private readonly SolicitudesDeCambio _solicitudes;
     private readonly ISesionActual _sesionActual;
@@ -45,12 +45,12 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         _dialogos = dialogos;
         _solicitudes = new SolicitudesDeCambio(sesion, dialogos);
         _sesionActual = sesion;
-        _tanques = DataSourceFactory.CrearTanquesCombustible();
+        _stockCombustible = DataSourceFactory.CrearStockCombustible();
 
         _servicio = new CombustibleService(
-            vales, _tanques, DataSourceFactory.CrearRecargasCombustible(), DataSourceFactory.CrearActivosFlota());
+            vales, _stockCombustible, DataSourceFactory.CrearRecargasCombustible(), DataSourceFactory.CrearActivosFlota());
 
-        Tanques = new ObservableCollection<TanqueCombustible>(_tanques.GetAll());
+        StocksCombustible = new ObservableCollection<StockCombustible>(_stockCombustible.GetAll());
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -61,7 +61,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         ConfirmarCommand = new RelayCommand(Confirmar,
             () => SelectedItem is { } v && _servicio.PuedeConfirmar(v) && _sesionActual.Puede("Combustible.Confirmar"));
 
-        // Anular un vale y recargar la cisterna son de administrador; el remesero las solicita.
+        // Anular un vale y recargar el stock son de administrador; el remesero las solicita.
         AnularCommand = new RelayCommand(Anular,
             () => SelectedItem is { } v && _servicio.PuedeAnular(v) && _solicitudes.PuedeIntentar(Permisos.Combustible.Anular));
 
@@ -76,7 +76,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
     public ICommand AnularCommand { get; }
     public ICommand RegistrarRecargaCommand { get; }
 
-    public ObservableCollection<TanqueCombustible> Tanques { get; }
+    public ObservableCollection<StockCombustible> StocksCombustible { get; }
 
     /// <summary>
     /// Rendimiento del centro en la última semana: litros despachados por tonelada recibida.
@@ -100,7 +100,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
     protected override bool CoincideBusqueda(ValeCombustible item, string texto) =>
         item.ActivoCodigo.Contains(texto, StringComparison.OrdinalIgnoreCase)
         || item.ActivoEtiqueta.Contains(texto, StringComparison.OrdinalIgnoreCase)
-        || item.TanqueNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
+        || item.StockCombustibleNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
         || item.ResponsableNombre.Contains(texto, StringComparison.OrdinalIgnoreCase);
 
     protected override bool PasaFiltroExtra(ValeCombustible item) => _filtroEstado switch
@@ -125,7 +125,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
     };
 
     protected override CrudEditorViewModelBase<ValeCombustible> CrearEditor(ValeCombustible item) =>
-        new ValeCombustibleEditorViewModel(item, _tanques, DataSourceFactory.CrearActivosFlota(), _dialogos, _sesionActual);
+        new ValeCombustibleEditorViewModel(item, _stockCombustible, DataSourceFactory.CrearActivosFlota(), _dialogos, _sesionActual);
 
     // --- Transiciones ---
 
@@ -152,7 +152,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
 
         var editor = new MotivoEditorViewModel(
             $"Anular vale Nº {vale.Id}",
-            $"{vale.ActivoEtiqueta} — {vale.LitrosTexto} desde {vale.TanqueNombre}",
+            $"{vale.ActivoEtiqueta} — {vale.LitrosTexto} desde {vale.StockCombustibleNombre}",
             "Motivo de la anulación",
             "Indique el motivo de la anulación.");
 
@@ -166,12 +166,12 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
     {
         if (_solicitudes.RequierePeticion(Permisos.Combustible.Recargar))
         {
-            _solicitudes.Solicitar(Permisos.Combustible.Recargar, "Registrar recarga de cisterna",
-                nameof(TanqueCombustible), string.Empty, "Entrada de combustible a la cisterna");
+            _solicitudes.Solicitar(Permisos.Combustible.Recargar, "Registrar recarga de stock de combustible",
+                nameof(StockCombustible), string.Empty, "Entrada de combustible al stock");
             return;
         }
 
-        var editor = new RecargaEditorViewModel(_tanques, _dialogos, _sesionActual);
+        var editor = new RecargaEditorViewModel(_stockCombustible, _dialogos, _sesionActual);
         if (!_dialogos.MostrarEditor(editor))
             return;
 
@@ -189,10 +189,10 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
     /// Ejecuta una transición. Si el servicio la rechaza se informa en vez de tragarse el error:
     /// el botón habilitado es cortesía, la regla la impone el servicio.
     ///
-    /// Ni la lista ni las cisternas se tocan aquí. Confirmar un vale escribe el vale, descuenta
-    /// la cisterna y adelanta la lectura del activo; esas escrituras disparan por sí solas la
-    /// recarga de la pantalla (ver <see cref="Recargar"/> y <c>Services/CambiosDeDatos</c>), que
-    /// es justo lo que antes había que acordarse de cablear en cada acción nueva.
+    /// Ni la lista ni el stock se tocan aquí. Confirmar un vale escribe el vale, descuenta el
+    /// stock y adelanta la lectura del activo; esas escrituras disparan por sí solas la recarga
+    /// de la pantalla (ver <see cref="Recargar"/> y <c>Services/CambiosDeDatos</c>), que es justo
+    /// lo que antes había que acordarse de cablear en cada acción nueva.
     /// </summary>
     private void Aplicar(Func<ValeCombustible> transicion)
     {
@@ -212,13 +212,13 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         }
     }
 
-    /// <summary>Relee los vales y, además, el nivel de las cisternas y el rendimiento.</summary>
+    /// <summary>Relee los vales y, además, el stock de combustible y el rendimiento.</summary>
     public override void Recargar()
     {
         base.Recargar();
 
-        Tanques.Clear();
-        foreach (var tanque in _tanques.GetAll())
-            Tanques.Add(tanque);
+        StocksCombustible.Clear();
+        foreach (var stock in _stockCombustible.GetAll())
+            StocksCombustible.Add(stock);
     }
 }

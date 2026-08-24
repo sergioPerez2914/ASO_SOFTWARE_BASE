@@ -7,6 +7,6 @@ namespace ASO.Desktop.BD;
 
 public class SqlRecargaCombustibleDataSource : SqlCrudDataSource<RecargaCombustible, int>, IRecargaCombustibleDataSource
 {
-    public IEnumerable<RecargaCombustible> GetByTanque(int tanqueId)
-        => Consultar(q => q.Where(e => e.TanqueId == tanqueId));
+    public IEnumerable<RecargaCombustible> GetByStockCombustible(int stockCombustibleId)
+        => Consultar(q => q.Where(e => e.StockCombustibleId == stockCombustibleId));
 }

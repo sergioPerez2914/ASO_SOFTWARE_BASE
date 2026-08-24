@@ -4,6 +4,7 @@ using ASO.Desktop.BD;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASO.Desktop.Migrations
 {
     [DbContext(typeof(AsoDbContext))]
-    partial class AsoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260824051204_Fase9_RenombrarCisternaAStock")]
+    partial class Fase9_RenombrarCisternaAStock
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -615,9 +618,6 @@ namespace ASO.Desktop.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("MontoCotizado")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("MotivoAnulacion")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -1120,6 +1120,11 @@ namespace ASO.Desktop.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("Notas")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int>("OrganizacionId")
                         .HasColumnType("int");
 
@@ -1586,14 +1591,6 @@ namespace ASO.Desktop.Migrations
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
 
-                            b1.Property<string>("ActivoEtiqueta")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
-
-                            b1.Property<int?>("ActivoId")
-                                .HasColumnType("int");
-
                             b1.Property<string>("ArticuloCodigo")
                                 .HasMaxLength(30)
                                 .HasColumnType("nvarchar(30)");
@@ -1612,15 +1609,16 @@ namespace ASO.Desktop.Migrations
                             b1.Property<decimal>("PrecioUnitario")
                                 .HasColumnType("decimal(18,2)");
 
-                            b1.Property<int?>("TipoCombustibleSolicitado")
+                            b1.Property<int?>("StockCombustibleId")
                                 .HasColumnType("int");
+
+                            b1.Property<string>("StockCombustibleNombre")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("nvarchar(150)");
 
                             b1.Property<int>("TipoInsumo")
                                 .HasColumnType("int");
-
-                            b1.Property<string>("TipoLubricante")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
 
                             b1.Property<string>("UnidadTexto")
                                 .IsRequired()
@@ -1650,14 +1648,6 @@ namespace ASO.Desktop.Migrations
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
 
-                            b1.Property<string>("ActivoEtiqueta")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
-
-                            b1.Property<int?>("ActivoId")
-                                .HasColumnType("int");
-
                             b1.Property<string>("ArticuloCodigo")
                                 .HasMaxLength(30)
                                 .HasColumnType("nvarchar(30)");
@@ -1673,15 +1663,16 @@ namespace ASO.Desktop.Migrations
                             b1.Property<int>("RequisicionId")
                                 .HasColumnType("int");
 
-                            b1.Property<int?>("TipoCombustibleSolicitado")
+                            b1.Property<int?>("StockCombustibleId")
                                 .HasColumnType("int");
+
+                            b1.Property<string>("StockCombustibleNombre")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("nvarchar(150)");
 
                             b1.Property<int>("TipoInsumo")
                                 .HasColumnType("int");
-
-                            b1.Property<string>("TipoLubricante")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
 
                             b1.Property<string>("UnidadTexto")
                                 .IsRequired()

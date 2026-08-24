@@ -1,0 +1,215 @@
+<UserControl x:Class="ASO.Desktop.Views.ComprasView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="640" d:DesignWidth="1100">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <controls:PageHeader Grid.Row="0"
+                         Titulo="{Binding Submodulo.Nombre}"
+                         Descripcion="{Binding Submodulo.Descripcion}" />
+
+    <!-- Conmutador: qué hace falta pedir, y lo que ya se compró. -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
+      <RadioButton Content="Requisiciones" GroupName="VistaCompras"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsRequisiciones, Mode=TwoWay}" />
+      <RadioButton Content="Órdenes de compra" GroupName="VistaCompras"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsOrdenesCompra, Mode=TwoWay}" />
+    </StackPanel>
+
+    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+            Background="{DynamicResource BorderBrush}" />
+
+    <!-- Requisiciones -->
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarRequisiciones, Converter={StaticResource BoolToVis}}">
+      <Grid DataContext="{Binding Requisiciones}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <WrapPanel Grid.Row="0" VerticalAlignment="Center">
+            <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
+                                Sugerencia="Buscar por notas o destino de línea"
+                                Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+
+            <RadioButton Content="Todas" GroupName="FiltroRequisicion" IsChecked="True"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
+            <RadioButton Content="Borrador" GroupName="FiltroRequisicion"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
+            <RadioButton Content="Enviada" GroupName="FiltroRequisicion"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Enviada" />
+            <RadioButton Content="Atendida" GroupName="FiltroRequisicion"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Atendida" />
+            <RadioButton Content="Anulada" GroupName="FiltroRequisicion"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+          </WrapPanel>
+
+          <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
+            <Button Content="Nueva requisición" Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding AgregarCommand}" />
+            <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding EditarCommand}" />
+            <Button Content="Enviar" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding EnviarCommand}" />
+            <Button Content="Armar orden de compra" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding ArmarOrdenCompraCommand}" />
+            <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
+                    Command="{Binding AnularCommand}" />
+            <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
+                    Command="{Binding EliminarCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
+        <Grid>
+          <DataGrid x:Name="TablaRequisiciones" Style="{StaticResource DataGridStyle}"
+                    ItemsSource="{Binding ItemsView}"
+                    SelectedItem="{Binding SelectedItem}">
+            <DataGrid.Columns>
+              <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+              <controls:ColumnaTexto Header="Fecha" Width="12*" MinWidth="86"
+                                     Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" />
+              <controls:ColumnaTexto Header="Líneas" Binding="{Binding LineasTexto}" Width="58*" MinWidth="220" />
+              <DataGridTemplateColumn Header="Estado" Width="96">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Border Style="{StaticResource ChipEstadoRequisicionStyle}">
+                      <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
+                    </Border>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <controls:EmptyState Icono="&#xE9D5;"
+                               Titulo="No hay requisiciones"
+                               Detalle="Registra la primera requisición para identificar lo que hace falta."
+                               Visibility="{Binding HasItems, ElementName=TablaRequisiciones, Converter={StaticResource SinItemsAVis}}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </Grid>
+
+    <!-- Órdenes de compra -->
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarOrdenesCompra, Converter={StaticResource BoolToVis}}">
+      <Grid DataContext="{Binding OrdenesCompra}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <WrapPanel Grid.Row="0" VerticalAlignment="Center">
+            <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
+                                Sugerencia="Buscar por proveedor"
+                                Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+
+            <RadioButton Content="Todas" GroupName="FiltroOrdenCompra" IsChecked="True"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
+            <RadioButton Content="Borrador" GroupName="FiltroOrdenCompra"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
+            <RadioButton Content="Aprobada" GroupName="FiltroOrdenCompra"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Aprobada" />
+            <RadioButton Content="Cerrada" GroupName="FiltroOrdenCompra"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Cerrada" />
+            <RadioButton Content="Anulada" GroupName="FiltroOrdenCompra"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+          </WrapPanel>
+
+          <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
+            <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding EditarCommand}" />
+            <Button Content="Aprobar" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding AprobarCommand}" />
+            <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
+                    Command="{Binding AnularCommand}" />
+            <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
+                    Command="{Binding EliminarCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
+        <Grid>
+          <DataGrid x:Name="TablaOrdenesCompra" Style="{StaticResource DataGridStyle}"
+                    ItemsSource="{Binding ItemsView}"
+                    SelectedItem="{Binding SelectedItem}">
+            <DataGrid.Columns>
+              <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
+              <controls:ColumnaTexto Header="Fecha" Width="12*" MinWidth="86"
+                                     Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" />
+              <controls:ColumnaTexto Header="Proveedor" Binding="{Binding ProveedorNombre}" Width="18*" MinWidth="120" />
+              <controls:ColumnaTexto Header="Líneas" Binding="{Binding LineasTexto}" Width="26*" MinWidth="170" />
+              <controls:ColumnaNumero Header="Cotizado" Binding="{Binding MontoCotizadoTexto}" Width="11*" MinWidth="90" />
+              <controls:ColumnaNumero Header="Monto" Binding="{Binding MontoTotalTexto}" Width="11*" MinWidth="90">
+                <controls:ColumnaNumero.ElementStyle>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                  </Style>
+                </controls:ColumnaNumero.ElementStyle>
+              </controls:ColumnaNumero>
+              <DataGridTemplateColumn Header="Estado" Width="96">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Border Style="{StaticResource ChipEstadoOrdenCompraStyle}">
+                      <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
+                    </Border>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <controls:EmptyState Icono="&#xE719;"
+                               Titulo="No hay órdenes de compra"
+                               Detalle="Se arman desde una requisición enviada, comparando precios de proveedor."
+                               Visibility="{Binding HasItems, ElementName=TablaOrdenesCompra, Converter={StaticResource SinItemsAVis}}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>

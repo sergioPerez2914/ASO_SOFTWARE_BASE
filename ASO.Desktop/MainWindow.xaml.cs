@@ -164,6 +164,7 @@ public partial class MainWindow : Window
             ["Inventario.Repuestos"] = (m, s) => new RepuestosViewModel(m, s),
             ["Inventario.Combustible"] = (m, s) => new CombustibleViewModel(m, s),
             ["Inventario.Producto"] = (m, s) => new ProductoViewModel(m, s),
+            ["Inventario.Compras"] = (m, s) => new ComprasViewModel(m, s),
             ["Nomina.Empleados"] = (m, s) => new EmpleadosViewModel(m, s),
             ["Nomina.Horarios"] = (m, s) => new HorariosViewModel(m, s),
             ["Nomina.Liquidaciones"] = (m, s) => new LiquidacionesViewModel(m, s),

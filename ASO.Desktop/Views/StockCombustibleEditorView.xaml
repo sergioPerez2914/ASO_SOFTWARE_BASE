@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ASO.Desktop.Views.TanqueCombustibleEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.StockCombustibleEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -8,7 +8,7 @@
              d:DesignWidth="360">
 
   <StackPanel>
-    <controls:FormField Etiqueta="Nombre">
+    <controls:FormField Etiqueta="Producto">
       <TextBox Style="{StaticResource FormTextBoxStyle}"
                Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>

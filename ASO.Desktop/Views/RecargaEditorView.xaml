@@ -8,7 +8,7 @@
              d:DesignWidth="420">
 
   <StackPanel>
-    <TextBlock Text="Cisterna que se recarga" Style="{StaticResource FormLabelStyle}" />
+    <TextBlock Text="Stock de combustible que se recarga" Style="{StaticResource FormLabelStyle}" />
     <Grid>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
@@ -16,13 +16,13 @@
       </Grid.ColumnDefinitions>
 
       <ComboBox Grid.Column="0" Style="{StaticResource FormComboBoxStyle}"
-                ItemsSource="{Binding Tanques}"
+                ItemsSource="{Binding StocksCombustible}"
                 DisplayMemberPath="Nombre"
-                SelectedItem="{Binding TanqueSeleccionado}" />
+                SelectedItem="{Binding StockSeleccionado}" />
 
       <Button Grid.Column="1" Style="{StaticResource BarraBotonStyle}"
-              Content="+ Nueva" ToolTip="Nueva cisterna"
-              Command="{Binding NuevaCisternaCommand}" />
+              Content="+ Nuevo" ToolTip="Nuevo stock de combustible"
+              Command="{Binding NuevoStockCommand}" />
     </Grid>
     <TextBlock Text="{Binding EspacioTexto}" FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
@@ -70,7 +70,7 @@
                Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
-    <TextBlock Text="La recarga suma los litros a la cisterna al guardarse: se registra cuando el combustible ya está descargado."
+    <TextBlock Text="La recarga suma los litros al stock de combustible al guardarse: se registra cuando el combustible ya está descargado."
                FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>

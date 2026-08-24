@@ -1,21 +1,27 @@
 namespace ASO.Desktop.Models;
 
 /// <summary>
-/// Depósito de combustible del centro (cisterna principal, tanque de taller). Su existencia
-/// sube con las recargas al proveedor y baja con cada vale despachado a una máquina.
+/// Existencia general de un producto de combustible/aceite del centro (p. ej. "Diesel",
+/// "Aceite hidráulico"). No representa un envase físico: en la empresa el aceite se queda en la
+/// presentación en que llega (barril, garrafa), no se vierte a una cisterna común. Mientras no se
+/// defina con el socio cómo rastrear esas presentaciones, cada producto lleva una capacidad y
+/// existencia general en litros — puede haber varias filas, una por producto.
 ///
 /// PROVISIONAL: la medición se asume por contómetro (litros despachados). Si el socio mide
 /// por aforo (regla de nivel), habrá que añadir la conversión y un ajuste de inventario.
 ///
 /// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
-public class TanqueCombustible : IEntidad<int>, IDeOrganizacion
+public class StockCombustible : IEntidad<int>, IDeOrganizacion
 {
     /// <summary>Nucleo (organizacion) duenno de la fila; lo estampa AsoDbContext.SaveChanges.</summary>
     public int OrganizacionId { get; set; }
 
     public int Id { get; set; }
+
+    /// <summary>El producto (p. ej. "Diesel", "Aceite hidráulico"), no un nombre de envase.</summary>
     public string Nombre { get; set; } = string.Empty;
+
     public decimal CapacidadL { get; set; }
     public decimal ExistenciaL { get; set; }
     public bool Activo { get; set; } = true;
@@ -27,5 +33,5 @@ public class TanqueCombustible : IEntidad<int>, IDeOrganizacion
     public string PorcentajeTexto => $"{PorcentajeLleno:N0} %";
 
     /// <summary>Copia superficial (solo hay tipos de valor y cadenas) para no mutar el original en la lista.</summary>
-    public TanqueCombustible Clonar() => (TanqueCombustible)MemberwiseClone();
+    public StockCombustible Clonar() => (StockCombustible)MemberwiseClone();
 }

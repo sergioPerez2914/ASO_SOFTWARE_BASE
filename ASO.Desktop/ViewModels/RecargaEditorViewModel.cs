@@ -8,53 +8,53 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Captura de una recarga de cisterna. No hereda de la base genérica porque no edita una
-/// entidad existente: solo recoge los datos con los que el servicio construye y aplica la
+/// Captura de una recarga de stock de combustible. No hereda de la base genérica porque no edita
+/// una entidad existente: solo recoge los datos con los que el servicio construye y aplica la
 /// recarga (el tope de capacidad lo valida <see cref="CombustibleService"/>).
 /// </summary>
 public sealed class RecargaEditorViewModel : CrudEditorViewModelBase
 {
-    private readonly ITanqueCombustibleDataSource _tanques;
+    private readonly IStockCombustibleDataSource _stockCombustible;
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesion;
 
-    public RecargaEditorViewModel(ITanqueCombustibleDataSource tanques, IServicioDialogo dialogos, ISesionActual sesion)
+    public RecargaEditorViewModel(IStockCombustibleDataSource stockCombustible, IServicioDialogo dialogos, ISesionActual sesion)
     {
-        _tanques = tanques;
+        _stockCombustible = stockCombustible;
         _dialogos = dialogos;
         _sesion = sesion;
 
-        Tanques = new ObservableCollection<TanqueCombustible>(tanques.GetAll().Where(t => t.Activo));
-        TanqueSeleccionado = Tanques.FirstOrDefault();
+        StocksCombustible = new ObservableCollection<StockCombustible>(stockCombustible.GetAll().Where(t => t.Activo));
+        StockSeleccionado = StocksCombustible.FirstOrDefault();
 
-        NuevaCisternaCommand = new RelayCommand(NuevaCisterna, () => _sesion.Puede(Permisos.Combustible.CrearCisterna));
+        NuevoStockCommand = new RelayCommand(NuevoStock, () => _sesion.Puede(Permisos.Combustible.CrearStock));
     }
 
-    public override string Titulo => "Registrar recarga de cisterna";
+    public override string Titulo => "Registrar recarga de stock de combustible";
     public override double AnchoEditor => Ancho.Estandar;
 
-    public ObservableCollection<TanqueCombustible> Tanques { get; }
+    public ObservableCollection<StockCombustible> StocksCombustible { get; }
 
-    public ICommand NuevaCisternaCommand { get; }
+    public ICommand NuevoStockCommand { get; }
 
-    private void NuevaCisterna()
+    private void NuevoStock()
     {
-        var editor = new TanqueCombustibleEditorViewModel();
+        var editor = new StockCombustibleEditorViewModel();
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        var nuevo = _tanques.Add(editor.ObtenerResultado());
-        Tanques.Add(nuevo);
-        TanqueSeleccionado = nuevo;
+        var nuevo = _stockCombustible.Add(editor.ObtenerResultado());
+        StocksCombustible.Add(nuevo);
+        StockSeleccionado = nuevo;
     }
 
-    private TanqueCombustible? _tanqueSeleccionado;
-    public TanqueCombustible? TanqueSeleccionado
+    private StockCombustible? _stockSeleccionado;
+    public StockCombustible? StockSeleccionado
     {
-        get => _tanqueSeleccionado;
+        get => _stockSeleccionado;
         set
         {
-            if (SetProperty(ref _tanqueSeleccionado, value))
+            if (SetProperty(ref _stockSeleccionado, value))
                 OnPropertyChanged(nameof(EspacioTexto));
         }
     }
@@ -94,15 +94,15 @@ public sealed class RecargaEditorViewModel : CrudEditorViewModelBase
         set => SetProperty(ref _notas, value);
     }
 
-    public string EspacioTexto => TanqueSeleccionado is { } t
+    public string EspacioTexto => StockSeleccionado is { } t
         ? $"Contiene {t.ExistenciaTexto}; admite {t.CapacidadL - t.ExistenciaL:N0} L más."
-        : "Seleccione la cisterna que se recarga.";
+        : "Seleccione el stock de combustible que se recarga.";
 
     protected override bool Validar(out string? error)
     {
-        if (TanqueSeleccionado is null)
+        if (StockSeleccionado is null)
         {
-            error = "Seleccione la cisterna que se recarga.";
+            error = "Seleccione el stock de combustible que se recarga.";
             return false;
         }
 
@@ -126,8 +126,8 @@ public sealed class RecargaEditorViewModel : CrudEditorViewModelBase
     public RecargaCombustible ObtenerRecarga(int creadoPorId) => new()
     {
         Fecha = Fecha,
-        TanqueId = TanqueSeleccionado?.Id ?? 0,
-        TanqueNombre = TanqueSeleccionado?.Nombre ?? string.Empty,
+        StockCombustibleId = StockSeleccionado?.Id ?? 0,
+        StockCombustibleNombre = StockSeleccionado?.Nombre ?? string.Empty,
         Litros = decimal.TryParse(LitrosTexto, out var litros) ? litros : 0m,
         CostoTotal = decimal.TryParse(CostoTexto, out var costo) ? costo : null,
         ProveedorNombre = ProveedorNombre.Trim(),

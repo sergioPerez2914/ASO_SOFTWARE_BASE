@@ -1,0 +1,110 @@
+<UserControl x:Class="ASO.Desktop.Views.RequisicionEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             mc:Ignorable="d"
+             d:DesignWidth="760">
+
+  <StackPanel>
+    <TextBlock Text="Agregar línea" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,4" />
+
+    <StackPanel Orientation="Horizontal">
+      <RadioButton Content="Combustible" GroupName="TipoLinea" Margin="0,0,6,0"
+                   Style="{StaticResource RangeToggleStyle}"
+                   IsChecked="{Binding EsLineaCombustible, Mode=OneWay}"
+                   Command="{Binding CambiarTipoLineaCommand}" CommandParameter="Combustible" />
+      <RadioButton Content="Repuesto" GroupName="TipoLinea"
+                   Style="{StaticResource RangeToggleStyle}"
+                   IsChecked="{Binding EsLineaRepuesto, Mode=OneWay}"
+                   Command="{Binding CambiarTipoLineaCommand}" CommandParameter="Repuesto" />
+    </StackPanel>
+
+    <!-- Combustible: diésel o lubricante, sin catálogo que elegir todavía (ver RequisicionLinea). -->
+    <StackPanel Visibility="{Binding EsLineaCombustible, Converter={StaticResource BoolToVis}}"
+                Margin="0,8,0,0">
+      <StackPanel Orientation="Horizontal">
+        <RadioButton Content="Diésel" GroupName="TipoCombustibleLinea" Margin="0,0,6,0"
+                     Style="{StaticResource RangeToggleStyle}"
+                     IsChecked="{Binding EsLineaDiesel, Mode=OneWay}"
+                     Command="{Binding CambiarTipoCombustibleCommand}" CommandParameter="Diesel" />
+        <RadioButton Content="Lubricante" GroupName="TipoCombustibleLinea"
+                     Style="{StaticResource RangeToggleStyle}"
+                     IsChecked="{Binding EsLineaLubricante, Mode=OneWay}"
+                     Command="{Binding CambiarTipoCombustibleCommand}" CommandParameter="Lubricante" />
+      </StackPanel>
+
+      <controls:FormField Etiqueta="Grado del lubricante"
+                           Visibility="{Binding EsLineaLubricante, Converter={StaticResource BoolToVis}}"
+                           Margin="0,8,0,0">
+        <TextBox Style="{StaticResource FormTextBoxStyle}"
+                 Text="{Binding TipoLubricanteTexto, UpdateSourceTrigger=PropertyChanged}" />
+      </controls:FormField>
+    </StackPanel>
+
+    <!-- Repuesto: el artículo del catálogo y, opcionalmente, para qué unidad de flota es. -->
+    <Grid Visibility="{Binding EsLineaRepuesto, Converter={StaticResource BoolToVis}}" Margin="0,8,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <controls:FormField Grid.Column="0" Etiqueta="Artículo">
+        <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                  ItemsSource="{Binding Articulos}"
+                  DisplayMemberPath="Nombre"
+                  SelectedItem="{Binding ArticuloLineaSeleccionado}" />
+      </controls:FormField>
+
+      <controls:FormField Grid.Column="2" Etiqueta="Para qué unidad (opcional)">
+        <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                  ItemsSource="{Binding Activos}"
+                  DisplayMemberPath="Etiqueta"
+                  SelectedItem="{Binding ActivoLineaSeleccionado}" />
+      </controls:FormField>
+    </Grid>
+
+    <Grid Margin="0,8,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="140" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="Cantidad">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding CantidadLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+        <Button Content="Agregar línea" Style="{StaticResource SecondaryButtonStyle}"
+                Command="{Binding AgregarLineaCommand}" Margin="0,0,0,4" />
+      </StackPanel>
+    </Grid>
+
+    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="220" Margin="0,12,0,0"
+              ItemsSource="{Binding Lineas}" IsReadOnly="True">
+      <DataGrid.Columns>
+        <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoInsumoTexto}" Width="8*" MinWidth="90" />
+        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="18*" MinWidth="140" />
+        <controls:ColumnaTexto Header="Para qué unidad" Binding="{Binding UnidadDestinoTexto}" Width="16*" MinWidth="130" />
+        <controls:ColumnaNumero Header="Cantidad" Binding="{Binding CantidadTexto}" Width="11*" MinWidth="90" />
+        <DataGridTemplateColumn Width="70">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Button Content="Quitar" Style="{StaticResource BarraBotonStyle}"
+                      Foreground="{DynamicResource DangerTextBrush}"
+                      Command="{Binding DataContext.QuitarLineaCommand,
+                                RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                      CommandParameter="{Binding}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </StackPanel>
+</UserControl>

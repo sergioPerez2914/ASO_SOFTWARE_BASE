@@ -18,22 +18,22 @@ namespace ASO.Desktop.ViewModels;
 public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<ValeCombustible>
 {
     private readonly ValeCombustible _original;
-    private readonly ITanqueCombustibleDataSource _tanques;
+    private readonly IStockCombustibleDataSource _stockCombustible;
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesion;
 
     public ValeCombustibleEditorViewModel(ValeCombustible original,
-                                          ITanqueCombustibleDataSource tanques,
+                                          IStockCombustibleDataSource stockCombustible,
                                           IActivoFlotaDataSource activos,
                                           IServicioDialogo dialogos,
                                           ISesionActual sesion)
     {
         _original = original;
-        _tanques = tanques;
+        _stockCombustible = stockCombustible;
         _dialogos = dialogos;
         _sesion = sesion;
 
-        Tanques = new ObservableCollection<TanqueCombustible>(tanques.GetAll().Where(t => t.Activo));
+        StocksCombustible = new ObservableCollection<StockCombustible>(stockCombustible.GetAll().Where(t => t.Activo));
         Activos = activos.GetAll().OrderBy(a => a.Codigo).ToList();
 
         Fecha = original.Fecha == default ? DateTime.Today : original.Fecha;
@@ -42,38 +42,38 @@ public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<Val
         ResponsableNombre = original.ResponsableNombre;
         Notas = original.Notas;
 
-        TanqueSeleccionado = Tanques.FirstOrDefault(t => t.Id == original.TanqueId) ?? Tanques.FirstOrDefault();
+        StockSeleccionado = StocksCombustible.FirstOrDefault(t => t.Id == original.StockCombustibleId) ?? StocksCombustible.FirstOrDefault();
         ActivoSeleccionado = Activos.FirstOrDefault(a => a.Id == original.ActivoId);
 
-        NuevaCisternaCommand = new RelayCommand(NuevaCisterna, () => _sesion.Puede(Permisos.Combustible.CrearCisterna));
+        NuevoStockCommand = new RelayCommand(NuevoStock, () => _sesion.Puede(Permisos.Combustible.CrearStock));
     }
 
     public override string Titulo => _original.Id == 0 ? "Nuevo vale de combustible" : $"Editar vale Nº {_original.Id}";
     public override double AnchoEditor => Ancho.Estandar;
 
-    public ObservableCollection<TanqueCombustible> Tanques { get; }
+    public ObservableCollection<StockCombustible> StocksCombustible { get; }
     public IReadOnlyList<ActivoFlota> Activos { get; }
 
-    public ICommand NuevaCisternaCommand { get; }
+    public ICommand NuevoStockCommand { get; }
 
-    private void NuevaCisterna()
+    private void NuevoStock()
     {
-        var editor = new TanqueCombustibleEditorViewModel();
+        var editor = new StockCombustibleEditorViewModel();
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        var nuevo = _tanques.Add(editor.ObtenerResultado());
-        Tanques.Add(nuevo);
-        TanqueSeleccionado = nuevo;
+        var nuevo = _stockCombustible.Add(editor.ObtenerResultado());
+        StocksCombustible.Add(nuevo);
+        StockSeleccionado = nuevo;
     }
 
-    private TanqueCombustible? _tanqueSeleccionado;
-    public TanqueCombustible? TanqueSeleccionado
+    private StockCombustible? _stockSeleccionado;
+    public StockCombustible? StockSeleccionado
     {
-        get => _tanqueSeleccionado;
+        get => _stockSeleccionado;
         set
         {
-            if (SetProperty(ref _tanqueSeleccionado, value))
+            if (SetProperty(ref _stockSeleccionado, value))
                 OnPropertyChanged(nameof(ExistenciaTexto));
         }
     }
@@ -127,9 +127,9 @@ public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<Val
         set => SetProperty(ref _notas, value);
     }
 
-    public string ExistenciaTexto => TanqueSeleccionado is { } t
-        ? $"Existencia en {t.Nombre.ToLowerInvariant()}: {t.ExistenciaTexto} ({t.PorcentajeTexto})"
-        : "Seleccione la cisterna de origen.";
+    public string ExistenciaTexto => StockSeleccionado is { } t
+        ? $"Existencia de {t.Nombre}: {t.ExistenciaTexto} ({t.PorcentajeTexto})"
+        : "Seleccione el stock de combustible de origen.";
 
     public string EtiquetaLectura => ActivoSeleccionado?.EsTransporte == true
         ? "Odómetro (km)"
@@ -141,9 +141,9 @@ public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<Val
 
     protected override bool Validar(out string? error)
     {
-        if (TanqueSeleccionado is null)
+        if (StockSeleccionado is null)
         {
-            error = "Seleccione la cisterna de origen.";
+            error = "Seleccione el stock de combustible de origen.";
             return false;
         }
 
@@ -174,8 +174,8 @@ public sealed class ValeCombustibleEditorViewModel : CrudEditorViewModelBase<Val
         var vale = _original.Clonar();
 
         vale.Fecha = Fecha;
-        vale.TanqueId = TanqueSeleccionado?.Id ?? 0;
-        vale.TanqueNombre = TanqueSeleccionado?.Nombre ?? string.Empty;
+        vale.StockCombustibleId = StockSeleccionado?.Id ?? 0;
+        vale.StockCombustibleNombre = StockSeleccionado?.Nombre ?? string.Empty;
         vale.ActivoId = ActivoSeleccionado?.Id ?? 0;
         vale.ActivoCodigo = ActivoSeleccionado?.Codigo ?? string.Empty;
         vale.ActivoEtiqueta = ActivoSeleccionado?.Etiqueta ?? string.Empty;

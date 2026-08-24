@@ -19,7 +19,7 @@ public class AsoDbContext : DbContext
     // Fase 1 (catálogos simples)
     public DbSet<Proveedor> Proveedores { get; set; }
     public DbSet<ConceptoNomina> ConceptosNomina { get; set; }
-    public DbSet<TanqueCombustible> TanquesCombustible { get; set; }
+    public DbSet<StockCombustible> StockCombustible { get; set; }
 
     // Fase 2 (catálogos con relaciones livianas)
     public DbSet<PersonalCampo> PersonalCampo { get; set; }
@@ -43,6 +43,11 @@ public class AsoDbContext : DbContext
 
     // Fase 5 (evento derivado/adaptador)
     public DbSet<EventoOperacion> EventosOperacion { get; set; }
+
+    // Fase 8 (flujo de compras: requisición y orden de compra)
+    public DbSet<Requisicion> Requisiciones { get; set; }
+    public DbSet<CotizacionProveedor> CotizacionesProveedor { get; set; }
+    public DbSet<OrdenCompra> OrdenesCompra { get; set; }
 
     // Fase 6 (organización y seguridad)
     public DbSet<Organizacion> Organizaciones { get; set; }
@@ -141,7 +146,7 @@ public class AsoDbContext : DbContext
             entity.Ignore(c => c.EstadoTexto);
         });
 
-        modelBuilder.Entity<TanqueCombustible>(entity =>
+        modelBuilder.Entity<StockCombustible>(entity =>
         {
             entity.HasKey(t => t.Id);
             entity.Property(t => t.Nombre).IsRequired().HasMaxLength(150);
@@ -302,7 +307,7 @@ public class AsoDbContext : DbContext
         modelBuilder.Entity<ValeCombustible>(entity =>
         {
             entity.HasKey(v => v.Id);
-            entity.Property(v => v.TanqueNombre).HasMaxLength(150);
+            entity.Property(v => v.StockCombustibleNombre).HasMaxLength(150);
             entity.Property(v => v.ActivoCodigo).HasMaxLength(30);
             entity.Property(v => v.ActivoEtiqueta).HasMaxLength(150);
             entity.Property(v => v.ResponsableNombre).HasMaxLength(150);
@@ -324,7 +329,7 @@ public class AsoDbContext : DbContext
         modelBuilder.Entity<RecargaCombustible>(entity =>
         {
             entity.HasKey(r => r.Id);
-            entity.Property(r => r.TanqueNombre).HasMaxLength(150);
+            entity.Property(r => r.StockCombustibleNombre).HasMaxLength(150);
             entity.Property(r => r.ProveedorNombre).HasMaxLength(150);
             entity.Property(r => r.Notas).HasMaxLength(500);
             entity.Property(r => r.Litros).HasColumnType("decimal(18,2)").IsRequired();
@@ -536,6 +541,85 @@ public class AsoDbContext : DbContext
             entity.Ignore(p => p.EstaPendiente);
             entity.Ignore(p => p.EstadoTexto);
             entity.Ignore(p => p.Resumen);
+        });
+
+        // ---- Fase 8: flujo de compras (requisición y orden de compra) ----
+        //
+        // Mismas dos entidades "documento con líneas" que la Fase 4: Include/ThenInclude +
+        // RemoveRange antes de reasignar, por el mismo motivo (ver la nota de esa fase arriba).
+
+        modelBuilder.Entity<Requisicion>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.MotivoAnulacion).HasMaxLength(500);
+
+            entity.Ignore(r => r.EstadoTexto);
+            entity.Ignore(r => r.LineasTexto);
+
+            entity.OwnsMany(r => r.Lineas, linea =>
+            {
+                linea.WithOwner().HasForeignKey("RequisicionId");
+                linea.Property<int>("Id");
+                linea.HasKey("Id");
+                linea.Property(x => x.TipoLubricante).HasMaxLength(20);
+                linea.Property(x => x.ArticuloCodigo).HasMaxLength(30);
+                linea.Property(x => x.ArticuloNombre).HasMaxLength(150);
+                linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
+                linea.Property(x => x.UnidadTexto).HasMaxLength(20);
+                linea.Property(x => x.Cantidad).HasColumnType("decimal(18,2)");
+
+                linea.Ignore(x => x.TipoInsumoTexto);
+                linea.Ignore(x => x.DestinoTexto);
+                linea.Ignore(x => x.UnidadDestinoTexto);
+                linea.Ignore(x => x.CantidadTexto);
+            });
+        });
+
+        modelBuilder.Entity<CotizacionProveedor>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.ProveedorNombre).HasMaxLength(150);
+            entity.Property(c => c.Notas).HasMaxLength(500);
+            entity.Property(c => c.MontoTotal).HasColumnType("decimal(18,2)").IsRequired();
+
+            entity.Ignore(c => c.MontoTexto);
+        });
+
+        modelBuilder.Entity<OrdenCompra>(entity =>
+        {
+            entity.HasKey(o => o.Id);
+            entity.Property(o => o.ProveedorNombre).HasMaxLength(150);
+            entity.Property(o => o.Notas).HasMaxLength(500);
+            entity.Property(o => o.MotivoAnulacion).HasMaxLength(500);
+            entity.Property(o => o.MontoCotizado).HasColumnType("decimal(18,2)");
+
+            entity.Ignore(o => o.MontoTotal);
+            entity.Ignore(o => o.MontoTotalTexto);
+            entity.Ignore(o => o.MontoCotizadoTexto);
+            entity.Ignore(o => o.LineasTexto);
+            entity.Ignore(o => o.EstadoTexto);
+
+            entity.OwnsMany(o => o.Lineas, linea =>
+            {
+                linea.WithOwner().HasForeignKey("OrdenCompraId");
+                linea.Property<int>("Id");
+                linea.HasKey("Id");
+                linea.Property(x => x.TipoLubricante).HasMaxLength(20);
+                linea.Property(x => x.ArticuloCodigo).HasMaxLength(30);
+                linea.Property(x => x.ArticuloNombre).HasMaxLength(150);
+                linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
+                linea.Property(x => x.UnidadTexto).HasMaxLength(20);
+                linea.Property(x => x.Cantidad).HasColumnType("decimal(18,2)");
+                linea.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
+
+                linea.Ignore(x => x.Subtotal);
+                linea.Ignore(x => x.TipoInsumoTexto);
+                linea.Ignore(x => x.DestinoTexto);
+                linea.Ignore(x => x.UnidadDestinoTexto);
+                linea.Ignore(x => x.CantidadTexto);
+                linea.Ignore(x => x.PrecioUnitarioTexto);
+                linea.Ignore(x => x.SubtotalTexto);
+            });
         });
 
         AplicarFiltroDeOrganizacion(modelBuilder);

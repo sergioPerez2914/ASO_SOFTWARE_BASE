@@ -4,7 +4,8 @@ namespace ASO.Desktop.Models;
 
 /// <summary>
 /// Estados del documento. <c>Borrador</c> es la ventana de corrección; al confirmar se
-/// descuenta la cisterna, se actualiza la lectura del activo y el vale queda inmutable.
+/// descuenta el stock de combustible, se actualiza la lectura del activo y el vale queda
+/// inmutable.
 /// </summary>
 public enum EstadoVale
 {
@@ -14,8 +15,8 @@ public enum EstadoVale
 }
 
 /// <summary>
-/// Vale de combustible: documento de movimiento que despacha litros de una cisterna a un
-/// activo y registra la lectura de su instrumento (horómetro en máquinas, odómetro en
+/// Vale de combustible: documento de movimiento que despacha litros de un stock de combustible a
+/// un activo y registra la lectura de su instrumento (horómetro en máquinas, odómetro en
 /// transporte). Sigue el mismo patrón que la remesa: máquina de estados, inmutabilidad tras
 /// confirmar, efectos en una sola operación, auditoría.
 ///
@@ -36,8 +37,8 @@ public class ValeCombustible : IEntidad<int>, IDeOrganizacion
     public DateTime Fecha { get; set; }
 
     // --- Origen (snapshots: el documento debe leerse igual aunque el catálogo cambie) ---
-    public int TanqueId { get; set; }
-    public string TanqueNombre { get; set; } = string.Empty;
+    public int StockCombustibleId { get; set; }
+    public string StockCombustibleNombre { get; set; } = string.Empty;
 
     // --- Destino ---
     public int ActivoId { get; set; }

@@ -2,9 +2,9 @@ using System.Windows.Controls;
 
 namespace ASO.Desktop.Views;
 
-public partial class TanqueCombustibleEditorView : UserControl
+public partial class RequisicionEditorView : UserControl
 {
-    public TanqueCombustibleEditorView()
+    public RequisicionEditorView()
     {
         InitializeComponent();
     }

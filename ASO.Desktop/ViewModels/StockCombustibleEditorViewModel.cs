@@ -3,13 +3,13 @@ using ASO.Desktop.Models;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Alta rápida de una cisterna, invocada desde el botón "+" de los editores de vale y de
-/// recarga: no es una pantalla propia, solo evita que registrar un despacho o una recarga se
-/// trabe porque la cisterna todavía no existe en el catálogo.
+/// Alta rápida de un producto de stock de combustible, invocada desde el botón "+" de los
+/// editores de vale y de recarga: no es una pantalla propia, solo evita que registrar un despacho
+/// o una recarga se trabe porque el producto todavía no existe en el catálogo.
 /// </summary>
-public sealed class TanqueCombustibleEditorViewModel : CrudEditorViewModelBase<TanqueCombustible>
+public sealed class StockCombustibleEditorViewModel : CrudEditorViewModelBase<StockCombustible>
 {
-    public override string Titulo => "Nueva cisterna";
+    public override string Titulo => "Nuevo stock de combustible";
 
     private string _nombre = string.Empty;
     public string Nombre
@@ -36,7 +36,7 @@ public sealed class TanqueCombustibleEditorViewModel : CrudEditorViewModelBase<T
     {
         if (string.IsNullOrWhiteSpace(Nombre))
         {
-            error = "Indique el nombre de la cisterna.";
+            error = "Indique el producto (ej. Diesel, Aceite hidráulico).";
             return false;
         }
 
@@ -62,7 +62,7 @@ public sealed class TanqueCombustibleEditorViewModel : CrudEditorViewModelBase<T
         return true;
     }
 
-    public override TanqueCombustible ObtenerResultado() => new()
+    public override StockCombustible ObtenerResultado() => new()
     {
         Nombre = Nombre.Trim(),
         CapacidadL = decimal.TryParse(CapacidadTexto, out var capacidad) ? capacidad : 0m,

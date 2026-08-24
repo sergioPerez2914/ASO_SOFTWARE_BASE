@@ -35,8 +35,8 @@ public static class CambiosDeDatos
 
     /// <summary>
     /// 1 mientras hay un aviso esperando en la cola del despachador. Evita la ráfaga: una sola
-    /// acción de dominio puede guardar tres veces —confirmar un vale toca el vale, la cisterna y
-    /// el activo— y sin esto serían tres recargas para el mismo clic.
+    /// acción de dominio puede guardar tres veces —confirmar un vale toca el vale, el stock de
+    /// combustible y el activo— y sin esto serían tres recargas para el mismo clic.
     /// </summary>
     private static int _enCola;
 

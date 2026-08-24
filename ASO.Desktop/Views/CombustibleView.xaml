@@ -20,8 +20,8 @@
                          Titulo="{Binding Submodulo.Nombre}"
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
-    <!-- Estado de las cisternas: lo primero que se mira antes de despachar -->
-    <ItemsControl Grid.Row="1" ItemsSource="{Binding Tanques}" Margin="0,0,0,12">
+    <!-- Estado del stock de combustible: lo primero que se mira antes de despachar -->
+    <ItemsControl Grid.Row="1" ItemsSource="{Binding StocksCombustible}" Margin="0,0,0,12">
       <ItemsControl.ItemsPanel>
         <ItemsPanelTemplate>
           <StackPanel Orientation="Horizontal" />
@@ -62,7 +62,7 @@
 
         <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por activo, cisterna o responsable"
+                              Sugerencia="Buscar por activo, stock de combustible o responsable"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <RadioButton Content="Todos" GroupName="FiltroVale" IsChecked="True"
@@ -118,7 +118,7 @@
             <controls:ColumnaTexto Header="Fecha" Width="10*" MinWidth="82"
                                    Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" />
             <controls:ColumnaTexto Header="Activo" Binding="{Binding ActivoEtiqueta}" Width="20*" MinWidth="120" />
-            <controls:ColumnaTexto Header="Cisterna" Binding="{Binding TanqueNombre}" Width="15*" MinWidth="100" />
+            <controls:ColumnaTexto Header="Stock" Binding="{Binding StockCombustibleNombre}" Width="15*" MinWidth="100" />
             <controls:ColumnaNumero Header="Litros" Binding="{Binding LitrosTexto}" Width="9*" MinWidth="72" />
             <controls:ColumnaNumero Header="Lectura" Binding="{Binding LecturaTexto}" Width="10*" MinWidth="76" />
             <DataGridTemplateColumn Header="Consumo" Width="14*" MinWidth="110">
@@ -158,7 +158,7 @@
 
         <controls:EmptyState Icono="&#xEB42;"
                              Titulo="No hay vales de combustible"
-                             Detalle="Los vales aparecen aquí al despachar desde una cisterna."
+                             Detalle="Los vales aparecen aquí al despachar desde un stock de combustible."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
       </Grid>
     </Border>

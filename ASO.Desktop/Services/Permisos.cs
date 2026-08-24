@@ -75,7 +75,27 @@ public static class Permisos
         public const string Confirmar = "Combustible.Confirmar";
         public const string Anular = "Combustible.Anular";
         public const string Recargar = "Combustible.Recargar";
-        public const string CrearCisterna = "Combustible.CrearCisterna";
+        public const string CrearStock = "Combustible.CrearStock";
+    }
+
+    /// <summary>Primer eslabón del flujo de compras: identificar cuánto hace falta.</summary>
+    public static class Requisicion
+    {
+        public const string Crear = "Requisicion.Crear";
+        public const string Editar = "Requisicion.Editar";
+        public const string Eliminar = "Requisicion.Eliminar";
+        public const string Enviar = "Requisicion.Enviar";
+        public const string Anular = "Requisicion.Anular";
+    }
+
+    /// <summary>Comparar proveedores y autorizar el gasto, a partir de una requisición enviada.</summary>
+    public static class OrdenCompra
+    {
+        public const string Crear = "OrdenCompra.Crear";
+        public const string Editar = "OrdenCompra.Editar";
+        public const string Eliminar = "OrdenCompra.Eliminar";
+        public const string Aprobar = "OrdenCompra.Aprobar";
+        public const string Anular = "OrdenCompra.Anular";
     }
 
     public static class Empleados

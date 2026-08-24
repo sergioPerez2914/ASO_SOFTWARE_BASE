@@ -1,0 +1,72 @@
+<UserControl x:Class="ASO.Desktop.Views.CompararProveedoresEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             mc:Ignorable="d"
+             d:DesignWidth="760">
+
+  <StackPanel>
+    <TextBlock Text="{Binding Requisicion.LineasTexto}" TextWrapping="Wrap"
+               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" />
+
+    <TextBlock Text="Cotizar proveedor" Style="{StaticResource FormLabelStyle}" />
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="140" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="Proveedor">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Proveedores}"
+                    DisplayMemberPath="Etiqueta"
+                    SelectedItem="{Binding ProveedorLineaSeleccionado}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <controls:FormField Etiqueta="Monto total">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding MontoLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="4">
+        <controls:FormField Etiqueta="Notas (opcional)">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding NotasLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="6" VerticalAlignment="Bottom">
+        <Button Content="Agregar cotización" Style="{StaticResource SecondaryButtonStyle}"
+                Command="{Binding AgregarCotizacionCommand}" Margin="0,0,0,4" />
+      </StackPanel>
+    </Grid>
+
+    <TextBlock Text="Cotizaciones capturadas — seleccione la fila ganadora" Style="{StaticResource FormLabelStyle}" Margin="0,12,0,4" />
+
+    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="220"
+              ItemsSource="{Binding Cotizaciones}"
+              SelectedItem="{Binding GanadoraSeleccionada}" IsReadOnly="True">
+      <DataGrid.Columns>
+        <controls:ColumnaTexto Header="Proveedor" Binding="{Binding ProveedorNombre}" Width="24*" MinWidth="140" />
+        <controls:ColumnaNumero Header="Monto" Binding="{Binding MontoTexto}" Width="12*" MinWidth="90" />
+        <controls:ColumnaTexto Header="Notas" Binding="{Binding Notas}" Width="22*" MinWidth="120" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <TextBlock Text="La fila seleccionada en la grilla es la cotización ganadora. Cada cotización queda registrada al agregarla, aunque al final no se arme la orden en este momento."
+               FontSize="11" TextWrapping="Wrap"
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
+  </StackPanel>
+</UserControl>

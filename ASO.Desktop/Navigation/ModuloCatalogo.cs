@@ -90,9 +90,11 @@ public static class ModuloCatalogo
                 new Submodulo("Inventario.Repuestos", "Repuestos",
                     "Stock de repuestos y consumibles de taller.", ""),
                 new Submodulo("Inventario.Combustible", "Combustible",
-                    "Existencia en cisterna, despachos y rendimiento.", ""),
+                    "Existencia en stock, despachos y rendimiento.",""),
                 new Submodulo("Inventario.Producto", "Producto",
-                    "Caña cosechada y entregada al ingenio.", "")
+                    "Caña cosechada y entregada al ingenio.", ""),
+                new Submodulo("Inventario.Compras", "Compras",
+                    "Requisiciones y órdenes de compra de combustible y repuestos.", "")
             ]),
 
         new Modulo(

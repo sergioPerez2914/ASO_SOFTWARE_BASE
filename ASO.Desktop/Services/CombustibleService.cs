@@ -11,25 +11,26 @@ namespace ASO.Desktop.Services;
 /// <c>PuedeX</c> alimentan el <c>CanExecute</c> y las transiciones revalidan antes de aplicar
 /// efectos.
 ///
-/// Confirmar un vale toca tres cosas a la vez: descuenta la cisterna, calcula el rendimiento
-/// del período y adelanta la lectura del instrumento del activo. Ese último efecto convierte
-/// al vale en la fuente principal del horómetro y el odómetro: hasta ahora solo se actualizaban
-/// cuando alguien registraba un mantenimiento, que es mucho menos frecuente que un despacho.
+/// Confirmar un vale toca tres cosas a la vez: descuenta el stock de combustible, calcula el
+/// rendimiento del período y adelanta la lectura del instrumento del activo. Ese último efecto
+/// convierte al vale en la fuente principal del horómetro y el odómetro: hasta ahora solo se
+/// actualizaban cuando alguien registraba un mantenimiento, que es mucho menos frecuente que un
+/// despacho.
 /// </summary>
 public sealed class CombustibleService
 {
     private readonly IValeCombustibleDataSource _vales;
-    private readonly ITanqueCombustibleDataSource _tanques;
+    private readonly IStockCombustibleDataSource _stockCombustible;
     private readonly IRecargaCombustibleDataSource _recargas;
     private readonly IActivoFlotaDataSource _activos;
 
     public CombustibleService(IValeCombustibleDataSource vales,
-                              ITanqueCombustibleDataSource tanques,
+                              IStockCombustibleDataSource stockCombustible,
                               IRecargaCombustibleDataSource recargas,
                               IActivoFlotaDataSource activos)
     {
         _vales = vales;
-        _tanques = tanques;
+        _stockCombustible = stockCombustible;
         _recargas = recargas;
         _activos = activos;
     }
@@ -49,8 +50,8 @@ public sealed class CombustibleService
     {
         var falta = new List<string>();
 
-        if (v.TanqueId == 0)
-            falta.Add("la cisterna de origen");
+        if (v.StockCombustibleId == 0)
+            falta.Add("el stock de combustible de origen");
 
         if (v.ActivoId == 0)
             falta.Add("el activo que recibe el combustible");
@@ -68,8 +69,8 @@ public sealed class CombustibleService
     // --- Transiciones ---
 
     /// <summary>
-    /// Confirma el despacho: descuenta la cisterna, calcula el rendimiento y adelanta la
-    /// lectura del activo. A partir de aquí el vale es inmutable.
+    /// Confirma el despacho: descuenta el stock de combustible, calcula el rendimiento y adelanta
+    /// la lectura del activo. A partir de aquí el vale es inmutable.
     /// </summary>
     public ValeCombustible Confirmar(ValeCombustible vale)
     {
@@ -79,12 +80,12 @@ public sealed class CombustibleService
         if (!EstaCompleto(vale, out var faltantes))
             throw new InvalidOperationException($"Faltan datos para confirmar el vale: {faltantes}.");
 
-        var tanque = _tanques.GetById(vale.TanqueId)
-            ?? throw new InvalidOperationException("La cisterna indicada ya no existe.");
+        var stock = _stockCombustible.GetById(vale.StockCombustibleId)
+            ?? throw new InvalidOperationException("El stock de combustible indicado ya no existe.");
 
-        if (vale.Litros > tanque.ExistenciaL)
+        if (vale.Litros > stock.ExistenciaL)
             throw new InvalidOperationException(
-                $"La {tanque.Nombre.ToLowerInvariant()} tiene {tanque.ExistenciaL:N2} L y se piden {vale.Litros:N2} L. " +
+                $"El stock de {stock.Nombre} tiene {stock.ExistenciaL:N2} L y se piden {vale.Litros:N2} L. " +
                 "Registre una recarga antes de despachar.");
 
         var activo = _activos.GetById(vale.ActivoId)
@@ -112,10 +113,10 @@ public sealed class CombustibleService
         copia.FechaConfirmacion = DateTime.Now;
         _vales.Update(copia);
 
-        // Efecto: descontar la cisterna.
-        var tanqueActualizado = tanque.Clonar();
-        tanqueActualizado.ExistenciaL -= vale.Litros;
-        _tanques.Update(tanqueActualizado);
+        // Efecto: descontar el stock de combustible.
+        var stockActualizado = stock.Clonar();
+        stockActualizado.ExistenciaL -= vale.Litros;
+        _stockCombustible.Update(stockActualizado);
 
         // Efecto: adelantar la lectura del instrumento del activo.
         if (copia.Lectura is { } nueva && (lecturaAnterior is null || nueva > lecturaAnterior))
@@ -133,9 +134,9 @@ public sealed class CombustibleService
     }
 
     /// <summary>
-    /// Anula el vale. Si estaba confirmado repone los litros a la cisterna, pero NO revierte la
-    /// lectura del activo: el instrumento marca lo que marca, y anular un papel no deshace las
-    /// horas que la máquina trabajó.
+    /// Anula el vale. Si estaba confirmado repone los litros al stock de combustible, pero NO
+    /// revierte la lectura del activo: el instrumento marca lo que marca, y anular un papel no
+    /// deshace las horas que la máquina trabajó.
     /// </summary>
     public ValeCombustible Anular(ValeCombustible vale, string motivo)
     {
@@ -145,11 +146,11 @@ public sealed class CombustibleService
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Indique el motivo de la anulación.");
 
-        if (vale.Estado == EstadoVale.Confirmado && _tanques.GetById(vale.TanqueId) is { } tanque)
+        if (vale.Estado == EstadoVale.Confirmado && _stockCombustible.GetById(vale.StockCombustibleId) is { } stock)
         {
-            var repuesto = tanque.Clonar();
+            var repuesto = stock.Clonar();
             repuesto.ExistenciaL += vale.Litros;
-            _tanques.Update(repuesto);
+            _stockCombustible.Update(repuesto);
         }
 
         var copia = vale.Clonar();
@@ -161,29 +162,29 @@ public sealed class CombustibleService
         return copia;
     }
 
-    /// <summary>Registra una recarga y suma sus litros a la cisterna en la misma operación.</summary>
+    /// <summary>Registra una recarga y suma sus litros al stock de combustible en la misma operación.</summary>
     public RecargaCombustible RegistrarRecarga(RecargaCombustible recarga)
     {
-        if (recarga.TanqueId == 0)
-            throw new InvalidOperationException("Seleccione la cisterna que se recarga.");
+        if (recarga.StockCombustibleId == 0)
+            throw new InvalidOperationException("Seleccione el stock de combustible que se recarga.");
 
         if (recarga.Litros <= 0)
             throw new InvalidOperationException("Los litros de la recarga deben ser mayores que cero.");
 
-        var tanque = _tanques.GetById(recarga.TanqueId)
-            ?? throw new InvalidOperationException("La cisterna indicada ya no existe.");
+        var stock = _stockCombustible.GetById(recarga.StockCombustibleId)
+            ?? throw new InvalidOperationException("El stock de combustible indicado ya no existe.");
 
-        if (tanque.ExistenciaL + recarga.Litros > tanque.CapacidadL)
+        if (stock.ExistenciaL + recarga.Litros > stock.CapacidadL)
             throw new InvalidOperationException(
-                $"La {tanque.Nombre.ToLowerInvariant()} tiene {tanque.ExistenciaL:N2} L de {tanque.CapacidadL:N2} L " +
+                $"El stock de {stock.Nombre} tiene {stock.ExistenciaL:N2} L de {stock.CapacidadL:N2} L " +
                 $"y no admite {recarga.Litros:N2} L más. Verifique la cantidad recibida.");
 
-        recarga.TanqueNombre = tanque.Nombre;
+        recarga.StockCombustibleNombre = stock.Nombre;
         var agregada = _recargas.Add(recarga);
 
-        var actualizado = tanque.Clonar();
+        var actualizado = stock.Clonar();
         actualizado.ExistenciaL += recarga.Litros;
-        _tanques.Update(actualizado);
+        _stockCombustible.Update(actualizado);
 
         return agregada;
     }

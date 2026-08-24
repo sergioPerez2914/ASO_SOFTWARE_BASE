@@ -64,8 +64,8 @@
     <views:RecargaEditorView />
   </DataTemplate>
 
-  <DataTemplate DataType="{x:Type vm:TanqueCombustibleEditorViewModel}">
-    <views:TanqueCombustibleEditorView />
+  <DataTemplate DataType="{x:Type vm:StockCombustibleEditorViewModel}">
+    <views:StockCombustibleEditorView />
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type vm:JornadaEditorViewModel}">
@@ -98,6 +98,18 @@
 
   <DataTemplate DataType="{x:Type vm:FincaEditorViewModel}">
     <views:FincaEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:RequisicionEditorViewModel}">
+    <views:RequisicionEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:CompararProveedoresEditorViewModel}">
+    <views:CompararProveedoresEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:OrdenCompraEditorViewModel}">
+    <views:OrdenCompraEditorView />
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type vm:UsuarioEditorViewModel}">

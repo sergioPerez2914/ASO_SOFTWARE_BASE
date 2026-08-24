@@ -32,7 +32,7 @@ public static class DataSourceFactory
     private static IFacturaClienteDataSource? _facturasCliente;
     private static IProveedorDataSource? _proveedores;
     private static IFacturaProveedorDataSource? _facturasProveedor;
-    private static ITanqueCombustibleDataSource? _tanquesCombustible;
+    private static IStockCombustibleDataSource? _stockCombustible;
     private static IValeCombustibleDataSource? _valesCombustible;
     private static IRecargaCombustibleDataSource? _recargasCombustible;
     private static IConceptoNominaDataSource? _conceptosNomina;
@@ -40,6 +40,9 @@ public static class DataSourceFactory
     private static IUsuarioDataSource? _usuarios;
     private static IPermisoUsuarioDataSource? _permisosUsuario;
     private static IPeticionCambioDataSource? _peticiones;
+    private static IRequisicionDataSource? _requisiciones;
+    private static ICotizacionProveedorDataSource? _cotizacionesProveedor;
+    private static IOrdenCompraDataSource? _ordenesCompra;
     private static IAuthService? _auth;
     private static IAjustesStore? _ajustesStore;
 
@@ -91,8 +94,8 @@ public static class DataSourceFactory
     public static IFacturaProveedorDataSource CrearFacturasProveedor() =>
         _facturasProveedor ??= new SqlFacturaProveedorDataSource();
 
-    public static ITanqueCombustibleDataSource CrearTanquesCombustible() =>
-        _tanquesCombustible ??= new SqlTanqueCombustibleDataSource();
+    public static IStockCombustibleDataSource CrearStockCombustible() =>
+        _stockCombustible ??= new SqlStockCombustibleDataSource();
 
     public static IValeCombustibleDataSource CrearValesCombustible() =>
         _valesCombustible ??= new SqlValeCombustibleDataSource();
@@ -114,6 +117,15 @@ public static class DataSourceFactory
 
     public static IPeticionCambioDataSource CrearPeticiones() =>
         _peticiones ??= new SqlPeticionCambioDataSource();
+
+    public static IRequisicionDataSource CrearRequisiciones() =>
+        _requisiciones ??= new SqlRequisicionDataSource();
+
+    public static ICotizacionProveedorDataSource CrearCotizacionesProveedor() =>
+        _cotizacionesProveedor ??= new SqlCotizacionProveedorDataSource();
+
+    public static IOrdenCompraDataSource CrearOrdenesCompra() =>
+        _ordenesCompra ??= new SqlOrdenCompraDataSource();
 
     public static IAuthService CrearAuth() =>
         _auth ??= new AuthService(CrearUsuarios());

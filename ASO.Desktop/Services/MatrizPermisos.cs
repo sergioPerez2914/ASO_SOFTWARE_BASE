@@ -66,6 +66,7 @@ public static class MatrizPermisos
         Permisos.Ver("Flota.Mantenimiento"),
         Permisos.Ver("Flota.Telemetria"),
         Permisos.Ver("Inventario.Combustible"),
+        Permisos.Ver("Inventario.Compras"),
         Permisos.Ver("Nomina.Horarios"),
 
         Permisos.Remesas.Crear,
@@ -86,6 +87,14 @@ public static class MatrizPermisos
         Permisos.Horarios.Crear,
         Permisos.Horarios.Editar,
         Permisos.Horarios.RegistrarSalida,
+
+        // Identifica y envía la necesidad; comparar proveedores y aprobar el gasto (la orden de
+        // compra) queda exclusivo del administrador.
+        Permisos.Requisicion.Crear,
+        Permisos.Requisicion.Editar,
+        Permisos.Requisicion.Eliminar,
+        Permisos.Requisicion.Enviar,
+        Permisos.Requisicion.Anular,
 
         Permisos.Peticiones.Solicitar
     ];
