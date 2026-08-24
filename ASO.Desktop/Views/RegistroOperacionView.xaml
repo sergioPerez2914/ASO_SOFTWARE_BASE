@@ -18,70 +18,76 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
     <controls:PageHeader Grid.Row="0"
                          Titulo="{Binding Submodulo.Nombre}"
-                         Descripcion="{Binding Submodulo.Descripcion}">
-      <Button Content="Nueva remesa" Style="{StaticResource PrimaryButtonStyle}"
-              Command="{Binding AgregarCommand}" />
-    </controls:PageHeader>
+                         Descripcion="{Binding Submodulo.Descripcion}" />
 
-    <!-- Busqueda y filtros. Sin tarjeta: una barra de herramientas no contiene datos, los
-         filtra, y envolverla en la misma caja blanca que la tabla borraba esa diferencia. -->
-    <Grid Grid.Row="1" Margin="{StaticResource TkEtiqueta}">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
+    <!-- Barra de parametros: buscador y filtros arriba, acciones abajo, todo dentro del mismo
+         recuadro. Antes iban sueltas y sin tarjeta, y "Nueva remesa" colgaba del encabezado —
+         era la unica de las veinte pantallas que usaba esa ranura. Encerrarlas es lo que hace
+         que la barra se lea igual en los catorce modulos.
 
-      <controls:SearchBox Grid.Column="0" Width="280" VerticalAlignment="Center"
-                          Sugerencia="Buscar por Nº, finca, placa, personal o núcleo"
-                          Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+         El WrapPanel no es adorno: el buscador ocupa 280 px y detras van cinco pastillas, que en
+         la ventana minima no caben en una linea. Asi bajan de fila en vez de recortarse. -->
+    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-      <StackPanel Grid.Column="1" Orientation="Horizontal"
-                  HorizontalAlignment="Right" VerticalAlignment="Center">
-        <RadioButton Content="Todas" GroupName="FiltroEstado" IsChecked="True"
-                     Style="{StaticResource FilterChipStyle}"
-                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-        <RadioButton Content="Borrador" GroupName="FiltroEstado"
-                     Style="{StaticResource FilterChipStyle}"
-                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-        <RadioButton Content="Confirmada" GroupName="FiltroEstado"
-                     Style="{StaticResource FilterChipStyle}"
-                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmada" />
-        <RadioButton Content="Recibida" GroupName="FiltroEstado"
-                     Style="{StaticResource FilterChipStyle}"
-                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Recibida" />
-        <RadioButton Content="Anulada" GroupName="FiltroEstado"
-                     Style="{StaticResource FilterChipStyle}"
-                     Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
-      </StackPanel>
-    </Grid>
+        <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+          <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
+                              Sugerencia="Buscar por Nº, finca, placa, personal o núcleo"
+                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-    <!-- Acciones sobre la remesa seleccionada. Anular va en rojo: es lo unico de aqui que no
-         tiene vuelta atras. -->
-    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
-                Margin="{StaticResource TkEtiqueta}">
-      <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
-              Command="{Binding EditarCommand}" />
-      <Button Content="Confirmar" Style="{StaticResource SecondaryButtonStyle}"
-              Command="{Binding ConfirmarCommand}" />
-      <Button Content="Registrar recepción" Style="{StaticResource SecondaryButtonStyle}"
-              Command="{Binding RegistrarRecepcionCommand}" />
-      <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
-              Foreground="{DynamicResource DangerTextBrush}"
-              Command="{Binding AnularCommand}" />
-      <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
-              Foreground="{DynamicResource DangerTextBrush}"
-              Command="{Binding EliminarCommand}" />
-      <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
-              Command="{Binding RefrescarCommand}" />
-    </StackPanel>
+          <RadioButton Content="Todas" GroupName="FiltroEstado" IsChecked="True"
+                       Style="{StaticResource FilterChipStyle}"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
+          <RadioButton Content="Borrador" GroupName="FiltroEstado"
+                       Style="{StaticResource FilterChipStyle}"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
+          <RadioButton Content="Confirmada" GroupName="FiltroEstado"
+                       Style="{StaticResource FilterChipStyle}"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmada" />
+          <RadioButton Content="Recibida" GroupName="FiltroEstado"
+                       Style="{StaticResource FilterChipStyle}"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Recibida" />
+          <RadioButton Content="Anulada" GroupName="FiltroEstado"
+                       Style="{StaticResource FilterChipStyle}"
+                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+        </WrapPanel>
 
-    <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0">
+        <!-- Alta, edicion, transiciones y por ultimo lo destructivo, que va en rojo: es lo unico
+             de aqui que no tiene vuelta atras, y conviene que este lejos de lo que mas se pulsa. -->
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    Margin="0,12,0,0">
+          <Button Content="Nueva remesa" Style="{StaticResource PrimaryButtonStyle}"
+                  Command="{Binding AgregarCommand}" />
+          <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
+                  Command="{Binding EditarCommand}" />
+          <Button Content="Confirmar" Style="{StaticResource SecondaryButtonStyle}"
+                  Command="{Binding ConfirmarCommand}" />
+          <Button Content="Registrar recepción" Style="{StaticResource SecondaryButtonStyle}"
+                  Command="{Binding RegistrarRecepcionCommand}" />
+          <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
+                  Foreground="{DynamicResource DangerTextBrush}"
+                  Command="{Binding AnularCommand}" />
+          <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                  Foreground="{DynamicResource DangerTextBrush}"
+                  Command="{Binding EliminarCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
       <Grid>
         <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
                   ItemsSource="{Binding ItemsView}"

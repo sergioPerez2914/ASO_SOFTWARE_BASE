@@ -134,6 +134,26 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
     public bool MostrarExistencias => VistaActual == VistaExistencias;
     public bool MostrarSalidas => VistaActual == VistaSalidas;
 
+    /// <summary>
+    /// Las dos pestañas, enlazadas en DOS VÍAS al <c>IsChecked</c> de su botón, como en
+    /// <see cref="AdministracionViewModel"/>. Antes la selección viajaba solo de la vista al
+    /// ViewModel por <c>Command</c>, con <c>IsChecked="True"</c> a fuego en la primera: si algo
+    /// cambiaba <see cref="VistaActual"/> desde el código, los botones no se enteraban.
+    ///
+    /// El setter solo actúa al marcar: al desmarcar ya hay otro botón del grupo encendiéndose.
+    /// </summary>
+    public bool EsExistencias
+    {
+        get => MostrarExistencias;
+        set { if (value) VistaActual = VistaExistencias; }
+    }
+
+    public bool EsSalidas
+    {
+        get => MostrarSalidas;
+        set { if (value) VistaActual = VistaSalidas; }
+    }
+
     /// <summary>Resumen del almacén, visible en la barra sin tener que ir al dashboard.</summary>
     public string ResumenExistencias
     {
@@ -216,8 +236,7 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
             return;
 
         var agregada = _fuenteSalidas.Add(editor.ObtenerResultado());
-        Salidas.Insert(0, agregada);
-        SalidaSeleccionada = agregada;
+        _idSalidaASeleccionar = agregada.Id;
         VistaActual = VistaSalidas;
     }
 
@@ -232,7 +251,7 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
 
         var actualizada = editor.ObtenerResultado();
         _fuenteSalidas.Update(actualizada);
-        Reemplazar(actual, actualizada);
+        _idSalidaASeleccionar = actualizada.Id;
     }
 
     private SalidaInventarioEditorViewModel CrearEditorSalida(SalidaInventario salida) =>
@@ -245,7 +264,7 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
 
         try
         {
-            Reemplazar(salida, _servicio.Confirmar(salida));
+            _idSalidaASeleccionar = _servicio.Confirmar(salida).Id;
         }
         catch (InvalidOperationException ex)
         {
@@ -259,7 +278,7 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
             {
                 try
                 {
-                    Reemplazar(salida, _servicio.Confirmar(salida, forzarStock: true));
+                    _idSalidaASeleccionar = _servicio.Confirmar(salida, forzarStock: true).Id;
                 }
                 catch (InvalidOperationException reintento)
                 {
@@ -270,10 +289,6 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
             }
 
             _dialogos.Informar("No se pudo confirmar", ex.Message);
-        }
-        finally
-        {
-            RefrescarExistencias();
         }
     }
 
@@ -293,15 +308,11 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
 
         try
         {
-            Reemplazar(salida, _servicio.Anular(salida, editor.Motivo));
+            _idSalidaASeleccionar = _servicio.Anular(salida, editor.Motivo).Id;
         }
         catch (InvalidOperationException ex)
         {
             _dialogos.Informar("No se pudo anular", ex.Message);
-        }
-        finally
-        {
-            RefrescarExistencias();
         }
     }
 
@@ -315,31 +326,35 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
             return;
 
         _fuenteSalidas.Delete(salida.Id);
-        Salidas.Remove(salida);
+        _idSalidaASeleccionar = null;
         SalidaSeleccionada = null;
     }
 
+    /// <summary>Id de la salida que debe quedar seleccionada tras la próxima recarga.</summary>
+    private int? _idSalidaASeleccionar;
+
     /// <summary>
-    /// Sustituye la salida por la copia devuelta por el servicio: los modelos no notifican
-    /// cambios, así que la lista debe reemplazar el elemento para que la grilla se entere.
+    /// Relee las DOS tablas de la pantalla, y por eso la recarga automática importa aquí más que
+    /// en ninguna otra: confirmar una salida descuenta el stock del artículo, así que la tabla de
+    /// existencias cambia por una acción hecha sobre la de salidas.
+    ///
+    /// Como en el listado base, la fila se reencuentra por Id: la recarga trae objetos nuevos.
     /// </summary>
-    private void Reemplazar(SalidaInventario anterior, SalidaInventario nueva)
+    public override void Recargar()
     {
-        var indice = Salidas.IndexOf(anterior);
-        if (indice >= 0)
-            Salidas[indice] = nueva;
+        base.Recargar();
 
-        SalidaSeleccionada = nueva;
+        var idBuscado = _idSalidaASeleccionar ?? SalidaSeleccionada?.Id;
+        _idSalidaASeleccionar = null;
+
+        Salidas.Clear();
+        foreach (var salida in _fuenteSalidas.GetAll().OrderByDescending(s => s.Fecha))
+            Salidas.Add(salida);
+
         SalidasView.Refresh();
-    }
 
-    /// <summary>Recarga las existencias tras una transición: el stock cambió bajo los pies de la grilla.</summary>
-    private void RefrescarExistencias()
-    {
-        Items.Clear();
-        foreach (var articulo in _articulos.GetAll())
-            Items.Add(articulo);
-
-        OnPropertyChanged(nameof(ResumenExistencias));
+        SalidaSeleccionada = idBuscado is { } id
+            ? Salidas.FirstOrDefault(s => s.Id == id)
+            : null;
     }
 }

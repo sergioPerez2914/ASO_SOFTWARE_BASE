@@ -57,8 +57,6 @@ public sealed class SeguimientoViewModel : PantallaViewModelBase
         RemesasView.SortDescriptions.Add(
             new SortDescription(nameof(Remesa.InicioCarga), ListSortDirection.Descending));
 
-        RefrescarCommand = new RelayCommand(Refrescar);
-
         AgregarNotaCommand = new RelayCommand(AgregarNota,
             () => RemesaSeleccionada is not null && _sesion.Puede("Seguimiento.AgregarNota"));
 
@@ -71,7 +69,6 @@ public sealed class SeguimientoViewModel : PantallaViewModelBase
 
     // --- Encabezado de la pantalla (mismo patrón que las demás) ---
 
-    public ICommand RefrescarCommand { get; }
     public ICommand AgregarNotaCommand { get; }
     public ICommand CambiarFiltroEstadoCommand { get; }
 
@@ -125,7 +122,7 @@ public sealed class SeguimientoViewModel : PantallaViewModelBase
         => valor.Contains(texto, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Recarga desde la fuente conservando la remesa que se estaba mirando.</summary>
-    private void Refrescar()
+    public override void Recargar()
     {
         var seleccionadaId = RemesaSeleccionada?.Id;
 

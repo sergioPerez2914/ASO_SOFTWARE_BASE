@@ -12,7 +12,31 @@ namespace ASO.Desktop.ViewModels;
 /// llegan por dos ramas de herencia distintas —<see cref="PantallaViewModelBase"/> y
 /// <see cref="PantallaCrudViewModel{T, TId}"/>—, y <c>MainWindow</c> las enruta a todas por igual.
 /// </summary>
-public interface IPantalla
+/// <summary>
+/// Lo que el shell puede poner al día por su cuenta.
+///
+/// Va aparte de <see cref="IPantalla"/> porque el resumen de módulo
+/// (<see cref="ModuloDashboardViewModel"/>) también se recarga y también escucha el bus, pero no
+/// es una pantalla de submódulo: no tiene ruta propia ni botón de volver, y obligarlo a declarar
+/// esos miembros solo para que se le pueda pedir una recarga sería inventarle un preámbulo que
+/// nadie usa.
+/// </summary>
+public interface IRecargable
+{
+    /// <summary>
+    /// Relee de la base lo que se está mostrando. Lo llama el bus de cambios tras cada
+    /// escritura, y también F5. Sustituye a los botones "Actualizar" que había en las barras.
+    /// </summary>
+    void Recargar();
+
+    /// <summary>
+    /// Da de baja la escucha del bus. Lo llama <c>MainWindow</c> al cambiar de sección y al
+    /// cerrarse; ver <see cref="Services.SuscripcionACambios"/> para por qué es obligatorio.
+    /// </summary>
+    void Desconectar();
+}
+
+public interface IPantalla : IRecargable
 {
     event EventHandler? VolverSolicitado;
 
@@ -45,13 +69,30 @@ public abstract class PantallaViewModelBase : ViewModelBase, IPantalla
 
     public ICommand VolverCommand { get; }
 
+    private readonly SuscripcionACambios _suscripcion;
+
     protected PantallaViewModelBase(Modulo modulo, Submodulo? submodulo = null)
     {
         Modulo = modulo;
         Submodulo = submodulo;
 
         VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
+
+        // Suscribirse aquí alcanza a la subclase antes de que su constructor termine, y es
+        // seguro: el aviso se entrega por la cola del despachador (ver CambiosDeDatos.Publicar),
+        // que no corre hasta que se vuelve al bucle de mensajes.
+        _suscripcion = new SuscripcionACambios(Recargar);
     }
+
+    /// <summary>
+    /// Qué relee esta pantalla. Vacío por defecto: las que no muestran datos —el marcador de
+    /// posición de un submódulo sin construir, Configuración— no tienen nada que releer.
+    /// </summary>
+    public virtual void Recargar()
+    {
+    }
+
+    public void Desconectar() => _suscripcion.Dispose();
 }
 
 /// <summary>
@@ -76,6 +117,8 @@ public abstract class PantallaCrudViewModel<T, TId> : CrudViewModelBase<T, TId>,
 
     public ICommand VolverCommand { get; }
 
+    private readonly SuscripcionACambios _suscripcion;
+
     protected PantallaCrudViewModel(Modulo modulo,
                                     Submodulo? submodulo,
                                     ICrudDataSource<T, TId> source,
@@ -87,5 +130,11 @@ public abstract class PantallaCrudViewModel<T, TId> : CrudViewModelBase<T, TId>,
         Submodulo = submodulo;
 
         VolverCommand = new RelayCommand(() => VolverSolicitado?.Invoke(this, EventArgs.Empty));
+
+        // El Recargar de CrudViewModelBase ya relee el listado; las pantallas con más de una
+        // tabla lo redefinen para releer también las suyas.
+        _suscripcion = new SuscripcionACambios(Recargar);
     }
+
+    public void Desconectar() => _suscripcion.Dispose();
 }

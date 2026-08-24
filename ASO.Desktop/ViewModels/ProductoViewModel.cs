@@ -51,8 +51,6 @@ public sealed class ProductoViewModel : PantallaViewModelBase
         EntregasView = CollectionViewSource.GetDefaultView(Entregas);
         EntregasView.Filter = FiltrarEntrega;
 
-        RefrescarCommand = new RelayCommand(Cargar);
-
         CambiarRangoCommand = new RelayCommand<string>(rango =>
         {
             _rango = rango;
@@ -65,7 +63,6 @@ public sealed class ProductoViewModel : PantallaViewModelBase
 
     // --- Encabezado de la pantalla ---
 
-    public ICommand RefrescarCommand { get; }
     public ICommand CambiarRangoCommand { get; }
 
     public ObservableCollection<EntregaProducto> Entregas { get; }
@@ -114,6 +111,9 @@ public sealed class ProductoViewModel : PantallaViewModelBase
         get => _sinFacturarTexto;
         private set => SetProperty(ref _sinFacturarTexto, value);
     }
+
+    /// <summary>Reporte de solo lectura: recargar es recalcularlo entero.</summary>
+    public override void Recargar() => Cargar();
 
     private void Cargar()
     {

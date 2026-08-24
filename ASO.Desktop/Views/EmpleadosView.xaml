@@ -19,18 +19,25 @@
                          Titulo="{Binding Submodulo.Nombre}"
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
-    <!-- Conmutador de padrón: son dos catálogos distintos, no se mezclan -->
-    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
-      <RadioButton Content="Administrativos" GroupName="PadronEmpleados" IsChecked="True"
-                   Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Administrativos" />
+    <!-- Conmutador de padrón: son dos catálogos distintos, no se mezclan.
+
+         Pestañas y no pastillas: las pastillas son el estilo de los FILTROS de la barra de
+         abajo, y usarlas también aquí dibujaba igual "qué padrón miro" y "cómo lo acoto". -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
+      <RadioButton Content="Administrativos" GroupName="PadronEmpleados"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsAdministrativos, Mode=TwoWay}" />
       <RadioButton Content="Personal de campo" GroupName="PadronEmpleados"
-                   Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                   Command="{Binding CambiarVistaCommand}" CommandParameter="Campo" />
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsCampo, Mode=TwoWay}" />
     </StackPanel>
 
+    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+            Background="{DynamicResource BorderBrush}" />
+
     <!-- Padrón administrativo: empleados de nómina del centro -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarAdministrativos, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarAdministrativos, Converter={StaticResource BoolToVis}}">
       <!-- DataContext en un Grid interno: compartir elemento con Visibility haría que esa
            binding se resuelva contra el sub-VM (sin MostrarAdministrativos) y no contra este ViewModel. -->
       <Grid DataContext="{Binding Administrativos}">
@@ -39,44 +46,42 @@
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
 
-          <controls:SearchBox Grid.Row="0" Grid.Column="0" Width="280" VerticalAlignment="Center"
-                              Sugerencia="Buscar por nombre, cédula o cargo"
-                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+          <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+            <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
+                                Sugerencia="Buscar por nombre, cédula o cargo"
+                                Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
-                      HorizontalAlignment="Right" VerticalAlignment="Center">
             <RadioButton Content="Todos" GroupName="FiltroEmpleado" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todos" />
             <RadioButton Content="Activos" GroupName="FiltroEmpleado"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Activos" />
             <RadioButton Content="Inactivos" GroupName="FiltroEmpleado"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Inactivos" />
-          </StackPanel>
+          </WrapPanel>
 
           <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
-                      HorizontalAlignment="Right" Margin="0,12,0,0">
+                      Margin="0,12,0,0">
             <Button Content="Nuevo empleado" Style="{StaticResource PrimaryButtonStyle}"
                     Command="{Binding AgregarCommand}" />
             <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding EditarCommand}" />
             <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
                     Command="{Binding EliminarCommand}" />
-            <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
-                    Command="{Binding RefrescarCommand}" />
           </StackPanel>
         </Grid>
       </Border>
@@ -113,57 +118,56 @@
     </Grid>
 
     <!-- Padrón de campo: quienes firman la remesa, con su núcleo (C.O.D) -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarCampo, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarCampo, Converter={StaticResource BoolToVis}}">
       <Grid DataContext="{Binding Campo}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
 
-          <controls:SearchBox Grid.Row="0" Grid.Column="0" Width="280" VerticalAlignment="Center"
-                              Sugerencia="Buscar por nombre, cédula, rol o núcleo"
-                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+          <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+            <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
+                                Sugerencia="Buscar por nombre, cédula, rol o núcleo"
+                                Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
-                      HorizontalAlignment="Right" VerticalAlignment="Center">
             <RadioButton Content="Todos" GroupName="FiltroRolCampo" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Todos" />
             <RadioButton Content="Operador" GroupName="FiltroRolCampo"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Operador" />
             <RadioButton Content="Tractorista" GroupName="FiltroRolCampo"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Tractorista" />
             <RadioButton Content="Chofer" GroupName="FiltroRolCampo"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Chofer" />
             <RadioButton Content="Remesero" GroupName="FiltroRolCampo"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Remesero" />
-          </StackPanel>
+          </WrapPanel>
 
           <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
-                      HorizontalAlignment="Right" Margin="0,12,0,0">
+                      Margin="0,12,0,0">
             <Button Content="Nuevo personal" Style="{StaticResource PrimaryButtonStyle}"
                     Command="{Binding AgregarCommand}" />
             <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding EditarCommand}" />
             <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
                     Command="{Binding EliminarCommand}" />
-            <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
-                    Command="{Binding RefrescarCommand}" />
           </StackPanel>
         </Grid>
       </Border>

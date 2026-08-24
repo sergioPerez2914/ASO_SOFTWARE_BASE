@@ -28,6 +28,7 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
     private readonly SolicitudesDeCambio _solicitudes;
     private readonly ISesionActual _sesion;
     private readonly IRemesaDataSource _remesas;
+    private readonly IActivoFlotaDataSource _activos;
 
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
 
@@ -35,6 +36,7 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
         : base(modulo, submodulo)
     {
         var activos = DataSourceFactory.CrearActivosFlota();
+        _activos = activos;
         var mantenimientos = DataSourceFactory.CrearMantenimientos();
         _remesas = DataSourceFactory.CrearRemesas();
 
@@ -49,8 +51,6 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
         ActivosView = CollectionViewSource.GetDefaultView(Activos);
         ActivosView.Filter = Filtrar;
         ActivosView.SortDescriptions.Add(new SortDescription(nameof(ActivoFlota.Codigo), ListSortDirection.Ascending));
-
-        RefrescarCommand = new RelayCommand(() => { RecargarActivos(activos); });
 
         AbrirDetalleCommand = new RelayCommand<ActivoFlota>(activo => ActivoSeleccionado = activo);
         CerrarDetalleCommand = new RelayCommand(() => ActivoSeleccionado = null);
@@ -77,7 +77,6 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
 
     // --- Encabezado ---
 
-    public ICommand RefrescarCommand { get; }
     public ICommand AbrirDetalleCommand { get; }
     public ICommand CerrarDetalleCommand { get; }
     public ICommand NuevoActivoCommand { get; }
@@ -156,9 +155,20 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
     private static bool Contiene(string valor, string texto)
         => valor.Contains(texto, StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Relee la flota y, si hay una ficha abierta, su detalle: al confirmar un vale o registrar
+    /// un mantenimiento cambian el horometro y las recomendaciones del activo que se esta viendo.
+    /// </summary>
+    public override void Recargar()
+    {
+        RecargarActivos(_activos);
+        RecargarDetalle();
+    }
+
     private void RecargarActivos(IActivoFlotaDataSource fuente)
     {
-        var seleccionadoId = ActivoSeleccionado?.Id;
+        var seleccionadoId = _idActivoASeleccionar ?? ActivoSeleccionado?.Id;
+        _idActivoASeleccionar = null;
 
         Activos.Clear();
         foreach (var activo in fuente.GetAll())
@@ -226,9 +236,7 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
 
         try
         {
-            var agregado = _flota.Agregar(editor.ObtenerResultado());
-            Activos.Add(agregado);
-            ActivoSeleccionado = agregado;
+            _idActivoASeleccionar = _flota.Agregar(editor.ObtenerResultado()).Id;
         }
         catch (InvalidOperationException ex)
         {
@@ -254,7 +262,7 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
 
         try
         {
-            Reemplazar(actual, _flota.Actualizar(editor.ObtenerResultado()));
+            _idActivoASeleccionar = _flota.Actualizar(editor.ObtenerResultado()).Id;
         }
         catch (InvalidOperationException ex)
         {
@@ -280,7 +288,7 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
 
         try
         {
-            Reemplazar(actual, _flota.CambiarEstado(actual, nuevoEstado));
+            _idActivoASeleccionar = _flota.CambiarEstado(actual, nuevoEstado).Id;
         }
         catch (InvalidOperationException ex)
         {
@@ -300,11 +308,10 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
 
         try
         {
+            // La lectura del activo pudo cambiar, pero ya no hay que ir a buscarla: guardar
+            // dispara la recarga de la pantalla, que relee la flota y el detalle abierto.
             _mantenimiento.Registrar(editor.ObtenerResultado());
-            // La lectura del activo pudo cambiar: recargar su instancia desde la fuente.
-            var refrescado = DataSourceFactory.CrearActivosFlota().GetById(activo.Id);
-            if (refrescado is not null)
-                Reemplazar(activo, refrescado);
+            _idActivoASeleccionar = activo.Id;
         }
         catch (InvalidOperationException ex)
         {
@@ -312,13 +319,6 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
         }
     }
 
-    private void Reemplazar(ActivoFlota anterior, ActivoFlota nuevo)
-    {
-        var indice = Activos.IndexOf(anterior);
-        if (indice >= 0)
-            Activos[indice] = nuevo;
-
-        ActivoSeleccionado = nuevo;
-        ActivosView.Refresh();
-    }
+    /// <summary>Id del activo que debe quedar seleccionado tras la próxima recarga.</summary>
+    private int? _idActivoASeleccionar;
 }

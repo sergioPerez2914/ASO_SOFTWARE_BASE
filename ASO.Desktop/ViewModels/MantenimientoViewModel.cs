@@ -61,8 +61,6 @@ public sealed class MantenimientoViewModel : PantallaViewModelBase
         RegistrosView.SortDescriptions.Add(
             new SortDescription(nameof(MantenimientoRegistro.Fecha), ListSortDirection.Descending));
 
-        RefrescarCommand = new RelayCommand(Refrescar);
-
         RegistrarCommand = new RelayCommand(() => Registrar(null, null),
             () => _sesion.Puede("Mantenimiento.Registrar"));
 
@@ -81,7 +79,6 @@ public sealed class MantenimientoViewModel : PantallaViewModelBase
 
     // --- Encabezado ---
 
-    public ICommand RefrescarCommand { get; }
     public ICommand RegistrarCommand { get; }
     public ICommand RegistrarDesdeRecomendacionCommand { get; }
     public ICommand CambiarFiltroTipoCommand { get; }
@@ -150,10 +147,9 @@ public sealed class MantenimientoViewModel : PantallaViewModelBase
 
         try
         {
-            var guardado = _servicio.Registrar(editor.ObtenerResultado());
-            Registros.Add(guardado);
-            RegistrosView.Refresh();
-            RecalcularRecomendaciones();
+            // Guardar dispara la recarga de la pantalla, que repuebla los registros y vuelve a
+            // calcular las revisiones pendientes.
+            _servicio.Registrar(editor.ObtenerResultado());
         }
         catch (InvalidOperationException ex)
         {
@@ -161,7 +157,8 @@ public sealed class MantenimientoViewModel : PantallaViewModelBase
         }
     }
 
-    private void Refrescar()
+    /// <summary>Relee los registros y vuelve a calcular las revisiones pendientes.</summary>
+    public override void Recargar()
     {
         Registros.Clear();
         foreach (var registro in _registrosFuente.GetAll())

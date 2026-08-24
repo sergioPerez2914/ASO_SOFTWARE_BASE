@@ -64,21 +64,23 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
-      <!-- MAESTRO: listado de remesas -->
-      <Border Grid.Column="0" Style="{StaticResource ToolbarStyle}">
-        <Grid>
+      <!-- MAESTRO: listado de remesas. Sin Border envolvente: solo aportaba un relleno
+           inferior que ya pone la barra de parametros de dentro. -->
+      <Grid Grid.Column="0">
           <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
           </Grid.RowDefinitions>
 
-          <controls:SearchBox Grid.Row="0" Width="280" VerticalAlignment="Center"
-                              Sugerencia="Buscar por Nº, finca o placa"
-                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+          <!-- Barra de parametros. Aqui la lista es un ListBox en una columna estrecha, asi que
+               el buscador y las pastillas caen en la misma columna y el recuadro las agrupa
+               igual que en el resto de modulos. -->
+          <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+            <WrapPanel VerticalAlignment="Center">
+              <controls:SearchBox Width="280" Margin="0,0,12,6" VerticalAlignment="Center"
+                                  Sugerencia="Buscar por Nº, finca o placa"
+                                  Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <Grid Grid.Row="1" Margin="0,10,0,10">
-            <WrapPanel>
               <RadioButton Content="Todas" GroupName="FiltroSeguimiento" IsChecked="True"
                            Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
                            Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
@@ -95,9 +97,9 @@
                            Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
                            Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
             </WrapPanel>
-          </Grid>
+          </Border>
 
-          <ListBox Grid.Row="2" ItemsSource="{Binding RemesasView}"
+          <ListBox Grid.Row="1" ItemsSource="{Binding RemesasView}"
                    SelectedItem="{Binding RemesaSeleccionada}"
                    BorderThickness="0" Background="Transparent"
                    HorizontalContentAlignment="Stretch"
@@ -133,7 +135,6 @@
             </ListBox.ItemTemplate>
           </ListBox>
         </Grid>
-      </Border>
 
       <!-- DETALLE: línea de tiempo -->
       <Border Grid.Column="2" Style="{StaticResource CardStyle}">
@@ -172,10 +173,6 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
               <Button Content="Agregar nota" Style="{StaticResource PrimaryButtonStyle}"
                       Command="{Binding AgregarNotaCommand}" />
-              <Button Content="Actualizar" Padding="12,6" Margin="8,0,0,0" Cursor="Hand" FontSize="{StaticResource FsBody}"
-                      Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
-                      Foreground="{DynamicResource TextPrimaryBrush}"
-                      Command="{Binding RefrescarCommand}" />
             </StackPanel>
           </Grid>
 

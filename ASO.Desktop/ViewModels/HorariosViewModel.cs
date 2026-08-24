@@ -138,10 +138,7 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
         try
         {
             var registrada = _servicio.Registrar(editor.ObtenerResultado());
-            Items.Add(registrada);
-            SelectedItem = registrada;
-            ItemsView.Refresh();
-            OnPropertyChanged(nameof(ResumenHoras));
+            SeleccionarTrasRecargar(registrada.Id);
         }
         catch (InvalidOperationException ex)
         {
@@ -161,14 +158,7 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
         try
         {
             var cerrada = _servicio.RegistrarSalida(jornada, editor.Salida);
-
-            var indice = Items.IndexOf(jornada);
-            if (indice >= 0)
-                Items[indice] = cerrada;
-
-            SelectedItem = cerrada;
-            ItemsView.Refresh();
-            OnPropertyChanged(nameof(ResumenHoras));
+            SeleccionarTrasRecargar(cerrada.Id);
         }
         catch (InvalidOperationException ex)
         {

@@ -66,43 +66,44 @@
     </Border>
 
     <!-- Barra de herramientas -->
-    <Border Grid.Row="2" Style="{StaticResource ToolbarStyle}">
+    <!-- El buscador iba AL FINAL de esta barra, detras del combo y de las pastillas: era la
+         unica pantalla donde no se encontraba en el mismo sitio que en las demas. -->
+    <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
       <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <ComboBox Grid.Column="0" Width="240" VerticalAlignment="Center"
-                  Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding OpcionesActivo}" DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding ActivoFiltro}" />
-
-        <WrapPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
-          <RadioButton Content="Todos" GroupName="FiltroMantenimiento" IsChecked="True"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Todos" />
-          <RadioButton Content="Preventivo" GroupName="FiltroMantenimiento"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Preventivo" />
-          <RadioButton Content="Correctivo" GroupName="FiltroMantenimiento"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Correctivo" />
-        </WrapPanel>
-
-        <controls:SearchBox Grid.Column="2" Margin="12,0,0,0" Width="280" VerticalAlignment="Center"
+        <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+          <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
                               Sugerencia="Buscar por activo, descripción o quién lo realizó"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-        <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+          <RadioButton Content="Todos" GroupName="FiltroMantenimiento" IsChecked="True"
+                       Style="{StaticResource FilterChipStyle}"
+                       Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Todos" />
+          <RadioButton Content="Preventivo" GroupName="FiltroMantenimiento"
+                       Style="{StaticResource FilterChipStyle}"
+                       Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Preventivo" />
+          <RadioButton Content="Correctivo" GroupName="FiltroMantenimiento"
+                       Style="{StaticResource FilterChipStyle}"
+                       Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Correctivo" />
+
+          <ComboBox Width="240" Margin="6,0,0,0" VerticalAlignment="Center"
+                    Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding OpcionesActivo}" DisplayMemberPath="Etiqueta"
+                    SelectedItem="{Binding ActivoFiltro}" />
+        </WrapPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    Margin="0,12,0,0">
           <Button Content="Registrar mantenimiento" Style="{StaticResource PrimaryButtonStyle}"
                   Command="{Binding RegistrarCommand}" />
-          <Button Content="Actualizar" Padding="12,6" Margin="8,0,0,0" Cursor="Hand" FontSize="{StaticResource FsBody}"
-                  Background="Transparent" BorderBrush="{DynamicResource BorderBrush}"
-                  Foreground="{DynamicResource TextPrimaryBrush}"
-                  Command="{Binding RefrescarCommand}" />
         </StackPanel>
       </Grid>
     </Border>

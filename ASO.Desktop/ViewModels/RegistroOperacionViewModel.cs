@@ -117,7 +117,7 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
                 $"¿Confirmar la remesa Nº {remesa.Id}? Después de confirmarla no se podrá editar."))
             return;
 
-        Aplicar(remesa, () => _servicio.Confirmar(remesa));
+        Aplicar(() => _servicio.Confirmar(remesa));
     }
 
     /// <summary>Como se ve la remesa en la bandeja del administrador, congelado al solicitar.</summary>
@@ -142,7 +142,7 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(remesa, () => _servicio.Anular(remesa, editor.Motivo));
+        Aplicar(() => _servicio.Anular(remesa, editor.Motivo));
     }
 
     private void RegistrarRecepcion()
@@ -161,31 +161,28 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(remesa, () => _servicio.RegistrarRecepcion(remesa, editor.Llegada, editor.PesoBrutoT, editor.TaraT));
+        Aplicar(() => _servicio.RegistrarRecepcion(remesa, editor.Llegada, editor.PesoBrutoT, editor.TaraT));
     }
 
     /// <summary>
-    /// Ejecuta una transición y refleja el resultado en la lista. El servicio devuelve una copia,
-    /// así que hay que reemplazar el elemento (los modelos no notifican cambios por sí solos).
+    /// Ejecuta una transición. La lista NO se toca aquí: el servicio guarda, y esa escritura
+    /// dispara la recarga de la pantalla (ver <c>Services/CambiosDeDatos</c>). Lo único que se
+    /// conserva es qué fila dejar seleccionada, porque la recarga trae objetos nuevos y la
+    /// referencia anterior ya no está en la lista.
+    ///
+    /// Si el servicio rechaza la transición se informa y no se guarda nada, así que tampoco hay
+    /// recarga: la pantalla se queda como estaba, que es lo correcto.
     /// </summary>
-    private void Aplicar(Remesa original, Func<Remesa> transicion)
+    private void Aplicar(Func<Remesa> transicion)
     {
-        Remesa actualizada;
         try
         {
-            actualizada = transicion();
+            var actualizada = transicion();
+            SeleccionarTrasRecargar(actualizada.Id);
         }
         catch (InvalidOperationException ex)
         {
             _dialogos.Informar("Remesas", ex.Message);
-            return;
         }
-
-        var indice = Items.IndexOf(original);
-        if (indice >= 0)
-            Items[indice] = actualizada;
-
-        SelectedItem = actualizada;
-        ItemsView.Refresh();
     }
 }

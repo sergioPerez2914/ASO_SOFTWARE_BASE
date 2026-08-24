@@ -134,7 +134,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         if (SelectedItem is not { } vale)
             return;
 
-        Aplicar(vale, () => _servicio.Confirmar(vale));
+        Aplicar(() => _servicio.Confirmar(vale));
     }
 
     private void Anular()
@@ -159,7 +159,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(vale, () => _servicio.Anular(vale, editor.Motivo));
+        Aplicar(() => _servicio.Anular(vale, editor.Motivo));
     }
 
     private void RegistrarRecarga()
@@ -183,28 +183,23 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         {
             _dialogos.Informar("No se pudo registrar la recarga", ex.Message);
         }
-        finally
-        {
-            RefrescarTanques();
-        }
     }
 
     /// <summary>
-    /// Ejecuta una transición y refleja el resultado. Si el servicio la rechaza se informa en
-    /// vez de tragarse el error: el botón habilitado es cortesía, la regla la impone el servicio.
+    /// Ejecuta una transición. Si el servicio la rechaza se informa en vez de tragarse el error:
+    /// el botón habilitado es cortesía, la regla la impone el servicio.
+    ///
+    /// Ni la lista ni las cisternas se tocan aquí. Confirmar un vale escribe el vale, descuenta
+    /// la cisterna y adelanta la lectura del activo; esas escrituras disparan por sí solas la
+    /// recarga de la pantalla (ver <see cref="Recargar"/> y <c>Services/CambiosDeDatos</c>), que
+    /// es justo lo que antes había que acordarse de cablear en cada acción nueva.
     /// </summary>
-    private void Aplicar(ValeCombustible original, Func<ValeCombustible> transicion)
+    private void Aplicar(Func<ValeCombustible> transicion)
     {
         try
         {
             var actualizado = transicion();
-
-            var indice = Items.IndexOf(original);
-            if (indice >= 0)
-                Items[indice] = actualizado;
-
-            SelectedItem = actualizado;
-            ItemsView.Refresh();
+            SeleccionarTrasRecargar(actualizado.Id);
 
             if (actualizado.AlertaConsumo)
                 _dialogos.Informar("Consumo por encima de lo habitual",
@@ -215,18 +210,15 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         {
             _dialogos.Informar("No se pudo completar la operación", ex.Message);
         }
-        finally
-        {
-            RefrescarTanques();
-        }
     }
 
-    private void RefrescarTanques()
+    /// <summary>Relee los vales y, además, el nivel de las cisternas y el rendimiento.</summary>
+    public override void Recargar()
     {
+        base.Recargar();
+
         Tanques.Clear();
         foreach (var tanque in _tanques.GetAll())
             Tanques.Add(tanque);
-
-        OnPropertyChanged(nameof(RendimientoTexto));
     }
 }

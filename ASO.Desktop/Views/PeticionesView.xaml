@@ -18,10 +18,14 @@
     <controls:PageHeader Grid.Row="0" Titulo="Peticiones de cambio"
                          Descripcion="{Binding ResumenPendientes}" />
 
-    <!-- Barra: filtro por estado y acciones -->
+    <!-- Barra de parámetros. Esta pantalla es la que dio la forma al resto, pero tenía las
+         acciones arriba a la derecha; bajan a su fila para seguir el mismo orden que las demás.
+         La nota va DEBAJO de las acciones y no en la columna del resumen: es un texto que se
+         ajusta a varias líneas, no un contador corto. -->
     <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
       <Grid>
         <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -30,27 +34,26 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+        <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
           <RadioButton Content="Pendientes" GroupName="FiltroPeticion" IsChecked="True"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}"
                        Command="{Binding CambiarFiltroCommand}" CommandParameter="Pendientes" />
           <RadioButton Content="Resueltas" GroupName="FiltroPeticion"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}"
                        Command="{Binding CambiarFiltroCommand}" CommandParameter="Resueltas" />
           <RadioButton Content="Todas" GroupName="FiltroPeticion"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                       Style="{StaticResource FilterChipStyle}"
                        Command="{Binding CambiarFiltroCommand}" CommandParameter="Todas" />
-        </StackPanel>
+        </WrapPanel>
 
-        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    Margin="0,12,0,0">
           <Button Content="Aprobar" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AprobarCommand}" />
           <Button Content="Rechazar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding RechazarCommand}" />
-          <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
-                  Command="{Binding RefrescarCommand}" />
         </StackPanel>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
                    Text="{Binding NotaAprobacion}" TextWrapping="Wrap" FontSize="{StaticResource FsCaption}"
                    Foreground="{DynamicResource TextMutedBrush}" />
       </Grid>

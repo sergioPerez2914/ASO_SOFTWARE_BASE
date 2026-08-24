@@ -19,67 +19,69 @@
                          Titulo="{Binding Submodulo.Nombre}"
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
-    <!-- Conmutador: el catálogo del almacén y el documento que lo mueve -->
-    <Grid Grid.Row="1" Margin="0,0,0,12">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
+    <!-- Conmutador: el catálogo del almacén y el documento que lo mueve.
 
-      <StackPanel Grid.Column="0" Orientation="Horizontal">
-        <RadioButton Content="Existencias" GroupName="VistaInventario" IsChecked="True"
-                     Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                     Command="{Binding CambiarVistaCommand}" CommandParameter="Existencias" />
-        <RadioButton Content="Salidas de almacén" GroupName="VistaInventario"
-                     Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                     Command="{Binding CambiarVistaCommand}" CommandParameter="Salidas" />
-      </StackPanel>
+         Pestañas y no pastillas: las pastillas son el estilo de los FILTROS, y usarlas también
+         aquí hacía que "qué estoy mirando" y "cómo lo acoto" se dibujaran igual. Enlazado en dos
+         vías, porque VistaActual cambia también desde el código —al registrar una salida la
+         pantalla salta sola a Salidas— y con Command la pestaña se quedaba marcada en la otra. -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
+      <RadioButton Content="Existencias" GroupName="VistaInventario"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsExistencias, Mode=TwoWay}" />
+      <RadioButton Content="Salidas de almacén" GroupName="VistaInventario"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsSalidas, Mode=TwoWay}" />
+    </StackPanel>
 
-      <TextBlock Grid.Column="1" Text="{Binding ResumenExistencias}" FontSize="{StaticResource FsBody}"
-                 VerticalAlignment="Center" HorizontalAlignment="Right"
-                 Foreground="{DynamicResource TextSecondaryBrush}" />
-    </Grid>
+    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+            Background="{DynamicResource BorderBrush}" />
 
     <!-- Existencias del almacén -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarExistencias, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarExistencias, Converter={StaticResource BoolToVis}}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
 
-          <controls:SearchBox Grid.Row="0" Grid.Column="0" Width="280" VerticalAlignment="Center"
-                              Sugerencia="Buscar por código, nombre, categoría o ubicación"
-                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+          <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+            <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
+                                Sugerencia="Buscar por código, nombre, categoría o ubicación"
+                                Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
-                      HorizontalAlignment="Right" VerticalAlignment="Center">
             <RadioButton Content="Todos" GroupName="FiltroStock" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroStockCommand}" CommandParameter="Todos" />
             <RadioButton Content="Disponible" GroupName="FiltroStock"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroStockCommand}" CommandParameter="Disponible" />
             <RadioButton Content="Stock bajo" GroupName="FiltroStock"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroStockCommand}" CommandParameter="Bajo" />
             <RadioButton Content="Agotado" GroupName="FiltroStock"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroStockCommand}" CommandParameter="Agotado" />
-          </StackPanel>
+          </WrapPanel>
+
+          <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ResumenExistencias}"
+                     FontSize="{StaticResource FsBody}" VerticalAlignment="Center"
+                     Margin="12,0,0,0"
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
 
           <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
-                      HorizontalAlignment="Right" Margin="0,12,0,0">
+                      Margin="0,12,0,0">
             <Button Content="Nuevo artículo" Style="{StaticResource PrimaryButtonStyle}"
                     Command="{Binding AgregarCommand}" />
             <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
@@ -87,9 +89,8 @@
             <Button Content="Registrar salida" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding RegistrarSalidaCommand}" />
             <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
                     Command="{Binding EliminarCommand}" />
-            <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
-                    Command="{Binding RefrescarCommand}" />
           </StackPanel>
         </Grid>
       </Border>
@@ -130,45 +131,45 @@
     </Grid>
 
     <!-- Salidas de almacén: el documento que descuenta la existencia -->
-    <Grid Grid.Row="2" Visibility="{Binding MostrarSalidas, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarSalidas, Converter={StaticResource BoolToVis}}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
 
-          <controls:SearchBox Grid.Row="0" Grid.Column="0" Width="280" VerticalAlignment="Center"
-                              Sugerencia="Buscar por artículo, destino o motivo"
-                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+          <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+            <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
+                                Sugerencia="Buscar por artículo, destino o motivo"
+                                Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
-                      HorizontalAlignment="Right" VerticalAlignment="Center">
             <RadioButton Content="Todas" GroupName="FiltroSalida" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroSalidaCommand}" CommandParameter="Todas" />
             <RadioButton Content="Borrador" GroupName="FiltroSalida"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroSalidaCommand}" CommandParameter="Borrador" />
             <RadioButton Content="Confirmada" GroupName="FiltroSalida"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroSalidaCommand}" CommandParameter="Confirmada" />
             <RadioButton Content="Anulada" GroupName="FiltroSalida"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
+                         Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroSalidaCommand}" CommandParameter="Anulada" />
-          </StackPanel>
+          </WrapPanel>
 
           <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
-                      HorizontalAlignment="Right" Margin="0,12,0,0">
+                      Margin="0,12,0,0">
             <Button Content="Nueva salida" Style="{StaticResource PrimaryButtonStyle}"
                     Command="{Binding RegistrarSalidaCommand}" />
             <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
@@ -176,8 +177,10 @@
             <Button Content="Confirmar" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding ConfirmarSalidaCommand}" />
             <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
                     Command="{Binding AnularSalidaCommand}" />
             <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
                     Command="{Binding EliminarSalidaCommand}" />
           </StackPanel>
         </Grid>

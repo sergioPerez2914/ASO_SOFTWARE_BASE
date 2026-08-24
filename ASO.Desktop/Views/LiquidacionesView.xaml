@@ -21,23 +21,22 @@
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
     <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
+    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <controls:SearchBox Grid.Row="0" Grid.Column="0" Width="280" VerticalAlignment="Center"
+        <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+          <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
                               Sugerencia="Buscar por núcleo o empleado"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
-                    HorizontalAlignment="Right" VerticalAlignment="Center">
           <RadioButton Content="Todas" GroupName="FiltroLiquidacion" IsChecked="True"
                        Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
@@ -53,23 +52,26 @@
           <RadioButton Content="Anulada" GroupName="FiltroLiquidacion"
                        Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
-        </StackPanel>
+        </WrapPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
-                    HorizontalAlignment="Right" Margin="0,12,0,0">
+                    Margin="0,12,0,0">
           <Button Content="Generar liquidación" Style="{StaticResource PrimaryButtonStyle}"
                   Command="{Binding GenerarCommand}" />
           <Button Content="Agregar concepto" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding AgregarConceptoCommand}" />
           <Button Content="Quitar línea" Style="{StaticResource SecondaryButtonStyle}"
+                  Foreground="{DynamicResource DangerTextBrush}"
                   Command="{Binding QuitarLineaCommand}" />
           <Button Content="Cerrar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding CerrarCommand}" />
           <Button Content="Registrar pago" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding PagarCommand}" />
           <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
+                  Foreground="{DynamicResource DangerTextBrush}"
                   Command="{Binding AnularCommand}" />
           <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                  Foreground="{DynamicResource DangerTextBrush}"
                   Command="{Binding EliminarCommand}" />
         </StackPanel>
       </Grid>

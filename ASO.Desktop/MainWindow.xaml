@@ -13,6 +13,17 @@
         Background="{DynamicResource BackgroundBrush}"
         FontFamily="Segoe UI">
 
+  <!-- Recarga manual. Las pantallas se actualizan solas tras cada escritura (ver
+       Services/CambiosDeDatos.cs) y por eso ninguna barra trae ya un boton "Actualizar"; F5
+       queda como red de seguridad. Se declara el gesto ademas del comando porque asi el atajo
+       no depende de que el foco este en un control que herede el de NavigationCommands. -->
+  <Window.CommandBindings>
+    <CommandBinding Command="NavigationCommands.Refresh" Executed="OnRecargar" />
+  </Window.CommandBindings>
+  <Window.InputBindings>
+    <KeyBinding Key="F5" Command="NavigationCommands.Refresh" />
+  </Window.InputBindings>
+
   <!-- La escala de la interfaz es un LayoutTransform sobre la raiz, no un FontSize global:
        los estilos traen tamanos propios y subir solo la fuente descuadraria iconos, chips y
        columnas. Escalando el arbol entero todo crece a la vez. -->

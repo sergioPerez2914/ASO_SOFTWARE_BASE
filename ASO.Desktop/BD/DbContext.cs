@@ -584,7 +584,10 @@ public class AsoDbContext : DbContext
     public override int SaveChanges()
     {
         EstamparOrganizacion();
-        return base.SaveChanges();
+
+        var filas = base.SaveChanges();
+        AnunciarSiEscribio(filas);
+        return filas;
     }
 
     /// <summary>
@@ -592,11 +595,31 @@ public class AsoDbContext : DbContext
     /// sea toda síncrona: el día que se agregue el primer <c>SaveChangesAsync</c>, sus filas
     /// nacerían con <c>OrganizacionId = 0</c> y el filtro global las haría invisibles al instante.
     /// </summary>
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
-                                               CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+                                                     CancellationToken cancellationToken = default)
     {
         EstamparOrganizacion();
-        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+
+        var filas = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        AnunciarSiEscribio(filas);
+        return filas;
+    }
+
+    /// <summary>
+    /// Avisa de la escritura para que la pantalla abierta se recargue sola (ver
+    /// <see cref="CambiosDeDatos"/>). Va aquí por el mismo motivo que el estampado de arriba: es
+    /// el único punto por el que pasan TODAS las escrituras de la aplicación —fuera de
+    /// <c>BD/</c> nadie construye un <c>AsoDbContext</c>—, así que ninguna acción puede
+    /// olvidarse de avisar, ni siquiera las que hace un servicio de dominio por su cuenta.
+    ///
+    /// Solo cuando la escritura llegó a la base: se llama DESPUÉS del <c>base.SaveChanges</c>,
+    /// de modo que una excepción se propaga sin haber disparado ninguna recarga, y se comprueba
+    /// que haya filas afectadas para no mover nada cuando no cambió nada.
+    /// </summary>
+    private static void AnunciarSiEscribio(int filasAfectadas)
+    {
+        if (filasAfectadas > 0)
+            CambiosDeDatos.Publicar();
     }
 
     private void EstamparOrganizacion()

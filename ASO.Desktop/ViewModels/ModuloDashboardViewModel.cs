@@ -34,7 +34,7 @@ public sealed record Indicador(
 /// y recorría todas las reglas de mantenimiento. La ventana se quedaba congelada mientras tanto,
 /// sin decir por qué, y volver al módulo lo repetía entero.
 /// </summary>
-public sealed class ModuloDashboardViewModel : ViewModelBase
+public sealed class ModuloDashboardViewModel : ViewModelBase, IRecargable
 {
     public event EventHandler<Submodulo>? SubmoduloSolicitado;
 
@@ -86,7 +86,24 @@ public sealed class ModuloDashboardViewModel : ViewModelBase
             Indicadores.Add(new Indicador(string.Empty, string.Empty, string.Empty));
 
         _ = CargarIndicadores();
+
+        _suscripcion = new SuscripcionACambios(Recargar);
     }
+
+    private readonly SuscripcionACambios _suscripcion;
+
+    /// <summary>
+    /// Vuelve a calcular los indicadores. Reutiliza la carga en segundo plano de siempre, así que
+    /// las tarjetas muestran su esqueleto mientras llegan los valores nuevos.
+    /// </summary>
+    public void Recargar()
+    {
+        Cargando = true;
+        ErrorCarga = string.Empty;
+        _ = CargarIndicadores();
+    }
+
+    public void Desconectar() => _suscripcion.Dispose();
 
     /// <summary>
     /// Trae los indicadores en segundo plano y los publica de vuelta en el hilo de interfaz.

@@ -147,10 +147,7 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
         try
         {
             var generada = _servicio.GenerarBorrador(editor.Seleccionadas, _sesionActual.UsuarioActual?.Id ?? 0);
-            Items.Add(generada);
-            SelectedItem = generada;
-            ItemsView.Refresh();
-            OnPropertyChanged(nameof(ResumenCartera));
+            SeleccionarTrasRecargar(generada.Id);
         }
         catch (InvalidOperationException ex)
         {
@@ -168,7 +165,7 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
                 "Sus remesas quedarán marcadas como facturadas."))
             return;
 
-        Aplicar(factura, () => _servicio.Emitir(factura));
+        Aplicar(() => _servicio.Emitir(factura));
     }
 
     private void RegistrarCobro()
@@ -180,7 +177,7 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
                 $"¿Registrar el cobro de {factura.TotalTexto} de la factura {factura.NumeroTexto}?"))
             return;
 
-        Aplicar(factura, () => _servicio.RegistrarCobro(factura));
+        Aplicar(() => _servicio.RegistrarCobro(factura));
     }
 
     private void Anular()
@@ -197,7 +194,7 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(factura, () => _servicio.Anular(factura, editor.Motivo));
+        Aplicar(() => _servicio.Anular(factura, editor.Motivo));
     }
 
     /// <summary>Lo que rinde una tonelada sumando los tres servicios; solo para el estimado del editor.</summary>
@@ -210,22 +207,17 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
     }
 
     /// <summary>
-    /// Ejecuta una transición y refleja el resultado. Si el servicio la rechaza se informa en vez
-    /// de tragarse el error: el botón habilitado es cortesía, la regla la impone el servicio.
+    /// Ejecuta una transición. Si el servicio la rechaza se informa en vez de tragarse el error:
+    /// el botón habilitado es cortesía, la regla la impone el servicio.
+    ///
+    /// La lista la repuebla la recarga que dispara la propia escritura del servicio; aquí solo
+    /// se apunta qué factura dejar seleccionada.
     /// </summary>
-    private void Aplicar(FacturaCliente original, Func<FacturaCliente> transicion)
+    private void Aplicar(Func<FacturaCliente> transicion)
     {
         try
         {
-            var actualizada = transicion();
-
-            var indice = Items.IndexOf(original);
-            if (indice >= 0)
-                Items[indice] = actualizada;
-
-            SelectedItem = actualizada;
-            ItemsView.Refresh();
-            OnPropertyChanged(nameof(TotalesTexto));
+            SeleccionarTrasRecargar(transicion().Id);
         }
         catch (InvalidOperationException ex)
         {

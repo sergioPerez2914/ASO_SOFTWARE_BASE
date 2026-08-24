@@ -43,6 +43,7 @@ public partial class MainWindow : Window
     private void OnCerrada(object? sender, EventArgs e)
     {
         Ajustes.Cambiaron -= AplicarEscala;
+        DesconectarPantallaActual();
 
         if (Ajustes.Actual.AbrirEnUltimaSeccion)
             Ajustes.Guardar();
@@ -119,9 +120,30 @@ public partial class MainWindow : Window
         // por clic del menú.
         Ajustes.Actual.UltimaSeccion = modulo.Clave;
 
+        // La pantalla que se va deja de escuchar el bus de cambios. Este es el único sitio por
+        // el que se cambia de sección, así que basta hacerlo aquí; si no, cada pantalla visitada
+        // seguiría viva y recargándose contra la base a espaldas del usuario.
+        DesconectarPantallaActual();
+
         ContentArea.Content = submodulo is not null
             ? CrearVistaSubmodulo(modulo, submodulo)
             : CrearVistaModulo(modulo);
+    }
+
+    private void DesconectarPantallaActual()
+    {
+        if (ContentArea.Content is IRecargable saliente)
+            saliente.Desconectar();
+    }
+
+    /// <summary>
+    /// Recarga manual con F5. No hay ningún botón "Actualizar" en las barras —la actualización
+    /// es automática—, pero queda el atajo como red de seguridad.
+    /// </summary>
+    private void OnRecargar(object sender, ExecutedRoutedEventArgs e)
+    {
+        if (ContentArea.Content is IRecargable seccion)
+            seccion.Recargar();
     }
 
     /// <summary>

@@ -40,6 +40,13 @@ public sealed class EmpleadosViewModel : PantallaViewModelBase
     public EmpleadosAdminViewModel Administrativos { get; }
     public PersonalCampoCrudViewModel Campo { get; }
 
+    /// <summary>Los dos padrones de la pantalla; cada uno relee el suyo.</summary>
+    public override void Recargar()
+    {
+        Administrativos.Recargar();
+        Campo.Recargar();
+    }
+
     private string _vistaActual = VistaAdministrativos;
     public string VistaActual
     {
@@ -55,6 +62,26 @@ public sealed class EmpleadosViewModel : PantallaViewModelBase
 
     public bool MostrarAdministrativos => VistaActual == VistaAdministrativos;
     public bool MostrarCampo => VistaActual == VistaCampo;
+
+    /// <summary>
+    /// Las dos pestañas, enlazadas en DOS VÍAS al <c>IsChecked</c> de su botón, como en
+    /// <see cref="AdministracionViewModel"/>. Antes la selección viajaba solo de la vista al
+    /// ViewModel por <c>Command</c>, con <c>IsChecked="True"</c> a fuego en la primera: si algo
+    /// cambiaba <see cref="VistaActual"/> desde el código, los botones no se enteraban.
+    ///
+    /// El setter solo actúa al marcar: al desmarcar ya hay otro botón del grupo encendiéndose.
+    /// </summary>
+    public bool EsAdministrativos
+    {
+        get => MostrarAdministrativos;
+        set { if (value) VistaActual = VistaAdministrativos; }
+    }
+
+    public bool EsCampo
+    {
+        get => MostrarCampo;
+        set { if (value) VistaActual = VistaCampo; }
+    }
 
     public ICommand CambiarVistaCommand { get; }
 }

@@ -164,9 +164,7 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
                     editor.Desde, editor.Hasta,
                     _sesionActual.UsuarioActual?.Id ?? 0);
 
-            Items.Add(generada);
-            SelectedItem = generada;
-            ItemsView.Refresh();
+            SeleccionarTrasRecargar(generada.Id);
         }
         catch (InvalidOperationException ex)
         {
@@ -183,7 +181,7 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(liquidacion, () => _servicio.AgregarLineaConcepto(
+        Aplicar(() => _servicio.AgregarLineaConcepto(
             liquidacion, editor.ConceptoSeleccionado!, editor.MontoValor));
     }
 
@@ -192,7 +190,7 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
         if (SelectedItem is not { } liquidacion || LineaSeleccionada is not { } linea)
             return;
 
-        Aplicar(liquidacion, () => _servicio.QuitarLinea(liquidacion, linea));
+        Aplicar(() => _servicio.QuitarLinea(liquidacion, linea));
     }
 
     private void Cerrar()
@@ -200,7 +198,7 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
         if (SelectedItem is not { } liquidacion)
             return;
 
-        Aplicar(liquidacion, () => _servicio.Cerrar(liquidacion));
+        Aplicar(() => _servicio.Cerrar(liquidacion));
     }
 
     private void Pagar()
@@ -212,7 +210,7 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
                 $"¿Registrar el pago de {liquidacion.NetoTexto} a {liquidacion.SujetoTexto}?"))
             return;
 
-        Aplicar(liquidacion, () => _servicio.Pagar(liquidacion));
+        Aplicar(() => _servicio.Pagar(liquidacion));
     }
 
     private void Anular()
@@ -229,27 +227,22 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(liquidacion, () => _servicio.Anular(liquidacion, editor.Motivo));
+        Aplicar(() => _servicio.Anular(liquidacion, editor.Motivo));
     }
 
     /// <summary>
-    /// Ejecuta una transición y refleja el resultado. Si el servicio la rechaza se informa en vez
-    /// de tragarse el error: el botón habilitado es cortesía, la regla la impone el servicio.
+    /// Ejecuta una transición. Si el servicio la rechaza se informa en vez de tragarse el error:
+    /// el botón habilitado es cortesía, la regla la impone el servicio.
+    ///
+    /// La lista la repuebla la recarga que dispara la escritura del servicio; aquí solo se apunta
+    /// qué liquidación dejar seleccionada.
     /// </summary>
-    private void Aplicar(Liquidacion original, Func<Liquidacion> transicion)
+    private void Aplicar(Func<Liquidacion> transicion)
     {
         try
         {
-            var actualizada = transicion();
-
-            var indice = Items.IndexOf(original);
-            if (indice >= 0)
-                Items[indice] = actualizada;
-
-            SelectedItem = actualizada;
+            SeleccionarTrasRecargar(transicion().Id);
             LineaSeleccionada = null;
-            ItemsView.Refresh();
-            OnPropertyChanged(nameof(TotalesTexto));
         }
         catch (InvalidOperationException ex)
         {

@@ -95,7 +95,7 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
                 $"¿Registrar el pago de {factura.MontoTexto} a {factura.ProveedorNombre}?"))
             return;
 
-        Aplicar(factura, () => _servicio.RegistrarPago(factura));
+        Aplicar(() => _servicio.RegistrarPago(factura));
     }
 
     private void Anular()
@@ -112,29 +112,22 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(factura, () => _servicio.Anular(factura, editor.Motivo));
+        Aplicar(() => _servicio.Anular(factura, editor.Motivo));
     }
 
-    private void Aplicar(FacturaProveedor original, Func<FacturaProveedor> transicion)
+    /// <summary>
+    /// La lista la repuebla la recarga que dispara la escritura del servicio; aquí solo se
+    /// apunta qué factura dejar seleccionada.
+    /// </summary>
+    private void Aplicar(Func<FacturaProveedor> transicion)
     {
         try
         {
-            var actualizada = transicion();
-
-            var indice = Items.IndexOf(original);
-            if (indice >= 0)
-                Items[indice] = actualizada;
-
-            SelectedItem = actualizada;
-            ItemsView.Refresh();
+            SeleccionarTrasRecargar(transicion().Id);
         }
         catch (InvalidOperationException ex)
         {
             _dialogos.Informar("No se pudo completar la operación", ex.Message);
-        }
-        finally
-        {
-            OnPropertyChanged(nameof(ResumenDeuda));
         }
     }
 }
@@ -198,6 +191,16 @@ public sealed class CuentasPorPagarViewModel : PantallaViewModelBase
     public FacturasProveedorCrudViewModel Facturas { get; }
     public ProveedoresCrudViewModel Proveedores { get; }
 
+    /// <summary>
+    /// Los dos listados, aunque solo se vea uno: dar de alta un proveedor desde la vista de
+    /// facturas tiene que dejarlo disponible al conmutar, sin salir y volver a entrar.
+    /// </summary>
+    public override void Recargar()
+    {
+        Facturas.Recargar();
+        Proveedores.Recargar();
+    }
+
     private string _vistaActual = VistaFacturas;
     public string VistaActual
     {
@@ -213,6 +216,26 @@ public sealed class CuentasPorPagarViewModel : PantallaViewModelBase
 
     public bool MostrarFacturas => VistaActual == VistaFacturas;
     public bool MostrarProveedores => VistaActual == VistaProveedores;
+
+    /// <summary>
+    /// Las dos pestañas, enlazadas en DOS VÍAS al <c>IsChecked</c> de su botón, como en
+    /// <see cref="AdministracionViewModel"/>. Antes la selección viajaba solo de la vista al
+    /// ViewModel por <c>Command</c>, con <c>IsChecked="True"</c> a fuego en la primera: si algo
+    /// cambiaba <see cref="VistaActual"/> desde el código, los botones no se enteraban.
+    ///
+    /// El setter solo actúa al marcar: al desmarcar ya hay otro botón del grupo encendiéndose.
+    /// </summary>
+    public bool EsFacturas
+    {
+        get => MostrarFacturas;
+        set { if (value) VistaActual = VistaFacturas; }
+    }
+
+    public bool EsProveedores
+    {
+        get => MostrarProveedores;
+        set { if (value) VistaActual = VistaProveedores; }
+    }
 
     public ICommand CambiarVistaCommand { get; }
 }

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
 using ASO.Desktop.Models;
@@ -36,7 +37,6 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
         AgregarCommand = new RelayCommand(Agregar, () => _sesion.Puede($"{ModuloPermiso}.Crear"));
         EditarCommand = new RelayCommand(Editar, () => SelectedItem is { } e && PuedeEditar(e) && _sesion.Puede($"{ModuloPermiso}.Editar"));
         EliminarCommand = new RelayCommand(Eliminar, () => SelectedItem is { } b && PuedeEliminar(b) && _sesion.Puede($"{ModuloPermiso}.Eliminar"));
-        RefrescarCommand = new RelayCommand(Refrescar);
     }
 
     private T? _selectedItem;
@@ -60,7 +60,6 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
     public ICommand AgregarCommand { get; }
     public ICommand EditarCommand { get; }
     public ICommand EliminarCommand { get; }
-    public ICommand RefrescarCommand { get; }
 
     /// <summary>Prefijo de permiso RBAC del módulo, p. ej. "Empleados" (→ "Empleados.Crear").</summary>
     protected abstract string ModuloPermiso { get; }
@@ -90,6 +89,11 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
            && (string.IsNullOrWhiteSpace(TextoBusqueda) || CoincideBusqueda(item, TextoBusqueda.Trim()))
            && PasaFiltroExtra(item);
 
+    // Los tres comandos guardan y no tocan la colección: de eso se encarga la recarga que
+    // dispara el bus de cambios (ver CambiosDeDatos). Mantener aquí además el alta/reemplazo a
+    // mano duplicaría las filas — la fila entraría una vez por Items.Add y otra por la recarga.
+    // Lo único que se conserva es a QUIÉN dejar seleccionado después.
+
     private void Agregar()
     {
         var editor = CrearEditor(CrearNuevo());
@@ -97,8 +101,7 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
             return;
 
         var agregado = _source.Add(editor.ObtenerResultado());
-        Items.Add(agregado);
-        SelectedItem = agregado;
+        _idASeleccionar = agregado.Id;
     }
 
     private void Editar()
@@ -112,12 +115,7 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
 
         var actualizado = editor.ObtenerResultado();
         _source.Update(actualizado);
-
-        var indice = Items.IndexOf(actual);
-        if (indice >= 0)
-            Items[indice] = actualizado;
-
-        SelectedItem = actualizado;
+        _idASeleccionar = actualizado.Id;
     }
 
     private void Eliminar()
@@ -129,14 +127,47 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
             return;
 
         _source.Delete(actual.Id);
-        Items.Remove(actual);
+        _idASeleccionar = null;
         SelectedItem = default;
     }
 
-    private void Refrescar()
+    /// <summary>
+    /// Id que debe quedar seleccionado tras la próxima recarga. Se guarda como <c>object</c>
+    /// porque <c>TId</c> puede ser <c>int</c> o <c>string</c> y hace falta poder decir "ninguno"
+    /// en los dos casos.
+    /// </summary>
+    private object? _idASeleccionar;
+
+    /// <summary>Deja apuntado qué fila reseleccionar; lo usan las pantallas con transiciones.</summary>
+    protected void SeleccionarTrasRecargar(TId id) => _idASeleccionar = id;
+
+    /// <summary>
+    /// Relee el listado.
+    ///
+    /// Conserva la fila seleccionada BUSCÁNDOLA POR ID, no por referencia: la recarga trae
+    /// objetos nuevos y la instancia anterior ya no está en la lista. Sin esto, y como ahora la
+    /// recarga es automática y no un botón, cada acción dejaría la tabla sin selección y los
+    /// comandos que dependen de ella —Editar, Confirmar, Anular— se apagarían solos.
+    /// </summary>
+    public virtual void Recargar()
     {
+        var idBuscado = _idASeleccionar ?? (SelectedItem is { } actual ? (object?)actual.Id : null);
+        _idASeleccionar = null;
+
         Items.Clear();
         foreach (var item in _source.GetAll())
             Items.Add(item);
+
+        // El refresco va ANTES de reseleccionar: re-aplica el filtro y puede mover el elemento
+        // actual de la vista, así que hacerlo después dejaría la selección recién puesta a medias.
+        ItemsView.Refresh();
+
+        SelectedItem = idBuscado is null
+            ? default
+            : Items.FirstOrDefault(i => Equals(i.Id, idBuscado));
+
+        // Los resúmenes derivados (totales, contadores) se recalculan solos al reevaluarse
+        // todos los bindings; enumerarlos a mano sería una lista que se queda corta.
+        OnTodasLasPropiedadesCambiaron();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Navigation;
@@ -80,6 +81,31 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
 
         _usuarioMostrado = nuevo;
         PermisosDeUsuario.Cargar(nuevo);
+    }
+
+    /// <summary>
+    /// Relee el padrón de usuarios y vuelve a apuntar el panel de permisos al mismo usuario.
+    ///
+    /// Va con la guarda <c>_restaurandoSeleccion</c> puesta porque la recarga trae instancias
+    /// NUEVAS: sin ella, <see cref="OnUsuarioSeleccionado"/> creería que se cambió de fila y
+    /// ofrecería descartar los permisos que se estén editando. La ficha del núcleo no se toca —
+    /// es un formulario de una sola fila y recargarlo pisaría lo que se está escribiendo.
+    /// </summary>
+    public override void Recargar()
+    {
+        var idMostrado = _usuarioMostrado?.Id;
+
+        _restaurandoSeleccion = true;
+        Usuarios.Recargar();
+        _restaurandoSeleccion = false;
+
+        _usuarioMostrado = idMostrado is { } id
+            ? Usuarios.Items.FirstOrDefault(u => u.Id == id)
+            : null;
+
+        // Un panel con cambios a medio hacer no se pisa; se recarga cuando ya se guardaron.
+        if (!PermisosDeUsuario.HayCambios)
+            PermisosDeUsuario.Cargar(_usuarioMostrado);
     }
 
     private string _vistaActual = VistaUsuarios;

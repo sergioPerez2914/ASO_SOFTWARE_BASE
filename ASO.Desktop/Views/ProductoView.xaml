@@ -68,19 +68,19 @@
     </UniformGrid>
 
     <!-- Barra: búsqueda y rango -->
-    <Border Grid.Row="2" Style="{StaticResource ToolbarStyle}">
+    <!-- Reporte de solo lectura: la barra no lleva fila de acciones porque no hay ninguna. -->
+    <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
       <Grid>
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <controls:SearchBox Grid.Column="0" Width="280" VerticalAlignment="Center"
+        <WrapPanel Grid.Column="0" VerticalAlignment="Center">
+          <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
                               Sugerencia="Buscar por finca, lote o núcleo de transporte"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-        <StackPanel Grid.Column="1" Orientation="Horizontal"
-                    HorizontalAlignment="Right" VerticalAlignment="Center">
           <RadioButton Content="Todo" GroupName="RangoProducto" IsChecked="True"
                        Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarRangoCommand}" CommandParameter="Todo" />
@@ -90,9 +90,7 @@
           <RadioButton Content="Hoy" GroupName="RangoProducto"
                        Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
                        Command="{Binding CambiarRangoCommand}" CommandParameter="Hoy" />
-          <Button Content="Actualizar" Style="{StaticResource SecondaryButtonStyle}"
-                  Command="{Binding RefrescarCommand}" />
-        </StackPanel>
+        </WrapPanel>
       </Grid>
     </Border>
 

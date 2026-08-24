@@ -49,8 +49,6 @@ public sealed class PeticionesViewModel : PantallaViewModelBase
         PeticionesView = CollectionViewSource.GetDefaultView(Peticiones);
         PeticionesView.Filter = Filtrar;
 
-        RefrescarCommand = new RelayCommand(Refrescar);
-
         AprobarCommand = new RelayCommand(Aprobar, PuedeResolverSeleccionada);
         RechazarCommand = new RelayCommand(Rechazar, PuedeResolverSeleccionada);
 
@@ -75,7 +73,6 @@ public sealed class PeticionesViewModel : PantallaViewModelBase
         }
     }
 
-    public ICommand RefrescarCommand { get; }
     public ICommand AprobarCommand { get; }
     public ICommand RechazarCommand { get; }
     public ICommand CambiarFiltroCommand { get; }
@@ -104,7 +101,14 @@ public sealed class PeticionesViewModel : PantallaViewModelBase
             _ => true
         };
 
-    private void Refrescar()
+    /// <summary>
+    /// Relee la bandeja conservando la fila seleccionada.
+    ///
+    /// Es la pantalla donde mas se notaria un sondeo periodico: las peticiones las crea OTRO
+    /// usuario, y un bus en proceso no puede enterarse de lo que escribe otra maquina. Ver la
+    /// nota de extension en Services/CambiosDeDatos.cs.
+    /// </summary>
+    public override void Recargar()
     {
         var seleccionadaId = Seleccionada?.Id;
 
