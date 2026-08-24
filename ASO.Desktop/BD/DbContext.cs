@@ -603,8 +603,32 @@ public class AsoDbContext : DbContext
     {
         foreach (var entrada in ChangeTracker.Entries<IDeOrganizacion>())
         {
-            if (entrada.State == EntityState.Added && entrada.Entity.OrganizacionId == 0)
+            if (entrada.Entity.OrganizacionId != 0)
+                continue;
+
+            if (entrada.State == EntityState.Added)
+            {
                 entrada.Entity.OrganizacionId = Ambito.Exigir();
+                continue;
+            }
+
+            // Una MODIFICACIÓN que llega sin núcleo es el caso que dejaba filas huérfanas.
+            //
+            // Ninguno de los editores conserva OrganizacionId: todos construyen su resultado con
+            // un `new` que copia los campos del formulario y nada más (ver
+            // FincaEditorViewModel.ObtenerResultado). Esa copia llega con 0, y como el estampado
+            // solo miraba las filas nuevas, el UPDATE escribía 0 encima del núcleo bueno. La fila
+            // seguía en la tabla, pero el filtro global la dejaba fuera de TODA consulta: editar
+            // un registro equivalía a borrarlo de la vista.
+            //
+            // Se recupera el valor que tenía la fila antes del cambio, y solo si no hay (la
+            // entidad se adjuntó desprendida, sin pasar por la base) se cae al núcleo activo.
+            // Así un update jamás mueve una fila de núcleo, ni siquiera por accidente.
+            if (entrada.State == EntityState.Modified)
+            {
+                var original = entrada.OriginalValues.GetValue<int>(nameof(IDeOrganizacion.OrganizacionId));
+                entrada.Entity.OrganizacionId = original != 0 ? original : Ambito.Exigir();
+            }
         }
     }
 }
