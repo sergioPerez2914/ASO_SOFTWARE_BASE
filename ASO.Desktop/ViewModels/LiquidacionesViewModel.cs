@@ -45,7 +45,9 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
             liquidaciones,
             DataSourceFactory.CrearRemesas(),
             new TarifaService(DataSourceFactory.CrearTarifas()),
-            new HorarioService(DataSourceFactory.CrearJornadas()));
+            new HorarioService(DataSourceFactory.CrearJornadas(),
+                               DataSourceFactory.CrearEventosOperacion(),
+                               DataSourceFactory.CrearRemesas()));
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {

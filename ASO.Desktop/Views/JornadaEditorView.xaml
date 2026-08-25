@@ -27,6 +27,14 @@
                 SelectedItem="{Binding PersonaSeleccionada}" />
     </controls:FormField>
 
+    <StackPanel Visibility="{Binding EsCampo, Converter={StaticResource BoolToVis}}"
+                Margin="0,4,0,8">
+      <TextBlock Text="Frente de trabajo" Style="{StaticResource FormLabelStyle}" />
+      <TextBlock Text="{Binding FrenteTexto}" TextWrapping="Wrap"
+                 FontSize="{StaticResource FsBody}" FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
+    </StackPanel>
+
     <Grid>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
@@ -66,7 +74,7 @@
                Text="{Binding Observacion, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
-    <TextBlock Text="La jornada queda abierta hasta que se registre la salida. Una persona no puede tener dos jornadas abiertas a la vez."
+    <TextBlock Text="La jornada queda abierta hasta que se registre la salida. Una persona no puede tener dos jornadas abiertas a la vez. En campo, la entrada y la salida quedan registradas en el seguimiento del frente; para cambiar de frente, ciérrelo arriba antes de registrar."
                FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>

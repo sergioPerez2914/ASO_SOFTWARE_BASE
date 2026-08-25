@@ -22,8 +22,17 @@ public sealed class SalidaJornadaEditorViewModel : CrudEditorViewModelBase
     public override string Titulo => $"Registrar salida — {_jornada.PersonaNombre}";
     public override string TextoAccion => "Registrar la salida";
 
-    public string Resumen =>
-        $"{_jornada.CargoORol} · turno {_jornada.TurnoTexto.ToLowerInvariant()} · entrada {_jornada.EntradaTexto}";
+    /// <summary>La remesa ya viaja en la jornada: aquí solo se recuerda contra qué frente se fichó.</summary>
+    public string Resumen
+    {
+        get
+        {
+            var basico = $"{_jornada.CargoORol} · turno {_jornada.TurnoTexto.ToLowerInvariant()} · " +
+                         $"entrada {_jornada.EntradaTexto}";
+
+            return _jornada.RemesaId is null ? basico : $"{basico} · remesa {_jornada.RemesaTexto}";
+        }
+    }
 
     private DateTime _fechaSalida = DateTime.Today;
     public DateTime FechaSalida

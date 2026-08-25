@@ -142,6 +142,15 @@ y **contenedor de dos padrones** (`EmpleadosViewModel`, `CuentasPorPagarViewMode
   `FlotaService` recibe los vales por constructor opcional y los suma al historial de uso.
 - **Registros de solo inserción**: las jornadas de trabajo no se editan ni se borran (`HorarioService`);
   de esas horas sale un pago, y el criterio favorece la futura sincronización offline.
+- **La jornada de campo se ficha contra una remesa** (`JornadaTrabajo.RemesaId`, obligatorio solo
+  para `TipoPersonal.Campo`): al abrirla y al cerrarla, `HorarioService` publica un evento
+  `CambioTurno` en la línea de tiempo de ese frente. El frente **se elige en la pantalla, no en el
+  diálogo** (`HorariosViewModel.FrenteSeleccionado`): se ficha a varias personas seguidas contra la
+  misma remesa, así que elegirlo en cada alta sería teclear lo mismo diez veces. Ese selector acota
+  además la tabla al frente elegido, y el editor solo lo muestra como texto. Es el segundo módulo que escribe en el
+  seguimiento sin tocar Operaciones, con el mismo patrón que `MantenimientoService`. La remesa
+  debe estar en `Borrador` o `Confirmada` al abrir; al cerrar **no** se revalida, porque anular la
+  remesa mientras alguien trabajaba no borra las horas que hay que pagarle.
 - **Dos padrones de personal sin unificar**: `Empleado` (nómina/taller, entidad EF) y `PersonalCampo`
   (quien firma la remesa, con núcleo C.O.D). Nómina · Empleados los administra por separado en una
   vista conmutable.
@@ -206,7 +215,8 @@ hay mocks: `Configuration/DataSourceFactory.cs` devuelve siempre la implementaci
   `Fase3_DocumentosPlanos` → `Fase4_ColeccionesAnidadas` → `Fase5_EventoOperacion` →
   `FixStockActualStockMinimoDecimal` → `Fase6_OrganizacionYSeguridad` → `Fase7_NucleoUnico` →
   `Fase8_RequisicionYOrdenCompra` → `Fase9_RenombrarCisternaAStock` →
-  `Fase10_RequisicionCombustibleYUnidad` → `Fase11_MontoCotizadoYLineasOrdenCompra`.
+  `Fase10_RequisicionCombustibleYUnidad` → `Fase11_MontoCotizadoYLineasOrdenCompra` →
+  `Fase12_RecepcionMercancia` → `Fase13_JornadaEnFrente`.
 - **La cadena de conexión vive solo en `appsettings.local.json`** (por máquina, en `.gitignore`).
 - **No hay claves foráneas reales** en las tablas planas: las relaciones son `int` sueltos y la
   integridad es de la aplicación, con snapshots de texto (`…Nombre`, `…Codigo`) en cada documento.

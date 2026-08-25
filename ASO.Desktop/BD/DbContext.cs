@@ -266,6 +266,7 @@ public class AsoDbContext : DbContext
             entity.Ignore(j => j.EstadoTexto);
             entity.Ignore(j => j.EntradaTexto);
             entity.Ignore(j => j.SalidaTexto);
+            entity.Ignore(j => j.RemesaTexto);
         });
 
         modelBuilder.Entity<SalidaInventario>(entity =>

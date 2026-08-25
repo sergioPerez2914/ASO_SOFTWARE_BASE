@@ -213,7 +213,9 @@ public sealed class ModuloDashboardViewModel : ViewModelBase, IRecargable
         var liquidaciones = DataSourceFactory.CrearLiquidaciones().GetAll().ToList();
         var pendientes = liquidaciones.Count(l => l.Estado is EstadoLiquidacion.Borrador or EstadoLiquidacion.Cerrada);
 
-        var horarios = new HorarioService(DataSourceFactory.CrearJornadas());
+        var horarios = new HorarioService(DataSourceFactory.CrearJornadas(),
+                                          DataSourceFactory.CrearEventosOperacion(),
+                                          DataSourceFactory.CrearRemesas());
         var horas = horarios.HorasTotalesEnPeriodo(DateTime.Today.AddDays(-14), DateTime.Today);
 
         var inicioMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);

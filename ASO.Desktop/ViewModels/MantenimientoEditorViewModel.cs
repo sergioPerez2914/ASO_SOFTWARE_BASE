@@ -7,18 +7,6 @@ using ASO.Desktop.Services;
 
 namespace ASO.Desktop.ViewModels;
 
-/// <summary>Opción del combo de remesa vinculada; la primera es "Sin vínculo" (Remesa null).</summary>
-public sealed class OpcionRemesa
-{
-    public OpcionRemesa(Remesa? remesa) => Remesa = remesa;
-
-    public Remesa? Remesa { get; }
-
-    public string Etiqueta => Remesa is { } r
-        ? $"Nº {r.Id} · {r.InicioCarga:dd/MM} · {r.FincaNombre} ({r.VehiculoPlaca})"
-        : "Sin vínculo";
-}
-
 /// <summary>
 /// Registro de un mantenimiento realizado. La entidad resultante pasa por
 /// <see cref="MantenimientoService.Registrar"/>, que aplica las reglas de negocio; aquí solo se

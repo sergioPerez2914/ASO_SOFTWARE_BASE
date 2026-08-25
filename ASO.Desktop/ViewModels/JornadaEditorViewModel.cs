@@ -12,21 +12,29 @@ namespace ASO.Desktop.ViewModels;
 /// Apertura de una jornada. La persona sale de uno de los dos padrones según el conmutador, y
 /// al guardar se copian su nombre, cargo y núcleo dentro de la jornada: el registro de
 /// asistencia debe leerse igual dentro de dos zafras aunque la persona ya no esté.
+///
+/// El frente contra el que se ficha NO se elige aquí: llega ya decidido desde la pantalla, que
+/// es donde se escoge una vez para toda una tanda de altas. El editor solo lo muestra, para que
+/// se vea a qué remesa va a parar la jornada. La regla dura la aplica
+/// <see cref="HorarioService.Registrar"/>; aquí solo se guía el formulario.
 /// </summary>
 public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrabajo>
 {
     private readonly JornadaTrabajo _original;
     private readonly HorarioService _servicio;
+    private readonly Remesa? _frente;
     private readonly IReadOnlyList<Empleado> _administrativos;
     private readonly IReadOnlyList<PersonalCampo> _campo;
 
     public JornadaEditorViewModel(JornadaTrabajo original,
                                   HorarioService servicio,
                                   IEmpleadoDataSource empleados,
-                                  IPersonalCampoDataSource personalCampo)
+                                  IPersonalCampoDataSource personalCampo,
+                                  Remesa? frente)
     {
         _original = original;
         _servicio = servicio;
+        _frente = frente;
 
         _administrativos = empleados.GetAll().Where(e => e.Activo).OrderBy(e => e.Nombre).ToList();
         _campo = personalCampo.GetAll().Where(p => p.Activo).OrderBy(p => p.Nombre).ToList();
@@ -50,6 +58,11 @@ public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrab
     public override double AnchoEditor => Ancho.Estandar;
 
     public IReadOnlyList<TurnoJornada> Turnos { get; } = Enum.GetValues<TurnoJornada>();
+
+    /// <summary>Frente elegido en la pantalla; solo se enseña, no se edita.</summary>
+    public string FrenteTexto => _frente is { } r
+        ? $"Nº {r.Id} · {r.FincaNombre} · {r.UbicacionTexto}"
+        : "Sin frente elegido";
 
     /// <summary>Lista que ve el combo: cambia con el conmutador de padrón.</summary>
     public IEnumerable<object> Personas =>
@@ -123,6 +136,13 @@ public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrab
             return false;
         }
 
+        if (EsCampo && _frente is null)
+        {
+            error = "El personal de campo se ficha contra un frente. " +
+                    "Elija la remesa en el selector \"Frente\" de la pantalla y vuelva a intentarlo.";
+            return false;
+        }
+
         var (personaId, nombre, _, _) = DatosPersona();
         if (_servicio.TieneJornadaAbierta(TipoPersonal, personaId, out var abierta))
         {
@@ -149,6 +169,7 @@ public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrab
         jornada.NucleoCodigo = nucleo;
         jornada.Turno = Turno;
         jornada.HoraEntrada = Fecha.Date + hora;
+        jornada.RemesaId = EsCampo ? _frente?.Id : null;
         jornada.Observacion = Observacion.Trim();
 
         return jornada;

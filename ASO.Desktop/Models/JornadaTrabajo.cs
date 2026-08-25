@@ -52,6 +52,13 @@ public class JornadaTrabajo : IEntidad<int>, IDeOrganizacion
     public DateTime HoraEntrada { get; set; }
     public DateTime? HoraSalida { get; set; }
 
+    /// <summary>
+    /// Remesa (frente de trabajo) contra la que se trabaja. Obligatoria para el personal de
+    /// campo y siempre nula para los administrativos, que no fichan contra un documento de
+    /// campo. Al abrir y al cerrar la jornada se publica un cambio de turno en su seguimiento.
+    /// </summary>
+    public int? RemesaId { get; set; }
+
     public string Observacion { get; set; } = string.Empty;
 
     public int CreadoPorId { get; set; }
@@ -75,6 +82,8 @@ public class JornadaTrabajo : IEntidad<int>, IDeOrganizacion
     public string EntradaTexto => HoraEntrada.ToString("dd/MM/yyyy HH:mm");
 
     public string SalidaTexto => HoraSalida is { } salida ? salida.ToString("dd/MM/yyyy HH:mm") : "—";
+
+    public string RemesaTexto => RemesaId is { } id ? $"Nº {id}" : "—";
 
     /// <summary>Copia superficial (solo hay tipos de valor y cadenas) para no mutar el original en la lista.</summary>
     public JornadaTrabajo Clonar() => (JornadaTrabajo)MemberwiseClone();

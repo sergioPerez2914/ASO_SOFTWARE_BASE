@@ -13,6 +13,11 @@ namespace ASO.Desktop.Services;
 /// <see cref="HorasEnPeriodo"/> es la puerta por la que Liquidaciones consulta las horas: si
 /// mañana cambia la forma de contarlas (descansos, horas extra, recargo nocturno), cambia aquí
 /// y la nómina se entera sola.
+///
+/// Una jornada de campo se ficha además contra una remesa, y al abrirla y al cerrarla se publica
+/// el movimiento en su línea de tiempo de Seguimiento — mismo criterio que
+/// <see cref="MantenimientoService.Registrar"/>: lo que se registra en Nómina se ve en
+/// Operaciones sin tocar ese módulo.
 /// </summary>
 public sealed class HorarioService
 {
@@ -20,14 +25,25 @@ public sealed class HorarioService
     private const int MaximoHorasJornada = 24;
 
     private readonly IJornadaDataSource _jornadas;
+    private readonly IEventoOperacionDataSource _eventos;
+    private readonly IRemesaDataSource _remesas;
 
-    public HorarioService(IJornadaDataSource jornadas) => _jornadas = jornadas;
+    public HorarioService(IJornadaDataSource jornadas,
+                          IEventoOperacionDataSource eventos,
+                          IRemesaDataSource remesas)
+    {
+        _jornadas = jornadas;
+        _eventos = eventos;
+        _remesas = remesas;
+    }
 
     public bool PuedeRegistrarSalida(JornadaTrabajo jornada) => jornada.EstaAbierta;
 
     /// <summary>
     /// Abre una jornada. Una persona no puede tener dos jornadas abiertas a la vez: si aparece
     /// una, es que la anterior quedó sin cerrar y hay que resolver eso antes.
+    ///
+    /// El personal de campo ficha contra una remesa en curso; el administrativo, contra ninguna.
     /// </summary>
     public JornadaTrabajo Registrar(JornadaTrabajo jornada)
     {
@@ -42,8 +58,16 @@ public sealed class HorarioService
                 $"{jornada.PersonaNombre} tiene una jornada abierta desde el {abierta!.EntradaTexto}. " +
                 "Ciérrela antes de registrar una nueva.");
 
+        ExigirFrenteValido(jornada);
+
         jornada.FechaRegistro = DateTime.Now;
-        return _jornadas.Add(jornada);
+        var guardada = _jornadas.Add(jornada);
+
+        PublicarEnSeguimiento(guardada, guardada.HoraEntrada,
+            $"Entra al frente {guardada.PersonaNombre}{Oficio(guardada)}, " +
+            $"turno {guardada.TurnoTexto.ToLowerInvariant()}.");
+
+        return guardada;
     }
 
     /// <summary>Cierra la jornada con la hora de salida. Es la única modificación que admite.</summary>
@@ -63,6 +87,13 @@ public sealed class HorarioService
         var copia = jornada.Clonar();
         copia.HoraSalida = salida;
         _jornadas.Update(copia);
+
+        // Sobre la copia ya cerrada: es la única que sabe cuántas horas fueron.
+        // No se revalida el estado de la remesa: si se anuló mientras tanto, bloquear el cierre
+        // dejaría la jornada abierta para siempre y falsearía las horas de la nómina.
+        PublicarEnSeguimiento(copia, salida,
+            $"Sale del frente {copia.PersonaNombre}{Oficio(copia)} tras {copia.HorasTexto} de jornada.");
+
         return copia;
     }
 
@@ -88,4 +119,53 @@ public sealed class HorarioService
         abierta = _jornadas.GetByPersona(tipo, personaId).FirstOrDefault(j => j.EstaAbierta);
         return abierta is not null;
     }
+
+    /// <summary>
+    /// Comprueba el vínculo con la remesa. La obligatoriedad vive aquí y no solo en el editor:
+    /// es lo que impide que una jornada de campo entre por otra vía sin frente.
+    /// </summary>
+    private void ExigirFrenteValido(JornadaTrabajo jornada)
+    {
+        if (jornada.TipoPersonal != TipoPersonal.Campo)
+        {
+            // Un administrativo no ficha contra un documento de campo, venga lo que venga.
+            jornada.RemesaId = null;
+            return;
+        }
+
+        if (jornada.RemesaId is not { } remesaId)
+            throw new InvalidOperationException(
+                "Seleccione la remesa en la que trabaja el personal de campo.");
+
+        var remesa = _remesas.GetById(remesaId)
+            ?? throw new InvalidOperationException("La remesa seleccionada no existe.");
+
+        if (remesa.Estado is EstadoRemesa.Recibida or EstadoRemesa.Anulada)
+            throw new InvalidOperationException(
+                $"La remesa Nº {remesaId} está {remesa.EstadoTexto.ToLowerInvariant()}: " +
+                "elija una remesa en curso.");
+    }
+
+    /// <summary>
+    /// Refleja el movimiento de personal en la línea de tiempo de la remesa. Solo lo tienen las
+    /// jornadas de campo: una jornada administrativa no pertenece a ningún frente. Va sin
+    /// <c>Autor</c> porque es un evento de sistema, no una nota escrita a mano.
+    /// </summary>
+    private void PublicarEnSeguimiento(JornadaTrabajo jornada, DateTime fechaHora, string descripcion)
+    {
+        if (jornada.RemesaId is not { } remesaId)
+            return;
+
+        _eventos.Add(new EventoOperacion
+        {
+            RemesaId = remesaId,
+            Tipo = TipoEventoOperacion.CambioTurno,
+            FechaHora = fechaHora,
+            Descripcion = descripcion
+        });
+    }
+
+    /// <summary>Sin cargo no se escribe un paréntesis vacío en la línea de tiempo.</summary>
+    private static string Oficio(JornadaTrabajo jornada) =>
+        string.IsNullOrWhiteSpace(jornada.CargoORol) ? string.Empty : $" ({jornada.CargoORol})";
 }
