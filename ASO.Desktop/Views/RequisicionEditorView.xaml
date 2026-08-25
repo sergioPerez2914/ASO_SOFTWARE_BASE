@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             xmlns:vm="clr-namespace:ASO.Desktop.ViewModels"
              mc:Ignorable="d"
              d:DesignWidth="760">
 
@@ -21,7 +22,8 @@
                    Command="{Binding CambiarTipoLineaCommand}" CommandParameter="Repuesto" />
     </StackPanel>
 
-    <!-- Combustible: diésel o lubricante, sin catálogo que elegir todavía (ver RequisicionLinea). -->
+    <!-- Combustible: diésel o lubricante. El grado de lubricante se elige más abajo, junto a
+         Cantidad, para no gastar una fila propia en algo que cabe al lado. -->
     <StackPanel Visibility="{Binding EsLineaCombustible, Converter={StaticResource BoolToVis}}"
                 Margin="0,8,0,0">
       <StackPanel Orientation="Horizontal">
@@ -34,53 +36,55 @@
                      IsChecked="{Binding EsLineaLubricante, Mode=OneWay}"
                      Command="{Binding CambiarTipoCombustibleCommand}" CommandParameter="Lubricante" />
       </StackPanel>
-
-      <controls:FormField Etiqueta="Grado del lubricante"
-                           Visibility="{Binding EsLineaLubricante, Converter={StaticResource BoolToVis}}"
-                           Margin="0,8,0,0">
-        <TextBox Style="{StaticResource FormTextBoxStyle}"
-                 Text="{Binding TipoLubricanteTexto, UpdateSourceTrigger=PropertyChanged}" />
-      </controls:FormField>
     </StackPanel>
 
-    <!-- Repuesto: el artículo del catálogo y, opcionalmente, para qué unidad de flota es. -->
+    <!-- Repuesto: el artículo del catálogo. -->
     <Grid Visibility="{Binding EsLineaRepuesto, Converter={StaticResource BoolToVis}}" Margin="0,8,0,0">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="12" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
-
-      <controls:FormField Grid.Column="0" Etiqueta="Artículo">
+      <controls:FormField Etiqueta="Artículo">
         <ComboBox Style="{StaticResource FormComboBoxStyle}"
                   ItemsSource="{Binding Articulos}"
                   DisplayMemberPath="Nombre"
                   SelectedItem="{Binding ArticuloLineaSeleccionado}" />
       </controls:FormField>
-
-      <controls:FormField Grid.Column="2" Etiqueta="Para qué unidad (opcional)">
-        <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                  ItemsSource="{Binding Activos}"
-                  DisplayMemberPath="Etiqueta"
-                  SelectedItem="{Binding ActivoLineaSeleccionado}" />
-      </controls:FormField>
     </Grid>
 
     <Grid Margin="0,8,0,0">
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="150" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="130" />
+        <ColumnDefinition Width="12" />
         <ColumnDefinition Width="140" />
         <ColumnDefinition Width="12" />
         <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
 
-      <StackPanel Grid.Column="0">
+      <StackPanel Grid.Column="0"
+                  Visibility="{Binding EsLineaLubricante, Converter={StaticResource BoolToVis}}">
+        <controls:FormField Etiqueta="Tipo">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{x:Static vm:RequisicionEditorViewModel.TiposLubricante}"
+                    SelectedItem="{Binding TipoLubricanteSeleccionado}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2"
+                  Visibility="{Binding EsLineaLubricante, Converter={StaticResource BoolToVis}}">
+        <controls:FormField Etiqueta="Grado">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{x:Static vm:RequisicionEditorViewModel.GradosViscosidadLubricante}"
+                    SelectedItem="{Binding GradoViscosidadSeleccionado}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="4">
         <controls:FormField Etiqueta="Cantidad">
           <TextBox Style="{StaticResource FormTextBoxStyle}"
                    Text="{Binding CantidadLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
         </controls:FormField>
       </StackPanel>
 
-      <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+      <StackPanel Grid.Column="6" VerticalAlignment="Bottom">
         <Button Content="Agregar línea" Style="{StaticResource SecondaryButtonStyle}"
                 Command="{Binding AgregarLineaCommand}" Margin="0,0,0,4" />
       </StackPanel>
@@ -90,8 +94,7 @@
               ItemsSource="{Binding Lineas}" IsReadOnly="True">
       <DataGrid.Columns>
         <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoInsumoTexto}" Width="8*" MinWidth="90" />
-        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="18*" MinWidth="140" />
-        <controls:ColumnaTexto Header="Para qué unidad" Binding="{Binding UnidadDestinoTexto}" Width="16*" MinWidth="130" />
+        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="30*" MinWidth="180" />
         <controls:ColumnaNumero Header="Cantidad" Binding="{Binding CantidadTexto}" Width="11*" MinWidth="90" />
         <DataGridTemplateColumn Width="70">
           <DataGridTemplateColumn.CellTemplate>

@@ -17,7 +17,6 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
     private const string FiltroTodas = "Todas";
 
     private readonly IInventoryDataSource _articulos;
-    private readonly IActivoFlotaDataSource _activos;
     private readonly IProveedorDataSource _proveedores;
     private readonly ICotizacionProveedorDataSource _cotizaciones;
     private readonly IServicioDialogo _dialogos;
@@ -28,7 +27,6 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
 
     public RequisicionesCrudViewModel(IRequisicionDataSource requisiciones,
                                       IInventoryDataSource articulos,
-                                      IActivoFlotaDataSource activos,
                                       IProveedorDataSource proveedores,
                                       ICotizacionProveedorDataSource cotizaciones,
                                       ComprasService servicio,
@@ -37,7 +35,6 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
         : base(requisiciones, dialogos, sesion)
     {
         _articulos = articulos;
-        _activos = activos;
         _proveedores = proveedores;
         _cotizaciones = cotizaciones;
         _servicio = servicio;
@@ -96,7 +93,7 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
     };
 
     protected override CrudEditorViewModelBase<Requisicion> CrearEditor(Requisicion item) =>
-        new RequisicionEditorViewModel(item, _articulos, _activos);
+        new RequisicionEditorViewModel(item, _articulos);
 
     private void Enviar()
     {
@@ -427,7 +424,6 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         : base(modulo, submodulo)
     {
         var articulos = DataSourceFactory.CrearInventario();
-        var activos = DataSourceFactory.CrearActivosFlota();
         var proveedores = DataSourceFactory.CrearProveedores();
         var requisiciones = DataSourceFactory.CrearRequisiciones();
         var cotizaciones = DataSourceFactory.CrearCotizacionesProveedor();
@@ -438,7 +434,7 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         var servicio = new ComprasService(requisiciones, cotizaciones, ordenesCompra, recepciones, articulos, stockCombustible);
 
         Requisiciones = new RequisicionesCrudViewModel(
-            requisiciones, articulos, activos, proveedores, cotizaciones, servicio, dialogos, sesion);
+            requisiciones, articulos, proveedores, cotizaciones, servicio, dialogos, sesion);
         Requisiciones.OrdenCompraCreada += (_, _) => VistaActual = VistaOrdenesCompra;
 
         OrdenesCompra = new OrdenesCompraCrudViewModel(ordenesCompra, servicio, dialogos, sesion);
