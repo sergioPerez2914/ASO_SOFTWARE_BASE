@@ -10,6 +10,12 @@ namespace ASO.Desktop.Models;
 /// un estado propio para "emitida", la entrega es un hecho externo al sistema. <c>Cerrada</c> es
 /// el estado terminal, una vez que la recepción y la factura del proveedor cotejan contra ella
 /// (ver <c>ComprasService.RevisarCotejo</c>, Fase 3).
+///
+/// Registrar la Recepción de mercancía (<see cref="RecepcionMercancia"/>) NO mueve el estado a
+/// <c>Cerrada</c> por sí sola: se marca aparte, en <see cref="OrdenCompra.RecepcionMercanciaId"/>,
+/// mismo criterio que <c>Remesa.FacturaClienteId</c> — un hecho de inventario no tiene por qué
+/// inventarle un estado propio a la máquina de otro documento. <c>Cerrada</c> sigue reservada
+/// para cuando exista el cotejo a tres vías con Cuentas por Pagar.
 /// </summary>
 public enum EstadoOrdenCompra
 {
@@ -58,6 +64,14 @@ public class OrdenCompra : IEntidad<int>, IDeOrganizacion
     public int? AprobadoPorId { get; set; }
     public DateTime? FechaAprobacion { get; set; }
     public DateTime? FechaAnulacion { get; set; }
+
+    /// <summary>Recepción de mercancía activa de esta orden (Borrador o Confirmada); null si aún
+    /// no se registró ninguna. Se limpia si esa recepción se anula — a diferencia de
+    /// FacturaClienteId, anular existe aquí para corregir y volver a registrar, no para dejar la
+    /// orden bloqueada para siempre. Mientras tenga valor, no se ofrece una segunda recepción.</summary>
+    public int? RecepcionMercanciaId { get; set; }
+
+    public bool TieneRecepcionActiva => RecepcionMercanciaId is not null;
 
     public int CreadoPorId { get; set; }
     public DateTime FechaCreacion { get; set; }

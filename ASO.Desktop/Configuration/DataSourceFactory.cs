@@ -43,6 +43,7 @@ public static class DataSourceFactory
     private static IRequisicionDataSource? _requisiciones;
     private static ICotizacionProveedorDataSource? _cotizacionesProveedor;
     private static IOrdenCompraDataSource? _ordenesCompra;
+    private static IRecepcionMercanciaDataSource? _recepcionesMercancia;
     private static IAuthService? _auth;
     private static IAjustesStore? _ajustesStore;
 
@@ -126,6 +127,9 @@ public static class DataSourceFactory
 
     public static IOrdenCompraDataSource CrearOrdenesCompra() =>
         _ordenesCompra ??= new SqlOrdenCompraDataSource();
+
+    public static IRecepcionMercanciaDataSource CrearRecepcionesMercancia() =>
+        _recepcionesMercancia ??= new SqlRecepcionMercanciaDataSource();
 
     public static IAuthService CrearAuth() =>
         _auth ??= new AuthService(CrearUsuarios());

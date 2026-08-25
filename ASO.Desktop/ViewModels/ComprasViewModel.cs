@@ -194,11 +194,18 @@ public sealed class OrdenesCompraCrudViewModel : CrudViewModelBase<OrdenCompra, 
 
         AnularCommand = new RelayCommand(Anular,
             () => SelectedItem is { } oc && _servicio.PuedeAnularOrdenCompra(oc) && _sesionActual.Puede(Permisos.OrdenCompra.Anular));
+
+        RegistrarRecepcionCommand = new RelayCommand(RegistrarRecepcion,
+            () => SelectedItem is { } oc && _servicio.PuedeRegistrarRecepcion(oc) && _sesionActual.Puede(Permisos.RecepcionMercancia.Crear));
     }
 
     public ICommand CambiarFiltroEstadoCommand { get; }
     public ICommand AprobarCommand { get; }
     public ICommand AnularCommand { get; }
+    public ICommand RegistrarRecepcionCommand { get; }
+
+    /// <summary>Se dispara al registrar una recepción, para que el contenedor cambie de pestaña.</summary>
+    public event EventHandler<int>? RecepcionCreada;
 
     protected override string ModuloPermiso => "OrdenCompra";
 
@@ -254,7 +261,138 @@ public sealed class OrdenesCompraCrudViewModel : CrudViewModelBase<OrdenCompra, 
         Aplicar(() => _servicio.AnularOrdenCompra(orden, editor.Motivo));
     }
 
+    private void RegistrarRecepcion()
+    {
+        if (SelectedItem is not { } orden)
+            return;
+
+        if (!_dialogos.Confirmar("Registrar recepción",
+                $"¿Registrar la recepción de mercancía de la orden Nº {orden.Id} a {orden.ProveedorNombre}?"))
+            return;
+
+        try
+        {
+            var recepcion = _servicio.CrearRecepcionDesdeOrdenCompra(orden, _sesionActual.UsuarioActual?.Id ?? 0);
+            SeleccionarTrasRecargar(orden.Id);
+            RecepcionCreada?.Invoke(this, recepcion.Id);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _dialogos.Informar("No se pudo registrar la recepción", ex.Message);
+        }
+    }
+
     private void Aplicar(Func<OrdenCompra> transicion)
+    {
+        try
+        {
+            SeleccionarTrasRecargar(transicion().Id);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _dialogos.Informar("No se pudo completar la operación", ex.Message);
+        }
+    }
+}
+
+/// <summary>
+/// Recepciones de mercancía de las órdenes de compra aprobadas: la que de verdad mueve
+/// inventario real. Sub-listado de Inventario · Compras; el encabezado y el conmutador los pone
+/// <see cref="ComprasViewModel"/>. Nace desde la fila de una orden de compra
+/// (<see cref="OrdenesCompraCrudViewModel.RegistrarRecepcionCommand"/>), no con un botón
+/// "Nueva…", igual que las órdenes de compra nacen desde una requisición.
+/// </summary>
+public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercancia, int>
+{
+    private const string FiltroTodas = "Todas";
+
+    private readonly IStockCombustibleDataSource _stockCombustible;
+    private readonly IServicioDialogo _dialogos;
+    private readonly ISesionActual _sesionActual;
+    private readonly ComprasService _servicio;
+
+    private string _filtroEstado = FiltroTodas;
+
+    public RecepcionesCrudViewModel(IRecepcionMercanciaDataSource recepciones,
+                                    IStockCombustibleDataSource stockCombustible,
+                                    ComprasService servicio,
+                                    IServicioDialogo dialogos,
+                                    ISesionActual sesion)
+        : base(recepciones, dialogos, sesion)
+    {
+        _stockCombustible = stockCombustible;
+        _servicio = servicio;
+        _dialogos = dialogos;
+        _sesionActual = sesion;
+
+        CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
+        {
+            _filtroEstado = filtro;
+            ItemsView.Refresh();
+        });
+
+        ConfirmarCommand = new RelayCommand(Confirmar,
+            () => SelectedItem is { } r && _servicio.PuedeConfirmarRecepcion(r) && _sesionActual.Puede(Permisos.RecepcionMercancia.Confirmar));
+
+        AnularCommand = new RelayCommand(Anular,
+            () => SelectedItem is { } r && _servicio.PuedeAnularRecepcion(r) && _sesionActual.Puede(Permisos.RecepcionMercancia.Anular));
+    }
+
+    public ICommand CambiarFiltroEstadoCommand { get; }
+    public ICommand ConfirmarCommand { get; }
+    public ICommand AnularCommand { get; }
+
+    protected override string ModuloPermiso => "RecepcionMercancia";
+
+    protected override bool CoincideBusqueda(RecepcionMercancia item, string texto) =>
+        item.ProveedorNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
+        || item.RecibidoPor.Contains(texto, StringComparison.OrdinalIgnoreCase);
+
+    protected override bool PasaFiltroExtra(RecepcionMercancia item) => _filtroEstado switch
+    {
+        "Borrador" => item.Estado == EstadoRecepcionMercancia.Borrador,
+        "Confirmada" => item.Estado == EstadoRecepcionMercancia.Confirmada,
+        "Anulada" => item.Estado == EstadoRecepcionMercancia.Anulada,
+        _ => true
+    };
+
+    protected override bool PuedeEditar(RecepcionMercancia item) => _servicio.PuedeEditarRecepcion(item);
+
+    protected override bool PuedeEliminar(RecepcionMercancia item) => _servicio.PuedeEliminarRecepcion(item);
+
+    protected override RecepcionMercancia CrearNuevo() =>
+        throw new NotSupportedException(
+            "La recepción se registra desde una orden de compra aprobada, con \"Registrar recepción\".");
+
+    protected override CrudEditorViewModelBase<RecepcionMercancia> CrearEditor(RecepcionMercancia item) =>
+        new RecepcionMercanciaEditorViewModel(item, _stockCombustible);
+
+    private void Confirmar()
+    {
+        if (SelectedItem is not { } recepcion)
+            return;
+
+        Aplicar(() => _servicio.ConfirmarRecepcion(recepcion));
+    }
+
+    private void Anular()
+    {
+        if (SelectedItem is not { } recepcion)
+            return;
+
+        var editor = new MotivoEditorViewModel(
+            $"Anular recepción Nº {recepcion.Id}",
+            $"{recepcion.ProveedorNombre} — orden de compra Nº {recepcion.OrdenCompraId}",
+            "Motivo de la anulación",
+            "Indique el motivo de la anulación.");
+
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        Aplicar(() => _servicio.AnularRecepcion(recepcion, editor.Motivo));
+    }
+
+    private void Aplicar(Func<RecepcionMercancia> transicion)
     {
         try
         {
@@ -275,6 +413,7 @@ public sealed class ComprasViewModel : PantallaViewModelBase
 {
     public const string VistaRequisiciones = "Requisiciones";
     public const string VistaOrdenesCompra = "OrdenesCompra";
+    public const string VistaRecepciones = "Recepciones";
 
     public ComprasViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, new ServicioDialogo(), SesionActual.Instancia)
@@ -293,29 +432,37 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         var requisiciones = DataSourceFactory.CrearRequisiciones();
         var cotizaciones = DataSourceFactory.CrearCotizacionesProveedor();
         var ordenesCompra = DataSourceFactory.CrearOrdenesCompra();
+        var recepciones = DataSourceFactory.CrearRecepcionesMercancia();
+        var stockCombustible = DataSourceFactory.CrearStockCombustible();
 
-        var servicio = new ComprasService(requisiciones, cotizaciones, ordenesCompra);
+        var servicio = new ComprasService(requisiciones, cotizaciones, ordenesCompra, recepciones, articulos, stockCombustible);
 
         Requisiciones = new RequisicionesCrudViewModel(
             requisiciones, articulos, activos, proveedores, cotizaciones, servicio, dialogos, sesion);
         Requisiciones.OrdenCompraCreada += (_, _) => VistaActual = VistaOrdenesCompra;
 
         OrdenesCompra = new OrdenesCompraCrudViewModel(ordenesCompra, servicio, dialogos, sesion);
+        OrdenesCompra.RecepcionCreada += (_, _) => VistaActual = VistaRecepciones;
+
+        Recepciones = new RecepcionesCrudViewModel(recepciones, stockCombustible, servicio, dialogos, sesion);
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }
 
     public RequisicionesCrudViewModel Requisiciones { get; }
     public OrdenesCompraCrudViewModel OrdenesCompra { get; }
+    public RecepcionesCrudViewModel Recepciones { get; }
 
     /// <summary>
-    /// Los dos listados, aunque solo se vea uno: armar una orden de compra desde la vista de
-    /// requisiciones tiene que dejarla disponible al conmutar, sin salir y volver a entrar.
+    /// Los tres listados, aunque solo se vea uno: armar una orden de compra o registrar una
+    /// recepción desde otra pestaña tiene que dejarla disponible al conmutar, sin salir y volver
+    /// a entrar.
     /// </summary>
     public override void Recargar()
     {
         Requisiciones.Recargar();
         OrdenesCompra.Recargar();
+        Recepciones.Recargar();
     }
 
     private string _vistaActual = VistaRequisiciones;
@@ -331,6 +478,7 @@ public sealed class ComprasViewModel : PantallaViewModelBase
 
     public bool MostrarRequisiciones => VistaActual == VistaRequisiciones;
     public bool MostrarOrdenesCompra => VistaActual == VistaOrdenesCompra;
+    public bool MostrarRecepciones => VistaActual == VistaRecepciones;
 
     public bool EsRequisiciones
     {
@@ -342,6 +490,12 @@ public sealed class ComprasViewModel : PantallaViewModelBase
     {
         get => MostrarOrdenesCompra;
         set { if (value) VistaActual = VistaOrdenesCompra; }
+    }
+
+    public bool EsRecepciones
+    {
+        get => MostrarRecepciones;
+        set { if (value) VistaActual = VistaRecepciones; }
     }
 
     public ICommand CambiarVistaCommand { get; }

@@ -49,6 +49,9 @@ public class AsoDbContext : DbContext
     public DbSet<CotizacionProveedor> CotizacionesProveedor { get; set; }
     public DbSet<OrdenCompra> OrdenesCompra { get; set; }
 
+    // Fase 12 (recepción de mercancía)
+    public DbSet<RecepcionMercancia> RecepcionesMercancia { get; set; }
+
     // Fase 6 (organización y seguridad)
     public DbSet<Organizacion> Organizaciones { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
@@ -598,6 +601,7 @@ public class AsoDbContext : DbContext
             entity.Ignore(o => o.MontoCotizadoTexto);
             entity.Ignore(o => o.LineasTexto);
             entity.Ignore(o => o.EstadoTexto);
+            entity.Ignore(o => o.TieneRecepcionActiva);
 
             entity.OwnsMany(o => o.Lineas, linea =>
             {
@@ -619,6 +623,41 @@ public class AsoDbContext : DbContext
                 linea.Ignore(x => x.CantidadTexto);
                 linea.Ignore(x => x.PrecioUnitarioTexto);
                 linea.Ignore(x => x.SubtotalTexto);
+            });
+        });
+
+        // ---- Fase 12: recepción de mercancía ----
+        modelBuilder.Entity<RecepcionMercancia>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.ProveedorNombre).HasMaxLength(150);
+            entity.Property(r => r.RecibidoPor).HasMaxLength(150);
+            entity.Property(r => r.Notas).HasMaxLength(500);
+            entity.Property(r => r.MotivoAnulacion).HasMaxLength(500);
+
+            entity.Ignore(r => r.EstadoTexto);
+            entity.Ignore(r => r.LineasTexto);
+
+            entity.OwnsMany(r => r.Lineas, linea =>
+            {
+                linea.WithOwner().HasForeignKey("RecepcionMercanciaId");
+                linea.Property<int>("Id");
+                linea.HasKey("Id");
+                linea.Property(x => x.TipoLubricante).HasMaxLength(20);
+                linea.Property(x => x.ArticuloCodigo).HasMaxLength(30);
+                linea.Property(x => x.ArticuloNombre).HasMaxLength(150);
+                linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
+                linea.Property(x => x.StockCombustibleNombre).HasMaxLength(150);
+                linea.Property(x => x.UnidadTexto).HasMaxLength(20);
+                linea.Property(x => x.CantidadPedida).HasColumnType("decimal(18,2)");
+                linea.Property(x => x.CantidadRecibida).HasColumnType("decimal(18,2)");
+
+                linea.Ignore(x => x.EsCombustible);
+                linea.Ignore(x => x.TipoInsumoTexto);
+                linea.Ignore(x => x.DestinoTexto);
+                linea.Ignore(x => x.CantidadPedidaTexto);
+                linea.Ignore(x => x.CantidadRecibidaTexto);
+                linea.Ignore(x => x.DiferenciaTexto);
             });
         });
 

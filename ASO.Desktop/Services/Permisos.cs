@@ -98,6 +98,18 @@ public static class Permisos
         public const string Anular = "OrdenCompra.Anular";
     }
 
+    /// <summary>Recepción de la mercancía de una orden de compra aprobada: mueve inventario
+    /// real. Crear se dispara desde la fila de la orden de compra ("Registrar recepción"), no
+    /// con un botón "Nueva…" — mismo criterio que OrdenCompra.Crear.</summary>
+    public static class RecepcionMercancia
+    {
+        public const string Crear = "RecepcionMercancia.Crear";
+        public const string Editar = "RecepcionMercancia.Editar";
+        public const string Eliminar = "RecepcionMercancia.Eliminar";
+        public const string Confirmar = "RecepcionMercancia.Confirmar";
+        public const string Anular = "RecepcionMercancia.Anular";
+    }
+
     public static class Empleados
     {
         public const string Crear = "Empleados.Crear";

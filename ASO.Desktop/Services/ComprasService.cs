@@ -7,28 +7,39 @@ namespace ASO.Desktop.Services;
 
 /// <summary>
 /// Reglas de negocio del flujo de compras: <c>Requisicion</c> (Borrador → Enviada → Atendida,
-/// rama Anulada) y <c>OrdenCompra</c> (Borrador → Aprobada → Cerrada, rama Anulada). Mismo
-/// contrato que <see cref="RemesaService"/>: los <c>PuedeX</c> alimentan el <c>CanExecute</c>
-/// (cortesía visual) y las transiciones vuelven a validar y lanzan si el estado no lo permite
-/// (defensa en profundidad).
+/// rama Anulada), <c>OrdenCompra</c> (Borrador → Aprobada → Cerrada, rama Anulada) y
+/// <c>RecepcionMercancia</c> (Borrador → Confirmada, rama Anulada). Mismo contrato que
+/// <see cref="RemesaService"/>: los <c>PuedeX</c> alimentan el <c>CanExecute</c> (cortesía
+/// visual) y las transiciones vuelven a validar y lanzan si el estado no lo permite (defensa en
+/// profundidad).
 ///
-/// La Recepción de mercancía y el cotejo a tres vías con Cuentas por Pagar (que cierra la orden)
-/// llegan en una fase posterior; este servicio hoy solo cubre el papeleo hasta la aprobación del
-/// gasto, sin tocar todavía ningún inventario real.
+/// Confirmar una recepción es lo que de verdad mueve inventario: suma cada línea al
+/// <see cref="StockCombustible"/> o al <see cref="InventoryItem"/> que le corresponde, por la
+/// cantidad REALMENTE recibida. El cotejo a tres vías con Cuentas por Pagar (el que cierra la
+/// orden a <c>Cerrada</c>) sigue pendiente, en una fase posterior.
 /// </summary>
 public sealed class ComprasService
 {
     private readonly IRequisicionDataSource _requisiciones;
     private readonly ICotizacionProveedorDataSource _cotizaciones;
     private readonly IOrdenCompraDataSource _ordenesCompra;
+    private readonly IRecepcionMercanciaDataSource _recepciones;
+    private readonly IInventoryDataSource _articulos;
+    private readonly IStockCombustibleDataSource _stockCombustible;
 
     public ComprasService(IRequisicionDataSource requisiciones,
                           ICotizacionProveedorDataSource cotizaciones,
-                          IOrdenCompraDataSource ordenesCompra)
+                          IOrdenCompraDataSource ordenesCompra,
+                          IRecepcionMercanciaDataSource recepciones,
+                          IInventoryDataSource articulos,
+                          IStockCombustibleDataSource stockCombustible)
     {
         _requisiciones = requisiciones;
         _cotizaciones = cotizaciones;
         _ordenesCompra = ordenesCompra;
+        _recepciones = recepciones;
+        _articulos = articulos;
+        _stockCombustible = stockCombustible;
     }
 
     // --- Requisición: reglas de transición ---
@@ -122,6 +133,10 @@ public sealed class ComprasService
 
     public bool PuedeAnularOrdenCompra(OrdenCompra oc)
         => oc.Estado is EstadoOrdenCompra.Borrador or EstadoOrdenCompra.Aprobada;
+
+    /// <summary>Solo una orden aprobada y sin recepción activa admite registrar una.</summary>
+    public bool PuedeRegistrarRecepcion(OrdenCompra oc) =>
+        oc.Estado == EstadoOrdenCompra.Aprobada && oc.RecepcionMercanciaId is null;
 
     public static bool OrdenCompraEstaCompleta(OrdenCompra orden, out string? faltantes)
     {
@@ -233,5 +248,205 @@ public sealed class ComprasService
         actualizada.FechaAnulacion = DateTime.Now;
         _ordenesCompra.Update(actualizada);
         return actualizada;
+    }
+
+    // --- Recepción de mercancía: reglas de transición ---
+
+    public bool PuedeEditarRecepcion(RecepcionMercancia r) => r.Estado == EstadoRecepcionMercancia.Borrador;
+
+    public bool PuedeEliminarRecepcion(RecepcionMercancia r) => r.Estado == EstadoRecepcionMercancia.Borrador;
+
+    public bool PuedeConfirmarRecepcion(RecepcionMercancia r) => r.Estado == EstadoRecepcionMercancia.Borrador;
+
+    public bool PuedeAnularRecepcion(RecepcionMercancia r) =>
+        r.Estado is EstadoRecepcionMercancia.Borrador or EstadoRecepcionMercancia.Confirmada;
+
+    public static bool RecepcionEstaCompleta(RecepcionMercancia r, out string? faltantes)
+    {
+        var pendientes = new List<string>();
+
+        if (r.Lineas.Count == 0)
+            pendientes.Add("al menos una línea");
+
+        if (r.Lineas.Any(l => l.CantidadRecibida < 0))
+            pendientes.Add("una cantidad recibida válida (no negativa) en cada línea");
+
+        if (r.Lineas.All(l => l.CantidadRecibida <= 0))
+            pendientes.Add("al menos una cantidad recibida mayor que cero");
+
+        if (r.Lineas.Any(l => l.TipoInsumo == TipoInsumo.Combustible
+                               && l.CantidadRecibida > 0
+                               && l.StockCombustibleId is null))
+            pendientes.Add("el stock de combustible al que se suma cada línea de combustible recibida");
+
+        faltantes = pendientes.Count == 0 ? null : string.Join(", ", pendientes);
+        return pendientes.Count == 0;
+    }
+
+    // --- Recepción de mercancía: transiciones ---
+
+    /// <summary>
+    /// Arma la recepción copiando las líneas de la orden de compra (cantidad recibida =
+    /// cantidad pedida, a corregir antes de confirmar si hubo faltante o sobrante) y marca la
+    /// orden con la recepción activa: una orden aprobada no admite dos recepciones a la vez.
+    /// </summary>
+    public RecepcionMercancia CrearRecepcionDesdeOrdenCompra(OrdenCompra orden, int creadoPorId)
+    {
+        if (!PuedeRegistrarRecepcion(orden))
+            throw new InvalidOperationException(orden.RecepcionMercanciaId is not null
+                ? $"La orden de compra Nº {orden.Id} ya tiene una recepción registrada."
+                : $"Solo se registra una recepción para una orden aprobada; esta está {orden.EstadoTexto}.");
+
+        var lineas = orden.Lineas.Select(l => new RecepcionMercanciaLinea
+        {
+            TipoInsumo = l.TipoInsumo,
+            TipoCombustibleSolicitado = l.TipoCombustibleSolicitado,
+            TipoLubricante = l.TipoLubricante,
+            ArticuloCodigo = l.ArticuloCodigo,
+            ArticuloNombre = l.ArticuloNombre,
+            ActivoId = l.ActivoId,
+            ActivoEtiqueta = l.ActivoEtiqueta,
+            CantidadPedida = l.Cantidad,
+            CantidadRecibida = l.Cantidad,      // se asume completa por defecto; se corrige en el editor
+            UnidadTexto = l.UnidadTexto
+        }).ToList();
+
+        var recepcion = new RecepcionMercancia
+        {
+            Fecha = DateTime.Today,
+            OrdenCompraId = orden.Id,
+            ProveedorId = orden.ProveedorId,
+            ProveedorNombre = orden.ProveedorNombre,
+            Estado = EstadoRecepcionMercancia.Borrador,
+            CreadoPorId = creadoPorId,
+            FechaCreacion = DateTime.Now,
+            Lineas = lineas
+        };
+
+        var agregada = _recepciones.Add(recepcion);
+
+        var ordenActualizada = orden.Clonar();
+        ordenActualizada.RecepcionMercanciaId = agregada.Id;
+        _ordenesCompra.Update(ordenActualizada);
+
+        return agregada;
+    }
+
+    /// <summary>
+    /// Confirma la recepción: suma cada línea al stock que le corresponde (StockCombustible o
+    /// InventoryItem) según lo REALMENTE recibido, no lo pedido. A partir de aquí es inmutable.
+    /// Valida todas las líneas ANTES de tocar cualquier stock, para no dejar el movimiento a
+    /// medias si una línea falla (mismo criterio que CombustibleService.Confirmar).
+    /// </summary>
+    public RecepcionMercancia ConfirmarRecepcion(RecepcionMercancia recepcion)
+    {
+        if (!PuedeConfirmarRecepcion(recepcion))
+            throw new InvalidOperationException(
+                $"Solo se puede confirmar una recepción en borrador; esta está {recepcion.EstadoTexto}.");
+
+        if (!RecepcionEstaCompleta(recepcion, out var faltantes))
+            throw new InvalidOperationException($"Faltan datos para confirmar la recepción: {faltantes}.");
+
+        var aAplicar = recepcion.Lineas.Where(l => l.CantidadRecibida > 0).ToList();
+
+        // Validación previa: nada se escribe hasta saber que todas las líneas son válidas.
+        foreach (var linea in aAplicar)
+        {
+            if (linea.TipoInsumo == TipoInsumo.Repuesto)
+            {
+                if (_articulos.GetById(linea.ArticuloCodigo!) is null)
+                    throw new InvalidOperationException(
+                        $"El artículo {linea.ArticuloCodigo} ya no existe en el catálogo de inventario.");
+            }
+            else
+            {
+                var stock = _stockCombustible.GetById(linea.StockCombustibleId!.Value)
+                    ?? throw new InvalidOperationException("El stock de combustible indicado ya no existe.");
+
+                if (stock.ExistenciaL + linea.CantidadRecibida > stock.CapacidadL)
+                    throw new InvalidOperationException(
+                        $"El stock de {stock.Nombre} tiene {stock.ExistenciaL:N2} L de {stock.CapacidadL:N2} L " +
+                        $"y no admite {linea.CantidadRecibida:N2} L más. Verifique la cantidad recibida.");
+            }
+        }
+
+        // Efecto: sumar cada línea a su stock.
+        foreach (var linea in aAplicar)
+        {
+            if (linea.TipoInsumo == TipoInsumo.Repuesto)
+            {
+                var articulo = _articulos.GetById(linea.ArticuloCodigo!)!;
+                var actualizado = articulo.Clonar();
+                actualizado.StockActual += linea.CantidadRecibida;
+                _articulos.Update(actualizado);
+            }
+            else
+            {
+                var stock = _stockCombustible.GetById(linea.StockCombustibleId!.Value)!;
+                var actualizado = stock.Clonar();
+                actualizado.ExistenciaL += linea.CantidadRecibida;
+                _stockCombustible.Update(actualizado);
+            }
+        }
+
+        var copia = recepcion.Clonar();
+        copia.Estado = EstadoRecepcionMercancia.Confirmada;
+        copia.FechaConfirmacion = DateTime.Now;
+        _recepciones.Update(copia);
+
+        return copia;
+    }
+
+    /// <summary>
+    /// Anula la recepción. Si estaba confirmada, repone (resta) lo que se había sumado a cada
+    /// stock — igual criterio que InventarioService.Anular/CombustibleService.Anular: no valida
+    /// que el stock quede en cero o negativo, porque puede haberse consumido desde entonces; es
+    /// un caso límite conocido y consistente con el resto del sistema. Libera además la orden de
+    /// compra (RecepcionMercanciaId vuelve a null) para permitir registrar una nueva recepción
+    /// si esta se anuló por un error de captura.
+    /// </summary>
+    public RecepcionMercancia AnularRecepcion(RecepcionMercancia recepcion, string motivo)
+    {
+        if (!PuedeAnularRecepcion(recepcion))
+            throw new InvalidOperationException(
+                $"No se puede anular una recepción en estado {recepcion.EstadoTexto}.");
+
+        if (string.IsNullOrWhiteSpace(motivo))
+            throw new InvalidOperationException("Debe indicar el motivo de la anulación.");
+
+        if (recepcion.Estado == EstadoRecepcionMercancia.Confirmada)
+        {
+            foreach (var linea in recepcion.Lineas.Where(l => l.CantidadRecibida > 0))
+            {
+                if (linea.TipoInsumo == TipoInsumo.Repuesto && _articulos.GetById(linea.ArticuloCodigo!) is { } articulo)
+                {
+                    var actualizado = articulo.Clonar();
+                    actualizado.StockActual -= linea.CantidadRecibida;
+                    _articulos.Update(actualizado);
+                }
+                else if (linea.TipoInsumo == TipoInsumo.Combustible && linea.StockCombustibleId is { } id
+                         && _stockCombustible.GetById(id) is { } stock)
+                {
+                    var actualizado = stock.Clonar();
+                    actualizado.ExistenciaL -= linea.CantidadRecibida;
+                    _stockCombustible.Update(actualizado);
+                }
+            }
+        }
+
+        var copia = recepcion.Clonar();
+        copia.Estado = EstadoRecepcionMercancia.Anulada;
+        copia.MotivoAnulacion = motivo.Trim();
+        copia.FechaAnulacion = DateTime.Now;
+        _recepciones.Update(copia);
+
+        if (_ordenesCompra.GetById(recepcion.OrdenCompraId) is { } orden && orden.RecepcionMercanciaId == recepcion.Id)
+        {
+            var ordenActualizada = orden.Clonar();
+            ordenActualizada.RecepcionMercanciaId = null;
+            _ordenesCompra.Update(ordenActualizada);
+        }
+
+        return copia;
     }
 }

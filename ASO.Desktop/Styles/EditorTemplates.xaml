@@ -112,6 +112,10 @@
     <views:OrdenCompraEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:RecepcionMercanciaEditorViewModel}">
+    <views:RecepcionMercanciaEditorView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:UsuarioEditorViewModel}">
     <views:UsuarioEditorView />
   </DataTemplate>
