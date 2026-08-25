@@ -26,10 +26,21 @@
 
       <StackPanel Grid.Column="0">
         <controls:FormField Etiqueta="Proveedor">
-          <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                    ItemsSource="{Binding Proveedores}"
-                    DisplayMemberPath="Etiqueta"
-                    SelectedItem="{Binding ProveedorLineaSeleccionado}" />
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ComboBox Grid.Column="0" Style="{StaticResource FormComboBoxStyle}"
+                      ItemsSource="{Binding Proveedores}"
+                      DisplayMemberPath="Etiqueta"
+                      SelectedItem="{Binding ProveedorLineaSeleccionado}" />
+
+            <Button Grid.Column="1" Style="{StaticResource BarraBotonStyle}"
+                    Content="+ Nuevo" ToolTip="Nuevo proveedor"
+                    Command="{Binding NuevoProveedorCommand}" />
+          </Grid>
         </controls:FormField>
       </StackPanel>
 

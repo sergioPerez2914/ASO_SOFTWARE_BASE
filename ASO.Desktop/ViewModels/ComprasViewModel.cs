@@ -128,7 +128,7 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
         if (SelectedItem is not { } requisicion)
             return;
 
-        var editor = new CompararProveedoresEditorViewModel(requisicion, _proveedores, _cotizaciones);
+        var editor = new CompararProveedoresEditorViewModel(requisicion, _proveedores, _cotizaciones, _dialogos, _sesionActual);
         if (!_dialogos.MostrarEditor(editor))
             return;
 

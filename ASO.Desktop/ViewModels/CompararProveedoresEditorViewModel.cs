@@ -19,16 +19,25 @@ namespace ASO.Desktop.ViewModels;
 /// </summary>
 public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
 {
+    private readonly IProveedorDataSource _proveedores;
     private readonly ICotizacionProveedorDataSource _cotizacionesFuente;
+    private readonly IServicioDialogo _dialogos;
+    private readonly ISesionActual _sesion;
 
     public CompararProveedoresEditorViewModel(Requisicion requisicion,
                                               IProveedorDataSource proveedores,
-                                              ICotizacionProveedorDataSource cotizacionesFuente)
+                                              ICotizacionProveedorDataSource cotizacionesFuente,
+                                              IServicioDialogo dialogos,
+                                              ISesionActual sesion)
     {
         Requisicion = requisicion;
+        _proveedores = proveedores;
         _cotizacionesFuente = cotizacionesFuente;
+        _dialogos = dialogos;
+        _sesion = sesion;
 
-        Proveedores = proveedores.GetAll().Where(p => p.Activo).OrderBy(p => p.Nombre).ToList();
+        Proveedores = new ObservableCollection<Proveedor>(
+            proveedores.GetAll().Where(p => p.Activo).OrderBy(p => p.Nombre));
         ProveedorLineaSeleccionado = Proveedores.FirstOrDefault();
 
         Cotizaciones = new ObservableCollection<CotizacionProveedor>(
@@ -36,6 +45,7 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
         GanadoraSeleccionada = Cotizaciones.FirstOrDefault();
 
         AgregarCotizacionCommand = new RelayCommand(AgregarCotizacion);
+        NuevoProveedorCommand = new RelayCommand(NuevoProveedor, () => _sesion.Puede(Permisos.Proveedores.Crear));
     }
 
     public override string Titulo => $"Comparar proveedores — Requisición Nº {Requisicion.Id}";
@@ -44,11 +54,23 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
 
     public Requisicion Requisicion { get; }
 
-    public IReadOnlyList<Proveedor> Proveedores { get; }
+    public ObservableCollection<Proveedor> Proveedores { get; }
 
     public ObservableCollection<CotizacionProveedor> Cotizaciones { get; }
 
     public ICommand AgregarCotizacionCommand { get; }
+    public ICommand NuevoProveedorCommand { get; }
+
+    private void NuevoProveedor()
+    {
+        var editor = new ProveedorEditorViewModel(new Proveedor(), _proveedores);
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        var nuevo = _proveedores.Add(editor.ObtenerResultado());
+        Proveedores.Add(nuevo);
+        ProveedorLineaSeleccionado = nuevo;
+    }
 
     private Proveedor? _proveedorLineaSeleccionado;
     public Proveedor? ProveedorLineaSeleccionado
