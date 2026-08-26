@@ -58,9 +58,9 @@ ASO/
 |---|---|
 | Operaciones | Registro de Operación · Seguimiento · Fincas |
 | Flota | Gestión de Flota · Mantenimiento · Telemetría *(pendiente)* |
-| Inventario | Repuestos · Combustible · Producto |
+| Inventario | Repuestos · Combustible · Producto · Compras |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios |
-| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas · Banco *(pendiente)* |
+| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas · Banco |
 
 Más cuatro secciones fijas según el rol: **Inicio**, **Peticiones**, **Administración** (usuarios
 y permisos) y **Configuración**, esta última anclada al pie del menú lateral: tema claro/oscuro,
@@ -81,9 +81,15 @@ y tablones.
 
 ## Estado del proyecto
 
-De los 15 submódulos hay 14 construidos; faltan **Flota · Telemetría** y **Finanzas · Banco**. Las entidades de dominio
+De los 17 submódulos hay 16 construidos; falta solo **Flota · Telemetría**. Las entidades de dominio
 persisten en SQL Server (EF Core Migrations) y los datos están aislados por núcleo. La matriz de
 roles y permisos está conectada: los comandos que piden un permiso ahora lo exigen de verdad.
+
+**Finanzas · Banco** es un libro interno de entradas y salidas: no se conecta con ningún banco. Los
+cobros, los pagos a proveedores y los pagos de nómina bajan solos al libro al registrarlos en su
+documento; lo que no tiene documento (comisiones, retiros, aportes) se teclea allí. Cada cuenta
+lleva su saldo inicial y cada movimiento se puede marcar como conciliado al aparecer en el
+extracto.
 
 Pendiente:
 

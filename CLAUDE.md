@@ -47,7 +47,7 @@ resumen y se despliega su lista de submódulos en el menú lateral.
 | Flota | Gestión de Flota · Mantenimiento · **Telemetría** | funcionales, salvo Telemetría (pendiente) |
 | Inventario | Repuestos · Combustible · Producto · **Compras** | funcionales |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios | funcionales |
-| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas · **Banco** | funcionales, salvo Banco (pendiente) |
+| Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas · Banco | funcionales |
 
 Además hay **cuatro módulos fijados** fuera de esa lista, sin submódulos, que se muestran en el
 menú según el permiso: **Inicio**, **Peticiones** (bandeja de solicitudes de cambio),
@@ -59,10 +59,10 @@ no es trabajo del día. La lista que sí las incluye a las cuatro es `TodosLosFi
 que usar para permisos y resolución de claves — con `Fijados`, `Ver.Configuracion` no existiría en la
 matriz y no habría forma de quitarle la sección a nadie.
 
-**De los 17 submódulos hay 15 construidos del todo; faltan Flota · Telemetría y Finanzas · Banco.**
-Banco está dado de alta en el catálogo pero cae en el marcador de posición: mostrará el estado de
-la cuenta según lo cobrado y pagado en la aplicación, y queda por decidir cómo llega el dato real
-del banco (importar el extracto, teclearlo o una interfaz contratada de banca empresas).
+**De los 17 submódulos hay 16 construidos del todo; falta solo Flota · Telemetría.**
+Banco se construyó el 2026-08-26 (ver su sección más abajo): es un libro interno de entradas y
+salidas, sin conexión con ningún banco, y la pregunta de cómo llega el extracto real quedó
+resuelta por la vía manual — se cuadra a mano con la marca de conciliado.
 Las reglas de Nómina y Finanzas se implementaron con supuestos provisionales (ver más abajo),
 porque el socio todavía no aportó tarifario real ni formatos de liquidación y factura.
 
@@ -247,6 +247,97 @@ grado, como se explica arriba. **Sigue pendiente con el socio cómo se van a ras
 presentaciones reales** (por barril/garrafa, con su propio conteo) — `StockCombustible` es un
 número general mientras tanto, ver `Models/StockCombustible.cs`.
 
+## Finanzas · Banco: el libro de entradas y salidas (2026-08-26)
+
+**El sistema no se conecta con ningún banco.** Banco es un libro interno de caja: dice cuánto
+dinero entró y salió por la aplicación, de qué cuenta, y cuánto queda. Cuadrarlo con el banco de
+verdad es lo que hace la marca de conciliado, a mano y contra el extracto en papel.
+
+Antes de esto la aplicación no sabía cuánto dinero había. Cobrar y pagar eran transiciones de
+estado dentro del propio documento —un enum y una fecha—, sin monto, sin cuenta y sin registro
+propio; el "Saldo neto" del dashboard era `porCobrar - porPagar`, la diferencia entre dos deudas,
+que no es dinero que se pueda gastar.
+
+- **`CuentaBancaria`**: banco, caja chica o divisas, cada una con su `SaldoInicial` y su
+  `FechaApertura`. **No guarda el saldo**: lo calcula `BancoService.SaldoDeLibro`, por el mismo
+  motivo que `OrdenCompra.MontoTotal` se deriva de sus líneas. Una cuenta con movimientos no se
+  borra, se desmarca `Activa`.
+- **`MovimientoBanco`** (`Estado`: Registrado → Conciliado, rama Anulado): el asiento. `Monto`
+  siempre positivo, el signo lo da `Tipo` (Entrada/Salida). Lleva `Fecha` **valor** —el día en que
+  el dinero se movió, que la elige el usuario— aparte de la fecha del documento, `Categoria`,
+  `Referencia` (cheque/transferencia) y `Origen` + `OrigenId`.
+
+**El asiento se ESCRIBE, no se deriva**, y va contra el instinto que deja el resto del código —la
+línea de tiempo de Seguimiento deriva y no guarda. Aquí no se puede por dos razones: un asiento
+necesita datos que el documento **no tiene** (a qué cuenta entró, con qué fecha valor, con qué
+referencia, si ya apareció en el extracto), y el precedente de dinero es `Tarifa` —los documentos
+copian el monto, nunca guardan solo el Id—, porque si mañana alguien corrige la factura el libro
+no puede moverse solo. Lo que sí se hereda de Seguimiento es que **el usuario nunca lo teclea dos
+veces**: cuando el asiento nace de un documento lo escribe el servicio de dominio.
+
+- **Los tres servicios de dinero reciben `BancoService` por constructor, obligatorio** (no
+  opcional: un default `null` dejaría un hueco silencioso por el que un pago no generaría
+  asiento), y escriben el movimiento en la misma operación que la transición:
+  `FacturaClienteService.RegistrarCobro`, `CuentasPorPagarService.RegistrarPago` y
+  `LiquidacionService.Pagar`, los tres con la firma `(documento, AsientoBanco, usuarioId)`. **El
+  asiento va primero** porque es el que puede rechazar: fallar después de marcar la factura
+  dejaría un documento cobrado sin rastro del dinero.
+- **`AsientoBanco`** es un `record` con `(CuentaId, Fecha, Referencia)` — exactamente lo que el
+  documento no puede responder. Lo pide **`AsientoBancoEditorViewModel`**, un solo editor para los
+  tres casos, en el mismo espíritu que `MotivoEditorViewModel` sirve a todas las anulaciones.
+  Sustituyó al `Confirmar` de sí/no que había en esos tres comandos.
+- **Anti-doble-asiento**: los tres `Registrar…` rechazan si el documento ya tiene un movimiento no
+  anulado (`GetByOrigen`), mismo patrón que `Remesa.FacturaClienteId` contra la doble facturación.
+  Si el asiento se anula, el documento puede volver a asentarse.
+- **Inmutabilidad**: un movimiento con `Origen != Manual` no se edita ni se borra desde Banco —su
+  verdad está en el documento—; solo admite conciliarse y anularse con motivo. El manual sí, y
+  solo mientras esté `Registrado`.
+- **Transferencia entre cuentas**: escribe **dos** asientos enlazados por `ContraparteId`, una
+  salida y una entrada, y anular uno anula el otro. Media transferencia haría aparecer o
+  desaparecer dinero. Sin conversión de moneda: transferir entre monedas distintas se rechaza.
+- **`SaldoCorrido` (movimiento) y `SaldoActual` (cuenta) son propiedades settable, ignoradas por
+  EF, que rellena la pantalla.** No son derivadas como el resto de las `…Texto`: dependen de toda
+  la historia de la cuenta, que una fila suelta no conoce. Y como los modelos no implementan
+  INotifyPropertyChanged, **hay que llamar a `ItemsView.Refresh()` después de recalcularlas** o la
+  tabla se queda con el valor viejo.
+- Pantalla `BancoViewModel` en Finanzas · Banco, contenedor de dos padrones (Movimientos /
+  Cuentas), mismo arquetipo que `CuentasPorPagarViewModel`. **La cuenta se elige en la pantalla, no
+  en el diálogo** (`MovimientosBancoCrudViewModel.CuentaSeleccionada`), con el criterio del frente
+  de `HorariosViewModel`; además es lo que hace que el saldo de la cabecera signifique algo. La
+  cabecera muestra **saldo de libro · conciliado · sin cuadrar**, y esa diferencia es lo que el
+  banco todavía no confirmó (un cheque girado que nadie cobró).
+- **Permisos**: `Banco.*` (Crear/Editar/Eliminar del movimiento manual, Conciliar, Anular,
+  Transferir) y `CuentasBancarias.*` para el catálogo — se llama así, y no `Cuentas.*`, para no
+  chocar con el vocabulario de Cuentas por Cobrar y por Pagar. Ninguno es solicitable y **el
+  remesero no tiene ninguno**: no entra a Finanzas. No hizo falta tocar `MatrizPermisos`: el
+  universo se arma por reflexión sobre `Permisos`, así que un permiso nuevo entra solo en
+  AdministradorNucleo y Desarrollador.
+- El dashboard de Finanzas gana el indicador **"Disponible"**, y va el primero: la cifra que se
+  puede gastar hoy, para que no se confunda con el "Saldo neto" del final.
+
+### Qué NO entra en el libro, y por qué
+
+Solo entra lo que movió caja de verdad. Son las cuatro preguntas que van a volver:
+
+1. **Vale de combustible, salida de repuestos, costo de taller** — costo devengado, no caja. Ese
+   dinero salió al pagar la factura de la compra; contarlo otra vez descuadraría el saldo para
+   siempre. `SalidaInventario.CostoTotal` e `InventoryItem.ValorTotal` son valoración de
+   existencias, no tesorería.
+2. **`RecargaCombustible.CostoTotal`** — sí es dinero que salió, pero es opcional, el proveedor es
+   texto libre y no genera `FacturaProveedor`. Como Compras corre en paralelo, derivarlo
+   arriesgaría contar el mismo gasto dos veces: queda **fuera de la derivación automática** y, si
+   se pagó de contado, se registra como movimiento manual. Se resuelve cuando la recarga genere su
+   factura de compra.
+3. **Orden de compra aprobada** — compromiso autorizado, no salida. Sigue sin crear deuda en
+   Cuentas por Pagar (el cotejo a tres vías está pendiente).
+4. **Anticipos de nómina** — se deducen del neto vía `ConceptoNomina{Tipo=Deduccion}`, pero el
+   desembolso original nunca se registró en ningún lado. Se captura como salida manual con
+   categoría Nómina.
+
+**El `SaldoInicial` de cada cuenta absorbe todo lo anterior a su `FechaApertura`**: las facturas ya
+cobradas o pagadas antes de existir el módulo no generan asiento retroactivo. Por eso un
+movimiento con fecha anterior a la apertura se rechaza — se contaría dos veces.
+
 ## Persistencia
 
 Las entidades de dominio persisten en **SQL Server vía EF Core Migrations**. Desde el 2026-08-20 no
@@ -259,7 +350,7 @@ hay mocks: `Configuration/DataSourceFactory.cs` devuelve siempre la implementaci
   `Fase8_RequisicionYOrdenCompra` → `Fase9_RenombrarCisternaAStock` →
   `Fase10_RequisicionCombustibleYUnidad` → `Fase11_MontoCotizadoYLineasOrdenCompra` →
   `Fase12_RecepcionMercancia` → `Fase13_JornadaEnFrente` → `Fase14_Lubricantes` →
-  `Fase14_OrigenDelEvento`.
+  `Fase14_OrigenDelEvento` → `Fase15_Banco`.
 - **La cadena de conexión vive solo en `appsettings.local.json`** (por máquina, en `.gitignore`).
 - **No hay claves foráneas reales** en las tablas planas: las relaciones son `int` sueltos y la
   integridad es de la aplicación, con snapshots de texto (`…Nombre`, `…Codigo`) en cada documento.
@@ -318,7 +409,7 @@ Tres roles (`Models/Rol.cs`), cada uno con un conjunto base en `Services/MatrizP
 administrador ajusta por usuario con `PermisoUsuario` (concede o revoca; **revocar gana**).
 
 Los ajustes se editan en **Administración · Usuarios**: al seleccionar un usuario, el panel de al
-lado (`PermisosDeUsuarioViewModel`) muestra los 90 permisos agrupados por módulo, marcados según lo
+lado (`PermisosDeUsuarioViewModel`) muestra los 99 permisos agrupados por módulo, marcados según lo
 que ya da su rol. La tabla `PermisosUsuario` sigue guardando **solo deltas**: al guardar, un permiso
 que vuelve a coincidir con el rol **borra** su ajuste en vez de dejar una fila que repita la matriz.
 Dos guardas: no se concede un permiso que quien edita no tiene (era una escalada real: un
@@ -327,9 +418,9 @@ propios.
 
 | Rol | Alcance |
 |---|---|
-| **Remesero** | 25 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios, Combustible y Configuración. Crea, edita y confirma; **no anula nada**, no entra a Finanzas, Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
-| **AdministradorNucleo** | Todo dentro del núcleo (89 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
-| **Desarrollador** | Los 90 permisos, y es el único que reparte su propio rol |
+| **Remesero** | 25 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios, Combustible y Configuración. Crea, edita y confirma; **no anula nada**, no entra a Finanzas (Banco incluido), Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
+| **AdministradorNucleo** | Todo dentro del núcleo (98 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
+| **Desarrollador** | Los 99 permisos, y es el único que reparte su propio rol |
 
 - **`Services/Permisos.cs`** es el catálogo de cadenas. Los de navegación llevan prefijo `Ver.` y se
   **derivan de la clave del submódulo**, así que no pueden desincronizarse al renombrar.
@@ -471,6 +562,10 @@ Lo que hace falta para cerrarlas:
 9. **Cómo se rastrean las presentaciones reales de aceite/combustible** (barril, garrafa): hoy
    `StockCombustible` es una existencia general por producto, sin envase — ver "Inventario · Compras"
    más arriba.
+10. **Tasa de cambio entre monedas.** `CuentaBancaria.Moneda` es texto libre y Banco **no
+    convierte**: no se transfiere entre cuentas de distinta moneda, y `DisponibleTotal` suma sin
+    convertir. Mientras todas las cuentas sean en bolívares la cifra es correcta; con una cuenta en
+    divisas hace falta decidir la tasa y si se consolida.
 
 ## El plan (SIGZ / ASO) — fases
 
@@ -534,6 +629,9 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
    Compras" más arriba.
 4. **Flota · Telemetría**, el único submódulo sin construir. Es también lo que permitiría desglosar el
    L/ton por máquina y frente, hoy calculado solo de forma global.
+   Con Banco construido, el otro frente natural de Finanzas es el **cotejo a tres vías**: hoy la
+   deuda con el proveedor solo existe si alguien teclea la `FacturaProveedor` a mano, así que una
+   orden de compra aprobada por 50.000 sigue siendo invisible para el libro.
 5. **Resolver las decisiones provisionales** con el socio (tarifario, formatos, turnos, presentaciones
    de aceite): ahora que la BD está conectada y no hay mocks, cada supuesto sin confirmar se
    convierte en datos reales mal cargados.
@@ -545,5 +643,5 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
    de desarrollo (2026-08-25) encontró 3 `Fincas` y 3 `Empleados` en ese estado — revisar si hay más
    antes de repartir esta build.
 
-El catálogo completo de permisos está en `Services/Permisos.cs` (90 en uso) y el reparto por rol en
+El catálogo completo de permisos está en `Services/Permisos.cs` (99 en uso) y el reparto por rol en
 `Services/MatrizPermisos.cs`.

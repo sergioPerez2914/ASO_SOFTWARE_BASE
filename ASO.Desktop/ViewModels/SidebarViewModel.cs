@@ -170,8 +170,19 @@ public sealed class SidebarViewModel : ViewModelBase
 
         _navegables = Configuracion is null ? Items : [.. Items, Configuracion];
 
+        // La caja del modulo tambien pliega: volver a pulsar el modulo que ya se esta viendo
+        // cierra su rama. Antes la unica forma de cerrarla era acertarle al chevron, un blanco
+        // de dieciseis pixeles al borde del menu, teniendo delante la fila entera.
         SeleccionarModuloCommand = new RelayCommand<ModuloNavItem>(item =>
-            NavegacionSolicitada?.Invoke(this, new NavegacionEventArgs(item.Modulo, null)));
+        {
+            if (item.EstaExpandido && item.EstaSeleccionado)
+            {
+                item.EstaExpandido = false;
+                return;
+            }
+
+            NavegacionSolicitada?.Invoke(this, new NavegacionEventArgs(item.Modulo, null));
+        });
 
         SeleccionarSubmoduloCommand = new RelayCommand<SubmoduloNavItem>(item =>
             NavegacionSolicitada?.Invoke(this, new NavegacionEventArgs(item.Modulo, item.Submodulo)));

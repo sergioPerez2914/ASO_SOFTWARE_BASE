@@ -4,6 +4,7 @@ using ASO.Desktop.BD;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASO.Desktop.Migrations
 {
     [DbContext(typeof(AsoDbContext))]
-    partial class AsoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260826192053_Fase15_Banco")]
+    partial class Fase15_Banco
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,7 +83,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivosFlota", (string)null);
+                    b.ToTable("ActivosFlota");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.ConceptoNomina", b =>
@@ -107,7 +110,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ConceptosNomina", (string)null);
+                    b.ToTable("ConceptosNomina");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.CotizacionProveedor", b =>
@@ -145,7 +148,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CotizacionesProveedor", (string)null);
+                    b.ToTable("CotizacionesProveedor");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.CuentaBancaria", b =>
@@ -232,7 +235,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Empleados", (string)null);
+                    b.ToTable("Empleados");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.EventoOperacion", b =>
@@ -270,7 +273,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventosOperacion", (string)null);
+                    b.ToTable("EventosOperacion");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.FacturaCliente", b =>
@@ -319,7 +322,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FacturasCliente", (string)null);
+                    b.ToTable("FacturasCliente");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.FacturaProveedor", b =>
@@ -381,7 +384,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FacturasProveedor", (string)null);
+                    b.ToTable("FacturasProveedor");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Finca", b =>
@@ -407,7 +410,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Fincas", (string)null);
+                    b.ToTable("Fincas");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.InventoryItem", b =>
@@ -513,7 +516,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Jornadas", (string)null);
+                    b.ToTable("Jornadas");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Liquidacion", b =>
@@ -574,7 +577,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Liquidaciones", (string)null);
+                    b.ToTable("Liquidaciones");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Lubricante", b =>
@@ -588,15 +591,15 @@ namespace ASO.Desktop.Migrations
                     b.Property<bool>("Activo")
                         .HasColumnType("bit");
 
+                    b.Property<decimal>("ExistenciaL")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("GradoViscosidad")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("MarcaLubricanteId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MarcaLubricanteNombre")
+                    b.Property<string>("Marca")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -604,22 +607,14 @@ namespace ASO.Desktop.Migrations
                     b.Property<int>("OrganizacionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Presentacion")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<string>("Tipo")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<decimal>("Unidades")
-                        .HasColumnType("decimal(18,2)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Lubricantes", (string)null);
+                    b.ToTable("Lubricantes");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.MantenimientoRegistro", b =>
@@ -684,96 +679,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MantenimientoRegistros", (string)null);
-                });
-
-            modelBuilder.Entity("ASO.Desktop.Models.MarcaLubricante", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MarcasLubricante", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Activo = true,
-                            Nombre = "PDV (PDVSA Vassa)"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Activo = true,
-                            Nombre = "Global Oil"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Activo = true,
-                            Nombre = "Mobil"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Activo = true,
-                            Nombre = "Castrol"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Activo = true,
-                            Nombre = "Chevron"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Activo = true,
-                            Nombre = "Shell"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Activo = true,
-                            Nombre = "Total"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Activo = true,
-                            Nombre = "Terpel"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Activo = true,
-                            Nombre = "Lukoil"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Activo = true,
-                            Nombre = "Mannol"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Activo = true,
-                            Nombre = "Valvoline"
-                        });
+                    b.ToTable("MantenimientoRegistros");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.MovimientoBanco", b =>
@@ -920,7 +826,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrdenesCompra", (string)null);
+                    b.ToTable("OrdenesCompra");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Organizacion", b =>
@@ -954,7 +860,7 @@ namespace ASO.Desktop.Migrations
                     b.HasIndex("Codigo")
                         .IsUnique();
 
-                    b.ToTable("Organizaciones", (string)null);
+                    b.ToTable("Organizaciones");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.PermisoUsuario", b =>
@@ -989,7 +895,7 @@ namespace ASO.Desktop.Migrations
                     b.HasIndex("UsuarioId", "Permiso")
                         .IsUnique();
 
-                    b.ToTable("PermisosUsuario", (string)null);
+                    b.ToTable("PermisosUsuario");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.PersonalCampo", b =>
@@ -1026,7 +932,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PersonalCampo", (string)null);
+                    b.ToTable("PersonalCampo");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.PeticionCambio", b =>
@@ -1102,7 +1008,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PeticionesCambio", (string)null);
+                    b.ToTable("PeticionesCambio");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Proveedor", b =>
@@ -1141,7 +1047,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Proveedores", (string)null);
+                    b.ToTable("Proveedores");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.RecargaCombustible", b =>
@@ -1190,7 +1096,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RecargasCombustible", (string)null);
+                    b.ToTable("RecargasCombustible");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.RecepcionMercancia", b =>
@@ -1249,7 +1155,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RecepcionesMercancia", (string)null);
+                    b.ToTable("RecepcionesMercancia");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.ReglaMantenimiento", b =>
@@ -1279,7 +1185,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReglasMantenimiento", (string)null);
+                    b.ToTable("ReglasMantenimiento");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Remesa", b =>
@@ -1423,7 +1329,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Remesas", (string)null);
+                    b.ToTable("Remesas");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Requisicion", b =>
@@ -1461,7 +1367,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Requisiciones", (string)null);
+                    b.ToTable("Requisiciones");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.SalidaInventario", b =>
@@ -1539,7 +1445,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SalidasInventario", (string)null);
+                    b.ToTable("SalidasInventario");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.StockCombustible", b =>
@@ -1569,7 +1475,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StockCombustible", (string)null);
+                    b.ToTable("StockCombustible");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Tarifa", b =>
@@ -1616,7 +1522,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tarifas", (string)null);
+                    b.ToTable("Tarifas");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Usuario", b =>
@@ -1661,7 +1567,7 @@ namespace ASO.Desktop.Migrations
                     b.HasIndex("NombreUsuario")
                         .IsUnique();
 
-                    b.ToTable("Usuarios", (string)null);
+                    b.ToTable("Usuarios");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.ValeCombustible", b =>
@@ -1748,12 +1654,12 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ValesCombustible", (string)null);
+                    b.ToTable("ValesCombustible");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.FacturaCliente", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.FacturaCliente.Lineas#ASO.Desktop.Models.FacturaClienteLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.FacturaClienteLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1793,7 +1699,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("FacturaClienteId");
 
-                            b1.ToTable("FacturaClienteLinea", (string)null);
+                            b1.ToTable("FacturaClienteLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("FacturaClienteId");
@@ -1804,7 +1710,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.Finca", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.Finca.Lotes#ASO.Desktop.Models.Lote", "Lotes", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.Lote", "Lotes", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1824,12 +1730,12 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("FincaId");
 
-                            b1.ToTable("Lote", (string)null);
+                            b1.ToTable("Lote");
 
                             b1.WithOwner()
                                 .HasForeignKey("FincaId");
 
-                            b1.OwnsMany("ASO.Desktop.Models.Finca.Lotes#ASO.Desktop.Models.Lote.Tablones#ASO.Desktop.Models.Tablon", "Tablones", b2 =>
+                            b1.OwnsMany("ASO.Desktop.Models.Tablon", "Tablones", b2 =>
                                 {
                                     b2.Property<int>("Id")
                                         .ValueGeneratedOnAdd()
@@ -1849,7 +1755,7 @@ namespace ASO.Desktop.Migrations
 
                                     b2.HasIndex("LoteId");
 
-                                    b2.ToTable("Tablon", (string)null);
+                                    b2.ToTable("Tablon");
 
                                     b2.WithOwner()
                                         .HasForeignKey("LoteId");
@@ -1863,7 +1769,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.Liquidacion", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.Liquidacion.Lineas#ASO.Desktop.Models.LiquidacionLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.LiquidacionLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1903,7 +1809,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("LiquidacionId");
 
-                            b1.ToTable("LiquidacionLinea", (string)null);
+                            b1.ToTable("LiquidacionLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("LiquidacionId");
@@ -1914,7 +1820,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.OrdenCompra", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.OrdenCompra.Lineas#ASO.Desktop.Models.OrdenCompraLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.OrdenCompraLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1942,27 +1848,11 @@ namespace ASO.Desktop.Migrations
                             b1.Property<decimal>("Cantidad")
                                 .HasColumnType("decimal(18,2)");
 
-                            b1.Property<string>("ClaseLubricante")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
-
-                            b1.Property<int?>("MarcaLubricanteId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("MarcaLubricanteNombre")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)");
-
                             b1.Property<int>("OrdenCompraId")
                                 .HasColumnType("int");
 
                             b1.Property<decimal>("PrecioUnitario")
                                 .HasColumnType("decimal(18,2)");
-
-                            b1.Property<string>("Presentacion")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
 
                             b1.Property<int?>("TipoCombustibleSolicitado")
                                 .HasColumnType("int");
@@ -1983,7 +1873,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("OrdenCompraId");
 
-                            b1.ToTable("OrdenCompraLinea", (string)null);
+                            b1.ToTable("OrdenCompraLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("OrdenCompraId");
@@ -1994,7 +1884,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.RecepcionMercancia", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.RecepcionMercancia.Lineas#ASO.Desktop.Models.RecepcionMercanciaLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.RecepcionMercanciaLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -2025,10 +1915,6 @@ namespace ASO.Desktop.Migrations
                             b1.Property<decimal>("CantidadRecibida")
                                 .HasColumnType("decimal(18,2)");
 
-                            b1.Property<string>("ClaseLubricante")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
-
                             b1.Property<int?>("LubricanteId")
                                 .HasColumnType("int");
 
@@ -2036,18 +1922,6 @@ namespace ASO.Desktop.Migrations
                                 .IsRequired()
                                 .HasMaxLength(150)
                                 .HasColumnType("nvarchar(150)");
-
-                            b1.Property<int?>("MarcaLubricanteId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("MarcaLubricanteNombre")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)");
-
-                            b1.Property<string>("Presentacion")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
 
                             b1.Property<int>("RecepcionMercanciaId")
                                 .HasColumnType("int");
@@ -2079,7 +1953,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("RecepcionMercanciaId");
 
-                            b1.ToTable("RecepcionMercanciaLinea", (string)null);
+                            b1.ToTable("RecepcionMercanciaLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("RecepcionMercanciaId");
@@ -2090,7 +1964,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.Requisicion", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.Requisicion.Lineas#ASO.Desktop.Models.RequisicionLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.RequisicionLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -2140,7 +2014,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("RequisicionId");
 
-                            b1.ToTable("RequisicionLinea", (string)null);
+                            b1.ToTable("RequisicionLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("RequisicionId");

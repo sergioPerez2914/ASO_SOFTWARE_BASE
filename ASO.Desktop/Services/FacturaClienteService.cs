@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ASO.Desktop.Models;
@@ -19,16 +19,25 @@ public sealed class FacturaClienteService
     private readonly IRemesaDataSource _remesas;
     private readonly TarifaService _tarifas;
     private readonly IEventoOperacionDataSource _eventos;
+    private readonly BancoService _banco;
 
+    /// <summary>
+    /// Recibe el <see cref="BancoService"/> como parámetro obligatorio, igual que ya recibía el
+    /// tarifario: cobrar una factura y anotar la entrada en el libro son la misma operación, y un
+    /// parámetro opcional dejaría un hueco silencioso por el que el dinero entraría sin aparecer
+    /// en ninguna cuenta.
+    /// </summary>
     public FacturaClienteService(IFacturaClienteDataSource facturas,
                                  IRemesaDataSource remesas,
                                  TarifaService tarifas,
-                                 IEventoOperacionDataSource eventos)
+                                 IEventoOperacionDataSource eventos,
+                                 BancoService banco)
     {
         _facturas = facturas;
         _remesas = remesas;
         _tarifas = tarifas;
         _eventos = eventos;
+        _banco = banco;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -147,10 +156,22 @@ public sealed class FacturaClienteService
         return copia;
     }
 
-    public FacturaCliente RegistrarCobro(FacturaCliente factura)
+    /// <summary>
+    /// Da la factura por cobrada y anota la entrada en el libro de banco, en una sola operación.
+    ///
+    /// El asiento va PRIMERO a propósito: es el que puede rechazar (cuenta cerrada, documento ya
+    /// asentado). Si fallara después de marcar la factura, quedaría una factura cobrada sin
+    /// rastro del dinero, que es justo lo que este módulo viene a evitar.
+    ///
+    /// <see cref="FacturaCliente.FechaCobro"/> conserva su significado de siempre —el día en que
+    /// se dio por cobrada—; la fecha valor del movimiento, que puede ser otra, vive en el asiento.
+    /// </summary>
+    public FacturaCliente RegistrarCobro(FacturaCliente factura, AsientoBanco asiento, int usuarioId)
     {
         if (!PuedeRegistrarCobro(factura))
             throw new InvalidOperationException("Solo se puede registrar el cobro de una factura emitida.");
+
+        _banco.RegistrarCobroCliente(factura, asiento, usuarioId);
 
         var copia = factura.Clonar();
         copia.Estado = EstadoFacturaCliente.Cobrada;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using ASO.Desktop.Models;
 
@@ -12,8 +12,17 @@ namespace ASO.Desktop.Services;
 public sealed class CuentasPorPagarService
 {
     private readonly IFacturaProveedorDataSource _facturas;
+    private readonly BancoService _banco;
 
-    public CuentasPorPagarService(IFacturaProveedorDataSource facturas) => _facturas = facturas;
+    /// <summary>
+    /// El <see cref="BancoService"/> es obligatorio: pagar la factura y anotar la salida en el
+    /// libro son la misma operación (ver <see cref="RegistrarPago"/>).
+    /// </summary>
+    public CuentasPorPagarService(IFacturaProveedorDataSource facturas, BancoService banco)
+    {
+        _facturas = facturas;
+        _banco = banco;
+    }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
 
@@ -71,10 +80,17 @@ public sealed class CuentasPorPagarService
         return true;
     }
 
-    public FacturaProveedor RegistrarPago(FacturaProveedor factura)
+    /// <summary>
+    /// Da la factura por pagada y anota la salida en el libro de banco, en una sola operación. El
+    /// asiento va primero porque es el que puede rechazar; ver
+    /// <see cref="FacturaClienteService.RegistrarCobro"/>.
+    /// </summary>
+    public FacturaProveedor RegistrarPago(FacturaProveedor factura, AsientoBanco asiento, int usuarioId)
     {
         if (!PuedeRegistrarPago(factura))
             throw new InvalidOperationException("Solo se puede pagar una factura pendiente.");
+
+        _banco.RegistrarPagoProveedor(factura, asiento, usuarioId);
 
         var copia = factura.Clonar();
         copia.Estado = EstadoFacturaProveedor.Pagada;

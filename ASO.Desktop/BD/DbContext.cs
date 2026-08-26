@@ -58,6 +58,10 @@ public class AsoDbContext : DbContext
     // Fase 15 (marca de lubricante)
     public DbSet<MarcaLubricante> MarcasLubricante { get; set; }
 
+    // Fase 15 (libro de banco)
+    public DbSet<CuentaBancaria> CuentasBancarias { get; set; }
+    public DbSet<MovimientoBanco> MovimientosBanco { get; set; }
+
     // Fase 6 (organización y seguridad)
     public DbSet<Organizacion> Organizaciones { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
@@ -721,6 +725,66 @@ public class AsoDbContext : DbContext
                 new MarcaLubricante { Id = 9, Nombre = "Lukoil", Activo = true },
                 new MarcaLubricante { Id = 10, Nombre = "Mannol", Activo = true },
                 new MarcaLubricante { Id = 11, Nombre = "Valvoline", Activo = true });
+        });
+
+        // --- Fase 15 (libro de banco) ---
+        //
+        // Documentos planos, sin colecciones: no hace falta SqlAgregadoDataSource ni Include.
+        // Como en el resto de las tablas planas, las relaciones son int sueltos (CuentaId,
+        // OrigenId, ContraparteId) sin clave foránea real: la integridad es de la aplicación y
+        // cada asiento lleva su snapshot de texto (CuentaNombre).
+
+        modelBuilder.Entity<CuentaBancaria>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Nombre).IsRequired().HasMaxLength(120);
+            entity.Property(c => c.Banco).HasMaxLength(120);
+            entity.Property(c => c.NumeroCuenta).HasMaxLength(40);
+            entity.Property(c => c.Moneda).IsRequired().HasMaxLength(10);
+            entity.Property(c => c.Notas).HasMaxLength(500);
+            entity.Property(c => c.SaldoInicial).HasColumnType("decimal(18,2)").IsRequired();
+
+            entity.Ignore(c => c.TipoTexto);
+            entity.Ignore(c => c.EstadoTexto);
+            entity.Ignore(c => c.NombreConMoneda);
+            entity.Ignore(c => c.SaldoActual);
+            entity.Ignore(c => c.SaldoActualTexto);
+            entity.Ignore(c => c.SaldoInicialTexto);
+            entity.Ignore(c => c.AperturaTexto);
+            entity.Ignore(c => c.DetalleTexto);
+        });
+
+        modelBuilder.Entity<MovimientoBanco>(entity =>
+        {
+            entity.HasKey(m => m.Id);
+            entity.Property(m => m.CuentaNombre).HasMaxLength(120);
+            entity.Property(m => m.Concepto).IsRequired().HasMaxLength(300);
+            entity.Property(m => m.Referencia).HasMaxLength(60);
+            entity.Property(m => m.MotivoAnulacion).HasMaxLength(500);
+            entity.Property(m => m.Monto).HasColumnType("decimal(18,2)").IsRequired();
+
+            // El extracto siempre se pide por cuenta y fecha; sin esto cada apertura de la
+            // pantalla haría un recorrido completo de la tabla, que es la que más crece.
+            entity.HasIndex(m => new { m.CuentaId, m.Fecha });
+
+            // La consulta del anti-doble-asiento: antes de escribir un cobro o un pago se
+            // comprueba que ese documento no tenga ya el suyo.
+            entity.HasIndex(m => new { m.Origen, m.OrigenId });
+
+            entity.Ignore(m => m.Efecto);
+            entity.Ignore(m => m.EsDerivado);
+            entity.Ignore(m => m.TipoTexto);
+            entity.Ignore(m => m.MontoTexto);
+            entity.Ignore(m => m.EntradaTexto);
+            entity.Ignore(m => m.SalidaTexto);
+            entity.Ignore(m => m.FechaTexto);
+            entity.Ignore(m => m.SaldoCorrido);
+            entity.Ignore(m => m.SaldoCorridoTexto);
+            entity.Ignore(m => m.EstadoTexto);
+            entity.Ignore(m => m.CategoriaTexto);
+            entity.Ignore(m => m.OrigenTexto);
+            entity.Ignore(m => m.DocumentoTexto);
+            entity.Ignore(m => m.ConciliacionTexto);
         });
 
         AplicarFiltroDeOrganizacion(modelBuilder);

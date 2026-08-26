@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
@@ -23,6 +23,7 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
     private readonly ISesionActual _sesionActual;
     private readonly FacturaClienteService _servicio;
     private readonly TarifaService _tarifas;
+    private readonly BancoService _banco;
 
     private string _filtroEstado = FiltroTodas;
 
@@ -41,8 +42,10 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
         _dialogos = dialogos;
         _sesionActual = sesion;
         _tarifas = new TarifaService(DataSourceFactory.CrearTarifas());
+        _banco = new BancoService(DataSourceFactory.CrearMovimientosBanco(),
+                                  DataSourceFactory.CrearCuentasBancarias());
         _servicio = new FacturaClienteService(facturas, DataSourceFactory.CrearRemesas(), _tarifas,
-                                              DataSourceFactory.CrearEventosOperacion());
+                                              DataSourceFactory.CrearEventosOperacion(), _banco);
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -169,16 +172,32 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
         Aplicar(() => _servicio.Emitir(factura));
     }
 
+    /// <summary>
+    /// Pregunta a qué cuenta entró el dinero y lo anota en el libro de banco, además de dar la
+    /// factura por cobrada.
+    ///
+    /// Antes esto era un Confirmar de sí/no. El paso extra no es burocracia: sin cuenta, fecha
+    /// valor y referencia, el cobro quedaba como un cambio de estado y no había forma de saber
+    /// después de qué bolsillo entró — que es justo lo que Finanzas · Banco viene a resolver.
+    /// </summary>
     private void RegistrarCobro()
     {
         if (SelectedItem is not { } factura)
             return;
 
-        if (!_dialogos.Confirmar("Registrar cobro",
-                $"¿Registrar el cobro de {factura.TotalTexto} de la factura {factura.NumeroTexto}?"))
+        var editor = new AsientoBancoEditorViewModel(
+            $"Registrar cobro de {factura.NumeroTexto}",
+            $"{factura.ClienteNombre} — {factura.RemesasTexto}",
+            factura.Total,
+            esEntrada: true,
+            _banco.CuentasActivas(),
+            "Registrar cobro");
+
+        if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(() => _servicio.RegistrarCobro(factura));
+        Aplicar(() => _servicio.RegistrarCobro(factura, editor.Resultado,
+                                               _sesionActual.UsuarioActual?.Id ?? 0));
     }
 
     private void Anular()
