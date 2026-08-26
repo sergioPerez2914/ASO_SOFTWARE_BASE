@@ -95,6 +95,10 @@
     <views:LubricanteEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:MarcaLubricanteEditorViewModel}">
+    <views:MarcaLubricanteEditorView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:JornadaEditorViewModel}">
     <views:JornadaEditorView />
   </DataTemplate>
@@ -133,10 +137,6 @@
 
   <DataTemplate DataType="{x:Type vm:CompararProveedoresEditorViewModel}">
     <views:CompararProveedoresEditorView />
-  </DataTemplate>
-
-  <DataTemplate DataType="{x:Type vm:OrdenCompraEditorViewModel}">
-    <views:OrdenCompraEditorView />
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type vm:RecepcionMercanciaEditorViewModel}">

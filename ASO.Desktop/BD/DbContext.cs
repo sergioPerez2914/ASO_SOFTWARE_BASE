@@ -55,6 +55,9 @@ public class AsoDbContext : DbContext
     // Fase 14 (catálogo de lubricantes)
     public DbSet<Lubricante> Lubricantes { get; set; }
 
+    // Fase 15 (marca de lubricante)
+    public DbSet<MarcaLubricante> MarcasLubricante { get; set; }
+
     // Fase 15 (libro de banco)
     public DbSet<CuentaBancaria> CuentasBancarias { get; set; }
     public DbSet<MovimientoBanco> MovimientosBanco { get; set; }
@@ -625,8 +628,15 @@ public class AsoDbContext : DbContext
                 linea.Property(x => x.Cantidad).HasColumnType("decimal(18,2)");
                 linea.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
 
+                linea.Property(x => x.MarcaLubricanteNombre).HasMaxLength(100);
+                linea.Property(x => x.ClaseLubricante).HasMaxLength(20);
+                linea.Property(x => x.Presentacion).HasMaxLength(20);
+
                 linea.Ignore(x => x.Subtotal);
                 linea.Ignore(x => x.TipoInsumoTexto);
+                linea.Ignore(x => x.EsCombustible);
+                linea.Ignore(x => x.EsDiesel);
+                linea.Ignore(x => x.EsLubricante);
                 linea.Ignore(x => x.DestinoTexto);
                 linea.Ignore(x => x.UnidadDestinoTexto);
                 linea.Ignore(x => x.CantidadTexto);
@@ -662,6 +672,9 @@ public class AsoDbContext : DbContext
                 linea.Property(x => x.CantidadRecibida).HasColumnType("decimal(18,2)");
 
                 linea.Property(x => x.LubricanteNombre).HasMaxLength(150);
+                linea.Property(x => x.MarcaLubricanteNombre).HasMaxLength(100);
+                linea.Property(x => x.ClaseLubricante).HasMaxLength(20);
+                linea.Property(x => x.Presentacion).HasMaxLength(20);
 
                 linea.Ignore(x => x.EsCombustible);
                 linea.Ignore(x => x.EsDiesel);
@@ -678,13 +691,40 @@ public class AsoDbContext : DbContext
         modelBuilder.Entity<Lubricante>(entity =>
         {
             entity.HasKey(l => l.Id);
-            entity.Property(l => l.Marca).IsRequired().HasMaxLength(100);
+            entity.Property(l => l.MarcaLubricanteNombre).IsRequired().HasMaxLength(100);
             entity.Property(l => l.Tipo).IsRequired().HasMaxLength(20);
             entity.Property(l => l.GradoViscosidad).IsRequired().HasMaxLength(20);
-            entity.Property(l => l.ExistenciaL).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(l => l.Presentacion).IsRequired().HasMaxLength(20);
+            entity.Property(l => l.Unidades).HasColumnType("decimal(18,2)").IsRequired();
 
             entity.Ignore(l => l.Etiqueta);
+            entity.Ignore(l => l.ExistenciaL);
             entity.Ignore(l => l.ExistenciaTexto);
+            entity.Ignore(l => l.UnidadesTexto);
+        });
+
+        // ---- Fase 15: marca de lubricante ----
+        //
+        // Sin IDeOrganizacion a propósito (ver el comentario de la clase): es catálogo de
+        // referencia universal, no dato de negocio del núcleo, y eso permite sembrarlo aquí
+        // con HasData sin necesitar una organización activa en tiempo de diseño.
+        modelBuilder.Entity<MarcaLubricante>(entity =>
+        {
+            entity.HasKey(m => m.Id);
+            entity.Property(m => m.Nombre).IsRequired().HasMaxLength(100);
+
+            entity.HasData(
+                new MarcaLubricante { Id = 1, Nombre = "PDV (PDVSA Vassa)", Activo = true },
+                new MarcaLubricante { Id = 2, Nombre = "Global Oil", Activo = true },
+                new MarcaLubricante { Id = 3, Nombre = "Mobil", Activo = true },
+                new MarcaLubricante { Id = 4, Nombre = "Castrol", Activo = true },
+                new MarcaLubricante { Id = 5, Nombre = "Chevron", Activo = true },
+                new MarcaLubricante { Id = 6, Nombre = "Shell", Activo = true },
+                new MarcaLubricante { Id = 7, Nombre = "Total", Activo = true },
+                new MarcaLubricante { Id = 8, Nombre = "Terpel", Activo = true },
+                new MarcaLubricante { Id = 9, Nombre = "Lukoil", Activo = true },
+                new MarcaLubricante { Id = 10, Nombre = "Mannol", Activo = true },
+                new MarcaLubricante { Id = 11, Nombre = "Valvoline", Activo = true });
         });
 
         // --- Fase 15 (libro de banco) ---

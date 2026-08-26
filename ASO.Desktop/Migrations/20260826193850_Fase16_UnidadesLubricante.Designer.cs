@@ -4,6 +4,7 @@ using ASO.Desktop.BD;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASO.Desktop.Migrations
 {
     [DbContext(typeof(AsoDbContext))]
-    partial class AsoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260826193850_Fase16_UnidadesLubricante")]
+    partial class Fase16_UnidadesLubricante
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,7 +83,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivosFlota", (string)null);
+                    b.ToTable("ActivosFlota");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.ConceptoNomina", b =>
@@ -107,7 +110,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ConceptosNomina", (string)null);
+                    b.ToTable("ConceptosNomina");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.CotizacionProveedor", b =>
@@ -145,60 +148,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CotizacionesProveedor", (string)null);
-                });
-
-            modelBuilder.Entity("ASO.Desktop.Models.CuentaBancaria", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activa")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Banco")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<DateTime>("FechaApertura")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Moneda")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<string>("Notas")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("NumeroCuenta")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
-
-                    b.Property<int>("OrganizacionId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("SaldoInicial")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Tipo")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CuentasBancarias");
+                    b.ToTable("CotizacionesProveedor");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Empleado", b =>
@@ -232,7 +182,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Empleados", (string)null);
+                    b.ToTable("Empleados");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.EventoOperacion", b =>
@@ -270,7 +220,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventosOperacion", (string)null);
+                    b.ToTable("EventosOperacion");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.FacturaCliente", b =>
@@ -319,7 +269,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FacturasCliente", (string)null);
+                    b.ToTable("FacturasCliente");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.FacturaProveedor", b =>
@@ -381,7 +331,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FacturasProveedor", (string)null);
+                    b.ToTable("FacturasProveedor");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Finca", b =>
@@ -407,7 +357,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Fincas", (string)null);
+                    b.ToTable("Fincas");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.InventoryItem", b =>
@@ -513,7 +463,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Jornadas", (string)null);
+                    b.ToTable("Jornadas");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Liquidacion", b =>
@@ -574,7 +524,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Liquidaciones", (string)null);
+                    b.ToTable("Liquidaciones");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Lubricante", b =>
@@ -619,7 +569,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Lubricantes", (string)null);
+                    b.ToTable("Lubricantes");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.MantenimientoRegistro", b =>
@@ -684,7 +634,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MantenimientoRegistros", (string)null);
+                    b.ToTable("MantenimientoRegistros");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.MarcaLubricante", b =>
@@ -705,7 +655,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MarcasLubricante", (string)null);
+                    b.ToTable("MarcasLubricante");
 
                     b.HasData(
                         new
@@ -776,87 +726,6 @@ namespace ASO.Desktop.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ASO.Desktop.Models.MovimientoBanco", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Categoria")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Concepto")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int?>("ConciliadoPorId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ContraparteId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CreadoPorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CuentaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CuentaNombre")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<int>("Estado")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaAnulacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaConciliacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Monto")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("MotivoAnulacion")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("OrganizacionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Origen")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("OrigenId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Referencia")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("nvarchar(60)");
-
-                    b.Property<int>("Tipo")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CuentaId", "Fecha");
-
-                    b.HasIndex("Origen", "OrigenId");
-
-                    b.ToTable("MovimientosBanco");
-                });
-
             modelBuilder.Entity("ASO.Desktop.Models.OrdenCompra", b =>
                 {
                     b.Property<int>("Id")
@@ -920,7 +789,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrdenesCompra", (string)null);
+                    b.ToTable("OrdenesCompra");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Organizacion", b =>
@@ -954,7 +823,7 @@ namespace ASO.Desktop.Migrations
                     b.HasIndex("Codigo")
                         .IsUnique();
 
-                    b.ToTable("Organizaciones", (string)null);
+                    b.ToTable("Organizaciones");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.PermisoUsuario", b =>
@@ -989,7 +858,7 @@ namespace ASO.Desktop.Migrations
                     b.HasIndex("UsuarioId", "Permiso")
                         .IsUnique();
 
-                    b.ToTable("PermisosUsuario", (string)null);
+                    b.ToTable("PermisosUsuario");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.PersonalCampo", b =>
@@ -1026,7 +895,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PersonalCampo", (string)null);
+                    b.ToTable("PersonalCampo");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.PeticionCambio", b =>
@@ -1102,7 +971,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PeticionesCambio", (string)null);
+                    b.ToTable("PeticionesCambio");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Proveedor", b =>
@@ -1141,7 +1010,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Proveedores", (string)null);
+                    b.ToTable("Proveedores");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.RecargaCombustible", b =>
@@ -1190,7 +1059,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RecargasCombustible", (string)null);
+                    b.ToTable("RecargasCombustible");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.RecepcionMercancia", b =>
@@ -1249,7 +1118,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RecepcionesMercancia", (string)null);
+                    b.ToTable("RecepcionesMercancia");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.ReglaMantenimiento", b =>
@@ -1279,7 +1148,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReglasMantenimiento", (string)null);
+                    b.ToTable("ReglasMantenimiento");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Remesa", b =>
@@ -1423,7 +1292,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Remesas", (string)null);
+                    b.ToTable("Remesas");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Requisicion", b =>
@@ -1461,7 +1330,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Requisiciones", (string)null);
+                    b.ToTable("Requisiciones");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.SalidaInventario", b =>
@@ -1539,7 +1408,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SalidasInventario", (string)null);
+                    b.ToTable("SalidasInventario");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.StockCombustible", b =>
@@ -1569,7 +1438,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StockCombustible", (string)null);
+                    b.ToTable("StockCombustible");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Tarifa", b =>
@@ -1616,7 +1485,7 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tarifas", (string)null);
+                    b.ToTable("Tarifas");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.Usuario", b =>
@@ -1661,7 +1530,7 @@ namespace ASO.Desktop.Migrations
                     b.HasIndex("NombreUsuario")
                         .IsUnique();
 
-                    b.ToTable("Usuarios", (string)null);
+                    b.ToTable("Usuarios");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.ValeCombustible", b =>
@@ -1748,12 +1617,12 @@ namespace ASO.Desktop.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ValesCombustible", (string)null);
+                    b.ToTable("ValesCombustible");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.FacturaCliente", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.FacturaCliente.Lineas#ASO.Desktop.Models.FacturaClienteLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.FacturaClienteLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1793,7 +1662,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("FacturaClienteId");
 
-                            b1.ToTable("FacturaClienteLinea", (string)null);
+                            b1.ToTable("FacturaClienteLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("FacturaClienteId");
@@ -1804,7 +1673,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.Finca", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.Finca.Lotes#ASO.Desktop.Models.Lote", "Lotes", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.Lote", "Lotes", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1824,12 +1693,12 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("FincaId");
 
-                            b1.ToTable("Lote", (string)null);
+                            b1.ToTable("Lote");
 
                             b1.WithOwner()
                                 .HasForeignKey("FincaId");
 
-                            b1.OwnsMany("ASO.Desktop.Models.Finca.Lotes#ASO.Desktop.Models.Lote.Tablones#ASO.Desktop.Models.Tablon", "Tablones", b2 =>
+                            b1.OwnsMany("ASO.Desktop.Models.Tablon", "Tablones", b2 =>
                                 {
                                     b2.Property<int>("Id")
                                         .ValueGeneratedOnAdd()
@@ -1849,7 +1718,7 @@ namespace ASO.Desktop.Migrations
 
                                     b2.HasIndex("LoteId");
 
-                                    b2.ToTable("Tablon", (string)null);
+                                    b2.ToTable("Tablon");
 
                                     b2.WithOwner()
                                         .HasForeignKey("LoteId");
@@ -1863,7 +1732,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.Liquidacion", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.Liquidacion.Lineas#ASO.Desktop.Models.LiquidacionLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.LiquidacionLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1903,7 +1772,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("LiquidacionId");
 
-                            b1.ToTable("LiquidacionLinea", (string)null);
+                            b1.ToTable("LiquidacionLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("LiquidacionId");
@@ -1914,7 +1783,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.OrdenCompra", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.OrdenCompra.Lineas#ASO.Desktop.Models.OrdenCompraLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.OrdenCompraLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -1983,7 +1852,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("OrdenCompraId");
 
-                            b1.ToTable("OrdenCompraLinea", (string)null);
+                            b1.ToTable("OrdenCompraLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("OrdenCompraId");
@@ -1994,7 +1863,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.RecepcionMercancia", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.RecepcionMercancia.Lineas#ASO.Desktop.Models.RecepcionMercanciaLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.RecepcionMercanciaLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -2079,7 +1948,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("RecepcionMercanciaId");
 
-                            b1.ToTable("RecepcionMercanciaLinea", (string)null);
+                            b1.ToTable("RecepcionMercanciaLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("RecepcionMercanciaId");
@@ -2090,7 +1959,7 @@ namespace ASO.Desktop.Migrations
 
             modelBuilder.Entity("ASO.Desktop.Models.Requisicion", b =>
                 {
-                    b.OwnsMany("ASO.Desktop.Models.Requisicion.Lineas#ASO.Desktop.Models.RequisicionLinea", "Lineas", b1 =>
+                    b.OwnsMany("ASO.Desktop.Models.RequisicionLinea", "Lineas", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -2140,7 +2009,7 @@ namespace ASO.Desktop.Migrations
 
                             b1.HasIndex("RequisicionId");
 
-                            b1.ToTable("RequisicionLinea", (string)null);
+                            b1.ToTable("RequisicionLinea");
 
                             b1.WithOwner()
                                 .HasForeignKey("RequisicionId");

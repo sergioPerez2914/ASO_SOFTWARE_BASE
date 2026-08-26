@@ -99,9 +99,17 @@ public class RecepcionMercanciaLinea
     public int? StockCombustibleId { get; set; }
     public string StockCombustibleNombre { get; set; } = string.Empty;   // snapshot
 
-    /// <summary>Marca concreta de lubricante a la que se suma la cantidad recibida. Solo aplica
-    /// cuando <see cref="TipoCombustibleSolicitado"/> es <see cref="TipoCombustible.Lubricante"/> —
-    /// la orden de compra solo decía diésel/lubricante, no una marca; eso se elige aquí.</summary>
+    /// <summary>Marca/clase/presentación, heredadas de la orden de compra que decidió qué
+    /// comprar — de solo lectura aquí, no se eligen en la recepción.</summary>
+    public int? MarcaLubricanteId { get; set; }
+    public string MarcaLubricanteNombre { get; set; } = string.Empty;   // snapshot
+    public string? ClaseLubricante { get; set; }
+    public string? Presentacion { get; set; }
+
+    /// <summary>Marca concreta de lubricante (catálogo <see cref="Lubricante"/>) a la que se
+    /// suma la cantidad recibida. Ya no lo elige el almacenista: <c>ComprasService.ConfirmarRecepcion</c>
+    /// lo resuelve solo (lo busca o lo crea) a partir de Marca+Clase+Grado, que ya vienen fijados
+    /// desde la orden de compra. Se conserva en la línea para trazabilidad y para poder anular.</summary>
     public int? LubricanteId { get; set; }
     public string LubricanteNombre { get; set; } = string.Empty;   // snapshot
 

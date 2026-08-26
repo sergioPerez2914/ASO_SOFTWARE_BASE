@@ -131,7 +131,7 @@
 
     <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
       <Grid>
-        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}" MaxHeight="420"
                   ItemsSource="{Binding ItemsView}"
                   SelectedItem="{Binding SelectedItem}">
           <DataGrid.Columns>
@@ -219,15 +219,17 @@
 
       <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
         <Grid>
-          <DataGrid x:Name="TablaLubricantes" Style="{StaticResource DataGridStyle}"
+          <DataGrid x:Name="TablaLubricantes" Style="{StaticResource DataGridStyle}" MaxHeight="480"
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>
-              <controls:ColumnaTexto Header="Marca" Binding="{Binding Marca}" Width="24*" MinWidth="120" />
-              <controls:ColumnaTexto Header="Tipo" Binding="{Binding Tipo}" Width="20*" MinWidth="110" />
-              <controls:ColumnaTexto Header="Grado" Binding="{Binding GradoViscosidad}" Width="16*" MinWidth="90" />
-              <controls:ColumnaNumero Header="Existencia" Binding="{Binding ExistenciaTexto}" Width="16*" MinWidth="94" />
-              <controls:ColumnaTexto Header="Activo" Width="12*" MinWidth="70"
+              <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="20*" MinWidth="110" />
+              <controls:ColumnaTexto Header="Tipo" Binding="{Binding Tipo}" Width="16*" MinWidth="100" />
+              <controls:ColumnaTexto Header="Grado" Binding="{Binding GradoViscosidad}" Width="13*" MinWidth="80" />
+              <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="15*" MinWidth="95" />
+              <controls:ColumnaNumero Header="Unidades" Binding="{Binding Unidades, StringFormat=N2}" Width="12*" MinWidth="80" />
+              <controls:ColumnaNumero Header="Existencia" Binding="{Binding ExistenciaTexto}" Width="14*" MinWidth="90" />
+              <controls:ColumnaTexto Header="Activo" Width="10*" MinWidth="65"
                                      Binding="{Binding Activo, StringFormat={}{0}}" />
             </DataGrid.Columns>
           </DataGrid>

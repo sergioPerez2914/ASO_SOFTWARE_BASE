@@ -14,37 +14,29 @@
     <TextBlock Text="Corrija la cantidad realmente recibida de cada línea; nace igual a lo pedido."
                Style="{StaticResource FormLabelStyle}" />
 
-    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="280"
+    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="280" IsReadOnly="False"
               ItemsSource="{Binding Lineas}" AutoGenerateColumns="False"
               CanUserAddRows="False" CanUserDeleteRows="False">
       <DataGrid.Columns>
-        <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoInsumoTexto}" Width="9*" MinWidth="90" IsReadOnly="True" />
-        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="16*" MinWidth="120" IsReadOnly="True" />
-        <controls:ColumnaNumero Header="Pedido" Binding="{Binding CantidadPedidaTexto}" Width="10*" MinWidth="86" IsReadOnly="True" />
-        <DataGridTextColumn Header="Recibido" Width="10*" MinWidth="86"
+        <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoInsumoTexto}" Width="7*" MinWidth="55" IsReadOnly="True" />
+        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="14*" MinWidth="95" IsReadOnly="True" />
+        <controls:ColumnaNumero Header="Pedido" Binding="{Binding CantidadPedidaTexto}" Width="8*" MinWidth="55" IsReadOnly="True" />
+        <DataGridTextColumn Header="Recibido" Width="8*" MinWidth="55"
                              Binding="{Binding CantidadRecibida, StringFormat=N2, UpdateSourceTrigger=LostFocus}" />
-        <controls:ColumnaTexto Header="Diferencia" Binding="{Binding DiferenciaTexto}" Width="12*" MinWidth="100" IsReadOnly="True" />
-        <DataGridTemplateColumn Header="Stock / lubricante" Width="20*" MinWidth="170">
+        <controls:ColumnaTexto Header="Diferencia" Binding="{Binding DiferenciaTexto}" Width="9*" MinWidth="65" IsReadOnly="True" />
+        <DataGridTemplateColumn Header="Stock" Width="12*" MinWidth="90">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <StackPanel Orientation="Horizontal">
-                <ComboBox ItemsSource="{Binding DataContext.StocksCombustible, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          DisplayMemberPath="Nombre" SelectedValuePath="Id"
-                          SelectedValue="{Binding StockCombustibleId, UpdateSourceTrigger=PropertyChanged}"
-                          Visibility="{Binding EsDiesel, Converter={StaticResource BoolToVis}}" />
-                <ComboBox ItemsSource="{Binding DataContext.Lubricantes, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          DisplayMemberPath="Etiqueta" SelectedValuePath="Id"
-                          SelectedValue="{Binding LubricanteId, UpdateSourceTrigger=PropertyChanged}"
-                          Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-                <Button Content="+ Nuevo" Style="{StaticResource BarraBotonStyle}" Margin="4,0,0,0"
-                        Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}"
-                        Command="{Binding DataContext.NuevoLubricanteCommand,
-                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        CommandParameter="{Binding}" />
-              </StackPanel>
+              <ComboBox ItemsSource="{Binding DataContext.StocksCombustible, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        DisplayMemberPath="Nombre" SelectedValuePath="Id"
+                        SelectedValue="{Binding StockCombustibleId, UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding EsDiesel, Converter={StaticResource BoolToVis}}" />
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
+        <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="11*" MinWidth="85" IsReadOnly="True" />
+        <controls:ColumnaTexto Header="Clase" Binding="{Binding ClaseLubricante}" Width="9*" MinWidth="65" IsReadOnly="True" />
+        <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="10*" MinWidth="75" IsReadOnly="True" />
       </DataGrid.Columns>
     </DataGrid>
 

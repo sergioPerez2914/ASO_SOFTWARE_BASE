@@ -19,6 +19,7 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
     private readonly IInventoryDataSource _articulos;
     private readonly IProveedorDataSource _proveedores;
     private readonly ICotizacionProveedorDataSource _cotizaciones;
+    private readonly IMarcaLubricanteDataSource _marcasLubricante;
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesionActual;
     private readonly ComprasService _servicio;
@@ -29,6 +30,7 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
                                       IInventoryDataSource articulos,
                                       IProveedorDataSource proveedores,
                                       ICotizacionProveedorDataSource cotizaciones,
+                                      IMarcaLubricanteDataSource marcasLubricante,
                                       ComprasService servicio,
                                       IServicioDialogo dialogos,
                                       ISesionActual sesion)
@@ -37,6 +39,7 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
         _articulos = articulos;
         _proveedores = proveedores;
         _cotizaciones = cotizaciones;
+        _marcasLubricante = marcasLubricante;
         _servicio = servicio;
         _dialogos = dialogos;
         _sesionActual = sesion;
@@ -125,14 +128,15 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
         if (SelectedItem is not { } requisicion)
             return;
 
-        var editor = new CompararProveedoresEditorViewModel(requisicion, _proveedores, _cotizaciones, _dialogos, _sesionActual);
+        var editor = new CompararProveedoresEditorViewModel(
+            requisicion, _proveedores, _cotizaciones, _marcasLubricante, _servicio, _dialogos, _sesionActual);
         if (!_dialogos.MostrarEditor(editor))
             return;
 
         try
         {
             var orden = _servicio.CrearDesdeRequisicion(
-                requisicion, editor.GanadoraSeleccionada!, _sesionActual.UsuarioActual?.Id ?? 0);
+                requisicion, editor.GanadoraSeleccionada!, [.. editor.LineasOrden], _sesionActual.UsuarioActual?.Id ?? 0);
 
             SeleccionarTrasRecargar(requisicion.Id);
             OrdenCompraCreada?.Invoke(this, orden.Id);
@@ -218,8 +222,6 @@ public sealed class OrdenesCompraCrudViewModel : CrudViewModelBase<OrdenCompra, 
         _ => true
     };
 
-    protected override bool PuedeEditar(OrdenCompra item) => _servicio.PuedeEditarOrdenCompra(item);
-
     protected override bool PuedeEliminar(OrdenCompra item) => _servicio.PuedeEliminarOrdenCompra(item);
 
     protected override OrdenCompra CrearNuevo() =>
@@ -227,7 +229,8 @@ public sealed class OrdenesCompraCrudViewModel : CrudViewModelBase<OrdenCompra, 
             "La orden de compra se arma desde una requisición enviada, con \"Armar orden de compra\".");
 
     protected override CrudEditorViewModelBase<OrdenCompra> CrearEditor(OrdenCompra item) =>
-        new OrdenCompraEditorViewModel(item);
+        throw new NotSupportedException(
+            "El detalle de la orden de compra se completa al armarla, en \"Comparar proveedores\" — aquí solo se autoriza.");
 
     private void Aprobar()
     {
@@ -304,7 +307,6 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
     private const string FiltroTodas = "Todas";
 
     private readonly IStockCombustibleDataSource _stockCombustible;
-    private readonly ILubricanteDataSource _lubricantes;
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesionActual;
     private readonly ComprasService _servicio;
@@ -313,14 +315,12 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
 
     public RecepcionesCrudViewModel(IRecepcionMercanciaDataSource recepciones,
                                     IStockCombustibleDataSource stockCombustible,
-                                    ILubricanteDataSource lubricantes,
                                     ComprasService servicio,
                                     IServicioDialogo dialogos,
                                     ISesionActual sesion)
         : base(recepciones, dialogos, sesion)
     {
         _stockCombustible = stockCombustible;
-        _lubricantes = lubricantes;
         _servicio = servicio;
         _dialogos = dialogos;
         _sesionActual = sesion;
@@ -365,7 +365,7 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
             "La recepción se registra desde una orden de compra aprobada, con \"Registrar recepción\".");
 
     protected override CrudEditorViewModelBase<RecepcionMercancia> CrearEditor(RecepcionMercancia item) =>
-        new RecepcionMercanciaEditorViewModel(item, _stockCombustible, _lubricantes, _dialogos);
+        new RecepcionMercanciaEditorViewModel(item, _stockCombustible);
 
     private void Confirmar()
     {
@@ -434,18 +434,19 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         var recepciones = DataSourceFactory.CrearRecepcionesMercancia();
         var stockCombustible = DataSourceFactory.CrearStockCombustible();
         var lubricantes = DataSourceFactory.CrearLubricantes();
+        var marcasLubricante = DataSourceFactory.CrearMarcasLubricante();
 
         var servicio = new ComprasService(
             requisiciones, cotizaciones, ordenesCompra, recepciones, articulos, stockCombustible, lubricantes);
 
         Requisiciones = new RequisicionesCrudViewModel(
-            requisiciones, articulos, proveedores, cotizaciones, servicio, dialogos, sesion);
+            requisiciones, articulos, proveedores, cotizaciones, marcasLubricante, servicio, dialogos, sesion);
         Requisiciones.OrdenCompraCreada += (_, _) => VistaActual = VistaOrdenesCompra;
 
         OrdenesCompra = new OrdenesCompraCrudViewModel(ordenesCompra, servicio, dialogos, sesion);
         OrdenesCompra.RecepcionCreada += (_, _) => VistaActual = VistaRecepciones;
 
-        Recepciones = new RecepcionesCrudViewModel(recepciones, stockCombustible, lubricantes, servicio, dialogos, sesion);
+        Recepciones = new RecepcionesCrudViewModel(recepciones, stockCombustible, servicio, dialogos, sesion);
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }

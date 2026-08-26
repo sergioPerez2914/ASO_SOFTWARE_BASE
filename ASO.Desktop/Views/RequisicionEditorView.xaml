@@ -78,7 +78,7 @@
       </StackPanel>
 
       <StackPanel Grid.Column="4">
-        <controls:FormField Etiqueta="Cantidad">
+        <controls:FormField Etiqueta="{Binding EtiquetaCantidad}">
           <TextBox Style="{StaticResource FormTextBoxStyle}"
                    Text="{Binding CantidadLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
         </controls:FormField>

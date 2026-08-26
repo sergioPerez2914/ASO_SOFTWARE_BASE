@@ -13,20 +13,31 @@ namespace ASO.Desktop.ViewModels;
 /// </summary>
 public sealed class LubricantesCrudViewModel : CrudViewModelBase<Lubricante, int>
 {
-    public LubricantesCrudViewModel(ILubricanteDataSource lubricantes, IServicioDialogo dialogos, ISesionActual sesion)
+    private readonly IMarcaLubricanteDataSource _marcasLubricante;
+    private readonly IServicioDialogo _dialogos;
+    private readonly ISesionActual _sesion;
+
+    public LubricantesCrudViewModel(ILubricanteDataSource lubricantes,
+                                    IMarcaLubricanteDataSource marcasLubricante,
+                                    IServicioDialogo dialogos,
+                                    ISesionActual sesion)
         : base(lubricantes, dialogos, sesion)
     {
+        _marcasLubricante = marcasLubricante;
+        _dialogos = dialogos;
+        _sesion = sesion;
     }
 
     protected override string ModuloPermiso => "Lubricantes";
 
     protected override bool CoincideBusqueda(Lubricante item, string texto) =>
-        item.Marca.Contains(texto, StringComparison.OrdinalIgnoreCase)
+        item.MarcaLubricanteNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
         || item.Tipo.Contains(texto, StringComparison.OrdinalIgnoreCase)
-        || item.GradoViscosidad.Contains(texto, StringComparison.OrdinalIgnoreCase);
+        || item.GradoViscosidad.Contains(texto, StringComparison.OrdinalIgnoreCase)
+        || item.Presentacion.Contains(texto, StringComparison.OrdinalIgnoreCase);
 
     protected override Lubricante CrearNuevo() => new() { Activo = true };
 
     protected override CrudEditorViewModelBase<Lubricante> CrearEditor(Lubricante item) =>
-        new LubricanteEditorViewModel(item);
+        new LubricanteEditorViewModel(item, _marcasLubricante, _dialogos, _sesion);
 }
