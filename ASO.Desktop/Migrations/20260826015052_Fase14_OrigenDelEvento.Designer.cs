@@ -4,6 +4,7 @@ using ASO.Desktop.BD;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASO.Desktop.Migrations
 {
     [DbContext(typeof(AsoDbContext))]
-    partial class AsoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260826015052_Fase14_OrigenDelEvento")]
+    partial class Fase14_OrigenDelEvento
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -522,43 +525,6 @@ namespace ASO.Desktop.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Liquidaciones");
-                });
-
-            modelBuilder.Entity("ASO.Desktop.Models.Lubricante", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("ExistenciaL")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("GradoViscosidad")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Marca")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("OrganizacionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Lubricantes");
                 });
 
             modelBuilder.Entity("ASO.Desktop.Models.MantenimientoRegistro", b =>
@@ -1777,14 +1743,6 @@ namespace ASO.Desktop.Migrations
 
                             b1.Property<decimal>("CantidadRecibida")
                                 .HasColumnType("decimal(18,2)");
-
-                            b1.Property<int?>("LubricanteId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("LubricanteNombre")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
 
                             b1.Property<int>("RecepcionMercanciaId")
                                 .HasColumnType("int");

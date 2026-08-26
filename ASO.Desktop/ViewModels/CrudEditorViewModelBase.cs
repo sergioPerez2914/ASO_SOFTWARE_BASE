@@ -55,6 +55,15 @@ public abstract class CrudEditorViewModelBase : ViewModelBase
     /// </summary>
     public virtual string TextoAccion => "Guardar";
 
+    /// <summary>
+    /// Si la ventana pinta el botón Cancelar.
+    ///
+    /// Lo pinta siempre salvo en las fichas de solo lectura, donde no hay nada que cancelar y
+    /// "Cancelar" junto a "Cerrar" son dos botones para lo mismo. Por defecto true: los editores
+    /// de alta y edición no se enteran de que esto existe.
+    /// </summary>
+    public virtual bool MuestraCancelar => true;
+
     protected CrudEditorViewModelBase()
     {
         GuardarCommand = new RelayCommand(Guardar);

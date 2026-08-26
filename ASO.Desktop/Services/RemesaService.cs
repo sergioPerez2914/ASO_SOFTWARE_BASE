@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ASO.Desktop.Models;
 
 namespace ASO.Desktop.Services;
@@ -18,8 +19,13 @@ namespace ASO.Desktop.Services;
 public sealed class RemesaService
 {
     private readonly IRemesaDataSource _source;
+    private readonly IEventoOperacionDataSource _eventos;
 
-    public RemesaService(IRemesaDataSource source) => _source = source;
+    public RemesaService(IRemesaDataSource source, IEventoOperacionDataSource eventos)
+    {
+        _source = source;
+        _eventos = eventos;
+    }
 
     public bool PuedeEditar(Remesa remesa) => remesa.Estado == EstadoRemesa.Borrador;
 
@@ -31,6 +37,88 @@ public sealed class RemesaService
         => remesa.Estado is EstadoRemesa.Borrador or EstadoRemesa.Confirmada;
 
     public bool PuedeRegistrarRecepcion(Remesa remesa) => remesa.Estado == EstadoRemesa.Confirmada;
+
+    /// <summary>
+    /// Guarda una edición del borrador dejando constancia de QUÉ cambió.
+    ///
+    /// Hasta ahora editar se escapaba por el CRUD genérico y no dejaba rastro ninguno: la remesa
+    /// no guarda fecha de modificación ni quién la tocó, así que sin este evento no había forma
+    /// de saber que el documento que se confirmó no era el que se registró.
+    /// </summary>
+    public Remesa Editar(Remesa original, Remesa editada, string autor)
+    {
+        if (!PuedeEditar(original))
+            throw new InvalidOperationException($"No se puede editar una remesa en estado {original.EstadoTexto}.");
+
+        _source.Update(editada);
+
+        var cambios = Comparar(original, editada);
+        if (cambios.Count > 0)
+        {
+            _eventos.Add(new EventoOperacion
+            {
+                RemesaId = editada.Id,
+                Tipo = TipoEventoOperacion.Edicion,
+                FechaHora = DateTime.Now,
+                Descripcion = string.Join(" · ", cambios),
+                Autor = autor,
+                OrigenId = editada.Id
+            });
+        }
+
+        return editada;
+    }
+
+    /// <summary>
+    /// Borra un borrador y barre sus eventos.
+    ///
+    /// No se publica un evento de borrado a propósito: Seguimiento se recorre por remesa, así que
+    /// una remesa que ya no existe no tiene línea de tiempo donde enseñarlo. Lo que sí hace falta
+    /// es la limpieza — las tablas son planas y no hay cascada, así que sin esto quedarían notas
+    /// y cambios de turno apuntando a un Id inexistente.
+    /// </summary>
+    public void Eliminar(Remesa remesa)
+    {
+        if (!PuedeEliminar(remesa))
+            throw new InvalidOperationException($"No se puede eliminar una remesa en estado {remesa.EstadoTexto}.");
+
+        _source.Delete(remesa.Id);
+        _eventos.EliminarDeRemesa(remesa.Id);
+    }
+
+    /// <summary>
+    /// Campos cuyo cambio merece contarse. Solo los que el editor deja tocar y significan algo
+    /// para quien lea la historia después; los Id van con su texto, que es lo legible.
+    /// </summary>
+    private static List<string> Comparar(Remesa antes, Remesa ahora)
+    {
+        var campos = new (string Etiqueta, string Antes, string Ahora)[]
+        {
+            ("Finca", antes.FincaNombre, ahora.FincaNombre),
+            ("Lote", antes.LoteNombre, ahora.LoteNombre),
+            ("Tablón", antes.TablonNombre, ahora.TablonNombre),
+            ("Cosecha", antes.TipoCosechaTexto, ahora.TipoCosechaTexto),
+            ("Operador", antes.OperadorNombre, ahora.OperadorNombre),
+            ("Tractorista", antes.TractoristaNombre, ahora.TractoristaNombre),
+            ("Chofer", antes.ChoferNombre, ahora.ChoferNombre),
+            ("Unidad", antes.VehiculoPlaca, ahora.VehiculoPlaca),
+            ("Remesero", antes.RemeseroNombre, ahora.RemeseroNombre),
+            ("Núcleo de corte", antes.NucleoCorteCodigo, ahora.NucleoCorteCodigo),
+            ("Núcleo de alza y empuje", antes.NucleoAlzaEmpujeCodigo, ahora.NucleoAlzaEmpujeCodigo),
+            ("Núcleo de transporte", antes.NucleoTransporteCodigo, ahora.NucleoTransporteCodigo),
+            ("Inicio de carga", Momento(antes.InicioCarga), Momento(ahora.InicioCarga)),
+            ("Fin de carga", Momento(antes.FinCarga), Momento(ahora.FinCarga))
+        };
+
+        return [.. campos
+            .Where(c => c.Antes != c.Ahora)
+            .Select(c => $"{c.Etiqueta}: {Vacio(c.Antes)} → {Vacio(c.Ahora)}")];
+    }
+
+    private static string Momento(DateTime valor)
+        => valor == default ? string.Empty : valor.ToString("dd/MM/yyyy HH:mm");
+
+    private static string Vacio(string valor) => valor.Length == 0 ? "(sin dato)" : valor;
 
     /// <summary>Confirma la remesa: a partir de aquí es inmutable y cuenta para la liquidación.</summary>
     public Remesa Confirmar(Remesa remesa)

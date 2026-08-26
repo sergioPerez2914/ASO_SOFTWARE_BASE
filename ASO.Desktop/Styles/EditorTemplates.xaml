@@ -23,6 +23,11 @@
     <views:NotaEditorView />
   </DataTemplate>
 
+  <!-- La unica de solo lectura: no guarda nada y oculta Cancelar (ver MuestraCancelar). -->
+  <DataTemplate DataType="{x:Type vm:DetalleEventoViewModel}">
+    <views:DetalleEventoView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:ActivoEditorViewModel}">
     <views:ActivoEditorView />
   </DataTemplate>

@@ -84,7 +84,8 @@ public sealed class MantenimientoService
             _activos.Update(actualizado);
         }
 
-        // 3. Publicar el evento en el seguimiento de la remesa vinculada.
+        // 3. Publicar el evento en el seguimiento de la remesa vinculada. Lleva el Id del
+        //    registro guardado para que la ficha del evento pueda abrir el trabajo completo.
         if (registro.RemesaId is { } idRemesa)
         {
             _eventos.Add(new EventoOperacion
@@ -92,7 +93,9 @@ public sealed class MantenimientoService
                 RemesaId = idRemesa,
                 Tipo = TipoEventoOperacion.Mantenimiento,
                 FechaHora = registro.Fecha,
-                Descripcion = $"{registro.TipoTexto} de {registro.ActivoEtiqueta}: {registro.Descripcion}"
+                Descripcion = $"{registro.TipoTexto} de {registro.ActivoEtiqueta}: {registro.Descripcion}",
+                Autor = guardado.RealizadoPor,
+                OrigenId = guardado.Id
             });
         }
 

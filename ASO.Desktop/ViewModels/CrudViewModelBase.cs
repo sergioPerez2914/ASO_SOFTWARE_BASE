@@ -104,7 +104,12 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
         _idASeleccionar = agregado.Id;
     }
 
-    private void Editar()
+    /// <summary>
+    /// Guarda la edición directo contra la fuente. Las pantallas cuyo documento tiene servicio de
+    /// dominio lo redefinen para pasar por él: aquí no hay validación de estado ni constancia de
+    /// lo que cambió.
+    /// </summary>
+    protected virtual void Editar()
     {
         if (SelectedItem is not { } actual)
             return;
@@ -118,7 +123,11 @@ public abstract class CrudViewModelBase<T, TId> : ViewModelBase where T : IEntid
         _idASeleccionar = actualizado.Id;
     }
 
-    private void Eliminar()
+    /// <summary>
+    /// Borra la fila tras confirmar. Se redefine cuando borrar arrastra algo más —lo que cuelga
+    /// del documento en otras tablas, que aquí no se conoce.
+    /// </summary>
+    protected virtual void Eliminar()
     {
         if (SelectedItem is not { } actual)
             return;

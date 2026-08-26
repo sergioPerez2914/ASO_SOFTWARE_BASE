@@ -9,4 +9,12 @@ public class SqlEventoOperacionDataSource : SqlCrudDataSource<EventoOperacion, i
 {
     public IEnumerable<EventoOperacion> GetByRemesa(int remesaId)
         => Consultar(q => q.Where(e => e.RemesaId == remesaId));
+
+    public void EliminarDeRemesa(int remesaId)
+    {
+        using var context = new AsoDbContext();
+        context.EventosOperacion.RemoveRange(
+            context.EventosOperacion.Where(e => e.RemesaId == remesaId));
+        context.SaveChanges();
+    }
 }

@@ -32,7 +32,12 @@ public sealed class SeguimientoViewModel : PantallaViewModelBase
     public SeguimientoViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo,
                DataSourceFactory.CrearRemesas(),
-               DataSourceFactory.CrearEventosOperacion(),
+               new SeguimientoService(DataSourceFactory.CrearEventosOperacion(),
+                                      DataSourceFactory.CrearFacturasCliente(),
+                                      DataSourceFactory.CrearLiquidaciones(),
+                                      DataSourceFactory.CrearPeticiones(),
+                                      DataSourceFactory.CrearJornadas(),
+                                      DataSourceFactory.CrearMantenimientos()),
                new ServicioDialogo(),
                SesionActual.Instancia)
     {
@@ -41,13 +46,13 @@ public sealed class SeguimientoViewModel : PantallaViewModelBase
     private SeguimientoViewModel(Modulo modulo,
                                  Submodulo submodulo,
                                  IRemesaDataSource remesas,
-                                 IEventoOperacionDataSource eventos,
+                                 SeguimientoService servicio,
                                  IServicioDialogo dialogos,
                                  ISesionActual sesion)
         : base(modulo, submodulo)
     {
         _remesas = remesas;
-        _servicio = new SeguimientoService(eventos);
+        _servicio = servicio;
         _dialogos = dialogos;
         _sesion = sesion;
 
@@ -58,7 +63,10 @@ public sealed class SeguimientoViewModel : PantallaViewModelBase
             new SortDescription(nameof(Remesa.InicioCarga), ListSortDirection.Descending));
 
         AgregarNotaCommand = new RelayCommand(AgregarNota,
-            () => RemesaSeleccionada is not null && _sesion.Puede("Seguimiento.AgregarNota"));
+            () => RemesaSeleccionada is not null && _sesion.Puede(Permisos.Seguimiento.AgregarNota));
+
+        // Consultar la ficha no pide permiso: quien puede ver el submódulo puede leer su historia.
+        VerDetalleEventoCommand = new RelayCommand<EventoTimelineItem>(VerDetalleEvento);
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -71,6 +79,7 @@ public sealed class SeguimientoViewModel : PantallaViewModelBase
 
     public ICommand AgregarNotaCommand { get; }
     public ICommand CambiarFiltroEstadoCommand { get; }
+    public ICommand VerDetalleEventoCommand { get; }
 
     public ObservableCollection<Remesa> Remesas { get; }
     public ICollectionView RemesasView { get; }
@@ -157,6 +166,16 @@ public sealed class SeguimientoViewModel : PantallaViewModelBase
         }
 
         ReconstruirTimeline();
+    }
+
+    /// <summary>Abre la ficha del evento con los datos del documento que lo originó.</summary>
+    private void VerDetalleEvento(EventoTimelineItem? item)
+    {
+        if (item is null || RemesaSeleccionada is not { } remesa)
+            return;
+
+        var datos = _servicio.ObtenerDetalle(item.Evento, remesa);
+        _dialogos.MostrarEditor(new DetalleEventoViewModel(item.Evento, datos));
     }
 
     private void ReconstruirTimeline()

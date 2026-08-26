@@ -141,6 +141,21 @@ y **contenedor de dos padrones** (`EmpleadosViewModel`, `CuentasPorPagarViewMode
   `FlotaService` recibe los vales por constructor opcional y los suma al historial de uso.
 - **Registros de solo inserción**: las jornadas de trabajo no se editan ni se borran (`HorarioService`);
   de esas horas sale un pago, y el criterio favorece la futura sincronización offline.
+- **La línea de tiempo de Seguimiento tiene tres orígenes**: eventos derivados de la propia
+  remesa, eventos derivados de los documentos que la citan (su factura, las liquidaciones que la
+  computaron, las peticiones de cambio sobre ella) y eventos almacenados. Derivar es siempre la
+  primera opción: no necesita tabla ni escritura y no se puede desincronizar. Solo se almacena lo
+  que no deja huella en ningún documento — cambios de turno, mantenimientos, notas, ediciones del
+  borrador y la liberación al anular una factura, que borra el campo que la delataba.
+  - `EventoOperacion.OrigenId` guarda el Id del documento que lo originó, para abrir su ficha
+    desde la línea de tiempo. No lleva el tipo: `Tipo` ya lo dice.
+  - **Los miembros de `TipoEventoOperacion` se añaden SIEMPRE al final**: se persisten como `int`
+    y declarar uno en medio reinterpretaría las filas guardadas. El orden de lectura lo da
+    `OrdenCicloVida`, no la declaración. Los `switch` del modelo no llevan arco de descarte a
+    propósito, para que olvidarse de mapear un tipo nuevo dé un aviso del compilador en vez de
+    disfrazarlo de otro evento; por eso silencian CS8524 con un `#pragma`.
+  - Combustible y repuestos **no** pueden llegar a la timeline: `ValeCombustible` y
+    `SalidaInventario` se vinculan al activo, no a la remesa.
 - **La jornada de campo se ficha contra una remesa** (`JornadaTrabajo.RemesaId`, obligatorio solo
   para `TipoPersonal.Campo`): al abrirla y al cerrarla, `HorarioService` publica un evento
   `CambioTurno` en la línea de tiempo de ese frente. El frente **se elige en la pantalla, no en el
@@ -243,7 +258,8 @@ hay mocks: `Configuration/DataSourceFactory.cs` devuelve siempre la implementaci
   `FixStockActualStockMinimoDecimal` → `Fase6_OrganizacionYSeguridad` → `Fase7_NucleoUnico` →
   `Fase8_RequisicionYOrdenCompra` → `Fase9_RenombrarCisternaAStock` →
   `Fase10_RequisicionCombustibleYUnidad` → `Fase11_MontoCotizadoYLineasOrdenCompra` →
-  `Fase12_RecepcionMercancia` → `Fase13_JornadaEnFrente` → `Fase14_Lubricantes`.
+  `Fase12_RecepcionMercancia` → `Fase13_JornadaEnFrente` → `Fase14_Lubricantes` →
+  `Fase14_OrigenDelEvento`.
 - **La cadena de conexión vive solo en `appsettings.local.json`** (por máquina, en `.gitignore`).
 - **No hay claves foráneas reales** en las tablas planas: las relaciones son `int` sueltos y la
   integridad es de la aplicación, con snapshots de texto (`…Nombre`, `…Codigo`) en cada documento.
