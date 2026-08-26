@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -235,21 +235,32 @@ public sealed class ModuloDashboardViewModel : ViewModelBase, IRecargable
 
     private static IReadOnlyList<Indicador> CalcularFinanzas()
     {
+        var banco = new BancoService(DataSourceFactory.CrearMovimientosBanco(),
+                                     DataSourceFactory.CrearCuentasBancarias());
+
         var cobrar = new FacturaClienteService(
             DataSourceFactory.CrearFacturasCliente(),
             DataSourceFactory.CrearRemesas(),
             new TarifaService(DataSourceFactory.CrearTarifas()),
-            DataSourceFactory.CrearEventosOperacion());
+            DataSourceFactory.CrearEventosOperacion(),
+            banco);
 
-        var pagar = new CuentasPorPagarService(DataSourceFactory.CrearFacturasProveedor());
+        var pagar = new CuentasPorPagarService(DataSourceFactory.CrearFacturasProveedor(), banco);
 
         var porCobrar = cobrar.TotalPorCobrar();
         var porPagar = pagar.TotalPorPagar();
         var vencido = cobrar.TotalVencido() + pagar.TotalVencido();
         var saldo = porCobrar - porPagar;
+        var disponible = banco.DisponibleTotal();
 
         return
         [
+            // "Disponible" va PRIMERO y "Saldo neto" al final a propósito: son dos cifras que se
+            // parecen y significan cosas muy distintas. Disponible es dinero que se puede gastar
+            // hoy; el saldo neto es la diferencia entre dos deudas, y hasta que existió el libro
+            // de banco era lo único que había, con el riesgo de leerlo como si fuera caja.
+            new Indicador("Disponible", $"{disponible:N2}", "en las cuentas del centro",
+                disponible <= 0 ? EstadoIndicador.Atencion : EstadoIndicador.Normal),
             new Indicador("Por cobrar", $"{porCobrar:N2}", "facturado al ingenio"),
             new Indicador("Por pagar", $"{porPagar:N2}", "deuda con proveedores"),
             // Cualquier cifra vencida es dinero fuera de plazo, en un sentido o en el otro.

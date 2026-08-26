@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
@@ -23,6 +23,7 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesionActual;
     private readonly LiquidacionService _servicio;
+    private readonly BancoService _banco;
 
     private string _filtroEstado = FiltroTodas;
 
@@ -41,13 +42,17 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
         _dialogos = dialogos;
         _sesionActual = sesion;
 
+        _banco = new BancoService(DataSourceFactory.CrearMovimientosBanco(),
+                                  DataSourceFactory.CrearCuentasBancarias());
+
         _servicio = new LiquidacionService(
             liquidaciones,
             DataSourceFactory.CrearRemesas(),
             new TarifaService(DataSourceFactory.CrearTarifas()),
             new HorarioService(DataSourceFactory.CrearJornadas(),
                                DataSourceFactory.CrearEventosOperacion(),
-                               DataSourceFactory.CrearRemesas()));
+                               DataSourceFactory.CrearRemesas()),
+            _banco);
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -208,11 +213,19 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
         if (SelectedItem is not { } liquidacion)
             return;
 
-        if (!_dialogos.Confirmar("Registrar pago",
-                $"¿Registrar el pago de {liquidacion.NetoTexto} a {liquidacion.SujetoTexto}?"))
+        var editor = new AsientoBancoEditorViewModel(
+            $"Registrar pago de la liquidación Nº {liquidacion.Id}",
+            $"{liquidacion.SujetoTexto} — {liquidacion.PeriodoTexto}",
+            liquidacion.Neto,
+            esEntrada: false,
+            _banco.CuentasActivas(),
+            "Registrar pago");
+
+        if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(() => _servicio.Pagar(liquidacion));
+        Aplicar(() => _servicio.Pagar(liquidacion, editor.Resultado,
+                                      _sesionActual.UsuarioActual?.Id ?? 0));
     }
 
     private void Anular()

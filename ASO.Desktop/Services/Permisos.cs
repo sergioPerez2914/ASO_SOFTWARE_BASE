@@ -1,4 +1,4 @@
-namespace ASO.Desktop.Services;
+﻿namespace ASO.Desktop.Services;
 
 /// <summary>
 /// Catalogo de los permisos que existen, en formato "Modulo.Accion".
@@ -183,6 +183,34 @@ public static class Permisos
         public const string RegistrarCobro = "Finanzas.RegistrarCobro";
         public const string Pagar = "Finanzas.Pagar";
         public const string Anular = "Finanzas.Anular";
+    }
+
+    /// <summary>
+    /// El libro de banco: los movimientos que se teclean a mano. Los que nacen de un cobro o un
+    /// pago no piden permiso propio — ya los guarda <see cref="Finanzas.RegistrarCobro"/>,
+    /// <see cref="Finanzas.Pagar"/> y <see cref="Nomina.Pagar"/>, y exigir otro más dejaría
+    /// pagar la factura sin que el dinero apareciera en el libro.
+    /// </summary>
+    public static class Banco
+    {
+        public const string Crear = "Banco.Crear";
+        public const string Editar = "Banco.Editar";
+        public const string Eliminar = "Banco.Eliminar";
+        public const string Conciliar = "Banco.Conciliar";
+        public const string Anular = "Banco.Anular";
+        public const string Transferir = "Banco.Transferir";
+    }
+
+    /// <summary>
+    /// El catálogo de cuentas del centro. Se llama "CuentasBancarias" y no "Cuentas" para no
+    /// chocar con el vocabulario de Cuentas por Cobrar y por Pagar: es la misma clase de
+    /// colisión que obligó a separar FacturasCliente, FacturasProveedor y Proveedores.
+    /// </summary>
+    public static class CuentasBancarias
+    {
+        public const string Crear = "CuentasBancarias.Crear";
+        public const string Editar = "CuentasBancarias.Editar";
+        public const string Eliminar = "CuentasBancarias.Eliminar";
     }
 
     public static class Tarifas

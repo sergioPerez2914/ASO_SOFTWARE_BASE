@@ -171,6 +171,7 @@ public partial class MainWindow : Window
             ["Finanzas.Tarifas"] = (m, s) => new TarifasViewModel(m, s),
             ["Finanzas.CuentasPorCobrar"] = (m, s) => new CuentasPorCobrarViewModel(m, s),
             ["Finanzas.CuentasPorPagar"] = (m, s) => new CuentasPorPagarViewModel(m, s),
+            ["Finanzas.Banco"] = (m, s) => new BancoViewModel(m, s),
         };
 
     private object CrearVistaModulo(Modulo modulo)

@@ -358,6 +358,42 @@
     </Style.Triggers>
   </Style>
 
+  <!-- Chip de estado de un movimiento de banco. "Conciliado" es el estado bueno —el banco ya lo
+       confirmó—, así que se lleva el verde; "Registrado" queda en azul de información, que es lo
+       que es: anotado y todavía sin cuadrar contra el extracto. -->
+  <Style x:Key="ChipEstadoMovimientoBancoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoMovimientoBanco.Registrado}">
+        <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoMovimientoBanco.Conciliado}">
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoMovimientoBanco.Anulado}">
+        <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
+  <!-- Chip Activa/Cerrada de una cuenta. No reutiliza ChipActivoStyle porque aquel se enlaza a
+       "Activo" y la cuenta dice "Activa"; renombrar la propiedad del modelo por un estilo habría
+       sido la cola meneando al perro. -->
+  <Style x:Key="ChipCuentaActivaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Activa}" Value="True">
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
   <!-- Chip de estado de una requisición -->
   <Style x:Key="ChipEstadoRequisicionStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>

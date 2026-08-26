@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ASO.Desktop.Models;
@@ -21,16 +21,23 @@ public sealed class LiquidacionService
     private readonly IRemesaDataSource _remesas;
     private readonly TarifaService _tarifas;
     private readonly HorarioService _horarios;
+    private readonly BancoService _banco;
 
+    /// <summary>
+    /// El <see cref="BancoService"/> es obligatorio: la nómina es la salida de caja más grande
+    /// del centro y no puede pagarse sin dejar rastro en el libro (ver <see cref="Pagar"/>).
+    /// </summary>
     public LiquidacionService(ILiquidacionDataSource liquidaciones,
                               IRemesaDataSource remesas,
                               TarifaService tarifas,
-                              HorarioService horarios)
+                              HorarioService horarios,
+                              BancoService banco)
     {
         _liquidaciones = liquidaciones;
         _remesas = remesas;
         _tarifas = tarifas;
         _horarios = horarios;
+        _banco = banco;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -223,10 +230,20 @@ public sealed class LiquidacionService
         return copia;
     }
 
-    public Liquidacion Pagar(Liquidacion liquidacion)
+    /// <summary>
+    /// Paga la liquidación y anota la salida en el libro de banco, en una sola operación. El
+    /// monto que sale de caja es el NETO: lo devengado menos las deducciones, que es lo que de
+    /// verdad se entrega.
+    ///
+    /// El asiento va primero porque es el que puede rechazar; ver
+    /// <see cref="FacturaClienteService.RegistrarCobro"/>.
+    /// </summary>
+    public Liquidacion Pagar(Liquidacion liquidacion, AsientoBanco asiento, int usuarioId)
     {
         if (!PuedePagar(liquidacion))
             throw new InvalidOperationException("Solo se puede pagar una liquidación cerrada.");
+
+        _banco.RegistrarPagoLiquidacion(liquidacion, asiento, usuarioId);
 
         var copia = liquidacion.Clonar();
         copia.Estado = EstadoLiquidacion.Pagada;

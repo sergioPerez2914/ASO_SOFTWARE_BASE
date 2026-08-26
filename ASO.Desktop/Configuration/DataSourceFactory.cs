@@ -1,4 +1,4 @@
-using ASO.Desktop.BD;
+﻿using ASO.Desktop.BD;
 using ASO.Desktop.Services;
 
 namespace ASO.Desktop.Configuration;
@@ -45,6 +45,8 @@ public static class DataSourceFactory
     private static ICotizacionProveedorDataSource? _cotizacionesProveedor;
     private static IOrdenCompraDataSource? _ordenesCompra;
     private static IRecepcionMercanciaDataSource? _recepcionesMercancia;
+    private static ICuentaBancariaDataSource? _cuentasBancarias;
+    private static IMovimientoBancoDataSource? _movimientosBanco;
     private static IAuthService? _auth;
     private static IAjustesStore? _ajustesStore;
 
@@ -134,6 +136,12 @@ public static class DataSourceFactory
 
     public static IRecepcionMercanciaDataSource CrearRecepcionesMercancia() =>
         _recepcionesMercancia ??= new SqlRecepcionMercanciaDataSource();
+
+    public static ICuentaBancariaDataSource CrearCuentasBancarias() =>
+        _cuentasBancarias ??= new SqlCuentaBancariaDataSource();
+
+    public static IMovimientoBancoDataSource CrearMovimientosBanco() =>
+        _movimientosBanco ??= new SqlMovimientoBancoDataSource();
 
     public static IAuthService CrearAuth() =>
         _auth ??= new AuthService(CrearUsuarios());

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
 using ASO.Desktop.Models;
@@ -19,6 +19,7 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesionActual;
     private readonly CuentasPorPagarService _servicio;
+    private readonly BancoService _banco;
 
     private string _filtroEstado = FiltroTodas;
 
@@ -31,7 +32,9 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
         _proveedores = proveedores;
         _dialogos = dialogos;
         _sesionActual = sesion;
-        _servicio = new CuentasPorPagarService(facturas);
+        _banco = new BancoService(DataSourceFactory.CrearMovimientosBanco(),
+                                  DataSourceFactory.CrearCuentasBancarias());
+        _servicio = new CuentasPorPagarService(facturas, _banco);
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -86,16 +89,29 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
     protected override CrudEditorViewModelBase<FacturaProveedor> CrearEditor(FacturaProveedor item) =>
         new FacturaProveedorEditorViewModel(item, _proveedores, _servicio);
 
+    /// <summary>
+    /// Pregunta de qué cuenta salió el dinero y lo anota en el libro de banco, además de dar la
+    /// factura por pagada. Ver <see cref="CuentasPorCobrarViewModel"/> para por qué sustituyó al
+    /// Confirmar de sí/no que había antes.
+    /// </summary>
     private void RegistrarPago()
     {
         if (SelectedItem is not { } factura)
             return;
 
-        if (!_dialogos.Confirmar("Registrar pago",
-                $"¿Registrar el pago de {factura.MontoTexto} a {factura.ProveedorNombre}?"))
+        var editor = new AsientoBancoEditorViewModel(
+            $"Registrar pago de la factura Nº {factura.NumeroDocumento}",
+            $"{factura.ProveedorNombre} — {factura.Descripcion}",
+            factura.Monto,
+            esEntrada: false,
+            _banco.CuentasActivas(),
+            "Registrar pago");
+
+        if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(() => _servicio.RegistrarPago(factura));
+        Aplicar(() => _servicio.RegistrarPago(factura, editor.Resultado,
+                                              _sesionActual.UsuarioActual?.Id ?? 0));
     }
 
     private void Anular()

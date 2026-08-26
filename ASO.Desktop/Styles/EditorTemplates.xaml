@@ -57,6 +57,24 @@
   </DataTemplate>
 
   <!-- Editor genérico de motivo: lo reutilizan todas las anulaciones -->
+  <!-- Finanzas · Banco -->
+
+  <DataTemplate DataType="{x:Type vm:AsientoBancoEditorViewModel}">
+    <views:AsientoBancoEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:MovimientoBancoEditorViewModel}">
+    <views:MovimientoBancoEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:CuentaBancariaEditorViewModel}">
+    <views:CuentaBancariaEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:TransferenciaEditorViewModel}">
+    <views:TransferenciaEditorView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:MotivoEditorViewModel}">
     <views:MotivoEditorView />
   </DataTemplate>
