@@ -88,7 +88,7 @@
 
       <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
         <Grid>
-          <DataGrid x:Name="Tabla1" Style="{StaticResource DataGridStyle}"
+          <DataGrid x:Name="Tabla1" Style="{StaticResource DataGridStyle}" MaxHeight="480"
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>
@@ -174,7 +174,7 @@
 
       <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
         <Grid>
-          <DataGrid x:Name="Tabla2" Style="{StaticResource DataGridStyle}"
+          <DataGrid x:Name="Tabla2" Style="{StaticResource DataGridStyle}" MaxHeight="480"
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>

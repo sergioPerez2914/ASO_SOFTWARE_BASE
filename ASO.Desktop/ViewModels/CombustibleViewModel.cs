@@ -58,7 +58,8 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
 
         StocksCombustible = new ObservableCollection<StockCombustible>(_stockCombustible.GetAll());
 
-        Lubricantes = new LubricantesCrudViewModel(DataSourceFactory.CrearLubricantes(), dialogos, sesion);
+        Lubricantes = new LubricantesCrudViewModel(
+            DataSourceFactory.CrearLubricantes(), DataSourceFactory.CrearMarcasLubricante(), dialogos, sesion);
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
 

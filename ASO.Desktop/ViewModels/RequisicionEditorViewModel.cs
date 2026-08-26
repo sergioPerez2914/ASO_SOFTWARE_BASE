@@ -74,12 +74,17 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
             {
                 OnPropertyChanged(nameof(EsLineaCombustible));
                 OnPropertyChanged(nameof(EsLineaRepuesto));
+                OnPropertyChanged(nameof(EtiquetaCantidad));
             }
         }
     }
 
     public bool EsLineaCombustible => TipoLineaSeleccionado == TipoInsumo.Combustible;
     public bool EsLineaRepuesto => TipoLineaSeleccionado == TipoInsumo.Repuesto;
+
+    /// <summary>Aclara que la cantidad de combustible se pide en litros, no en unidades de
+    /// envase (eso se decide recién al armar la orden de compra).</summary>
+    public string EtiquetaCantidad => EsLineaCombustible ? "Cantidad (litros)" : "Cantidad";
 
     private TipoCombustible _tipoCombustibleLineaSeleccionado = TipoCombustible.Diesel;
     public TipoCombustible TipoCombustibleLineaSeleccionado

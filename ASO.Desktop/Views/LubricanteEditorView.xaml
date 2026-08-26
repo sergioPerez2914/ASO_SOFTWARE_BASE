@@ -9,8 +9,21 @@
 
   <StackPanel>
     <controls:FormField Etiqueta="Marca">
-      <TextBox Style="{StaticResource FormTextBoxStyle}"
-               Text="{Binding Marca, UpdateSourceTrigger=PropertyChanged}" />
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <ComboBox Grid.Column="0" Style="{StaticResource FormComboBoxStyle}"
+                  ItemsSource="{Binding MarcasLubricante}"
+                  DisplayMemberPath="Nombre"
+                  SelectedItem="{Binding MarcaSeleccionada}" />
+
+        <Button Grid.Column="1" Style="{StaticResource BarraBotonStyle}"
+                Content="+ Nuevo" ToolTip="Nueva marca de lubricante"
+                Command="{Binding NuevoMarcaCommand}" />
+      </Grid>
     </controls:FormField>
 
     <Grid Margin="0,10,0,0">
@@ -35,10 +48,31 @@
       </StackPanel>
     </Grid>
 
-    <controls:FormField Etiqueta="Existencia (L)" Margin="0,10,0,0">
-      <TextBox Style="{StaticResource FormTextBoxStyle}"
-               Text="{Binding ExistenciaTexto, UpdateSourceTrigger=PropertyChanged}" />
-    </controls:FormField>
+    <Grid Margin="0,10,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="Presentación">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Presentaciones}" SelectedItem="{Binding PresentacionSeleccionada}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <controls:FormField Etiqueta="Unidades">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding UnidadesTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+    </Grid>
+
+    <TextBlock Text="{Binding ExistenciaPreviewTexto, StringFormat='Existencia: {0}'}"
+               FontSize="12" Margin="0,6,0,0"
+               Foreground="{DynamicResource TextSecondaryBrush}" />
 
     <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
               Foreground="{DynamicResource TextPrimaryBrush}"

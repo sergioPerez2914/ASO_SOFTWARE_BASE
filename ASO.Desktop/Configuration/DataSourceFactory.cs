@@ -34,6 +34,7 @@ public static class DataSourceFactory
     private static IFacturaProveedorDataSource? _facturasProveedor;
     private static IStockCombustibleDataSource? _stockCombustible;
     private static ILubricanteDataSource? _lubricantes;
+    private static IMarcaLubricanteDataSource? _marcasLubricante;
     private static IValeCombustibleDataSource? _valesCombustible;
     private static IRecargaCombustibleDataSource? _recargasCombustible;
     private static IConceptoNominaDataSource? _conceptosNomina;
@@ -101,6 +102,9 @@ public static class DataSourceFactory
 
     public static ILubricanteDataSource CrearLubricantes() =>
         _lubricantes ??= new SqlLubricanteDataSource();
+
+    public static IMarcaLubricanteDataSource CrearMarcasLubricante() =>
+        _marcasLubricante ??= new SqlMarcaLubricanteDataSource();
 
     public static IValeCombustibleDataSource CrearValesCombustible() =>
         _valesCombustible ??= new SqlValeCombustibleDataSource();

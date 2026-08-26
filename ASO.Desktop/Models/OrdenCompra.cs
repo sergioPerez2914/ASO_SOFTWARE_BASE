@@ -124,6 +124,15 @@ public class OrdenCompraLinea
     public TipoCombustible? TipoCombustibleSolicitado { get; set; }
     public string? TipoLubricante { get; set; }    // grado/viscosidad, p. ej. "20W50"
 
+    public int? MarcaLubricanteId { get; set; }
+    public string MarcaLubricanteNombre { get; set; } = string.Empty;   // snapshot
+
+    /// <summary>Mineral/Sintético/Semi-sintético. Lista cerrada: ver <see cref="Lubricante.Tipos"/>.</summary>
+    public string? ClaseLubricante { get; set; }
+
+    /// <summary>Envase en que viene. Lista cerrada: ver <see cref="Lubricante.Presentaciones"/>.</summary>
+    public string? Presentacion { get; set; }
+
     // --- Repuesto ---
     public string? ArticuloCodigo { get; set; }
     public string ArticuloNombre { get; set; } = string.Empty;    // snapshot
@@ -138,6 +147,17 @@ public class OrdenCompraLinea
     public decimal Subtotal => Cantidad * PrecioUnitario;
 
     public string TipoInsumoTexto => TipoInsumo == TipoInsumo.Combustible ? "Combustible" : "Repuesto";
+
+    public bool EsCombustible => TipoInsumo == TipoInsumo.Combustible;
+
+    public bool EsDiesel => EsCombustible && TipoCombustibleSolicitado == TipoCombustible.Diesel;
+
+    public bool EsLubricante => EsCombustible && TipoCombustibleSolicitado == TipoCombustible.Lubricante;
+
+    /// <summary>Para el TextBox de Cantidad al armar la orden: en Diésel/Repuesto queda fija a lo
+    /// pedido en la requisición; en Lubricante se puede ajustar (en litros) a lo que realmente
+    /// vende el proveedor — p. ej. redondear a lo que rinde un número entero de envases.</summary>
+    public bool CantidadSoloLectura => !EsLubricante;
 
     public string DestinoTexto => TipoInsumo == TipoInsumo.Combustible
         ? (TipoCombustibleSolicitado == TipoCombustible.Lubricante

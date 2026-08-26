@@ -129,8 +129,6 @@ public sealed class ComprasService
 
     // --- Orden de compra: reglas de transición ---
 
-    public bool PuedeEditarOrdenCompra(OrdenCompra oc) => oc.Estado == EstadoOrdenCompra.Borrador;
-
     public bool PuedeEliminarOrdenCompra(OrdenCompra oc) => oc.Estado == EstadoOrdenCompra.Borrador;
 
     public bool PuedeAprobarOrdenCompra(OrdenCompra oc) => oc.Estado == EstadoOrdenCompra.Borrador;
@@ -155,6 +153,15 @@ public sealed class ComprasService
         if (orden.Lineas.Any(l => l.PrecioUnitario <= 0))
             pendientes.Add("el precio unitario de cada línea");
 
+        if (orden.Lineas.Any(l => l.EsLubricante && l.MarcaLubricanteId is null))
+            pendientes.Add("la marca de cada línea de lubricante");
+
+        if (orden.Lineas.Any(l => l.EsLubricante && string.IsNullOrWhiteSpace(l.ClaseLubricante)))
+            pendientes.Add("la clase (mineral/sintético) de cada línea de lubricante");
+
+        if (orden.Lineas.Any(l => l.EsLubricante && string.IsNullOrWhiteSpace(l.Presentacion)))
+            pendientes.Add("la presentación de cada línea de lubricante");
+
         faltantes = pendientes.Count == 0 ? null : string.Join(", ", pendientes);
         return pendientes.Count == 0;
     }
@@ -162,19 +169,14 @@ public sealed class ComprasService
     // --- Orden de compra: transiciones ---
 
     /// <summary>
-    /// Arma la orden de compra copiando las líneas de la requisición (con precio en cero, a
-    /// completar antes de aprobar) y marca la requisición como Atendida: una requisición no
-    /// alimenta dos órdenes.
+    /// Construye las líneas de arranque para armar la orden (precio en cero, marca/clase/
+    /// presentación vacíos — a completar en "Comparar proveedores" antes de armar). Método puro,
+    /// sin efectos: lo usa <see cref="CompararProveedoresEditorViewModel"/> para poblar la grilla
+    /// de detalle en cuanto se elige una cotización ganadora, y no toca la requisición ni crea
+    /// nada todavía.
     /// </summary>
-    public OrdenCompra CrearDesdeRequisicion(Requisicion requisicion, CotizacionProveedor cotizacionGanadora, int creadoPorId)
+    public static List<OrdenCompraLinea> ArmarLineasIniciales(Requisicion requisicion, CotizacionProveedor cotizacionGanadora)
     {
-        if (!PuedeArmarOrdenCompra(requisicion))
-            throw new InvalidOperationException(
-                $"Solo se arma una orden de compra a partir de una requisición enviada; esta está {requisicion.EstadoTexto}.");
-
-        if (cotizacionGanadora.RequisicionId != requisicion.Id)
-            throw new InvalidOperationException("La cotización elegida no pertenece a esta requisición.");
-
         var lineas = requisicion.Lineas.Select(l => new OrdenCompraLinea
         {
             TipoInsumo = l.TipoInsumo,
@@ -196,6 +198,26 @@ public sealed class ComprasService
         if (lineas.Count == 1)
             lineas[0].PrecioUnitario = Math.Round(cotizacionGanadora.MontoTotal / lineas[0].Cantidad, 2);
 
+        return lineas;
+    }
+
+    /// <summary>
+    /// Arma la orden de compra con las líneas ya completadas en "Comparar proveedores" (marca,
+    /// clase, presentación y precio unitario de cada línea de lubricante; precio de las demás) y
+    /// marca la requisición como Atendida: una requisición no alimenta dos órdenes. Vuelve a
+    /// validar que las líneas estén completas — la ventana ya lo exige antes de dejar armar, pero
+    /// no hay que confiar solo en eso (defensa en profundidad, mismo criterio que <see cref="Aprobar"/>).
+    /// </summary>
+    public OrdenCompra CrearDesdeRequisicion(Requisicion requisicion, CotizacionProveedor cotizacionGanadora,
+                                             List<OrdenCompraLinea> lineas, int creadoPorId)
+    {
+        if (!PuedeArmarOrdenCompra(requisicion))
+            throw new InvalidOperationException(
+                $"Solo se arma una orden de compra a partir de una requisición enviada; esta está {requisicion.EstadoTexto}.");
+
+        if (cotizacionGanadora.RequisicionId != requisicion.Id)
+            throw new InvalidOperationException("La cotización elegida no pertenece a esta requisición.");
+
         var orden = new OrdenCompra
         {
             Fecha = DateTime.Today,
@@ -209,6 +231,9 @@ public sealed class ComprasService
             FechaCreacion = DateTime.Now,
             Lineas = lineas
         };
+
+        if (!OrdenCompraEstaCompleta(orden, out var faltantes))
+            throw new InvalidOperationException($"La orden de compra está incompleta. Faltan: {faltantes}.");
 
         var agregada = _ordenesCompra.Add(orden);
 
@@ -281,9 +306,6 @@ public sealed class ComprasService
         if (r.Lineas.Any(l => l.EsDiesel && l.CantidadRecibida > 0 && l.StockCombustibleId is null))
             pendientes.Add("el stock de combustible al que se suma cada línea de diésel recibida");
 
-        if (r.Lineas.Any(l => l.EsLubricante && l.CantidadRecibida > 0 && l.LubricanteId is null))
-            pendientes.Add("la marca de lubricante a la que se suma cada línea de lubricante recibida");
-
         faltantes = pendientes.Count == 0 ? null : string.Join(", ", pendientes);
         return pendientes.Count == 0;
     }
@@ -307,6 +329,10 @@ public sealed class ComprasService
             TipoInsumo = l.TipoInsumo,
             TipoCombustibleSolicitado = l.TipoCombustibleSolicitado,
             TipoLubricante = l.TipoLubricante,
+            MarcaLubricanteId = l.MarcaLubricanteId,
+            MarcaLubricanteNombre = l.MarcaLubricanteNombre,
+            ClaseLubricante = l.ClaseLubricante,
+            Presentacion = l.Presentacion,
             ArticuloCodigo = l.ArticuloCodigo,
             ArticuloNombre = l.ArticuloNombre,
             ActivoId = l.ActivoId,
@@ -373,11 +399,9 @@ public sealed class ComprasService
                         $"El stock de {stock.Nombre} tiene {stock.ExistenciaL:N2} L de {stock.CapacidadL:N2} L " +
                         $"y no admite {linea.CantidadRecibida:N2} L más. Verifique la cantidad recibida.");
             }
-            else
-            {
-                _ = _lubricantes.GetById(linea.LubricanteId!.Value)
-                    ?? throw new InvalidOperationException("El lubricante indicado ya no existe en el catálogo.");
-            }
+            // La rama de lubricante no valida nada aquí: Marca+Clase+Grado ya se exigieron para
+            // aprobar la orden de compra, y ConfirmarRecepcion la busca o la crea sola más abajo
+            // — a diferencia de Diésel/Repuesto, esta rama no puede fallar.
         }
 
         // Efecto: sumar cada línea a su stock.
@@ -399,10 +423,38 @@ public sealed class ComprasService
             }
             else
             {
-                var lubricante = _lubricantes.GetById(linea.LubricanteId!.Value)!;
+                // Ya no lo elige el almacenista: se busca por Marca+Clase+Grado+Presentación (todo
+                // ya fijado desde la orden de compra) y se crea si es la primera vez que llega esa
+                // combinación. La presentación entra en la búsqueda porque Unidades solo tiene
+                // sentido dentro de un mismo envase — mezclar barriles y galones en una sola fila
+                // rompería la cuenta.
+                var lubricante = _lubricantes.GetAll().FirstOrDefault(l =>
+                    l.MarcaLubricanteId == linea.MarcaLubricanteId
+                    && l.Tipo == linea.ClaseLubricante
+                    && l.GradoViscosidad == linea.TipoLubricante
+                    && l.Presentacion == linea.Presentacion);
+
+                lubricante ??= _lubricantes.Add(new Lubricante
+                {
+                    MarcaLubricanteId = linea.MarcaLubricanteId!.Value,
+                    MarcaLubricanteNombre = linea.MarcaLubricanteNombre,
+                    Tipo = linea.ClaseLubricante!,
+                    GradoViscosidad = linea.TipoLubricante!,
+                    Presentacion = linea.Presentacion!,
+                    Unidades = 0,
+                    Activo = true
+                });
+
+                // CantidadRecibida sigue en litros (como toda la cadena Requisición → Orden de
+                // Compra → Recepción); Unidades de Lubricante es la cuenta de envases, así que se
+                // convierte dividiendo por los litros que tiene la presentación elegida.
+                var litrosPorUnidad = Lubricante.LitrosPorPresentacion.GetValueOrDefault(linea.Presentacion!, 1m);
                 var actualizado = lubricante.Clonar();
-                actualizado.ExistenciaL += linea.CantidadRecibida;
+                actualizado.Unidades += linea.CantidadRecibida / litrosPorUnidad;
                 _lubricantes.Update(actualizado);
+
+                linea.LubricanteId = lubricante.Id;
+                linea.LubricanteNombre = lubricante.Etiqueta;
             }
         }
 
@@ -451,8 +503,9 @@ public sealed class ComprasService
                 else if (linea.EsLubricante && linea.LubricanteId is { } lubricanteId
                          && _lubricantes.GetById(lubricanteId) is { } lubricante)
                 {
+                    var litrosPorUnidad = Lubricante.LitrosPorPresentacion.GetValueOrDefault(linea.Presentacion!, 1m);
                     var actualizado = lubricante.Clonar();
-                    actualizado.ExistenciaL -= linea.CantidadRecibida;
+                    actualizado.Unidades -= linea.CantidadRecibida / litrosPorUnidad;
                     _lubricantes.Update(actualizado);
                 }
             }
