@@ -221,11 +221,14 @@ en paralelo a propósito — se retira cuando el cotejo a tres vías (ver más a
   línea de combustible elige aquí a qué `StockCombustible` concreto del catálogo se suma (la orden
   solo decía diésel/lubricante, no un producto). Confirmar es inmutable; anular revierte el stock
   con motivo (permisos `RecepcionMercancia.*` en `Services/Permisos.cs`).
-- **Reparto de roles**: Remesero identifica y envía la Requisición; comparar proveedores, armar y
-  aprobar la Orden de Compra, y registrar la Recepción es exclusivo de AdministradorNucleo
-  (permisos `Requisicion.*` / `OrdenCompra.*` / `RecepcionMercancia.*` en `Services/Permisos.cs`,
-  repartidos en `MatrizPermisos.cs`; ninguno es solicitable, porque cada rol ya tiene su parte del
-  flujo).
+- **Reparto de roles** (revisado el 2026-08-26 con la llegada del Almacenista): el Remesero
+  identifica y envía la Requisición; el **Almacenista** la atiende — compara proveedores, arma la
+  Orden de Compra en Borrador y registra la Recepción; y **aprobar la Orden de Compra sigue siendo
+  exclusivo del AdministradorNucleo**, porque es donde se autoriza el gasto. Quien compra y recibe
+  no firma el dinero: por eso el Almacenista tampoco tiene `OrdenCompra.Anular` (deshacer un
+  compromiso ya autorizado), aunque sí `OrdenCompra.Eliminar` para sus propios borradores. Permisos
+  `Requisicion.*` / `OrdenCompra.*` / `RecepcionMercancia.*` en `Services/Permisos.cs`, repartidos
+  en `MatrizPermisos.cs`; ninguno es solicitable, porque cada rol ya tiene su parte del flujo.
 - **`Services/ComprasService.cs`** concentra las reglas de los tres documentos, mismo contrato que
   `RemesaService` (`PuedeX` + transición que revalida y lanza `InvalidOperationException`). Pantalla
   `ComprasViewModel` en Inventario · Compras, contenedor de dos padrones (Requisiciones / Órdenes de
@@ -405,11 +408,11 @@ instalaciones que compartan base se vean entre sí.
 
 ## Roles y permisos (2026-08-20)
 
-Tres roles (`Models/Rol.cs`), cada uno con un conjunto base en `Services/MatrizPermisos.cs` que el
+Cuatro roles (`Models/Rol.cs`), cada uno con un conjunto base en `Services/MatrizPermisos.cs` que el
 administrador ajusta por usuario con `PermisoUsuario` (concede o revoca; **revocar gana**).
 
 Los ajustes se editan en **Administración · Usuarios**: al seleccionar un usuario, el panel de al
-lado (`PermisosDeUsuarioViewModel`) muestra los 99 permisos agrupados por módulo, marcados según lo
+lado (`PermisosDeUsuarioViewModel`) muestra los 119 permisos agrupados por módulo, marcados según lo
 que ya da su rol. La tabla `PermisosUsuario` sigue guardando **solo deltas**: al guardar, un permiso
 que vuelve a coincidir con el rol **borra** su ajuste en vez de dejar una fila que repita la matriz.
 Dos guardas: no se concede un permiso que quien edita no tiene (era una escalada real: un
@@ -418,12 +421,22 @@ propios.
 
 | Rol | Alcance |
 |---|---|
-| **Remesero** | 25 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios, Combustible y Configuración. Crea, edita y confirma; **no anula nada**, no entra a Finanzas (Banco incluido), Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
-| **AdministradorNucleo** | Todo dentro del núcleo (98 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
-| **Desarrollador** | Los 99 permisos, y es el único que reparte su propio rol |
+| **Remesero** | 31 permisos: Registro de Operación, Seguimiento, Flota, Mantenimiento, Horarios, Combustible y Configuración. Crea, edita y confirma; salvo la requisición **no anula nada**, no entra a Finanzas (Banco incluido), Nómina·Liquidaciones, Tarifas, Empleados ni a los catálogos maestros |
+| **Almacenista** (2026-08-26) | 43 permisos: dueño de Inventario (Repuestos, Combustible, Lubricantes) y del otro extremo de Compras — atiende las requisiciones, cotiza, arma la orden y recibe la mercancía. Anula lo suyo. Ve Flota (Gestión y Mantenimiento) y Finanzas · Cuentas por Pagar de solo lectura, porque una salida se imputa a una máquina y porque el padrón de Proveedores vive ahí. **No aprueba el gasto** (`OrdenCompra.Aprobar`), no fuerza stock (`Inventario.OverrideStock`), y no entra a Operaciones, Nómina ni Administración |
+| **AdministradorNucleo** | Todo dentro del núcleo (118 permisos). Lo único que no puede es crear usuarios Desarrollador (`Usuarios.CrearDesarrollador`) |
+| **Desarrollador** | Los 119 permisos, y es el único que reparte su propio rol |
 
 - **`Services/Permisos.cs`** es el catálogo de cadenas. Los de navegación llevan prefijo `Ver.` y se
   **derivan de la clave del submódulo**, así que no pueden desincronizarse al renombrar.
+- **`Rol` se persiste como ORDINAL** (`Usuarios.Rol int`, sin `HasConversion`): los miembros se
+  añaden **siempre al final**, igual que `TipoEventoOperacion`. Añadir un rol es enum + conjunto en
+  `MatrizPermisos` + el array `asignables` de `UsuarioEditorViewModel` (escrito a mano, no
+  `Enum.GetValues`). **No hace falta migración**: la columna ya es `int`.
+- **Los tres `switch` sobre `Rol` no llevan arco de descarte** (`Base`, `Usuario.RolTexto`,
+  `UsuarioEditorViewModel.Texto`), y callan CS8524 con `#pragma`. Antes sí lo llevaban, y era una
+  trampa doble: `Base` caía en `_ => Todos`, así que un rol nuevo que se olvidara ahí se convertía
+  en **superusuario en silencio**, y los otros dos lo mostraban en pantalla llamándose
+  "Desarrollador". Ahora olvidarse rompe la compilación.
 - **`SesionActual`** calcula el conjunto efectivo **una vez al entrar** y lo cachea. No es
   optimización prematura: `CommandManager.RequerySuggested` dispara los `CanExecute` de toda la
   ventana ante cualquier entrada del usuario. Consecuencia: **un cambio de rol o de permisos se
@@ -536,6 +549,17 @@ en la bandeja del administrador (módulo fijado **Peticiones**).
   Un motor que reprodujera mutaciones guardadas se saltaría justo esas comprobaciones.
 - **`PeticionService.Resolver` exige aprobador ≠ solicitante**, que es la segregación de funciones
   del diseño de autorización.
+- **Y exige que el aprobador tenga el permiso que se está pidiendo** (`EsDeSuDominio`, 2026-08-26).
+  Sale de que aprobar autoriza y no ejecuta: el cambio lo hace después a mano quien aprobó, así que
+  un aprobador sin ese permiso dejaría la petición aprobada y a nadie capaz de cumplirla. Es lo que
+  permite dar `Peticiones.Resolver` al Almacenista sin que acabe votando sobre la anulación de una
+  remesa: resuelve las de combustible y no las de Operaciones. Para AdministradorNucleo y
+  Desarrollador no cambia nada, que los tienen todos. `PeticionService` recibe `ISesionActual`
+  **por constructor obligatorio** — un default `null` dejaría el hueco silencioso justo en la regla
+  que acota quién resuelve qué, mismo criterio que `BancoService`.
+- **El contador del sidebar cuenta lo que ESE usuario puede atender**, no todo lo pendiente del
+  núcleo (`SidebarViewModel.ContarPendientes`): a un almacenista, un contador global le marcaría
+  trabajo que no puede quitar de en medio.
 - Hoy son solicitables `Remesas.Anular`, `Remesas.Recepcion`, `Flota.Crear`, `Flota.Editar`,
   `Combustible.Anular` y `Combustible.Recargar`: **exactamente** las acciones sensibles que aparecen
   en las pantallas que el remesero ve. Al ampliar lo que ve un rol, ampliar la lista **y** cablear el
@@ -573,7 +597,7 @@ Fase 0 fundación (auth, roles, maestros, shell) · **Fase 1** núcleo operativo
 combustible) · Fase 2 taller e inventario · Fase 3 finanzas (CxC/CxP/bancos) · Fase 4 nómina por destajo ·
 Fase 5 dashboard gerencial + reportes · Fase 6 (post-MVP) offline, API REST, app móvil.
 
-Roles: **Remesero, AdministradorNucleo, Desarrollador** (los seis anteriores —Admin, Operaciones,
+Roles: **Remesero, Almacenista, AdministradorNucleo, Desarrollador** (los seis anteriores —Admin, Operaciones,
 Taller, Finanzas, RRHH, Consulta— se sustituyeron el 2026-08-20; ver "Roles y permisos").
 Todo se filtra por la **zafra activa**, todavía pendiente: quedan 7 `// TODO: ZafraId`. El mecanismo
 donde encaja ya existe — sería un `IDeZafra` con su segundo `HasQueryFilter`, igual que
@@ -643,5 +667,6 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
    de desarrollo (2026-08-25) encontró 3 `Fincas` y 3 `Empleados` en ese estado — revisar si hay más
    antes de repartir esta build.
 
-El catálogo completo de permisos está en `Services/Permisos.cs` (99 en uso) y el reparto por rol en
+El catálogo completo de permisos está en `Services/Permisos.cs` (98 acciones, más 21 de navegación
+derivadas del catálogo de módulos = 119) y el reparto por rol en
 `Services/MatrizPermisos.cs`.

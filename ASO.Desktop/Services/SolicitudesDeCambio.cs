@@ -22,7 +22,7 @@ public class SolicitudesDeCambio
     {
         _sesion = sesion ?? SesionActual.Instancia;
         _dialogos = dialogos ?? new ServicioDialogo();
-        _servicio = servicio ?? new PeticionService(DataSourceFactory.CrearPeticiones());
+        _servicio = servicio ?? new PeticionService(DataSourceFactory.CrearPeticiones(), _sesion);
     }
 
     /// <summary>

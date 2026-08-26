@@ -4,6 +4,10 @@ namespace ASO.Desktop.Models;
 /// Roles del sistema. Cada uno trae un conjunto base de permisos
 /// (<c>Services/MatrizPermisos.cs</c>) que el administrador puede ajustar por usuario
 /// con <see cref="PermisoUsuario"/>.
+///
+/// Se persisten como ORDINAL (columna <c>Usuarios.Rol int</c>, sin <c>HasConversion</c>), asi
+/// que los miembros se agregan SIEMPRE al final: declarar uno en medio reinterpretaria los
+/// usuarios ya guardados. Misma regla que <see cref="TipoEventoOperacion"/>.
 /// </summary>
 public enum Rol
 {
@@ -24,5 +28,14 @@ public enum Rol
     /// Nosotros. Puede todo y ademas cambiar de nucleo sin cerrar sesion, para dar soporte
     /// y probar. Es el unico rol que atraviesa organizaciones.
     /// </summary>
-    Desarrollador
+    Desarrollador,
+
+    /// <summary>
+    /// Duenno del deposito. Manda en Inventario —repuestos, combustible, lubricantes— y
+    /// responde el otro extremo de Compras: atiende las requisiciones que le llegan, cotiza,
+    /// arma la orden de compra y recibe la mercancia. No aprueba el gasto (eso es del
+    /// administrador), no entra a Operaciones ni a Nomina, y del dinero solo ve la deuda con
+    /// proveedores. En la bandeja resuelve las peticiones de SU dominio, no las demas.
+    /// </summary>
+    Almacenista
 }

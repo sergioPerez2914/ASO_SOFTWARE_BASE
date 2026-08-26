@@ -26,12 +26,17 @@ public class Usuario : IEntidad<int>, IDeOrganizacion
 
     public bool Activo { get; set; } = true;
 
+    // Sin arco de descarte: con `_ => "Desarrollador"` un rol nuevo se mostraba con el nombre
+    // del rol que lo puede todo, que es la etiqueta mas enganosa posible. Ver Rol.Base.
+#pragma warning disable CS8524
     public string RolTexto => Rol switch
     {
         Rol.Remesero => "Remesero",
+        Rol.Almacenista => "Almacenista",
         Rol.AdministradorNucleo => "Administrador de núcleo",
-        _ => "Desarrollador"
+        Rol.Desarrollador => "Desarrollador"
     };
+#pragma warning restore CS8524
 
     public string EstadoTexto => Activo ? "Activo" : "Inactivo";
 

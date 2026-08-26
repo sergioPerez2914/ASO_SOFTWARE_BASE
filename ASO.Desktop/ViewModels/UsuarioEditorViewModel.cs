@@ -35,8 +35,8 @@ public sealed class UsuarioEditorViewModel : CrudEditorViewModelBase<Usuario>
         // Un administrador de núcleo no puede fabricar un Desarrollador: ese rol lo puede
         // todo, así que solo lo reparte quien ya lo tiene.
         Rol[] asignables = actual.Puede(Permisos.Usuarios.CrearDesarrollador)
-            ? [Rol.Remesero, Rol.AdministradorNucleo, Rol.Desarrollador]
-            : [Rol.Remesero, Rol.AdministradorNucleo];
+            ? [Rol.Remesero, Rol.Almacenista, Rol.AdministradorNucleo, Rol.Desarrollador]
+            : [Rol.Remesero, Rol.Almacenista, Rol.AdministradorNucleo];
 
         RolesDisponibles = [.. asignables.Select(r => new OpcionRol(r, Texto(r)))];
         _rolSeleccionado = RolesDisponibles.FirstOrDefault(o => o.Valor == rolInicial) ?? RolesDisponibles[0];
@@ -74,12 +74,17 @@ public sealed class UsuarioEditorViewModel : CrudEditorViewModelBase<Usuario>
         set => SetProperty(ref _rolSeleccionado, value);
     }
 
+    // Sin arco de descarte, igual que Usuario.RolTexto: un rol nuevo sin mapear tiene que
+    // romper la compilacion, no aparecer en el combo llamandose "Desarrollador".
+#pragma warning disable CS8524
     private static string Texto(Rol rol) => rol switch
     {
         Rol.Remesero => "Remesero",
+        Rol.Almacenista => "Almacenista",
         Rol.AdministradorNucleo => "Administrador de núcleo",
-        _ => "Desarrollador"
+        Rol.Desarrollador => "Desarrollador"
     };
+#pragma warning restore CS8524
 
     private bool _activo;
     public bool Activo

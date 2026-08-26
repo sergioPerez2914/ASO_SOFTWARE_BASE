@@ -99,16 +99,98 @@ public static class MatrizPermisos
         Permisos.Peticiones.Solicitar
     ];
 
+    /// <summary>
+    /// El deposito. Manda en Inventario y responde el otro extremo de Compras: atiende las
+    /// requisiciones que le llegan, cotiza, arma la orden de compra y recibe la mercancia.
+    /// Ve Flota de solo lectura porque una salida de repuestos se imputa a una maquina, y
+    /// Cuentas por Pagar porque el padron de Proveedores vive ahi.
+    /// </summary>
+    private static readonly HashSet<string> _almacenista =
+    [
+        Permisos.Ver(ModuloCatalogo.Inicio.Clave),
+        Permisos.Ver(ModuloCatalogo.Peticiones.Clave),
+        Permisos.Ver(ModuloCatalogo.Configuracion.Clave),
+        Permisos.Ver("Inventario.Repuestos"),
+        Permisos.Ver("Inventario.Combustible"),
+        Permisos.Ver("Inventario.Compras"),
+        Permisos.Ver("Flota.Gestion"),
+        Permisos.Ver("Flota.Mantenimiento"),
+        Permisos.Ver("Finanzas.CuentasPorPagar"),
+
+        Permisos.Inventario.Crear,
+        Permisos.Inventario.Editar,
+        Permisos.Inventario.Eliminar,
+        Permisos.Inventario.RegistrarSalida,
+        Permisos.Inventario.ConfirmarSalida,
+        Permisos.Inventario.AnularSalida,
+        Permisos.Inventario.EliminarSalida,
+
+        Permisos.Combustible.Crear,
+        Permisos.Combustible.Editar,
+        Permisos.Combustible.Eliminar,
+        Permisos.Combustible.Confirmar,
+        Permisos.Combustible.Anular,
+        Permisos.Combustible.Recargar,
+        Permisos.Combustible.CrearStock,
+
+        Permisos.Lubricantes.Crear,
+        Permisos.Lubricantes.Editar,
+        Permisos.Lubricantes.Eliminar,
+
+        Permisos.Requisicion.Crear,
+        Permisos.Requisicion.Editar,
+        Permisos.Requisicion.Eliminar,
+        Permisos.Requisicion.Enviar,
+        Permisos.Requisicion.Anular,
+
+        // Cotiza y arma la orden, pero NO la aprueba ni la anula: aprobar es autorizar el gasto
+        // y anular es deshacer un compromiso ya autorizado. Quien compra y recibe no firma el
+        // dinero. Sus ordenes en Borrador si las borra, con Eliminar.
+        Permisos.OrdenCompra.Crear,
+        Permisos.OrdenCompra.Editar,
+        Permisos.OrdenCompra.Eliminar,
+
+        Permisos.RecepcionMercancia.Crear,
+        Permisos.RecepcionMercancia.Editar,
+        Permisos.RecepcionMercancia.Eliminar,
+        Permisos.RecepcionMercancia.Confirmar,
+        Permisos.RecepcionMercancia.Anular,
+
+        // Los da de alta al vuelo mientras compara cotizaciones. No registra sus facturas:
+        // ve la deuda en Cuentas por Pagar, no la escribe.
+        Permisos.Proveedores.Crear,
+        Permisos.Proveedores.Editar,
+
+        // Resuelve peticiones, pero solo las de su dominio: la regla esta en
+        // PeticionService.EsDeSuDominio, no aqui.
+        Permisos.Peticiones.Solicitar,
+        Permisos.Peticiones.Resolver
+
+        // Fuera a proposito:
+        // - Inventario.OverrideStock: forzar una salida sin existencia. Es justo el custodio
+        //   del almacen quien no debe poder tapar un descuadre.
+        // - Configuracion.Preferencias: detras va el umbral de alerta de consumo, y aqui el
+        //   encargado del combustible se apagaria sus propias alertas.
+    ];
+
     private static readonly HashSet<string> _administrador =
         Todos.Where(p => !_soloDesarrollador.Contains(p)).ToHashSet();
 
     /// <summary>Conjunto base del rol, antes de los ajustes por usuario.</summary>
+    // Sin arco de descarte, y es deliberado: con `_ => Todos` un rol nuevo que se olvide aqui
+    // se convierte en superusuario EN SILENCIO. Ahora el compilador avisa (CS8509) en cuanto se
+    // declare un rol y no se mapee. Se calla CS8524, que solo se dispararia con un entero que no
+    // corresponde a ningun miembro: fila corrupta, y ahi preferimos la excepcion al disimulo.
+    // Mismo criterio que los switches de TipoEventoOperacion.
+#pragma warning disable CS8524
     public static IReadOnlySet<string> Base(Rol rol) => rol switch
     {
         Rol.Remesero => _remesero,
+        Rol.Almacenista => _almacenista,
         Rol.AdministradorNucleo => _administrador,
-        _ => Todos
+        Rol.Desarrollador => Todos
     };
+#pragma warning restore CS8524
 
     /// <summary>
     /// Permisos que, si faltan, no dejan el boton muerto: abren una peticion al administrador.

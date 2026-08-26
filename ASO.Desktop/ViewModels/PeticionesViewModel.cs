@@ -41,7 +41,7 @@ public sealed class PeticionesViewModel : PantallaViewModelBase
         : base(modulo)
     {
         _fuente = fuente;
-        _servicio = new PeticionService(fuente);
+        _servicio = new PeticionService(fuente, sesion);
         _dialogos = dialogos;
         _sesion = sesion;
 
@@ -90,6 +90,8 @@ public sealed class PeticionesViewModel : PantallaViewModelBase
         Seleccionada is { } p
         && _servicio.PuedeResolver(p)
         && _sesion.Puede(Permisos.Peticiones.Resolver)
+        // Solo las de su dominio: quien aprueba es quien tiene que ejecutar el cambio despues.
+        && _servicio.EsDeSuDominio(p)
         && p.SolicitadoPorId != _sesion.UsuarioActual?.Id;
 
     private bool Filtrar(object item) =>

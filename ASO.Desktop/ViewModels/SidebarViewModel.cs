@@ -199,11 +199,16 @@ public sealed class SidebarViewModel : ViewModelBase
 
         if (secciones.FirstOrDefault(i => i.Modulo.Clave == ModuloCatalogo.Peticiones.Clave)
             is { } peticiones)
-            _ = ContarPendientes(peticiones);
+            _ = ContarPendientes(peticiones, sesion);
     }
 
     /// <summary>
     /// Pone el contador de la bandeja de peticiones, fuera del hilo de interfaz.
+    ///
+    /// Cuenta lo que ESTE usuario puede atender, no todo lo pendiente del nucleo: a un
+    /// almacenista, que solo resuelve las peticiones de su dominio, un contador global le
+    /// marcaria trabajo que no es suyo y que no puede quitar de en medio. Quien no resuelve
+    /// sigue viendo el pendiente del nucleo, que es lo unico informativo para el.
     ///
     /// Va en segundo plano a propósito: el menú se construye durante el arranque de la ventana, y
     /// una consulta a SQL Server ahí dejaría la aplicación en blanco hasta que respondiera. El
@@ -211,13 +216,18 @@ public sealed class SidebarViewModel : ViewModelBase
     /// entera — no hay dónde informar de un error en un adorno, y desde luego no a costa de
     /// impedir que se abra la ventana.
     /// </summary>
-    private static async Task ContarPendientes(ModuloNavItem peticiones)
+    private static async Task ContarPendientes(ModuloNavItem peticiones, ISesionActual sesion)
     {
         try
         {
             var fuente = DataSourceFactory.CrearPeticiones();
+            var resuelve = sesion.Puede(Permisos.Peticiones.Resolver);
+            var propioId = sesion.UsuarioActual?.Id;
+
             peticiones.Contador = await Task.Run(
-                () => fuente.GetAll().Count(p => p.EstaPendiente));
+                () => fuente.GetAll().Count(p => p.EstaPendiente
+                    && (!resuelve
+                        || (sesion.Puede(p.Permiso) && p.SolicitadoPorId != propioId))));
         }
         catch
         {

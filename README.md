@@ -72,6 +72,7 @@ en `%AppData%\ASO\ajustes.json`, no en la base de datos.
 | Rol | Qué puede |
 |---|---|
 | **Remesero** | Lo del día a día en campo: remesas, seguimiento, flota, mantenimiento, horarios y combustible. Lo sensible (anular, recepción, alta de flota, recarga de cisterna) lo **solicita** al administrador |
+| **Almacenista** | El depósito: Inventario entero y el otro extremo de Compras — atiende las requisiciones, cotiza, arma la orden y recibe la mercancía. **Aprobar el gasto no es suyo**. En la bandeja resuelve solo las peticiones de su dominio |
 | **Administrador de núcleo** | Todo en el núcleo, incluidos los usuarios y la bandeja de peticiones |
 | **Desarrollador** | Todo, y es el único que puede crear otros usuarios Desarrollador |
 
