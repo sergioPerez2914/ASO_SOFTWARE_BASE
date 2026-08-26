@@ -12,7 +12,6 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
@@ -20,8 +19,30 @@
                          Titulo="{Binding Submodulo.Nombre}"
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
+    <!-- Conmutador: los vales despachados y el catálogo de lubricantes. -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
+      <RadioButton Content="Vales" GroupName="VistaCombustible"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsVales, Mode=TwoWay}" />
+      <RadioButton Content="Lubricantes" GroupName="VistaCombustible"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsLubricantes, Mode=TwoWay}" />
+    </StackPanel>
+
+    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+            Background="{DynamicResource BorderBrush}" />
+
+    <!-- Vales de combustible -->
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarVales, Converter={StaticResource BoolToVis}}">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
     <!-- Estado del stock de combustible: lo primero que se mira antes de despachar -->
-    <ItemsControl Grid.Row="1" ItemsSource="{Binding StocksCombustible}" Margin="0,0,0,12">
+    <ItemsControl Grid.Row="0" ItemsSource="{Binding StocksCombustible}" Margin="0,0,0,12">
       <ItemsControl.ItemsPanel>
         <ItemsPanelTemplate>
           <StackPanel Orientation="Horizontal" />
@@ -49,7 +70,7 @@
     </ItemsControl>
 
     <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -108,7 +129,7 @@
       </Grid>
     </Border>
 
-    <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0">
+    <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
       <Grid>
         <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
                   ItemsSource="{Binding ItemsView}"
@@ -162,5 +183,62 @@
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
       </Grid>
     </Border>
+    </Grid>
+
+    <!-- Catálogo de lubricantes -->
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarLubricantes, Converter={StaticResource BoolToVis}}">
+    <Grid DataContext="{Binding Lubricantes}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <controls:SearchBox Grid.Row="0" Width="280" HorizontalAlignment="Left"
+                              Sugerencia="Buscar por marca, tipo o grado"
+                              Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
+
+          <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
+            <Button Content="Nuevo lubricante" Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding AgregarCommand}" />
+            <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding EditarCommand}" />
+            <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
+                    Foreground="{DynamicResource DangerTextBrush}"
+                    Command="{Binding EliminarCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
+        <Grid>
+          <DataGrid x:Name="TablaLubricantes" Style="{StaticResource DataGridStyle}"
+                    ItemsSource="{Binding ItemsView}"
+                    SelectedItem="{Binding SelectedItem}">
+            <DataGrid.Columns>
+              <controls:ColumnaTexto Header="Marca" Binding="{Binding Marca}" Width="24*" MinWidth="120" />
+              <controls:ColumnaTexto Header="Tipo" Binding="{Binding Tipo}" Width="20*" MinWidth="110" />
+              <controls:ColumnaTexto Header="Grado" Binding="{Binding GradoViscosidad}" Width="16*" MinWidth="90" />
+              <controls:ColumnaNumero Header="Existencia" Binding="{Binding ExistenciaTexto}" Width="16*" MinWidth="94" />
+              <controls:ColumnaTexto Header="Activo" Width="12*" MinWidth="70"
+                                     Binding="{Binding Activo, StringFormat={}{0}}" />
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <controls:EmptyState Icono="&#xE7B8;"
+                               Titulo="No hay lubricantes en el catálogo"
+                               Detalle="Da de alta una marca, tipo y grado para controlar su existencia."
+                               Visibility="{Binding HasItems, ElementName=TablaLubricantes, Converter={StaticResource SinItemsAVis}}" />
+        </Grid>
+      </Border>
+    </Grid>
+    </Grid>
   </Grid>
 </UserControl>

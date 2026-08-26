@@ -304,6 +304,7 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
     private const string FiltroTodas = "Todas";
 
     private readonly IStockCombustibleDataSource _stockCombustible;
+    private readonly ILubricanteDataSource _lubricantes;
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesionActual;
     private readonly ComprasService _servicio;
@@ -312,12 +313,14 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
 
     public RecepcionesCrudViewModel(IRecepcionMercanciaDataSource recepciones,
                                     IStockCombustibleDataSource stockCombustible,
+                                    ILubricanteDataSource lubricantes,
                                     ComprasService servicio,
                                     IServicioDialogo dialogos,
                                     ISesionActual sesion)
         : base(recepciones, dialogos, sesion)
     {
         _stockCombustible = stockCombustible;
+        _lubricantes = lubricantes;
         _servicio = servicio;
         _dialogos = dialogos;
         _sesionActual = sesion;
@@ -362,7 +365,7 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
             "La recepción se registra desde una orden de compra aprobada, con \"Registrar recepción\".");
 
     protected override CrudEditorViewModelBase<RecepcionMercancia> CrearEditor(RecepcionMercancia item) =>
-        new RecepcionMercanciaEditorViewModel(item, _stockCombustible);
+        new RecepcionMercanciaEditorViewModel(item, _stockCombustible, _lubricantes, _dialogos);
 
     private void Confirmar()
     {
@@ -430,8 +433,10 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         var ordenesCompra = DataSourceFactory.CrearOrdenesCompra();
         var recepciones = DataSourceFactory.CrearRecepcionesMercancia();
         var stockCombustible = DataSourceFactory.CrearStockCombustible();
+        var lubricantes = DataSourceFactory.CrearLubricantes();
 
-        var servicio = new ComprasService(requisiciones, cotizaciones, ordenesCompra, recepciones, articulos, stockCombustible);
+        var servicio = new ComprasService(
+            requisiciones, cotizaciones, ordenesCompra, recepciones, articulos, stockCombustible, lubricantes);
 
         Requisiciones = new RequisicionesCrudViewModel(
             requisiciones, articulos, proveedores, cotizaciones, servicio, dialogos, sesion);
@@ -440,7 +445,7 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         OrdenesCompra = new OrdenesCompraCrudViewModel(ordenesCompra, servicio, dialogos, sesion);
         OrdenesCompra.RecepcionCreada += (_, _) => VistaActual = VistaRecepciones;
 
-        Recepciones = new RecepcionesCrudViewModel(recepciones, stockCombustible, servicio, dialogos, sesion);
+        Recepciones = new RecepcionesCrudViewModel(recepciones, stockCombustible, lubricantes, servicio, dialogos, sesion);
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }

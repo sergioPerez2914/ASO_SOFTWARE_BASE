@@ -24,13 +24,24 @@
         <DataGridTextColumn Header="Recibido" Width="10*" MinWidth="86"
                              Binding="{Binding CantidadRecibida, StringFormat=N2, UpdateSourceTrigger=LostFocus}" />
         <controls:ColumnaTexto Header="Diferencia" Binding="{Binding DiferenciaTexto}" Width="12*" MinWidth="100" IsReadOnly="True" />
-        <DataGridTemplateColumn Header="Stock combustible" Width="18*" MinWidth="150">
+        <DataGridTemplateColumn Header="Stock / lubricante" Width="20*" MinWidth="170">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <ComboBox ItemsSource="{Binding DataContext.StocksCombustible, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        DisplayMemberPath="Nombre" SelectedValuePath="Id"
-                        SelectedValue="{Binding StockCombustibleId, UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding EsCombustible, Converter={StaticResource BoolToVis}}" />
+              <StackPanel Orientation="Horizontal">
+                <ComboBox ItemsSource="{Binding DataContext.StocksCombustible, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          DisplayMemberPath="Nombre" SelectedValuePath="Id"
+                          SelectedValue="{Binding StockCombustibleId, UpdateSourceTrigger=PropertyChanged}"
+                          Visibility="{Binding EsDiesel, Converter={StaticResource BoolToVis}}" />
+                <ComboBox ItemsSource="{Binding DataContext.Lubricantes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          DisplayMemberPath="Etiqueta" SelectedValuePath="Id"
+                          SelectedValue="{Binding LubricanteId, UpdateSourceTrigger=PropertyChanged}"
+                          Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
+                <Button Content="+ Nuevo" Style="{StaticResource BarraBotonStyle}" Margin="4,0,0,0"
+                        Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}"
+                        Command="{Binding DataContext.NuevoLubricanteCommand,
+                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding}" />
+              </StackPanel>
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>

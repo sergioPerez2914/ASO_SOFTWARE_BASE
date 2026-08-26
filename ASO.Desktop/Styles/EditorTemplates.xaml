@@ -68,6 +68,10 @@
     <views:StockCombustibleEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:LubricanteEditorViewModel}">
+    <views:LubricanteEditorView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:JornadaEditorViewModel}">
     <views:JornadaEditorView />
   </DataTemplate>

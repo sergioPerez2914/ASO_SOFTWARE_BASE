@@ -15,26 +15,20 @@ namespace ASO.Desktop.ViewModels;
 /// </summary>
 public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisicion>
 {
-    /// <summary>Categoría del catálogo de Inventario que agrupa los lubricantes — permite
-    /// distinguirlos del resto de los repuestos sin un campo nuevo en el modelo.</summary>
-    public const string CategoriaLubricantes = "Lubricantes";
+    /// <summary>Tipos de aceite. Re-expuestas desde <see cref="Lubricante"/> (fuente canónica)
+    /// para no tocar los bindings <c>x:Static</c> de la vista.</summary>
+    public static readonly IReadOnlyList<string> TiposLubricante = Lubricante.Tipos;
 
-    /// <summary>Tipos de aceite. Lista cerrada: son los que hay, no texto libre.</summary>
-    public static readonly IReadOnlyList<string> TiposLubricante = ["Mineral", "Sintético", "Semi-sintético"];
-
-    /// <summary>Grados de viscosidad habituales en equipo diésel agrícola pesado.</summary>
-    public static readonly IReadOnlyList<string> GradosViscosidadLubricante =
-        ["15W40", "20W50", "10W40", "20W40", "15W30", "SAE 30", "SAE 40"];
+    /// <summary>Grados de viscosidad. Ver <see cref="TiposLubricante"/>.</summary>
+    public static readonly IReadOnlyList<string> GradosViscosidadLubricante = Lubricante.GradosViscosidad;
 
     private readonly Requisicion _original;
-    private readonly IInventoryDataSource _articulos;
 
     public RequisicionEditorViewModel(Requisicion original, IInventoryDataSource articulos)
     {
         _original = original;
-        _articulos = articulos;
 
-        Articulos = articulos.GetAll().Where(a => !EsLubricante(a)).OrderBy(a => a.Nombre).ToList();
+        Articulos = articulos.GetAll().OrderBy(a => a.Nombre).ToList();
 
         Lineas = new ObservableCollection<RequisicionLinea>(original.Lineas.Select(l => l.Clonar()));
 
@@ -55,9 +49,6 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
         CambiarTipoCombustibleCommand = new RelayCommand<string>(tipo =>
             TipoCombustibleLineaSeleccionado = tipo == "Lubricante" ? TipoCombustible.Lubricante : TipoCombustible.Diesel);
     }
-
-    private static bool EsLubricante(InventoryItem articulo) =>
-        string.Equals(articulo.Categoria, CategoriaLubricantes, System.StringComparison.OrdinalIgnoreCase);
 
     public override string Titulo =>
         _original.Id == 0 ? "Nueva requisición" : $"Editar requisición Nº {_original.Id}";
@@ -128,36 +119,6 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
         set => SetProperty(ref _gradoViscosidadSeleccionado, value);
     }
 
-    /// <summary>
-    /// Cada combinación Tipo × Grado es un artículo propio del catálogo, con su propio stock — un
-    /// 15W40 es distinto de un 20W50. El código sale de la combinación, no lo teclea nadie, así
-    /// que no hace falta pedir permiso para crearlo: no es un artículo de nombre libre, es una
-    /// de las ~20 combinaciones posibles de una lista cerrada.
-    /// </summary>
-    private InventoryItem ObtenerOCrearArticuloLubricante(string tipo, string grado)
-    {
-        var prefijoTipo = tipo switch
-        {
-            "Mineral" => "MIN",
-            "Sintético" => "SIN",
-            "Semi-sintético" => "SEMI",
-            _ => "OTR"
-        };
-
-        var codigo = $"LUB-{prefijoTipo}-{grado.Replace(" ", "")}";
-
-        if (_articulos.GetById(codigo) is { } existente)
-            return existente;
-
-        return _articulos.Add(new InventoryItem
-        {
-            Codigo = codigo,
-            Nombre = $"Aceite {tipo} {grado}",
-            Categoria = CategoriaLubricantes,
-            Unidad = "L"
-        });
-    }
-
     private string _cantidadLineaTexto = string.Empty;
     public string CantidadLineaTexto
     {
@@ -185,25 +146,16 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
         }
         else if (TipoLineaSeleccionado == TipoInsumo.Combustible)
         {
-            // Lubricante: ya no es un tipo de línea aparte — es un artículo real del catálogo de
-            // Inventario (ver CategoriaLubricantes), así que arma una línea de Repuesto como
-            // cualquier otra. Recepción de mercancía mueve su stock sin necesitar un tanque.
-            //
-            // TODO: por eso mismo hoy aparece como "Repuesto" en la columna Tipo, y su artículo
-            // (LUB-...) cae dentro de Inventario · Repuestos junto a correas y rodamientos — es
-            // lo único que ya sabía mover stock sin pedir un tanque. Si el negocio quiere que el
-            // lubricante se vea/organice aparte de los repuestos mecánicos, hay que revisarlo
-            // (¿una categoría propia en la pantalla de Repuestos? ¿un TipoInsumo.Lubricante nuevo
-            // que reutilice el mismo movimiento de stock?).
-            var lubricante = ObtenerOCrearArticuloLubricante(TipoLubricanteSeleccionado, GradoViscosidadSeleccionado);
-
+            // Lubricante: misma simetría que Diésel arriba — la requisición solo dice tipo y
+            // grado, sin decidir marca ni catálogo concreto. Eso se elige recién al Recibir
+            // mercancía, cuando se sabe qué trajo el proveedor (ver Lubricante.cs).
             Lineas.Add(new RequisicionLinea
             {
-                TipoInsumo = TipoInsumo.Repuesto,
-                ArticuloCodigo = lubricante.Codigo,
-                ArticuloNombre = lubricante.Nombre,
+                TipoInsumo = TipoInsumo.Combustible,
+                TipoCombustibleSolicitado = TipoCombustible.Lubricante,
+                TipoLubricante = GradoViscosidadSeleccionado,
                 Cantidad = cantidad,
-                UnidadTexto = lubricante.Unidad
+                UnidadTexto = "L"
             });
         }
         else

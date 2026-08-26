@@ -78,6 +78,16 @@ public static class Permisos
         public const string CrearStock = "Combustible.CrearStock";
     }
 
+    /// <summary>Catálogo de lubricantes (Marca + Tipo + Grado), pestaña de Inventario ·
+    /// Combustible. Maestro simple, sin máquina de estados — mismo trato que Proveedores: el
+    /// remesero no administra catálogos maestros, solo los ve.</summary>
+    public static class Lubricantes
+    {
+        public const string Crear = "Lubricantes.Crear";
+        public const string Editar = "Lubricantes.Editar";
+        public const string Eliminar = "Lubricantes.Eliminar";
+    }
+
     /// <summary>Primer eslabón del flujo de compras: identificar cuánto hace falta.</summary>
     public static class Requisicion
     {

@@ -52,6 +52,9 @@ public class AsoDbContext : DbContext
     // Fase 12 (recepción de mercancía)
     public DbSet<RecepcionMercancia> RecepcionesMercancia { get; set; }
 
+    // Fase 14 (catálogo de lubricantes)
+    public DbSet<Lubricante> Lubricantes { get; set; }
+
     // Fase 6 (organización y seguridad)
     public DbSet<Organizacion> Organizaciones { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
@@ -653,13 +656,30 @@ public class AsoDbContext : DbContext
                 linea.Property(x => x.CantidadPedida).HasColumnType("decimal(18,2)");
                 linea.Property(x => x.CantidadRecibida).HasColumnType("decimal(18,2)");
 
+                linea.Property(x => x.LubricanteNombre).HasMaxLength(150);
+
                 linea.Ignore(x => x.EsCombustible);
+                linea.Ignore(x => x.EsDiesel);
+                linea.Ignore(x => x.EsLubricante);
                 linea.Ignore(x => x.TipoInsumoTexto);
                 linea.Ignore(x => x.DestinoTexto);
                 linea.Ignore(x => x.CantidadPedidaTexto);
                 linea.Ignore(x => x.CantidadRecibidaTexto);
                 linea.Ignore(x => x.DiferenciaTexto);
             });
+        });
+
+        // ---- Fase 14: catálogo de lubricantes ----
+        modelBuilder.Entity<Lubricante>(entity =>
+        {
+            entity.HasKey(l => l.Id);
+            entity.Property(l => l.Marca).IsRequired().HasMaxLength(100);
+            entity.Property(l => l.Tipo).IsRequired().HasMaxLength(20);
+            entity.Property(l => l.GradoViscosidad).IsRequired().HasMaxLength(20);
+            entity.Property(l => l.ExistenciaL).HasColumnType("decimal(18,2)").IsRequired();
+
+            entity.Ignore(l => l.Etiqueta);
+            entity.Ignore(l => l.ExistenciaTexto);
         });
 
         AplicarFiltroDeOrganizacion(modelBuilder);

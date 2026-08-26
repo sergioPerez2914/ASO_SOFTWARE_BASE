@@ -45,7 +45,7 @@ resumen y se despliega su lista de submódulos en el menú lateral.
 |---|---|---|
 | Operaciones | Registro de Operación · Seguimiento · Fincas | funcionales |
 | Flota | Gestión de Flota · Mantenimiento · **Telemetría** | funcionales, salvo Telemetría (pendiente) |
-| Inventario | Repuestos · Combustible · Producto · **Compras** | funcionales, Compras a medias (ver más abajo) |
+| Inventario | Repuestos · Combustible · Producto · **Compras** | funcionales |
 | Nómina | Liquidaciones · Empleados · Gestión de Horarios | funcionales |
 | Finanzas | Cuentas por Cobrar · Cuentas por Pagar · Tarifas · **Banco** | funcionales, salvo Banco (pendiente) |
 
@@ -59,8 +59,7 @@ no es trabajo del día. La lista que sí las incluye a las cuatro es `TodosLosFi
 que usar para permisos y resolución de claves — con `Fijados`, `Ver.Configuracion` no existiría en la
 matriz y no habría forma de quitarle la sección a nadie.
 
-**De los 17 submódulos hay 14 construidos del todo; faltan Flota · Telemetría y Finanzas · Banco, y
-Inventario · Compras está a medias (ver "Inventario · Compras" más abajo).**
+**De los 17 submódulos hay 15 construidos del todo; faltan Flota · Telemetría y Finanzas · Banco.**
 Banco está dado de alta en el catálogo pero cae en el marcador de posición: mostrará el estado de
 la cuenta según lo cobrado y pagado en la aplicación, y queda por decidir cómo llega el dato real
 del banco (importar el extracto, teclearlo o una interfaz contratada de banca empresas).
@@ -159,39 +158,67 @@ y **contenedor de dos padrones** (`EmpleadosViewModel`, `CuentasPorPagarViewMode
 - **Umbral configurable** (`appsettings.json` → `Combustible:UmbralAlertaConsumo`, 0.25 = 25 %):
   cuánto puede superar un vale al promedio histórico del activo antes de marcarse con alerta.
 
-## Inventario · Compras: requisición y orden de compra (2026-08-24, A MEDIAS)
+## Inventario · Compras: requisición, orden de compra y recepción (2026-08-25)
 
 Reemplaza el atajo de `RecargaCombustible` (sumar litros a mano, sin aprobación ni proveedor real)
 por el proceso real: alguien identifica cuánto hace falta → se comparan precios de proveedor → se
 aprueba una orden de compra → el proveedor entrega → se recibe → **ahí** se refleja en existencia.
-**Hoy solo están construidos los dos primeros pasos; el tercero (Recepción) falta, así que Compras
-todavía no mueve ninguna existencia real** — `TanquesCombustible`/`InventoryItem.StockActual`
-siguen sin tocarse desde este flujo, y `RecargaCombustible` **sigue viva y en uso** en paralelo
-mientras tanto (no se retiró: se retira recién cuando la Recepción la reemplace de verdad).
+**Los tres pasos están construidos**, incluida la Recepción: es ella, no la Orden de Compra, la que
+mueve `StockCombustible`/`InventoryItem.StockActual`. `RecargaCombustible` **sigue viva y en uso**
+en paralelo a propósito — se retira cuando el cotejo a tres vías (ver más abajo) esté listo, no antes.
 
 - **`Requisicion`** (`Estado`: Borrador → Enviada → Atendida | Anulada): quien está en campo/taller
   dice qué hace falta. Documento con líneas (`RequisicionLinea`), sin monto — eso lo decide la
   cotización más adelante. Cada línea es `TipoInsumo.Combustible` (dice `TipoCombustibleSolicitado`:
-  Diesel o Lubricante, y si es Lubricante su grado en `TipoLubricante`, ej. "20W50" — **sin
-  catálogo de stock que elegir**, ver la corrección de abajo) o `TipoInsumo.Repuesto` (artículo del
-  catálogo + opcionalmente `ActivoId`/`ActivoEtiqueta`, para qué unidad de flota es).
+  Diesel o Lubricante; si es Lubricante, Tipo —Mineral/Sintético/Semi-sintético— y Grado de
+  viscosidad —15W40, 20W50, etc.— por dos desplegables cerrados, **sin catálogo de stock que
+  elegir**, igual que Diésel nunca referencia un `StockCombustible` en esta etapa) o
+  `TipoInsumo.Repuesto` (artículo del catálogo).
+- **`Lubricante` (2026-08-25), catálogo propio en Inventario · Combustible** (pestaña "Lubricantes"
+  dentro de `CombustibleViewModel`, no un submódulo nuevo): reemplaza el hack anterior que creaba
+  un `InventoryItem` con `Categoria = "Lubricantes"` y código `LUB-{tipo}-{grado}` por cada
+  combinación — se veía como "Repuesto" y sus características quedaban aplanadas en el `Nombre`.
+  Se identifica por **Marca + Tipo + Grado**: cada marca es su propia fila de existencia (un
+  Castrol 20W50 y un Mobil 20W50 son productos distintos). La Requisición sigue sin referenciarlo
+  (solo pide Tipo+Grado); la marca concreta se elige — o se crea al vuelo, botón "+ Nuevo" — recién
+  al confirmar la `RecepcionMercancia`, que es cuando se sabe qué trajo el proveedor
+  (`RecepcionMercanciaLinea.LubricanteId`, paralelo a `StockCombustibleId` para Diésel).
+  `ComprasService.ConfirmarRecepcion`/`AnularRecepcion` tienen ahora tres ramas de stock
+  (Repuesto → `InventoryItem`, Diésel → `StockCombustible`, Lubricante → `Lubricante`) en vez de
+  dos. Permiso `Lubricantes.*`: maestro simple, mismo trato que `Proveedores.*` — el remesero ve la
+  pestaña (tiene `Ver.Combustible`) pero no administra el catálogo.
 - **`CotizacionProveedor`**: por cada requisición Enviada, el administrador captura una fila por
   proveedor consultado (monto total, no por línea). Documento plano, sin estado propio — es apoyo
-  para decidir, no un documento con ciclo de vida.
+  para decidir, no un documento con ciclo de vida. Desde el diálogo de comparar proveedores se puede
+  dar de alta un proveedor nuevo al vuelo (botón "+ Nuevo", reutiliza `ProveedorEditorViewModel`)
+  sin salir a Finanzas · Cuentas por Pagar.
 - **`OrdenCompra`** (`Estado`: Borrador → Aprobada → Cerrada | Anulada): se arma desde una
   requisición Enviada más la cotización ganadora (`ComprasService.CrearDesdeRequisicion`), copiando
   las líneas y congelando `MontoCotizado` = el monto de esa cotización. Con una sola línea el
   precio unitario se calcula solo (`cotizado ÷ cantidad`); con varias, el sistema no reparte un
   total entre ellas — quedan en 0 para completarlas a mano, con el monto cotizado visible aparte
   como referencia. "Aprobada" es a la vez la aprobación del gasto y la emisión al proveedor.
+- **`RecepcionMercancia`** (`Estado`: Borrador → Confirmada, rama Anulada): "la carta de
+  recibimiento". Se arma desde una Orden Aprobada sin recepción activa
+  (`OrdenCompra.RecepcionMercanciaId`, una a la vez), copiando las líneas con `CantidadPedida` de
+  referencia y `CantidadRecibida` prellenada igual a la pedida, a corregir si hubo faltante o
+  sobrante real — es lo REALMENTE recibido, no lo pedido, lo que mueve el stock al confirmar. Una
+  línea de combustible elige aquí a qué `StockCombustible` concreto del catálogo se suma (la orden
+  solo decía diésel/lubricante, no un producto). Confirmar es inmutable; anular revierte el stock
+  con motivo (permisos `RecepcionMercancia.*` en `Services/Permisos.cs`).
 - **Reparto de roles**: Remesero identifica y envía la Requisición; comparar proveedores, armar y
-  aprobar la Orden de Compra es exclusivo de AdministradorNucleo (permisos `Requisicion.*` /
-  `OrdenCompra.*` en `Services/Permisos.cs`, repartidos en `MatrizPermisos.cs`; ninguno es
-  solicitable, porque cada rol ya tiene su parte del flujo).
-- **`Services/ComprasService.cs`** concentra las reglas, mismo contrato que `RemesaService` (`PuedeX`
-  + transición que revalida y lanza `InvalidOperationException`). Pantalla `ComprasViewModel` en
-  Inventario · Compras, contenedor de dos padrones (Requisiciones / Órdenes de Compra), mismo
-  arquetipo que `CuentasPorPagarViewModel`.
+  aprobar la Orden de Compra, y registrar la Recepción es exclusivo de AdministradorNucleo
+  (permisos `Requisicion.*` / `OrdenCompra.*` / `RecepcionMercancia.*` en `Services/Permisos.cs`,
+  repartidos en `MatrizPermisos.cs`; ninguno es solicitable, porque cada rol ya tiene su parte del
+  flujo).
+- **`Services/ComprasService.cs`** concentra las reglas de los tres documentos, mismo contrato que
+  `RemesaService` (`PuedeX` + transición que revalida y lanza `InvalidOperationException`). Pantalla
+  `ComprasViewModel` en Inventario · Compras, contenedor de dos padrones (Requisiciones / Órdenes de
+  Compra — la Recepción se edita desde la Orden, no es un tercer padrón), mismo arquetipo que
+  `CuentasPorPagarViewModel`.
+- **Pendiente**: el cotejo a tres vías (Orden de Compra + Recepción + factura del proveedor) antes
+  de que la deuda aparezca en Cuentas por Pagar — es lo que de verdad retiraría `RecargaCombustible`.
+  `OrdenCompra.Estado.Cerrada` existe pero nada la dispara todavía.
 
 **Corrección "cisterna" no existe (2026-08-24):** el modelo original (`TanqueCombustible`) asumía
 que el combustible/aceite se vacía en una cisterna física elegible de una lista. La empresa real
@@ -216,7 +243,7 @@ hay mocks: `Configuration/DataSourceFactory.cs` devuelve siempre la implementaci
   `FixStockActualStockMinimoDecimal` → `Fase6_OrganizacionYSeguridad` → `Fase7_NucleoUnico` →
   `Fase8_RequisicionYOrdenCompra` → `Fase9_RenombrarCisternaAStock` →
   `Fase10_RequisicionCombustibleYUnidad` → `Fase11_MontoCotizadoYLineasOrdenCompra` →
-  `Fase12_RecepcionMercancia` → `Fase13_JornadaEnFrente`.
+  `Fase12_RecepcionMercancia` → `Fase13_JornadaEnFrente` → `Fase14_Lubricantes`.
 - **La cadena de conexión vive solo en `appsettings.local.json`** (por máquina, en `.gitignore`).
 - **No hay claves foráneas reales** en las tablas planas: las relaciones son `int` sueltos y la
   integridad es de la aplicación, con snapshots de texto (`…Nombre`, `…Codigo`) en cada documento.
@@ -485,16 +512,22 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
    público: quitarla del HEAD no la revoca.
 2. **Llevar la comprobación de permisos a los servicios de dominio.** Hoy toda la autorización vive
    en el `CanExecute` de los comandos: quien llame a un servicio desde otro sitio se la salta.
-3. **Terminar Inventario · Compras**: falta la Recepción de mercancía (la "carta de recibimiento"),
-   que es el paso que de verdad mueve `StockCombustible`/`InventoryItem.StockActual` y recién
-   entonces permite retirar `RecargaCombustible`. Después de eso, el cotejo a tres vías
-   (OC + Recepción + factura del proveedor) antes de que la deuda aparezca en Cuentas por Pagar.
-   Ver "Inventario · Compras" más arriba para el diseño y lo ya construido.
+3. **Inventario · Compras ya tiene sus tres pasos** (Requisición, Orden de Compra, Recepción de
+   mercancía). Queda el cotejo a tres vías (OC + Recepción + factura del proveedor) antes de que la
+   deuda aparezca en Cuentas por Pagar — recién ahí se retira `RecargaCombustible`. Ver "Inventario ·
+   Compras" más arriba.
 4. **Flota · Telemetría**, el único submódulo sin construir. Es también lo que permitiría desglosar el
    L/ton por máquina y frente, hoy calculado solo de forma global.
 5. **Resolver las decisiones provisionales** con el socio (tarifario, formatos, turnos, presentaciones
    de aceite): ahora que la BD está conectada y no hay mocks, cada supuesto sin confirmar se
    convierte en datos reales mal cargados.
+6. **Reparar las filas huérfanas que dejó el bug de `OrganizacionId` en `UPDATE`** (corregido en
+   código el 2026-08-23, `AsoDbContext.EstamparOrganizacion`): un editor que no conservaba el
+   `OrganizacionId` original ponía 0 al guardar una edición, y el filtro fail-closed dejaba esa fila
+   fuera de toda consulta — visible en BD, invisible en pantalla. La corrección solo evita casos
+   nuevos; no repara los que ya quedaron en 0 antes de esa fecha. Un vistazo rápido a la base local
+   de desarrollo (2026-08-25) encontró 3 `Fincas` y 3 `Empleados` en ese estado — revisar si hay más
+   antes de repartir esta build.
 
 El catálogo completo de permisos está en `Services/Permisos.cs` (90 en uso) y el reparto por rol en
 `Services/MatrizPermisos.cs`.

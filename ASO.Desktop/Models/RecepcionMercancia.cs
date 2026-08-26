@@ -99,6 +99,12 @@ public class RecepcionMercanciaLinea
     public int? StockCombustibleId { get; set; }
     public string StockCombustibleNombre { get; set; } = string.Empty;   // snapshot
 
+    /// <summary>Marca concreta de lubricante a la que se suma la cantidad recibida. Solo aplica
+    /// cuando <see cref="TipoCombustibleSolicitado"/> es <see cref="TipoCombustible.Lubricante"/> —
+    /// la orden de compra solo decía diésel/lubricante, no una marca; eso se elige aquí.</summary>
+    public int? LubricanteId { get; set; }
+    public string LubricanteNombre { get; set; } = string.Empty;   // snapshot
+
     // --- Repuesto ---
     public string? ArticuloCodigo { get; set; }
     public string ArticuloNombre { get; set; } = string.Empty;    // snapshot
@@ -115,6 +121,12 @@ public class RecepcionMercanciaLinea
     public string UnidadTexto { get; set; } = string.Empty;
 
     public bool EsCombustible => TipoInsumo == TipoInsumo.Combustible;
+
+    /// <summary>Distingue, dentro de una línea de combustible, a qué catálogo se suma la
+    /// cantidad recibida: Diésel va a <see cref="StockCombustible"/>, Lubricante a <see cref="Lubricante"/>.</summary>
+    public bool EsDiesel => EsCombustible && TipoCombustibleSolicitado == TipoCombustible.Diesel;
+
+    public bool EsLubricante => EsCombustible && TipoCombustibleSolicitado == TipoCombustible.Lubricante;
 
     public string TipoInsumoTexto => EsCombustible ? "Combustible" : "Repuesto";
 

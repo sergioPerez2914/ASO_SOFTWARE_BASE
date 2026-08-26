@@ -14,9 +14,10 @@ namespace ASO.Desktop.Services;
 /// profundidad).
 ///
 /// Confirmar una recepción es lo que de verdad mueve inventario: suma cada línea al
-/// <see cref="StockCombustible"/> o al <see cref="InventoryItem"/> que le corresponde, por la
-/// cantidad REALMENTE recibida. El cotejo a tres vías con Cuentas por Pagar (el que cierra la
-/// orden a <c>Cerrada</c>) sigue pendiente, en una fase posterior.
+/// <see cref="StockCombustible"/> (diésel), al <see cref="Lubricante"/> (aceite) o al
+/// <see cref="InventoryItem"/> (repuesto) que le corresponde, por la cantidad REALMENTE recibida.
+/// El cotejo a tres vías con Cuentas por Pagar (el que cierra la orden a <c>Cerrada</c>) sigue
+/// pendiente, en una fase posterior.
 /// </summary>
 public sealed class ComprasService
 {
@@ -26,13 +27,15 @@ public sealed class ComprasService
     private readonly IRecepcionMercanciaDataSource _recepciones;
     private readonly IInventoryDataSource _articulos;
     private readonly IStockCombustibleDataSource _stockCombustible;
+    private readonly ILubricanteDataSource _lubricantes;
 
     public ComprasService(IRequisicionDataSource requisiciones,
                           ICotizacionProveedorDataSource cotizaciones,
                           IOrdenCompraDataSource ordenesCompra,
                           IRecepcionMercanciaDataSource recepciones,
                           IInventoryDataSource articulos,
-                          IStockCombustibleDataSource stockCombustible)
+                          IStockCombustibleDataSource stockCombustible,
+                          ILubricanteDataSource lubricantes)
     {
         _requisiciones = requisiciones;
         _cotizaciones = cotizaciones;
@@ -40,6 +43,7 @@ public sealed class ComprasService
         _recepciones = recepciones;
         _articulos = articulos;
         _stockCombustible = stockCombustible;
+        _lubricantes = lubricantes;
     }
 
     // --- Requisición: reglas de transición ---
@@ -274,10 +278,11 @@ public sealed class ComprasService
         if (r.Lineas.All(l => l.CantidadRecibida <= 0))
             pendientes.Add("al menos una cantidad recibida mayor que cero");
 
-        if (r.Lineas.Any(l => l.TipoInsumo == TipoInsumo.Combustible
-                               && l.CantidadRecibida > 0
-                               && l.StockCombustibleId is null))
-            pendientes.Add("el stock de combustible al que se suma cada línea de combustible recibida");
+        if (r.Lineas.Any(l => l.EsDiesel && l.CantidadRecibida > 0 && l.StockCombustibleId is null))
+            pendientes.Add("el stock de combustible al que se suma cada línea de diésel recibida");
+
+        if (r.Lineas.Any(l => l.EsLubricante && l.CantidadRecibida > 0 && l.LubricanteId is null))
+            pendientes.Add("la marca de lubricante a la que se suma cada línea de lubricante recibida");
 
         faltantes = pendientes.Count == 0 ? null : string.Join(", ", pendientes);
         return pendientes.Count == 0;
@@ -358,7 +363,7 @@ public sealed class ComprasService
                     throw new InvalidOperationException(
                         $"El artículo {linea.ArticuloCodigo} ya no existe en el catálogo de inventario.");
             }
-            else
+            else if (linea.EsDiesel)
             {
                 var stock = _stockCombustible.GetById(linea.StockCombustibleId!.Value)
                     ?? throw new InvalidOperationException("El stock de combustible indicado ya no existe.");
@@ -367,6 +372,11 @@ public sealed class ComprasService
                     throw new InvalidOperationException(
                         $"El stock de {stock.Nombre} tiene {stock.ExistenciaL:N2} L de {stock.CapacidadL:N2} L " +
                         $"y no admite {linea.CantidadRecibida:N2} L más. Verifique la cantidad recibida.");
+            }
+            else
+            {
+                _ = _lubricantes.GetById(linea.LubricanteId!.Value)
+                    ?? throw new InvalidOperationException("El lubricante indicado ya no existe en el catálogo.");
             }
         }
 
@@ -380,12 +390,19 @@ public sealed class ComprasService
                 actualizado.StockActual += linea.CantidadRecibida;
                 _articulos.Update(actualizado);
             }
-            else
+            else if (linea.EsDiesel)
             {
                 var stock = _stockCombustible.GetById(linea.StockCombustibleId!.Value)!;
                 var actualizado = stock.Clonar();
                 actualizado.ExistenciaL += linea.CantidadRecibida;
                 _stockCombustible.Update(actualizado);
+            }
+            else
+            {
+                var lubricante = _lubricantes.GetById(linea.LubricanteId!.Value)!;
+                var actualizado = lubricante.Clonar();
+                actualizado.ExistenciaL += linea.CantidadRecibida;
+                _lubricantes.Update(actualizado);
             }
         }
 
@@ -424,12 +441,19 @@ public sealed class ComprasService
                     actualizado.StockActual -= linea.CantidadRecibida;
                     _articulos.Update(actualizado);
                 }
-                else if (linea.TipoInsumo == TipoInsumo.Combustible && linea.StockCombustibleId is { } id
+                else if (linea.EsDiesel && linea.StockCombustibleId is { } id
                          && _stockCombustible.GetById(id) is { } stock)
                 {
                     var actualizado = stock.Clonar();
                     actualizado.ExistenciaL -= linea.CantidadRecibida;
                     _stockCombustible.Update(actualizado);
+                }
+                else if (linea.EsLubricante && linea.LubricanteId is { } lubricanteId
+                         && _lubricantes.GetById(lubricanteId) is { } lubricante)
+                {
+                    var actualizado = lubricante.Clonar();
+                    actualizado.ExistenciaL -= linea.CantidadRecibida;
+                    _lubricantes.Update(actualizado);
                 }
             }
         }
