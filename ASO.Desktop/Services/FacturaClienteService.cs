@@ -18,14 +18,17 @@ public sealed class FacturaClienteService
     private readonly IFacturaClienteDataSource _facturas;
     private readonly IRemesaDataSource _remesas;
     private readonly TarifaService _tarifas;
+    private readonly IEventoOperacionDataSource _eventos;
 
     public FacturaClienteService(IFacturaClienteDataSource facturas,
                                  IRemesaDataSource remesas,
-                                 TarifaService tarifas)
+                                 TarifaService tarifas,
+                                 IEventoOperacionDataSource eventos)
     {
         _facturas = facturas;
         _remesas = remesas;
         _tarifas = tarifas;
+        _eventos = eventos;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -204,6 +207,14 @@ public sealed class FacturaClienteService
         yield return (ServicioZafra.Transporte, remesa.NucleoTransporteCodigo);
     }
 
+    /// <summary>
+    /// Devuelve las remesas de la factura al estado de facturables.
+    ///
+    /// Este es el único hecho de facturación que hay que ESCRIBIR en el seguimiento. Los otros
+    /// —emisión y cobro— se deducen de la factura a la que apunta la remesa, pero aquí ese
+    /// puntero se pone a nulo: sin el evento, que la remesa estuvo facturada y dejó de estarlo no
+    /// quedaría en ninguna parte.
+    /// </summary>
     private void LiberarRemesas(FacturaCliente factura)
     {
         foreach (var id in factura.Lineas.Select(l => l.RemesaId).Distinct())
@@ -214,6 +225,16 @@ public sealed class FacturaClienteService
             var liberada = remesa.Clonar();
             liberada.FacturaClienteId = null;
             _remesas.Update(liberada);
+
+            _eventos.Add(new EventoOperacion
+            {
+                RemesaId = remesa.Id,
+                Tipo = TipoEventoOperacion.Facturacion,
+                FechaHora = DateTime.Now,
+                Descripcion = $"Anulada la factura {factura.NumeroTexto}: la remesa vuelve a estar " +
+                              "pendiente de facturar.",
+                OrigenId = factura.Id
+            });
         }
     }
 }

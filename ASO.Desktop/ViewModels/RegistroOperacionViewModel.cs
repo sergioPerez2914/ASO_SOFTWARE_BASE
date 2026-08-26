@@ -41,7 +41,7 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
                                        ISesionActual sesion)
         : base(modulo, submodulo, remesas, dialogos, sesion)
     {
-        _servicio = new RemesaService(remesas);
+        _servicio = new RemesaService(remesas, DataSourceFactory.CrearEventosOperacion());
         _dialogos = dialogos;
         _sesionActual = sesion;
         _fincas = DataSourceFactory.CrearFincas();
@@ -173,6 +173,51 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
     /// Si el servicio rechaza la transición se informa y no se guarda nada, así que tampoco hay
     /// recarga: la pantalla se queda como estaba, que es lo correcto.
     /// </summary>
+    /// <summary>
+    /// La edición pasa por el servicio, que valida el estado y deja constancia de qué campos
+    /// cambiaron. El camino heredado escribía directo a la fuente, y como la remesa no guarda
+    /// fecha de modificación ni quién la tocó, editar un borrador no dejaba ningún rastro.
+    /// </summary>
+    protected override void Editar()
+    {
+        if (SelectedItem is not { } actual)
+            return;
+
+        var editor = CrearEditor(actual);
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        Aplicar(() => _servicio.Editar(actual, editor.ObtenerResultado(), Autor));
+    }
+
+    /// <summary>
+    /// Borrar la remesa se lleva por delante sus eventos de seguimiento. Sin esto quedarían
+    /// notas y cambios de turno apuntando a un documento que ya no existe.
+    /// </summary>
+    protected override void Eliminar()
+    {
+        if (SelectedItem is not { } remesa)
+            return;
+
+        if (!_dialogos.Confirmar("Eliminar",
+                $"¿Eliminar la remesa Nº {remesa.Id} y su historial de seguimiento? " +
+                "Esta acción no se puede deshacer."))
+            return;
+
+        try
+        {
+            _servicio.Eliminar(remesa);
+            SelectedItem = null;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _dialogos.Informar("Remesas", ex.Message);
+        }
+    }
+
+    /// <summary>Quién firma lo que se registra, para los eventos que lo llevan.</summary>
+    private string Autor => _sesionActual.UsuarioActual?.NombreCompleto ?? string.Empty;
+
     private void Aplicar(Func<Remesa> transicion)
     {
         try

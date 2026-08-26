@@ -148,8 +148,10 @@ public sealed class HorarioService
 
     /// <summary>
     /// Refleja el movimiento de personal en la línea de tiempo de la remesa. Solo lo tienen las
-    /// jornadas de campo: una jornada administrativa no pertenece a ningún frente. Va sin
-    /// <c>Autor</c> porque es un evento de sistema, no una nota escrita a mano.
+    /// jornadas de campo: una jornada administrativa no pertenece a ningún frente.
+    ///
+    /// Lleva el Id de la jornada para que la ficha del evento pueda abrirla entera (turno, horas,
+    /// observación) en vez de quedarse en la frase.
     /// </summary>
     private void PublicarEnSeguimiento(JornadaTrabajo jornada, DateTime fechaHora, string descripcion)
     {
@@ -161,7 +163,9 @@ public sealed class HorarioService
             RemesaId = remesaId,
             Tipo = TipoEventoOperacion.CambioTurno,
             FechaHora = fechaHora,
-            Descripcion = descripcion
+            Descripcion = descripcion,
+            Autor = jornada.PersonaNombre,
+            OrigenId = jornada.Id
         });
     }
 

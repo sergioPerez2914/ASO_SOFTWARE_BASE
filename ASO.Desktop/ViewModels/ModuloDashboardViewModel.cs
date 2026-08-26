@@ -238,7 +238,8 @@ public sealed class ModuloDashboardViewModel : ViewModelBase, IRecargable
         var cobrar = new FacturaClienteService(
             DataSourceFactory.CrearFacturasCliente(),
             DataSourceFactory.CrearRemesas(),
-            new TarifaService(DataSourceFactory.CrearTarifas()));
+            new TarifaService(DataSourceFactory.CrearTarifas()),
+            DataSourceFactory.CrearEventosOperacion());
 
         var pagar = new CuentasPorPagarService(DataSourceFactory.CrearFacturasProveedor());
 

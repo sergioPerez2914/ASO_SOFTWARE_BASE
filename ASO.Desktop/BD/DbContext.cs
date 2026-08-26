@@ -487,6 +487,7 @@ public class AsoDbContext : DbContext
             entity.Ignore(e => e.EtiquetaTipo);
             entity.Ignore(e => e.Glifo);
             entity.Ignore(e => e.FechaHoraTexto);
+            entity.Ignore(e => e.OrdenCicloVida);
         });
 
         // ---- Fase 6: organización (núcleo) y seguridad ----

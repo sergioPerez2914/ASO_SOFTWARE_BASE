@@ -10,4 +10,11 @@ namespace ASO.Desktop.Services;
 public interface IEventoOperacionDataSource : ICrudDataSource<EventoOperacion, int>
 {
     IEnumerable<EventoOperacion> GetByRemesa(int remesaId);
+
+    /// <summary>
+    /// Borra los eventos de una remesa. No hay clave foránea ni borrado en cascada (las tablas
+    /// son planas a propósito), así que al eliminar una remesa en borrador hay que barrer sus
+    /// eventos aquí o quedan apuntando a un Id que ya no existe.
+    /// </summary>
+    void EliminarDeRemesa(int remesaId);
 }

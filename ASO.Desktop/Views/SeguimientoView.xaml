@@ -43,7 +43,32 @@
         <DataTrigger Binding="{Binding Evento.Tipo}" Value="{x:Static models:TipoEventoOperacion.Anulacion}">
           <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
         </DataTrigger>
+        <DataTrigger Binding="{Binding Evento.Tipo}" Value="{x:Static models:TipoEventoOperacion.Facturacion}">
+          <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Evento.Tipo}" Value="{x:Static models:TipoEventoOperacion.Cobro}">
+          <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Evento.Tipo}" Value="{x:Static models:TipoEventoOperacion.Liquidacion}">
+          <Setter Property="Background" Value="{DynamicResource AccentBlueBrush}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Evento.Tipo}" Value="{x:Static models:TipoEventoOperacion.Edicion}">
+          <Setter Property="Background" Value="{DynamicResource TextSecondaryBrush}" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Evento.Tipo}" Value="{x:Static models:TipoEventoOperacion.Peticion}">
+          <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        </DataTrigger>
       </Style.Triggers>
+    </Style>
+
+    <!-- Fila pulsable de la linea de tiempo. Hereda de la tarjeta pulsable del proyecto por el
+         cursor y la realimentacion de hover, pero le quita el marco: aqui el nodo y el riel ya
+         delimitan la fila, y un borde por evento convertiria la columna en una lista de cajas. -->
+    <Style x:Key="FilaEventoStyle" TargetType="Button" BasedOn="{StaticResource CardButtonStyle}">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="12,6,8,12" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
   </UserControl.Resources>
 
@@ -249,18 +274,25 @@
                       </Border>
                     </Grid>
 
-                    <StackPanel Grid.Column="1" Margin="12,6,0,18">
-                      <TextBlock Text="{Binding Evento.FechaHoraTexto}" FontSize="{StaticResource FsCaption}"
-                                 Foreground="{DynamicResource TextMutedBrush}" />
-                      <TextBlock Text="{Binding Evento.EtiquetaTipo}" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
-                                 Foreground="{DynamicResource TextPrimaryBrush}" />
-                      <TextBlock Text="{Binding Evento.Descripcion}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
-                                 Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-                      <TextBlock FontSize="{StaticResource FsCaption}" Margin="0,4,0,0"
-                                 Foreground="{DynamicResource TextMutedBrush}"
-                                 Visibility="{Binding TieneAutor, Converter={StaticResource BoolToVis}}"
-                                 Text="{Binding Evento.Autor, StringFormat=Registrado por {0}}" />
-                    </StackPanel>
+                    <Button Grid.Column="1" Style="{StaticResource FilaEventoStyle}"
+                            Command="{Binding DataContext.VerDetalleEventoCommand,
+                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            ToolTip="Ver la ficha completa de este evento"
+                            AutomationProperties.Name="{Binding Evento.EtiquetaTipo}">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Evento.FechaHoraTexto}" FontSize="{StaticResource FsCaption}"
+                                   Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBlock Text="{Binding Evento.EtiquetaTipo}" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <TextBlock Text="{Binding Evento.Descripcion}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                        <TextBlock FontSize="{StaticResource FsCaption}" Margin="0,4,0,0"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   Visibility="{Binding TieneAutor, Converter={StaticResource BoolToVis}}"
+                                   Text="{Binding Evento.Autor, StringFormat=Registrado por {0}}" />
+                      </StackPanel>
+                    </Button>
                   </Grid>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>

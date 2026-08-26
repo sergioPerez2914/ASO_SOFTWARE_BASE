@@ -42,7 +42,8 @@
       <!-- IsCancel/IsDefault: hasta ahora ni Esc ni Enter hacian nada en ninguna ventana de la
            aplicacion (cero usos de las dos propiedades en todo el proyecto). -->
       <Button Content="Cancelar" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"
-              IsCancel="True" Command="{Binding CancelarCommand}" />
+              IsCancel="True" Command="{Binding CancelarCommand}"
+              Visibility="{Binding MuestraCancelar, Converter={StaticResource BoolToVis}}" />
       <!-- El texto lo pone el editor: la misma ventana sirve para guardar una ficha y para
            anular una remesa, y "Guardar" describe mal lo segundo. -->
       <Button Content="{Binding TextoAccion}" Style="{StaticResource PrimaryButtonStyle}"

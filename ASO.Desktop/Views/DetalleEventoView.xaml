@@ -1,0 +1,32 @@
+<UserControl x:Class="ASO.Desktop.Views.DetalleEventoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="520">
+
+  <!-- La ventana es SizeToContent="Height" y no se puede redimensionar, así que el scroll tiene
+       que vivir aquí: una petición con motivo largo desbordaría la pantalla. -->
+  <ScrollViewer MaxHeight="420" VerticalScrollBarVisibility="Auto">
+    <ItemsControl ItemsSource="{Binding Datos}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Grid Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" MinWidth="150" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="{Binding Etiqueta}"
+                       Style="{StaticResource FormLabelStyle}" Margin="0,0,12,0" />
+
+            <TextBlock Grid.Column="1" Text="{Binding Valor}" TextWrapping="Wrap"
+                       FontSize="{StaticResource FsBody}"
+                       Foreground="{DynamicResource TextPrimaryBrush}" />
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </ScrollViewer>
+</UserControl>
