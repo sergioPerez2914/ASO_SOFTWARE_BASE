@@ -147,6 +147,10 @@
     <views:RecepcionMercanciaEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:ResponsableRecepcionEditorViewModel}">
+    <views:ResponsableRecepcionEditorView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:UsuarioEditorViewModel}">
     <views:UsuarioEditorView />
   </DataTemplate>

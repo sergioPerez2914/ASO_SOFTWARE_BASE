@@ -40,12 +40,7 @@
       </DataGrid.Columns>
     </DataGrid>
 
-    <controls:FormField Etiqueta="Recibido por" Margin="0,12,0,0">
-      <TextBox Style="{StaticResource FormTextBoxStyle}"
-               Text="{Binding RecibidoPor, UpdateSourceTrigger=PropertyChanged}" />
-    </controls:FormField>
-
-    <controls:FormField Etiqueta="Notas">
+    <controls:FormField Etiqueta="Notas" Margin="0,12,0,0">
       <TextBox Style="{StaticResource FormTextBoxStyle}"
                AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
                VerticalContentAlignment="Top"

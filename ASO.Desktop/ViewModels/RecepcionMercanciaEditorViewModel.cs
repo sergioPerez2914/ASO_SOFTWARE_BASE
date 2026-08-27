@@ -22,7 +22,6 @@ public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<
                                              IStockCombustibleDataSource stockCombustible)
     {
         _original = original;
-        RecibidoPor = original.RecibidoPor;
         Notas = original.Notas;
 
         StocksCombustible = stockCombustible.GetAll().Where(s => s.Activo).OrderBy(s => s.Nombre).ToList();
@@ -38,13 +37,6 @@ public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<
     public IReadOnlyList<StockCombustible> StocksCombustible { get; }
 
     public ObservableCollection<RecepcionMercanciaLinea> Lineas { get; }
-
-    private string _recibidoPor = string.Empty;
-    public string RecibidoPor
-    {
-        get => _recibidoPor;
-        set => SetProperty(ref _recibidoPor, value);
-    }
 
     private string _notas = string.Empty;
     public string Notas
@@ -80,7 +72,6 @@ public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<
     public override RecepcionMercancia ObtenerResultado()
     {
         var recepcion = _original.Clonar();
-        recepcion.RecibidoPor = RecibidoPor.Trim();
         recepcion.Notas = Notas.Trim();
         recepcion.Lineas = Lineas.Select(l =>
         {

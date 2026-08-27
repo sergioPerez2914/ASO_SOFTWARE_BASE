@@ -1,0 +1,28 @@
+<UserControl x:Class="ASO.Desktop.Views.ResponsableRecepcionEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             mc:Ignorable="d"
+             d:DesignWidth="400">
+
+  <StackPanel>
+    <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
+               Foreground="{DynamicResource TextSecondaryBrush}" />
+
+    <TextBlock Text="{Binding AvisoSinEmpleados}" FontSize="12" TextWrapping="Wrap"
+               Margin="0,12,0,0"
+               Foreground="{DynamicResource DangerTextBrush}"
+               Visibility="{Binding NoHayEmpleados, Converter={StaticResource BoolToVis}}" />
+
+    <StackPanel Visibility="{Binding HayEmpleados, Converter={StaticResource BoolToVis}}">
+      <controls:FormField Etiqueta="Recibido por" Margin="0,10,0,0">
+        <ListBox MaxHeight="220" BorderThickness="1"
+                 ItemsSource="{Binding Empleados}"
+                 DisplayMemberPath="Nombre"
+                 SelectedItem="{Binding EmpleadoSeleccionado}" />
+      </controls:FormField>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

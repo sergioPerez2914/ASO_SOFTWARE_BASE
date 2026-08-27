@@ -40,8 +40,9 @@ public class RecepcionMercancia : IEntidad<int>, IDeOrganizacion
 
     public List<RecepcionMercanciaLinea> Lineas { get; set; } = [];
 
-    /// <summary>Quién firmó al recibir. Texto libre — PROVISIONAL, como ResponsableNombre en
-    /// ValeCombustible, hasta que el padrón de empleados esté conectado a la operación.</summary>
+    /// <summary>Quién firmó al recibir. Snapshot de texto del <c>Empleado</c> elegido al confirmar
+    /// (<c>ComprasService.ConfirmarRecepcion</c>, vía <c>ResponsableRecepcionEditorViewModel</c>)
+    /// — no se teclea a mano.</summary>
     public string RecibidoPor { get; set; } = string.Empty;
 
     public string Notas { get; set; } = string.Empty;
