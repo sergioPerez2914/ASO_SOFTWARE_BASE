@@ -385,7 +385,8 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(() => _servicio.ConfirmarRecepcion(recepcion, editor.ResponsableNombre));
+        Aplicar(() => _servicio.ConfirmarRecepcion(
+            recepcion, editor.ResponsableNombre, _sesionActual.UsuarioActual?.Id ?? 0));
     }
 
     private void Anular()
@@ -449,9 +450,11 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         var empleados = DataSourceFactory.CrearEmpleados();
         var lubricantes = DataSourceFactory.CrearLubricantes();
         var marcasLubricante = DataSourceFactory.CrearMarcasLubricante();
+        var facturasProveedor = DataSourceFactory.CrearFacturasProveedor();
 
         var servicio = new ComprasService(
-            requisiciones, cotizaciones, ordenesCompra, recepciones, articulos, stockCombustible, lubricantes);
+            requisiciones, cotizaciones, ordenesCompra, recepciones, articulos, stockCombustible,
+            lubricantes, facturasProveedor);
 
         Requisiciones = new RequisicionesCrudViewModel(
             requisiciones, articulos, proveedores, cotizaciones, marcasLubricante, servicio, dialogos, sesion);

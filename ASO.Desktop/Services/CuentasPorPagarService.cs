@@ -32,7 +32,12 @@ public sealed class CuentasPorPagarService
 
     public bool PuedeRegistrarPago(FacturaProveedor f) => f.Estado == EstadoFacturaProveedor.Pendiente;
 
-    public bool PuedeAnular(FacturaProveedor f) => f.Estado == EstadoFacturaProveedor.Pendiente;
+    public bool PuedeAnular(FacturaProveedor f) =>
+        f.Estado is EstadoFacturaProveedor.Pendiente or EstadoFacturaProveedor.Borrador;
+
+    /// <summary>Solo la factura que generó automáticamente una recepción de mercancía nace en
+    /// Borrador: le falta el Nº de documento y el vencimiento que trae el papel del proveedor.</summary>
+    public bool PuedeCompletarBorrador(FacturaProveedor f) => f.Estado == EstadoFacturaProveedor.Borrador;
 
     /// <summary>
     /// Valida antes de guardar. El número de documento no puede repetirse dentro del mismo
@@ -58,7 +63,7 @@ public sealed class CuentasPorPagarService
             return false;
         }
 
-        if (factura.FechaVencimiento.Date < factura.FechaEmision.Date)
+        if (factura.FechaVencimiento is not { } vencimiento || vencimiento.Date < factura.FechaEmision.Date)
         {
             error = "El vencimiento no puede ser anterior a la fecha de emisión.";
             return false;
@@ -99,13 +104,48 @@ public sealed class CuentasPorPagarService
         return copia;
     }
 
+    /// <summary>
+    /// Completa el borrador que generó automáticamente una recepción de mercancía con lo único
+    /// que el sistema no podía inventar — Nº de documento y vencimiento — y la deja Pendiente,
+    /// igual que cualquier otra factura. Mismo patrón que <see cref="RegistrarPago"/>/<see cref="Anular"/>:
+    /// el número no puede repetirse dentro del mismo proveedor.
+    /// </summary>
+    public FacturaProveedor CompletarBorrador(FacturaProveedor factura, string numeroDocumento, DateTime fechaVencimiento)
+    {
+        if (!PuedeCompletarBorrador(factura))
+            throw new InvalidOperationException(
+                "Solo se completan facturas generadas automáticamente desde una recepción de mercancía.");
+
+        if (string.IsNullOrWhiteSpace(numeroDocumento))
+            throw new InvalidOperationException("Indique el número de la factura del proveedor.");
+
+        if (fechaVencimiento.Date < factura.FechaEmision.Date)
+            throw new InvalidOperationException("El vencimiento no puede ser anterior a la fecha de emisión.");
+
+        var repetida = _facturas.GetByProveedor(factura.ProveedorId)
+            .Where(f => f.Id != factura.Id && f.Estado != EstadoFacturaProveedor.Anulada)
+            .Any(f => string.Equals(f.NumeroDocumento.Trim(), numeroDocumento.Trim(),
+                                    StringComparison.OrdinalIgnoreCase));
+
+        if (repetida)
+            throw new InvalidOperationException($"El proveedor {factura.ProveedorNombre} ya tiene registrada la factura " +
+                                                $"Nº {numeroDocumento.Trim()}.");
+
+        var copia = factura.Clonar();
+        copia.NumeroDocumento = numeroDocumento.Trim();
+        copia.FechaVencimiento = fechaVencimiento;
+        copia.Estado = EstadoFacturaProveedor.Pendiente;
+        _facturas.Update(copia);
+        return copia;
+    }
+
     public FacturaProveedor Anular(FacturaProveedor factura, string motivo)
     {
         if (!PuedeAnular(factura))
             throw new InvalidOperationException(
                 factura.Estado == EstadoFacturaProveedor.Pagada
                     ? "Una factura ya pagada no se anula: registre la nota de crédito del proveedor."
-                    : "Solo se puede anular una factura pendiente.");
+                    : "Solo se puede anular una factura pendiente o generada automáticamente.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Indique el motivo de la anulación.");

@@ -28,9 +28,7 @@ public sealed class FacturaProveedorEditorViewModel : CrudEditorViewModelBase<Fa
         NumeroDocumento = original.NumeroDocumento;
         Descripcion = original.Descripcion;
         FechaEmision = original.FechaEmision == default ? DateTime.Today : original.FechaEmision;
-        FechaVencimiento = original.FechaVencimiento == default
-            ? DateTime.Today.AddDays(30)
-            : original.FechaVencimiento;
+        FechaVencimiento = original.FechaVencimiento ?? DateTime.Today.AddDays(30);
         Monto = original.Monto == 0 ? string.Empty : original.Monto.ToString("0.##");
 
         ProveedorSeleccionado = Proveedores.FirstOrDefault(p => p.Id == original.ProveedorId);

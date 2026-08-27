@@ -4,8 +4,91 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             xmlns:models="clr-namespace:ASO.Desktop.Models"
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
+
+  <UserControl.Resources>
+    <!-- Detalle tabular de la orden de compra, usado como ToolTip de fila: al bindear ToolTip a
+         todo el objeto (no a un string), WPF resuelve este DataTemplate implícito por tipo cada
+         vez que se muestra, en vez de compartir una única instancia de UIElement entre filas. -->
+    <DataTemplate DataType="{x:Type models:OrdenCompra}">
+      <StackPanel Grid.IsSharedSizeScope="True" MaxWidth="420">
+        <Grid Margin="0,0,0,4">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" SharedSizeGroup="ColDestino" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColCantidad" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColPrecio" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColSubtotal" />
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" Text="Destino" FontWeight="SemiBold" Margin="0,0,14,0" />
+          <TextBlock Grid.Column="1" Text="Cantidad" FontWeight="SemiBold" Margin="0,0,14,0" HorizontalAlignment="Right" />
+          <TextBlock Grid.Column="2" Text="Precio" FontWeight="SemiBold" Margin="0,0,14,0" HorizontalAlignment="Right" />
+          <TextBlock Grid.Column="3" Text="Subtotal" FontWeight="SemiBold" HorizontalAlignment="Right" />
+        </Grid>
+        <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,0,0,4" />
+        <ItemsControl ItemsSource="{Binding Lineas}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="0,2,0,2">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" SharedSizeGroup="ColDestino" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColCantidad" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColPrecio" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColSubtotal" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding DestinoTexto}" Margin="0,0,14,0" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="1" Text="{Binding CantidadMostrarTexto}" Margin="0,0,14,0" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="2" Text="{Binding PrecioUnitarioTexto}" Margin="0,0,14,0" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="3" Text="{Binding SubtotalTexto}" HorizontalAlignment="Right" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,4,0,4" />
+        <TextBlock HorizontalAlignment="Right" FontWeight="SemiBold"
+                   Text="{Binding MontoTotalTexto, StringFormat='Total: {0}'}" />
+      </StackPanel>
+    </DataTemplate>
+
+    <!-- Mismo criterio para la Recepción: pedido vs. recibido, sin precio (la recepción no
+         maneja dinero, solo cantidades). -->
+    <DataTemplate DataType="{x:Type models:RecepcionMercancia}">
+      <StackPanel Grid.IsSharedSizeScope="True" MaxWidth="420">
+        <Grid Margin="0,0,0,4">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" SharedSizeGroup="ColDestinoRecepcion" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColPedido" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColRecibido" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColDiferencia" />
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" Text="Destino" FontWeight="SemiBold" Margin="0,0,14,0" />
+          <TextBlock Grid.Column="1" Text="Pedido" FontWeight="SemiBold" Margin="0,0,14,0" HorizontalAlignment="Right" />
+          <TextBlock Grid.Column="2" Text="Recibido" FontWeight="SemiBold" Margin="0,0,14,0" HorizontalAlignment="Right" />
+          <TextBlock Grid.Column="3" Text="Diferencia" FontWeight="SemiBold" HorizontalAlignment="Right" />
+        </Grid>
+        <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,0,0,4" />
+        <ItemsControl ItemsSource="{Binding Lineas}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="0,2,0,2">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" SharedSizeGroup="ColDestinoRecepcion" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColPedido" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColRecibido" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColDiferencia" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding DestinoTexto}" Margin="0,0,14,0" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="1" Text="{Binding CantidadPedidaTexto}" Margin="0,0,14,0" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="2" Text="{Binding CantidadRecibidaTexto}" Margin="0,0,14,0" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="3" Text="{Binding DiferenciaTexto}" HorizontalAlignment="Right" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.Resources>
 
   <Grid>
     <Grid.RowDefinitions>
@@ -180,6 +263,12 @@
           <DataGrid x:Name="TablaOrdenesCompra" Style="{StaticResource DataGridStyle}" MaxHeight="480"
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
+            <DataGrid.RowStyle>
+              <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                <Setter Property="ToolTip" Value="{Binding}" />
+                <Setter Property="ToolTipService.InitialShowDelay" Value="300" />
+              </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
               <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
               <controls:ColumnaTexto Header="Fecha" Width="12*" MinWidth="86"
@@ -267,6 +356,12 @@
           <DataGrid x:Name="TablaRecepciones" Style="{StaticResource DataGridStyle}" MaxHeight="480"
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
+            <DataGrid.RowStyle>
+              <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                <Setter Property="ToolTip" Value="{Binding}" />
+                <Setter Property="ToolTipService.InitialShowDelay" Value="300" />
+              </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
               <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
               <controls:ColumnaTexto Header="Fecha" Width="12*" MinWidth="86"

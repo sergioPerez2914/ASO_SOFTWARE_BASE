@@ -73,6 +73,11 @@ public class OrdenCompra : IEntidad<int>, IDeOrganizacion
 
     public bool TieneRecepcionActiva => RecepcionMercanciaId is not null;
 
+    /// <summary>Factura de proveedor generada al confirmar la recepción (nace en Borrador, a
+    /// completar con Nº de documento y vencimiento en Cuentas por Pagar). Control
+    /// antifacturación doble, mismo criterio que <see cref="RecepcionMercanciaId"/>.</summary>
+    public int? FacturaProveedorId { get; set; }
+
     public int CreadoPorId { get; set; }
     public DateTime FechaCreacion { get; set; }
     // TODO: ZafraId cuando exista el maestro de zafras; todo se filtra por la zafra activa.
@@ -176,6 +181,10 @@ public class OrdenCompraLinea
     public string CantidadTexto => $"{Cantidad:N2} {UnidadTexto}".Trim();
 
     public string UnidadesTexto => $"{Unidades:N2} {Presentacion}".Trim();
+
+    /// <summary>Cantidad a mostrar en tablas compactas: envases si es Lubricante, litros/unidades
+    /// en el resto — evita repetir el <c>EsLubricante ? Unidades : Cantidad</c> en cada XAML.</summary>
+    public string CantidadMostrarTexto => EsLubricante ? UnidadesTexto : CantidadTexto;
 
     public string PrecioUnitarioTexto => PrecioUnitario.ToString("N2");
 

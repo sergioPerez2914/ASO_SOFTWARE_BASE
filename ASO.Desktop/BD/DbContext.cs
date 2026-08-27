@@ -369,6 +369,20 @@ public class AsoDbContext : DbContext
             entity.Ignore(f => f.MontoTexto);
             entity.Ignore(f => f.VencimientoTexto);
             entity.Ignore(f => f.PlazoTexto);
+
+            entity.OwnsMany(f => f.Lineas, linea =>
+            {
+                linea.WithOwner().HasForeignKey("FacturaProveedorId");
+                linea.Property<int>("Id");
+                linea.HasKey("Id");
+                linea.Property(x => x.DestinoTexto).HasMaxLength(150);
+                linea.Property(x => x.CantidadTexto).HasMaxLength(50);
+                linea.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
+                linea.Property(x => x.Subtotal).HasColumnType("decimal(18,2)");
+
+                linea.Ignore(x => x.PrecioUnitarioTexto);
+                linea.Ignore(x => x.SubtotalTexto);
+            });
         });
 
         // --- Fase 4 (documentos con colección anidada) ---

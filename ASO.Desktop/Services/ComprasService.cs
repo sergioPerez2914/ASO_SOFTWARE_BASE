@@ -28,6 +28,7 @@ public sealed class ComprasService
     private readonly IInventoryDataSource _articulos;
     private readonly IStockCombustibleDataSource _stockCombustible;
     private readonly ILubricanteDataSource _lubricantes;
+    private readonly IFacturaProveedorDataSource _facturasProveedor;
 
     public ComprasService(IRequisicionDataSource requisiciones,
                           ICotizacionProveedorDataSource cotizaciones,
@@ -35,7 +36,8 @@ public sealed class ComprasService
                           IRecepcionMercanciaDataSource recepciones,
                           IInventoryDataSource articulos,
                           IStockCombustibleDataSource stockCombustible,
-                          ILubricanteDataSource lubricantes)
+                          ILubricanteDataSource lubricantes,
+                          IFacturaProveedorDataSource facturasProveedor)
     {
         _requisiciones = requisiciones;
         _cotizaciones = cotizaciones;
@@ -44,6 +46,7 @@ public sealed class ComprasService
         _articulos = articulos;
         _stockCombustible = stockCombustible;
         _lubricantes = lubricantes;
+        _facturasProveedor = facturasProveedor;
     }
 
     // --- Requisición: reglas de transición ---
@@ -413,7 +416,7 @@ public sealed class ComprasService
     /// <c>ResponsableRecepcionEditorViewModel</c>), no al editar el borrador: es la firma de quien
     /// tuvo la carga enfrente al momento de confirmar, no un dato de las líneas.
     /// </summary>
-    public RecepcionMercancia ConfirmarRecepcion(RecepcionMercancia recepcion, string recibidoPor)
+    public RecepcionMercancia ConfirmarRecepcion(RecepcionMercancia recepcion, string recibidoPor, int usuarioId)
     {
         if (!PuedeConfirmarRecepcion(recepcion))
             throw new InvalidOperationException(
@@ -520,6 +523,38 @@ public sealed class ComprasService
             }
         }
 
+        // La deuda con el proveedor: un borrador de factura con lo que dice la orden de compra
+        // (proveedor, líneas, precio, monto), a completar en Cuentas por Pagar con lo único que
+        // el sistema no puede inventar — el Nº de documento y el vencimiento que trae el papel
+        // del proveedor. FacturaProveedorId es el control antifacturación doble, mismo criterio
+        // que RecepcionMercanciaId.
+        if (orden is not null && orden.FacturaProveedorId is null)
+        {
+            var factura = _facturasProveedor.Add(new FacturaProveedor
+            {
+                ProveedorId = orden.ProveedorId,
+                ProveedorNombre = orden.ProveedorNombre,
+                OrdenCompraId = orden.Id,
+                Descripcion = $"Orden de compra Nº {orden.Id} — recepción Nº {recepcion.Id}",
+                FechaEmision = DateTime.Today,
+                Monto = orden.MontoTotal,
+                Estado = EstadoFacturaProveedor.Borrador,
+                CreadoPorId = usuarioId,
+                FechaCreacion = DateTime.Now,
+                Lineas = orden.Lineas.Select(l => new FacturaProveedorLinea
+                {
+                    DestinoTexto = l.DestinoTexto,
+                    CantidadTexto = l.CantidadMostrarTexto,
+                    PrecioUnitario = l.PrecioUnitario,
+                    Subtotal = l.Subtotal
+                }).ToList()
+            });
+
+            var ordenConFactura = orden.Clonar();
+            ordenConFactura.FacturaProveedorId = factura.Id;
+            _ordenesCompra.Update(ordenConFactura);
+        }
+
         var copia = recepcion.Clonar();
         copia.RecibidoPor = recibidoPor.Trim();
         copia.Estado = EstadoRecepcionMercancia.Confirmada;
@@ -580,11 +615,37 @@ public sealed class ComprasService
         copia.FechaAnulacion = DateTime.Now;
         _recepciones.Update(copia);
 
-        if (_ordenesCompra.GetById(recepcion.OrdenCompraId) is { } orden && orden.RecepcionMercanciaId == recepcion.Id)
+        if (_ordenesCompra.GetById(recepcion.OrdenCompraId) is { } orden)
         {
             var ordenActualizada = orden.Clonar();
-            ordenActualizada.RecepcionMercanciaId = null;
-            _ordenesCompra.Update(ordenActualizada);
+            var tocoOrden = false;
+
+            if (orden.RecepcionMercanciaId == recepcion.Id)
+            {
+                ordenActualizada.RecepcionMercanciaId = null;
+                tocoOrden = true;
+            }
+
+            // El borrador de factura que generó esta recepción se anula con ella, para no dejar
+            // una deuda fantasma sin recepción real detrás — y se libera FacturaProveedorId para
+            // que una futura recepción sobre esta misma orden pueda generar una nueva. Si ya se
+            // completó (Pendiente) o se pagó, no se toca: eso se anula a mano desde Cuentas por
+            // Pagar si corresponde.
+            if (orden.FacturaProveedorId is { } facturaId
+                && _facturasProveedor.GetById(facturaId) is { Estado: EstadoFacturaProveedor.Borrador } factura)
+            {
+                var facturaAnulada = factura.Clonar();
+                facturaAnulada.Estado = EstadoFacturaProveedor.Anulada;
+                facturaAnulada.MotivoAnulacion = $"Recepción Nº {recepcion.Id} anulada: {motivo.Trim()}";
+                facturaAnulada.FechaAnulacion = DateTime.Now;
+                _facturasProveedor.Update(facturaAnulada);
+
+                ordenActualizada.FacturaProveedorId = null;
+                tocoOrden = true;
+            }
+
+            if (tocoOrden)
+                _ordenesCompra.Update(ordenActualizada);
         }
 
         return copia;

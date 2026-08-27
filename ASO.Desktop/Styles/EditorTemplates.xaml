@@ -83,6 +83,10 @@
     <views:MotivoEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:CompletarFacturaProveedorEditorViewModel}">
+    <views:CompletarFacturaProveedorEditorView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:ValeCombustibleEditorViewModel}">
     <views:ValeCombustibleEditorView />
   </DataTemplate>

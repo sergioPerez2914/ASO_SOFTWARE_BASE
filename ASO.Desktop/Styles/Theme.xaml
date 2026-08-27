@@ -350,6 +350,11 @@
         <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
       </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Borrador}">
+        <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
+      </DataTrigger>
       <DataTrigger Binding="{Binding EstaVencida}" Value="True">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />

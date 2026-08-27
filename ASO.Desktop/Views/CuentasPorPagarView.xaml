@@ -4,9 +4,54 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             xmlns:models="clr-namespace:ASO.Desktop.Models"
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
+  <UserControl.Resources>
+    <!-- Detalle tabular de la factura, usado como ToolTip de fila — mismo patrón que
+         Views/ComprasView.xaml en Órdenes de Compra: bindear ToolTip a todo el objeto (no a un
+         string) hace que WPF resuelva este DataTemplate implícito por tipo cada vez que se
+         muestra, en vez de compartir una única instancia de UIElement entre filas. -->
+    <DataTemplate DataType="{x:Type models:FacturaProveedor}">
+      <StackPanel Grid.IsSharedSizeScope="True" MaxWidth="420">
+        <Grid Margin="0,0,0,4">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" SharedSizeGroup="ColDestinoFactura" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColCantidadFactura" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColPrecioFactura" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="ColSubtotalFactura" />
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" Text="Destino" FontWeight="SemiBold" Margin="0,0,14,0" />
+          <TextBlock Grid.Column="1" Text="Cantidad" FontWeight="SemiBold" Margin="0,0,14,0" HorizontalAlignment="Right" />
+          <TextBlock Grid.Column="2" Text="Precio" FontWeight="SemiBold" Margin="0,0,14,0" HorizontalAlignment="Right" />
+          <TextBlock Grid.Column="3" Text="Subtotal" FontWeight="SemiBold" HorizontalAlignment="Right" />
+        </Grid>
+        <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,0,0,4" />
+        <ItemsControl ItemsSource="{Binding Lineas}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="0,2,0,2">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" SharedSizeGroup="ColDestinoFactura" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColCantidadFactura" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColPrecioFactura" />
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="ColSubtotalFactura" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding DestinoTexto}" Margin="0,0,14,0" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="1" Text="{Binding CantidadTexto}" Margin="0,0,14,0" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="2" Text="{Binding PrecioUnitarioTexto}" Margin="0,0,14,0" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="3" Text="{Binding SubtotalTexto}" HorizontalAlignment="Right" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,4,0,4" />
+        <TextBlock HorizontalAlignment="Right" FontWeight="SemiBold"
+                   Text="{Binding MontoTexto, StringFormat='Total: {0}'}" />
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.Resources>
 
   <Grid>
     <Grid.RowDefinitions>
@@ -65,6 +110,9 @@
             <RadioButton Content="Todas" GroupName="FiltroCxP" IsChecked="True"
                          Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
+            <RadioButton Content="Borrador" GroupName="FiltroCxP"
+                         Style="{StaticResource FilterChipStyle}"
+                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
             <RadioButton Content="Pendientes" GroupName="FiltroCxP"
                          Style="{StaticResource FilterChipStyle}"
                          Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Pendientes" />
@@ -89,6 +137,8 @@
                     Command="{Binding AgregarCommand}" />
             <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding EditarCommand}" />
+            <Button Content="Completar" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding CompletarCommand}" />
             <Button Content="Registrar pago" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding RegistrarPagoCommand}" />
             <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
@@ -106,6 +156,12 @@
           <DataGrid x:Name="Tabla1" Style="{StaticResource DataGridStyle}" MaxHeight="480"
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
+            <DataGrid.RowStyle>
+              <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                <Setter Property="ToolTip" Value="{Binding}" />
+                <Setter Property="ToolTipService.InitialShowDelay" Value="300" />
+              </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
               <controls:ColumnaTexto Header="Documento" Binding="{Binding NumeroDocumento}" Width="11*" MinWidth="78" />
               <controls:ColumnaTexto Header="Proveedor" Binding="{Binding ProveedorNombre}" Width="24*" MinWidth="120" />

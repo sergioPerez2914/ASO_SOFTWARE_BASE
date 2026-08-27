@@ -47,11 +47,16 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
 
         AnularCommand = new RelayCommand(Anular,
             () => SelectedItem is { } f && _servicio.PuedeAnular(f) && _sesionActual.Puede("Finanzas.Anular"));
+
+        CompletarCommand = new RelayCommand(Completar,
+            () => SelectedItem is { } f && _servicio.PuedeCompletarBorrador(f)
+                  && _sesionActual.Puede(Permisos.FacturasProveedor.Editar));
     }
 
     public ICommand CambiarFiltroEstadoCommand { get; }
     public ICommand RegistrarPagoCommand { get; }
     public ICommand AnularCommand { get; }
+    public ICommand CompletarCommand { get; }
 
     /// <summary>Estado de la deuda, visible sin ir al dashboard del módulo.</summary>
     public string ResumenDeuda =>
@@ -66,6 +71,7 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
 
     protected override bool PasaFiltroExtra(FacturaProveedor item) => _filtroEstado switch
     {
+        "Borrador" => item.Estado == EstadoFacturaProveedor.Borrador,
         "Pendientes" => item.Estado == EstadoFacturaProveedor.Pendiente,
         "Vencidas" => item.EstaVencida,
         "Pagadas" => item.Estado == EstadoFacturaProveedor.Pagada,
@@ -120,7 +126,9 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
             return;
 
         var editor = new MotivoEditorViewModel(
-            $"Anular factura {factura.NumeroDocumento}",
+            factura.Estado == EstadoFacturaProveedor.Borrador
+                ? $"Anular borrador de factura Nº {factura.Id}"
+                : $"Anular factura {factura.NumeroDocumento}",
             $"{factura.ProveedorNombre} — {factura.Descripcion} — {factura.MontoTexto}",
             "Motivo de la anulación",
             "Indique el motivo de la anulación.");
@@ -129,6 +137,24 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
             return;
 
         Aplicar(() => _servicio.Anular(factura, editor.Motivo));
+    }
+
+    /// <summary>
+    /// Completa el borrador que generó automáticamente una recepción de mercancía con el Nº de
+    /// documento y el vencimiento que trae el papel del proveedor. Ver
+    /// <see cref="Services.ComprasService.ConfirmarRecepcion"/>.
+    /// </summary>
+    private void Completar()
+    {
+        if (SelectedItem is not { } factura)
+            return;
+
+        var editor = new CompletarFacturaProveedorEditorViewModel(factura);
+
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        Aplicar(() => _servicio.CompletarBorrador(factura, editor.NumeroDocumento, editor.FechaVencimiento));
     }
 
     /// <summary>
