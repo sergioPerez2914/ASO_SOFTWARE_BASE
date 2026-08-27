@@ -577,6 +577,7 @@ public class AsoDbContext : DbContext
                 linea.Property<int>("Id");
                 linea.HasKey("Id");
                 linea.Property(x => x.TipoLubricante).HasMaxLength(20);
+                linea.Property(x => x.ClaseLubricante).HasMaxLength(20);
                 linea.Property(x => x.ArticuloCodigo).HasMaxLength(30);
                 linea.Property(x => x.ArticuloNombre).HasMaxLength(150);
                 linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
@@ -595,9 +596,40 @@ public class AsoDbContext : DbContext
             entity.HasKey(c => c.Id);
             entity.Property(c => c.ProveedorNombre).HasMaxLength(150);
             entity.Property(c => c.Notas).HasMaxLength(500);
-            entity.Property(c => c.MontoTotal).HasColumnType("decimal(18,2)").IsRequired();
 
+            entity.Ignore(c => c.MontoTotal);
             entity.Ignore(c => c.MontoTexto);
+
+            entity.OwnsMany(c => c.Lineas, linea =>
+            {
+                linea.WithOwner().HasForeignKey("CotizacionProveedorId");
+                linea.Property<int>("Id");
+                linea.HasKey("Id");
+                linea.Property(x => x.TipoLubricante).HasMaxLength(20);
+                linea.Property(x => x.ArticuloCodigo).HasMaxLength(30);
+                linea.Property(x => x.ArticuloNombre).HasMaxLength(150);
+                linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
+                linea.Property(x => x.UnidadTexto).HasMaxLength(20);
+                linea.Property(x => x.Cantidad).HasColumnType("decimal(18,2)");
+                linea.Property(x => x.Unidades).HasColumnType("decimal(18,2)");
+                linea.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
+
+                linea.Property(x => x.MarcaLubricanteNombre).HasMaxLength(100);
+                linea.Property(x => x.ClaseLubricante).HasMaxLength(20);
+                linea.Property(x => x.Presentacion).HasMaxLength(20);
+
+                linea.Ignore(x => x.Subtotal);
+                linea.Ignore(x => x.TipoInsumoTexto);
+                linea.Ignore(x => x.EsCombustible);
+                linea.Ignore(x => x.EsDiesel);
+                linea.Ignore(x => x.EsLubricante);
+                linea.Ignore(x => x.DestinoTexto);
+                linea.Ignore(x => x.UnidadDestinoTexto);
+                linea.Ignore(x => x.CantidadTexto);
+                linea.Ignore(x => x.UnidadesTexto);
+                linea.Ignore(x => x.PrecioUnitarioTexto);
+                linea.Ignore(x => x.SubtotalTexto);
+            });
         });
 
         modelBuilder.Entity<OrdenCompra>(entity =>
@@ -626,6 +658,7 @@ public class AsoDbContext : DbContext
                 linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
                 linea.Property(x => x.UnidadTexto).HasMaxLength(20);
                 linea.Property(x => x.Cantidad).HasColumnType("decimal(18,2)");
+                linea.Property(x => x.Unidades).HasColumnType("decimal(18,2)");
                 linea.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
 
                 linea.Property(x => x.MarcaLubricanteNombre).HasMaxLength(100);
@@ -640,6 +673,7 @@ public class AsoDbContext : DbContext
                 linea.Ignore(x => x.DestinoTexto);
                 linea.Ignore(x => x.UnidadDestinoTexto);
                 linea.Ignore(x => x.CantidadTexto);
+                linea.Ignore(x => x.UnidadesTexto);
                 linea.Ignore(x => x.PrecioUnitarioTexto);
                 linea.Ignore(x => x.SubtotalTexto);
             });
@@ -696,11 +730,15 @@ public class AsoDbContext : DbContext
             entity.Property(l => l.GradoViscosidad).IsRequired().HasMaxLength(20);
             entity.Property(l => l.Presentacion).IsRequired().HasMaxLength(20);
             entity.Property(l => l.Unidades).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(l => l.CostoUnitario).HasColumnType("decimal(18,2)").IsRequired();
 
             entity.Ignore(l => l.Etiqueta);
             entity.Ignore(l => l.ExistenciaL);
             entity.Ignore(l => l.ExistenciaTexto);
             entity.Ignore(l => l.UnidadesTexto);
+            entity.Ignore(l => l.ValorTotal);
+            entity.Ignore(l => l.ValorTotalTexto);
+            entity.Ignore(l => l.CostoUnitarioTexto);
         });
 
         // ---- Fase 15: marca de lubricante ----

@@ -4,6 +4,7 @@ using ASO.Desktop.BD;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASO.Desktop.Migrations
 {
     [DbContext(typeof(AsoDbContext))]
-    partial class AsoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260827160049_Fase17_CostoUnitarioLubricante")]
+    partial class Fase17_CostoUnitarioLubricante
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,6 +123,9 @@ namespace ASO.Desktop.Migrations
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("MontoTotal")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Notas")
                         .IsRequired()
@@ -1751,89 +1757,6 @@ namespace ASO.Desktop.Migrations
                     b.ToTable("ValesCombustible");
                 });
 
-            modelBuilder.Entity("ASO.Desktop.Models.CotizacionProveedor", b =>
-                {
-                    b.OwnsMany("ASO.Desktop.Models.CotizacionProveedorLinea", "Lineas", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<string>("ActivoEtiqueta")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
-
-                            b1.Property<int?>("ActivoId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("ArticuloCodigo")
-                                .HasMaxLength(30)
-                                .HasColumnType("nvarchar(30)");
-
-                            b1.Property<string>("ArticuloNombre")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("nvarchar(150)");
-
-                            b1.Property<decimal>("Cantidad")
-                                .HasColumnType("decimal(18,2)");
-
-                            b1.Property<string>("ClaseLubricante")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
-
-                            b1.Property<int>("CotizacionProveedorId")
-                                .HasColumnType("int");
-
-                            b1.Property<int?>("MarcaLubricanteId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("MarcaLubricanteNombre")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)");
-
-                            b1.Property<decimal>("PrecioUnitario")
-                                .HasColumnType("decimal(18,2)");
-
-                            b1.Property<string>("Presentacion")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
-
-                            b1.Property<int?>("TipoCombustibleSolicitado")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("TipoInsumo")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("TipoLubricante")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
-
-                            b1.Property<string>("UnidadTexto")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
-
-                            b1.Property<decimal>("Unidades")
-                                .HasColumnType("decimal(18,2)");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("CotizacionProveedorId");
-
-                            b1.ToTable("CotizacionProveedorLinea");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CotizacionProveedorId");
-                        });
-
-                    b.Navigation("Lineas");
-                });
-
             modelBuilder.Entity("ASO.Desktop.Models.FacturaCliente", b =>
                 {
                     b.OwnsMany("ASO.Desktop.Models.FacturaClienteLinea", "Lineas", b1 =>
@@ -2062,9 +1985,6 @@ namespace ASO.Desktop.Migrations
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)");
 
-                            b1.Property<decimal>("Unidades")
-                                .HasColumnType("decimal(18,2)");
-
                             b1.HasKey("Id");
 
                             b1.HasIndex("OrdenCompraId");
@@ -2203,10 +2123,6 @@ namespace ASO.Desktop.Migrations
 
                             b1.Property<decimal>("Cantidad")
                                 .HasColumnType("decimal(18,2)");
-
-                            b1.Property<string>("ClaseLubricante")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
 
                             b1.Property<int>("RequisicionId")
                                 .HasColumnType("int");
