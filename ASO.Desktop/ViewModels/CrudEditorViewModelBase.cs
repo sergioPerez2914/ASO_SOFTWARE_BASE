@@ -38,8 +38,11 @@ public abstract class CrudEditorViewModelBase : ViewModelBase
         /// <summary>Un formulario normal, de una columna.</summary>
         public const double Estandar = 560;
 
-        /// <summary>Formularios de dos columnas o con una lista dentro.</summary>
-        public const double Amplio = 760;
+        /// <summary>Formularios de dos columnas o con una lista dentro. "Comparar proveedores" y
+        /// "Recepción de mercancía" llegaron a nueve columnas en su grilla de detalle — con 760 el
+        /// contenido mínimo (~700 px) casi no dejaba margen y recortaba las últimas columnas
+        /// (Precio, Subtotal) sin scroll utilizable, porque la ventana es <c>ResizeMode="NoResize"</c>.</summary>
+        public const double Amplio = 960;
     }
 
     /// <summary>Ancho de la ventana modal. Uno de los tres de <see cref="Ancho"/>.</summary>

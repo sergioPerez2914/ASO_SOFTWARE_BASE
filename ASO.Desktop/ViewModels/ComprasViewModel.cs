@@ -136,7 +136,7 @@ public sealed class RequisicionesCrudViewModel : CrudViewModelBase<Requisicion, 
         try
         {
             var orden = _servicio.CrearDesdeRequisicion(
-                requisicion, editor.GanadoraSeleccionada!, [.. editor.LineasOrden], _sesionActual.UsuarioActual?.Id ?? 0);
+                requisicion, editor.GanadoraSeleccionada!, _sesionActual.UsuarioActual?.Id ?? 0);
 
             SeleccionarTrasRecargar(requisicion.Id);
             OrdenCompraCreada?.Invoke(this, orden.Id);
@@ -307,6 +307,7 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
     private const string FiltroTodas = "Todas";
 
     private readonly IStockCombustibleDataSource _stockCombustible;
+    private readonly IEmpleadoDataSource _empleados;
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesionActual;
     private readonly ComprasService _servicio;
@@ -315,12 +316,14 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
 
     public RecepcionesCrudViewModel(IRecepcionMercanciaDataSource recepciones,
                                     IStockCombustibleDataSource stockCombustible,
+                                    IEmpleadoDataSource empleados,
                                     ComprasService servicio,
                                     IServicioDialogo dialogos,
                                     ISesionActual sesion)
         : base(recepciones, dialogos, sesion)
     {
         _stockCombustible = stockCombustible;
+        _empleados = empleados;
         _servicio = servicio;
         _dialogos = dialogos;
         _sesionActual = sesion;
@@ -372,7 +375,17 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
         if (SelectedItem is not { } recepcion)
             return;
 
-        Aplicar(() => _servicio.ConfirmarRecepcion(recepcion));
+        var empleadosActivos = _empleados.GetAll().Where(e => e.Activo).OrderBy(e => e.Nombre).ToList();
+
+        var editor = new ResponsableRecepcionEditorViewModel(
+            $"Confirmar recepción Nº {recepcion.Id}",
+            $"{recepcion.ProveedorNombre} — orden de compra Nº {recepcion.OrdenCompraId}",
+            empleadosActivos);
+
+        if (!_dialogos.MostrarEditor(editor))
+            return;
+
+        Aplicar(() => _servicio.ConfirmarRecepcion(recepcion, editor.ResponsableNombre));
     }
 
     private void Anular()
@@ -433,6 +446,7 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         var ordenesCompra = DataSourceFactory.CrearOrdenesCompra();
         var recepciones = DataSourceFactory.CrearRecepcionesMercancia();
         var stockCombustible = DataSourceFactory.CrearStockCombustible();
+        var empleados = DataSourceFactory.CrearEmpleados();
         var lubricantes = DataSourceFactory.CrearLubricantes();
         var marcasLubricante = DataSourceFactory.CrearMarcasLubricante();
 
@@ -446,7 +460,7 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         OrdenesCompra = new OrdenesCompraCrudViewModel(ordenesCompra, servicio, dialogos, sesion);
         OrdenesCompra.RecepcionCreada += (_, _) => VistaActual = VistaRecepciones;
 
-        Recepciones = new RecepcionesCrudViewModel(recepciones, stockCombustible, servicio, dialogos, sesion);
+        Recepciones = new RecepcionesCrudViewModel(recepciones, stockCombustible, empleados, servicio, dialogos, sesion);
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }

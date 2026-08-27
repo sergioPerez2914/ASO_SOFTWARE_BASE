@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
-             d:DesignWidth="760">
+             d:DesignWidth="940">
 
   <StackPanel>
     <TextBlock Text="{Binding Requisicion.LineasTexto}" TextWrapping="Wrap"
@@ -17,11 +17,7 @@
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="12" />
-        <ColumnDefinition Width="140" />
-        <ColumnDefinition Width="12" />
         <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="12" />
-        <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
@@ -45,28 +41,90 @@
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <controls:FormField Etiqueta="Monto total (USD)">
-          <TextBox Style="{StaticResource FormTextBoxStyle}"
-                   Text="{Binding MontoLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
-        </controls:FormField>
-      </StackPanel>
-
-      <StackPanel Grid.Column="4">
         <controls:FormField Etiqueta="Notas (opcional)">
           <TextBox Style="{StaticResource FormTextBoxStyle}"
                    Text="{Binding NotasLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
         </controls:FormField>
       </StackPanel>
-
-      <StackPanel Grid.Column="6" VerticalAlignment="Bottom">
-        <Button Content="Agregar cotización" Style="{StaticResource SecondaryButtonStyle}"
-                Command="{Binding AgregarCotizacionCommand}" Margin="0,0,0,4" />
-      </StackPanel>
     </Grid>
 
-    <TextBlock Text="Cotizaciones capturadas — seleccione la fila ganadora" Style="{StaticResource FormLabelStyle}" Margin="0,12,0,4" />
+    <TextBlock Text="Complete el detalle como en una factura. En lubricante, primero elija marca, clase y presentación (el envase), y diga cuántas unidades de ese envase compra: el precio es por envase, y el total se calcula solo."
+               FontSize="11" TextWrapping="Wrap"
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,10,0,4" />
 
-    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="220"
+    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="260" IsReadOnly="False"
+              ItemsSource="{Binding LineasCotizacion}" AutoGenerateColumns="False"
+              CanUserAddRows="False" CanUserDeleteRows="False">
+      <DataGrid.Columns>
+        <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoInsumoTexto}" Width="6*" MinWidth="60" IsReadOnly="True" />
+        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="14*" MinWidth="110" IsReadOnly="True" />
+        <controls:ColumnaNumero Header="Pedido (L)" Binding="{Binding CantidadTexto}" Width="8*" MinWidth="70" IsReadOnly="True" />
+        <DataGridTemplateColumn Header="Marca" Width="16*" MinWidth="160">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <StackPanel Orientation="Horizontal">
+                <ComboBox ItemsSource="{Binding DataContext.MarcasLubricante, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          DisplayMemberPath="Nombre" SelectedValuePath="Id"
+                          SelectedValue="{Binding MarcaLubricanteId, UpdateSourceTrigger=PropertyChanged}"
+                          Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
+                <Button Content="+ Nuevo" Style="{StaticResource BarraBotonStyle}" Margin="4,0,0,0"
+                        Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}"
+                        Command="{Binding DataContext.NuevoMarcaCommand,
+                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CommandParameter="{Binding}" />
+              </StackPanel>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Clase" Width="10*" MinWidth="90">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <ComboBox ItemsSource="{Binding DataContext.ClasesLubricante, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        SelectedItem="{Binding ClaseLubricante, UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Presentación" Width="11*" MinWidth="95">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <ComboBox ItemsSource="{Binding DataContext.Presentaciones, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        SelectedItem="{Binding Presentacion, UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Unidades" Width="9*" MinWidth="75">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBox Text="{Binding Unidades, StringFormat=N2, UpdateSourceTrigger=LostFocus}"
+                       Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Precio/envase (USD)" Width="12*" MinWidth="95"
+                             Binding="{Binding PrecioUnitario, StringFormat=N2, UpdateSourceTrigger=LostFocus}" />
+        <controls:ColumnaNumero Header="Subtotal" Binding="{Binding SubtotalTexto}" Width="11*" MinWidth="90" IsReadOnly="True" />
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <Grid Margin="0,8,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                 Text="{Binding TotalLineasCotizacionTexto, StringFormat='Total: US$ {0}'}"
+                 FontWeight="{StaticResource FwMedium}" />
+
+      <Button Grid.Column="1" Content="Agregar cotización" Style="{StaticResource SecondaryButtonStyle}"
+              Command="{Binding AgregarCotizacionCommand}" />
+    </Grid>
+
+    <TextBlock Text="Cotizaciones capturadas — seleccione la fila ganadora" Style="{StaticResource FormLabelStyle}" Margin="0,16,0,4" />
+
+    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="180"
               ItemsSource="{Binding Cotizaciones}"
               SelectedItem="{Binding GanadoraSeleccionada}" IsReadOnly="True">
       <DataGrid.Columns>
@@ -76,77 +134,31 @@
       </DataGrid.Columns>
     </DataGrid>
 
-    <TextBlock Text="La fila seleccionada en la grilla es la cotización ganadora. Cada cotización queda registrada al agregarla, aunque al final no se arme la orden en este momento."
+    <TextBlock Text="La fila seleccionada en la grilla es la cotización ganadora. Cada cotización queda registrada, con su detalle, al agregarla, aunque al final no se arme la orden en este momento."
                FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
 
     <StackPanel Visibility="{Binding HayGanadora, Converter={StaticResource BoolToVis}}" Margin="0,16,0,0">
-      <StackPanel Orientation="Horizontal">
-        <TextBlock Text="Complete el detalle de cada línea" Style="{StaticResource FormLabelStyle}" />
-        <TextBlock Text="{Binding GanadoraSeleccionada.MontoTexto, StringFormat='  ·  Cotizado en total: US$ {0}'}"
-                   Style="{StaticResource FormLabelStyle}"
-                   Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="Normal" />
-      </StackPanel>
+      <TextBlock Text="Detalle de la cotización ganadora" Style="{StaticResource FormLabelStyle}" />
 
-      <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="260" IsReadOnly="False"
-                ItemsSource="{Binding LineasOrden}" AutoGenerateColumns="False"
+      <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="220" IsReadOnly="True"
+                ItemsSource="{Binding LineasGanadora}" AutoGenerateColumns="False"
                 CanUserAddRows="False" CanUserDeleteRows="False">
         <DataGrid.Columns>
-          <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoInsumoTexto}" Width="7*" MinWidth="60" IsReadOnly="True" />
-          <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="14*" MinWidth="100" IsReadOnly="True" />
-          <DataGridTemplateColumn Header="Cantidad (L)" Width="9*" MinWidth="65">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <TextBox Text="{Binding Cantidad, StringFormat=N2, UpdateSourceTrigger=LostFocus}"
-                         IsReadOnly="{Binding CantidadSoloLectura}" />
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <DataGridTextColumn Header="Precio (USD)" Width="8*" MinWidth="65"
-                               Binding="{Binding PrecioUnitario, StringFormat=N2, UpdateSourceTrigger=LostFocus}" />
-          <controls:ColumnaNumero Header="Subtotal" Binding="{Binding SubtotalTexto}" Width="8*" MinWidth="60" IsReadOnly="True" />
-          <DataGridTemplateColumn Header="Marca" Width="19*" MinWidth="150">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <StackPanel Orientation="Horizontal">
-                  <ComboBox ItemsSource="{Binding DataContext.MarcasLubricante, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                            DisplayMemberPath="Nombre" SelectedValuePath="Id"
-                            SelectedValue="{Binding MarcaLubricanteId, UpdateSourceTrigger=PropertyChanged}"
-                            Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-                  <Button Content="+ Nuevo" Style="{StaticResource BarraBotonStyle}" Margin="4,0,0,0"
-                          Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}"
-                          Command="{Binding DataContext.NuevoMarcaCommand,
-                                    RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          CommandParameter="{Binding}" />
-                </StackPanel>
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <DataGridTemplateColumn Header="Clase" Width="11*" MinWidth="80">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <ComboBox ItemsSource="{Binding DataContext.ClasesLubricante, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          SelectedItem="{Binding ClaseLubricante, UpdateSourceTrigger=PropertyChanged}"
-                          Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <DataGridTemplateColumn Header="Presentación" Width="12*" MinWidth="85">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <ComboBox ItemsSource="{Binding DataContext.Presentaciones, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          SelectedItem="{Binding Presentacion, UpdateSourceTrigger=PropertyChanged}"
-                          Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
+          <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="16*" MinWidth="120" />
+          <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="14*" MinWidth="110" />
+          <controls:ColumnaTexto Header="Clase" Binding="{Binding ClaseLubricante}" Width="9*" MinWidth="85" />
+          <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="11*" MinWidth="95" />
+          <controls:ColumnaNumero Header="Unidades" Binding="{Binding UnidadesTexto}" Width="10*" MinWidth="80" />
+          <controls:ColumnaNumero Header="Precio/envase" Binding="{Binding PrecioUnitarioTexto}" Width="11*" MinWidth="90" />
+          <controls:ColumnaNumero Header="Subtotal" Binding="{Binding SubtotalTexto}" Width="10*" MinWidth="85" />
         </DataGrid.Columns>
       </DataGrid>
 
-      <TextBlock Text="{Binding TotalTexto, StringFormat='Total: US$ {0}'}"
+      <TextBlock Text="{Binding GanadoraSeleccionada.MontoTexto, StringFormat='Total: US$ {0}'}"
                  FontWeight="{StaticResource FwMedium}" Margin="0,8,0,0" />
 
-      <TextBlock Text="En una línea de lubricante, Cantidad es en litros — ajústela si el proveedor vende en otra cantidad exacta. El total no se actualiza en pantalla hasta guardar: se recalcula al reabrir el listado."
+      <TextBlock Text="Ya está completo: viene tal cual se cargó al cotizar a este proveedor."
                  FontSize="11" TextWrapping="Wrap"
                  Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
     </StackPanel>

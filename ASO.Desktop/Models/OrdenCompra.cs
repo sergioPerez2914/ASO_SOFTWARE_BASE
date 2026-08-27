@@ -139,12 +139,21 @@ public class OrdenCompraLinea
     public int? ActivoId { get; set; }
     public string ActivoEtiqueta { get; set; } = string.Empty;    // snapshot
 
+    /// <summary>Litros pedidos, de referencia (copiados de la cotización ganadora, que a su vez
+    /// los copió de la requisición). Para Lubricante, lo que de verdad se compró es
+    /// <see cref="Unidades"/>.</summary>
     public decimal Cantidad { get; set; }
     public string UnidadTexto { get; set; } = string.Empty;
 
+    /// <summary>Cuántos envases de <see cref="Presentacion"/> se compraron. Solo aplica a
+    /// Lubricante; viene tal cual de <c>CotizacionProveedorLinea.Unidades</c>.</summary>
+    public decimal Unidades { get; set; }
+
+    /// <summary>Precio por envase en Lubricante (por <see cref="Unidades"/>), precio por litro/
+    /// unidad de repuesto en Diésel/Repuesto (por <see cref="Cantidad"/>).</summary>
     public decimal PrecioUnitario { get; set; }
 
-    public decimal Subtotal => Cantidad * PrecioUnitario;
+    public decimal Subtotal => (EsLubricante ? Unidades : Cantidad) * PrecioUnitario;
 
     public string TipoInsumoTexto => TipoInsumo == TipoInsumo.Combustible ? "Combustible" : "Repuesto";
 
@@ -153,11 +162,6 @@ public class OrdenCompraLinea
     public bool EsDiesel => EsCombustible && TipoCombustibleSolicitado == TipoCombustible.Diesel;
 
     public bool EsLubricante => EsCombustible && TipoCombustibleSolicitado == TipoCombustible.Lubricante;
-
-    /// <summary>Para el TextBox de Cantidad al armar la orden: en Diésel/Repuesto queda fija a lo
-    /// pedido en la requisición; en Lubricante se puede ajustar (en litros) a lo que realmente
-    /// vende el proveedor — p. ej. redondear a lo que rinde un número entero de envases.</summary>
-    public bool CantidadSoloLectura => !EsLubricante;
 
     public string DestinoTexto => TipoInsumo == TipoInsumo.Combustible
         ? (TipoCombustibleSolicitado == TipoCombustible.Lubricante
@@ -170,6 +174,8 @@ public class OrdenCompraLinea
         : string.Empty;
 
     public string CantidadTexto => $"{Cantidad:N2} {UnidadTexto}".Trim();
+
+    public string UnidadesTexto => $"{Unidades:N2} {Presentacion}".Trim();
 
     public string PrecioUnitarioTexto => PrecioUnitario.ToString("N2");
 

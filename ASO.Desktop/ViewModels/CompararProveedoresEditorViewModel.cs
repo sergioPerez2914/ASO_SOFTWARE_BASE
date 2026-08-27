@@ -9,12 +9,13 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Comparar precios entre proveedores para una requisición enviada, elegir el ganador, y
-/// completar el detalle de cada línea (precio unitario; marca, clase y presentación en
-/// lubricante) con el que se arma la orden de compra. No hereda de la base genérica: no edita
-/// una entidad existente, solo junta las cotizaciones y las líneas con las que
-/// <see cref="ComprasService.CrearDesdeRequisicion"/> arma la orden — ya completa, lista para
-/// que "Órdenes de compra" solo la autorice.
+/// Comparar precios entre proveedores para una requisición enviada y elegir el ganador. Cada
+/// proveedor se cotiza como una factura propia: se completa su detalle de línea (precio unitario;
+/// marca, clase y presentación en lubricante) y el monto sale solo, sumando línea por línea — no
+/// se teclea un total suelto. No hereda de la base genérica: no edita una entidad existente, solo
+/// junta las cotizaciones (cada una ya con su detalle completo) con la que
+/// <see cref="ComprasService.CrearDesdeRequisicion"/> arma la orden — ya completa, lista para que
+/// "Órdenes de compra" solo la autorice.
 ///
 /// Cada cotización se guarda al agregarla, no al cerrar el editor: así el historial de precios
 /// comparados queda aunque, al final, no se arme la orden en ese mismo momento.
@@ -54,11 +55,12 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
         MarcasLubricante = new ObservableCollection<MarcaLubricante>(
             marcasLubricante.GetAll().Where(m => m.Activo).OrderBy(m => m.Nombre));
 
-        LineasOrden = [];
+        LineasCotizacion = new ObservableCollection<CotizacionProveedorLinea>(
+            ComprasService.ArmarLineasCotizacion(Requisicion));
 
         AgregarCotizacionCommand = new RelayCommand(AgregarCotizacion);
         NuevoProveedorCommand = new RelayCommand(NuevoProveedor, () => _sesion.Puede(Permisos.Proveedores.Crear));
-        NuevoMarcaCommand = new RelayCommand<OrdenCompraLinea>(NuevoMarca, _ => _sesion.Puede(Permisos.Lubricantes.Crear));
+        NuevoMarcaCommand = new RelayCommand<CotizacionProveedorLinea>(NuevoMarca, _ => _sesion.Puede(Permisos.Lubricantes.Crear));
 
         GanadoraSeleccionada = Cotizaciones.FirstOrDefault();
     }
@@ -73,7 +75,9 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
 
     public ObservableCollection<CotizacionProveedor> Cotizaciones { get; }
 
-    public ObservableCollection<OrdenCompraLinea> LineasOrden { get; private set; }
+    /// <summary>Detalle en borrador del proveedor que se está cotizando ahora mismo — se reinicia
+    /// después de cada "Agregar cotización" para cotizar al siguiente.</summary>
+    public ObservableCollection<CotizacionProveedorLinea> LineasCotizacion { get; private set; }
 
     public ObservableCollection<MarcaLubricante> MarcasLubricante { get; }
 
@@ -95,7 +99,7 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
         ProveedorLineaSeleccionado = nuevo;
     }
 
-    private void NuevoMarca(OrdenCompraLinea? linea)
+    private void NuevoMarca(CotizacionProveedorLinea? linea)
     {
         if (linea is null)
             return;
@@ -117,19 +121,18 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
         set => SetProperty(ref _proveedorLineaSeleccionado, value);
     }
 
-    private string _montoLineaTexto = string.Empty;
-    public string MontoLineaTexto
-    {
-        get => _montoLineaTexto;
-        set => SetProperty(ref _montoLineaTexto, value);
-    }
-
     private string _notasLineaTexto = string.Empty;
     public string NotasLineaTexto
     {
         get => _notasLineaTexto;
         set => SetProperty(ref _notasLineaTexto, value);
     }
+
+    /// <summary>Suma de subtotales de la cotización en borrador, como el total de una factura.
+    /// Igual que el resto de la app, no se refresca solo mientras se escriben los precios línea
+    /// por línea (los modelos no implementan INotifyPropertyChanged) — se recalcula al reabrir el
+    /// editor o al terminar de agregar una cotización.</summary>
+    public string TotalLineasCotizacionTexto => LineasCotizacion.Sum(l => l.Subtotal).ToString("N2");
 
     private CotizacionProveedor? _ganadoraSeleccionada;
     public CotizacionProveedor? GanadoraSeleccionada
@@ -140,24 +143,16 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
             if (!SetProperty(ref _ganadoraSeleccionada, value))
                 return;
 
-            // El detalle de línea se rearma desde cero cada vez que cambia la ganadora: es lo
-            // último que se completa antes de armar, así que no vale la pena conservar ediciones
-            // de una cotización que ya se dejó de lado.
-            LineasOrden = value is null
-                ? []
-                : new ObservableCollection<OrdenCompraLinea>(ComprasService.ArmarLineasIniciales(Requisicion, value));
-
-            OnPropertyChanged(nameof(LineasOrden));
             OnPropertyChanged(nameof(HayGanadora));
-            OnPropertyChanged(nameof(TotalTexto));
+            OnPropertyChanged(nameof(LineasGanadora));
         }
     }
 
     public bool HayGanadora => GanadoraSeleccionada is not null;
 
-    /// <summary>Suma de subtotales, en dólares. Igual que el resto de la app, no se refresca
-    /// solo mientras se escriben los precios línea por línea — se recalcula al reabrir.</summary>
-    public string TotalTexto => LineasOrden.Sum(l => l.Subtotal).ToString("N2");
+    /// <summary>Vista previa de solo lectura del detalle ya completo de la cotización ganadora —
+    /// no hace falta volver a llenar nada, ya se cargó al cotizar a ese proveedor.</summary>
+    public IReadOnlyList<CotizacionProveedorLinea> LineasGanadora => GanadoraSeleccionada?.Lineas ?? [];
 
     private void AgregarCotizacion()
     {
@@ -167,9 +162,25 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
             return;
         }
 
-        if (!decimal.TryParse(MontoLineaTexto, out var monto) || monto <= 0)
+        // El ComboBox de Marca liga por Id (SelectedValue); el nombre snapshot de cada línea no
+        // se sincroniza solo al elegir una marca distinta, así que se recalcula aquí, justo antes
+        // de congelar la cotización.
+        foreach (var linea in LineasCotizacion)
+            linea.MarcaLubricanteNombre = MarcasLubricante.FirstOrDefault(m => m.Id == linea.MarcaLubricanteId)?.Nombre ?? string.Empty;
+
+        // Cantidad (litros) de una línea de lubricante deja de ser lo pedido en la requisición y
+        // pasa a reflejar lo que de verdad se compra: Unidades × litros del envase elegido. Se
+        // recalcula aquí, no en vivo, por el mismo motivo que el resto de los totales de la app
+        // (los modelos no implementan INotifyPropertyChanged).
+        foreach (var linea in LineasCotizacion.Where(l => l.EsLubricante))
         {
-            ErrorValidacion = "El monto cotizado debe ser un número mayor que cero.";
+            var litrosPorUnidad = Lubricante.LitrosPorPresentacion.GetValueOrDefault(linea.Presentacion ?? string.Empty, 0m);
+            linea.Cantidad = linea.Unidades * litrosPorUnidad;
+        }
+
+        if (!ComprasService.CotizacionEstaCompleta([.. LineasCotizacion], out var faltantes))
+        {
+            ErrorValidacion = $"Faltan datos para cotizar: {faltantes}.";
             return;
         }
 
@@ -178,28 +189,27 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
             RequisicionId = Requisicion.Id,
             ProveedorId = proveedor.Id,
             ProveedorNombre = proveedor.Nombre,
-            MontoTotal = monto,
             Notas = NotasLineaTexto.Trim(),
-            Fecha = DateTime.Today
+            Fecha = DateTime.Today,
+            Lineas = LineasCotizacion.Select(l => l.Clonar()).ToList()
         });
 
         Cotizaciones.Add(cotizacion);
         GanadoraSeleccionada ??= cotizacion;
 
+        // Se reinicia para cotizar al siguiente proveedor: no vale la pena conservar lo que ya
+        // quedó guardado en esta cotización.
+        LineasCotizacion = new ObservableCollection<CotizacionProveedorLinea>(
+            ComprasService.ArmarLineasCotizacion(Requisicion));
+        OnPropertyChanged(nameof(LineasCotizacion));
+        OnPropertyChanged(nameof(TotalLineasCotizacionTexto));
+
         ErrorValidacion = null;
-        MontoLineaTexto = string.Empty;
         NotasLineaTexto = string.Empty;
     }
 
     protected override bool Validar(out string? error)
     {
-        // El ComboBox de Marca liga por Id (SelectedValue); el nombre snapshot de cada línea no
-        // se sincroniza solo al elegir una marca distinta, así que se recalcula aquí, justo antes
-        // de dejar pasar la línea — mismo criterio que antes aplicaba OrdenCompraEditorViewModel
-        // al guardar.
-        foreach (var linea in LineasOrden)
-            linea.MarcaLubricanteNombre = MarcasLubricante.FirstOrDefault(m => m.Id == linea.MarcaLubricanteId)?.Nombre ?? string.Empty;
-
         if (Cotizaciones.Count == 0)
         {
             error = "Capture al menos una cotización antes de armar la orden de compra.";
@@ -209,30 +219,6 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
         if (GanadoraSeleccionada is null)
         {
             error = "Seleccione la cotización ganadora.";
-            return false;
-        }
-
-        if (LineasOrden.Any(l => l.PrecioUnitario <= 0))
-        {
-            error = "Indique el precio unitario de cada línea.";
-            return false;
-        }
-
-        if (LineasOrden.Any(l => l.EsLubricante && l.MarcaLubricanteId is null))
-        {
-            error = "Seleccione la marca de cada línea de lubricante.";
-            return false;
-        }
-
-        if (LineasOrden.Any(l => l.EsLubricante && string.IsNullOrWhiteSpace(l.ClaseLubricante)))
-        {
-            error = "Seleccione la clase (mineral/sintético) de cada línea de lubricante.";
-            return false;
-        }
-
-        if (LineasOrden.Any(l => l.EsLubricante && string.IsNullOrWhiteSpace(l.Presentacion)))
-        {
-            error = "Seleccione la presentación de cada línea de lubricante.";
             return false;
         }
 
