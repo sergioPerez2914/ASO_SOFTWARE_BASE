@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
 
@@ -26,9 +27,33 @@ public sealed class LubricantesCrudViewModel : CrudViewModelBase<Lubricante, int
         _marcasLubricante = marcasLubricante;
         _dialogos = dialogos;
         _sesion = sesion;
+
+        // La tarjeta de valor depende de SelectedItem, TextoBusqueda (cambia qué entra en
+        // ItemsView) y de una recarga completa (alta/edición/borrado) — la base solo notifica
+        // las dos primeras por su propio nombre, así que hace falta escucharse a sí mismo.
+        PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is null or "" or nameof(SelectedItem) or nameof(TextoBusqueda))
+            {
+                OnPropertyChanged(nameof(TituloValorTexto));
+                OnPropertyChanged(nameof(ValorMostradoTexto));
+            }
+        };
     }
 
     protected override string ModuloPermiso => "Lubricantes";
+
+    /// <summary>Suma de Unidades × CostoUnitario de lo que se ve en la tabla ahora mismo (con el
+    /// buscador aplicado), no del catálogo completo.</summary>
+    public decimal ValorTotalCatalogo => ItemsView.Cast<Lubricante>().Sum(l => l.ValorTotal);
+
+    /// <summary>Título de la tarjeta de valor: el total del catálogo visible, o la fila
+    /// seleccionada cuando hay una.</summary>
+    public string TituloValorTexto => SelectedItem is null
+        ? "Valor total del catálogo"
+        : $"Valor de {SelectedItem.MarcaLubricanteNombre} · {SelectedItem.Tipo} {SelectedItem.GradoViscosidad} ({SelectedItem.Presentacion})";
+
+    public string ValorMostradoTexto => (SelectedItem?.ValorTotal ?? ValorTotalCatalogo).ToString("N2");
 
     protected override bool CoincideBusqueda(Lubricante item, string texto) =>
         item.MarcaLubricanteNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)

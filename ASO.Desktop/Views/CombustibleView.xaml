@@ -191,10 +191,20 @@
     <Grid DataContext="{Binding Lubricantes}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Width="280" HorizontalAlignment="Left" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Text="{Binding TituloValorTexto}" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="{Binding ValorMostradoTexto}" FontSize="{StaticResource FsDisplay}" FontWeight="Bold"
+                     Foreground="{DynamicResource PrimaryBrush}" Margin="0,4,0,0" />
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -217,7 +227,7 @@
         </Grid>
       </Border>
 
-      <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
+      <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
         <Grid>
           <DataGrid x:Name="TablaLubricantes" Style="{StaticResource DataGridStyle}" MaxHeight="480"
                     ItemsSource="{Binding ItemsView}"
@@ -229,8 +239,6 @@
               <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="15*" MinWidth="95" />
               <controls:ColumnaNumero Header="Unidades" Binding="{Binding Unidades, StringFormat=N2}" Width="12*" MinWidth="80" />
               <controls:ColumnaNumero Header="Existencia" Binding="{Binding ExistenciaTexto}" Width="14*" MinWidth="90" />
-              <controls:ColumnaTexto Header="Activo" Width="10*" MinWidth="65"
-                                     Binding="{Binding Activo, StringFormat={}{0}}" />
             </DataGrid.Columns>
           </DataGrid>
 

@@ -45,6 +45,11 @@ public class Lubricante : IEntidad<int>, IDeOrganizacion
 
     public bool Activo { get; set; } = true;
 
+    /// <summary>Precio por envase de esta presentación, snapshot del último precio pagado. Lo
+    /// estampa <c>ComprasService.ConfirmarRecepcion</c> a partir del precio unitario (por litro)
+    /// de la línea de la Orden de Compra que trajo esta mercancía; no se captura a mano.</summary>
+    public decimal CostoUnitario { get; set; }
+
     /// <summary>Tipos de aceite. Lista cerrada: son los que hay, no texto libre.</summary>
     public static readonly IReadOnlyList<string> Tipos = ["Mineral", "Sintético", "Semi-sintético"];
 
@@ -81,6 +86,14 @@ public class Lubricante : IEntidad<int>, IDeOrganizacion
     public string ExistenciaTexto => $"{ExistenciaL:N0} L";
 
     public string UnidadesTexto => $"{Unidades:N2} {Presentacion}".Trim();
+
+    /// <summary>Valor de la existencia a costo, derivado de Unidades × CostoUnitario. No se
+    /// guarda: se desincronizaría si el costo unitario se actualiza en una recepción posterior.</summary>
+    public decimal ValorTotal => Unidades * CostoUnitario;
+
+    public string ValorTotalTexto => ValorTotal.ToString("N2");
+
+    public string CostoUnitarioTexto => CostoUnitario.ToString("N2");
 
     public Lubricante Clonar() => (Lubricante)MemberwiseClone();
 }

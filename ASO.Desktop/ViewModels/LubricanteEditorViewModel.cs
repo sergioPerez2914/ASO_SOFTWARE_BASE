@@ -38,6 +38,7 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
         GradoSeleccionado = string.IsNullOrWhiteSpace(original.GradoViscosidad) ? Lubricante.GradosViscosidad[0] : original.GradoViscosidad;
         PresentacionSeleccionada = string.IsNullOrWhiteSpace(original.Presentacion) ? Lubricante.Presentaciones[0] : original.Presentacion;
         UnidadesTexto = original.Id == 0 ? "0" : original.Unidades.ToString("0.##");
+        CostoUnitarioTexto = original.CostoUnitario.ToString("0.##");
         Activo = original.Id == 0 || original.Activo;
 
         NuevoMarcaCommand = new RelayCommand(NuevoMarca, () => sesion.Puede(Permisos.Lubricantes.Crear));
@@ -103,7 +104,10 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
         set
         {
             if (SetProperty(ref _unidadesTexto, value))
+            {
                 OnPropertyChanged(nameof(ExistenciaPreviewTexto));
+                OnPropertyChanged(nameof(ValorPreviewTexto));
+            }
         }
     }
 
@@ -115,6 +119,32 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
             var unidades = decimal.TryParse(UnidadesTexto, out var u) ? u : 0m;
             var litros = Lubricante.LitrosPorPresentacion.TryGetValue(PresentacionSeleccionada, out var l) ? l : 0m;
             return $"{unidades * litros:N0} L";
+        }
+    }
+
+    private string _costoUnitarioTexto = string.Empty;
+    /// <summary>Precio por envase de esta presentación. Normalmente lo estampa
+    /// <c>ComprasService.ConfirmarRecepcion</c> solo; se edita a mano aquí para completar el
+    /// costo de las filas que ya existían antes de que ese campo se agregara.</summary>
+    public string CostoUnitarioTexto
+    {
+        get => _costoUnitarioTexto;
+        set
+        {
+            if (SetProperty(ref _costoUnitarioTexto, value))
+                OnPropertyChanged(nameof(ValorPreviewTexto));
+        }
+    }
+
+    /// <summary>Vista previa del valor a costo mientras se edita, misma fórmula que
+    /// <see cref="Lubricante.ValorTotal"/>.</summary>
+    public string ValorPreviewTexto
+    {
+        get
+        {
+            var unidades = decimal.TryParse(UnidadesTexto, out var u) ? u : 0m;
+            var costo = decimal.TryParse(CostoUnitarioTexto, out var c) ? c : 0m;
+            return (unidades * costo).ToString("N2");
         }
     }
 
@@ -139,6 +169,12 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
             return false;
         }
 
+        if (!decimal.TryParse(CostoUnitarioTexto, out var costo) || costo < 0)
+        {
+            error = "El costo unitario debe ser un número mayor o igual a cero.";
+            return false;
+        }
+
         error = null;
         return true;
     }
@@ -152,6 +188,7 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
         lubricante.GradoViscosidad = GradoSeleccionado;
         lubricante.Presentacion = PresentacionSeleccionada;
         lubricante.Unidades = decimal.TryParse(UnidadesTexto, out var unidades) ? unidades : 0m;
+        lubricante.CostoUnitario = decimal.TryParse(CostoUnitarioTexto, out var costo) ? costo : 0m;
         lubricante.Activo = Activo;
         return lubricante;
     }
