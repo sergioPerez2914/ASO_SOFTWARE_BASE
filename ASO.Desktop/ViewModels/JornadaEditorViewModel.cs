@@ -2,21 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Windows.Input;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
 
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Apertura de una jornada. La persona sale de uno de los dos padrones según el conmutador, y
-/// al guardar se copian su nombre, cargo y núcleo dentro de la jornada: el registro de
-/// asistencia debe leerse igual dentro de dos zafras aunque la persona ya no esté.
+/// Apertura de una jornada. Al guardar se copian el nombre, el cargo y el núcleo de la persona
+/// dentro de la jornada: el registro de asistencia debe leerse igual dentro de dos zafras aunque
+/// la persona ya no esté.
 ///
-/// El frente contra el que se ficha NO se elige aquí: llega ya decidido desde la pantalla, que
-/// es donde se escoge una vez para toda una tanda de altas. El editor solo lo muestra, para que
-/// se vea a qué remesa va a parar la jornada. La regla dura la aplica
-/// <see cref="HorarioService.Registrar"/>; aquí solo se guía el formulario.
+/// Ni el PADRÓN ni el FRENTE se eligen aquí: los dos llegan decididos desde la pantalla, que es
+/// donde se escogen una vez para toda una tanda de altas. El editor solo los muestra, para que se
+/// vea de qué padrón sale la persona y a qué remesa va a parar la jornada. El padrón dejó de
+/// preguntarse cuando la pantalla lo separó en pestañas: tenerlo también aquí permitía guardar
+/// una jornada del otro padrón, que desaparecía de la tabla nada más crearse.
+///
+/// Las reglas duras las aplica <see cref="HorarioService.Registrar"/>; aquí solo se guía el
+/// formulario.
 /// </summary>
 public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrabajo>
 {
@@ -39,20 +42,14 @@ public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrab
         _administrativos = empleados.GetAll().Where(e => e.Activo).OrderBy(e => e.Nombre).ToList();
         _campo = personalCampo.GetAll().Where(p => p.Activo).OrderBy(p => p.Nombre).ToList();
 
+        TipoPersonal = original.TipoPersonal;
         Fecha = original.Fecha == default ? DateTime.Today : original.Fecha;
         Turno = original.Turno;
-        TipoPersonal = original.TipoPersonal;
         HoraEntrada = original.HoraEntrada == default
             ? DateTime.Now.ToString("HH:mm")
             : original.HoraEntrada.ToString("HH:mm");
         Observacion = original.Observacion;
-
-        CambiarPadronCommand = new RelayCommand<string>(padron =>
-            TipoPersonal = padron == "Campo" ? TipoPersonal.Campo : TipoPersonal.Administrativo);
     }
-
-    /// <summary>Conmuta entre los dos padrones; al hacerlo se recarga el combo de personas.</summary>
-    public ICommand CambiarPadronCommand { get; }
 
     public override string Titulo => "Registrar entrada";
     public override double AnchoEditor => Ancho.Estandar;
@@ -68,24 +65,14 @@ public sealed class JornadaEditorViewModel : CrudEditorViewModelBase<JornadaTrab
     public IEnumerable<object> Personas =>
         TipoPersonal == TipoPersonal.Administrativo ? _administrativos : _campo;
 
-    private TipoPersonal _tipoPersonal;
-    public TipoPersonal TipoPersonal
-    {
-        get => _tipoPersonal;
-        set
-        {
-            if (SetProperty(ref _tipoPersonal, value))
-            {
-                PersonaSeleccionada = null;
-                OnPropertyChanged(nameof(Personas));
-                OnPropertyChanged(nameof(EsAdministrativo));
-                OnPropertyChanged(nameof(EsCampo));
-            }
-        }
-    }
+    /// <summary>Padrón de la pestaña desde la que se abrió; fijo mientras dure el diálogo.</summary>
+    public TipoPersonal TipoPersonal { get; }
 
     public bool EsAdministrativo => TipoPersonal == TipoPersonal.Administrativo;
     public bool EsCampo => TipoPersonal == TipoPersonal.Campo;
+
+    /// <summary>Se enseña, no se edita, igual que <see cref="FrenteTexto"/>.</summary>
+    public string PadronTexto => EsCampo ? "Personal de campo" : "Administrativo";
 
     private object? _personaSeleccionada;
     public object? PersonaSeleccionada

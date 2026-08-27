@@ -11,10 +11,16 @@ namespace ASO.Desktop.ViewModels;
 /// <summary>
 /// Nómina · Gestión de Horarios: apertura y cierre de jornadas.
 ///
+/// Los DOS PADRONES van separados en un conmutador de pestañas, igual que en Nómina · Empleados:
+/// son catálogos distintos que no se mezclan, y verlos revueltos en una sola tabla obligaba a leer
+/// una columna "Padrón" para saber de quién era cada fila. La pestaña decide además qué se ficha,
+/// así que el diálogo de alta ya no pregunta por el padrón — llega decidido, como el frente.
+///
 /// El frente de trabajo se elige una vez arriba, no en cada diálogo: en campo se ficha a varias
 /// personas seguidas contra la misma remesa, y repetir la elección en cada alta sería teclear lo
 /// mismo diez veces. Ese frente hace dos cosas: acota la tabla a sus jornadas y es el que se
-/// estampa en las entradas nuevas de personal de campo.
+/// estampa en las entradas nuevas de personal de campo. Solo existe en la pestaña de campo: un
+/// administrativo no ficha contra ninguna remesa.
 ///
 /// Reusa el listado de <see cref="CrudViewModelBase{T, TId}"/> por el filtrado y la búsqueda,
 /// pero desactiva editar y eliminar: una asistencia registrada no se reescribe (ver
@@ -25,6 +31,9 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
 {
     private const string FiltroTodas = "Todas";
 
+    public const string VistaAdministrativos = "Administrativos";
+    public const string VistaCampo = "Campo";
+
     private readonly IJornadaDataSource _jornadas;
     private readonly IEventoOperacionDataSource _eventos;
     private readonly IRemesaDataSource _remesas;
@@ -33,6 +42,7 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
     private readonly HorarioService _servicio;
 
     private string _filtroEstado = FiltroTodas;
+    private string _vistaActual = VistaAdministrativos;
 
     public HorariosViewModel(Modulo modulo, Submodulo submodulo)
         : this(modulo, submodulo, DataSourceFactory.CrearJornadas(),
@@ -65,6 +75,8 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
             ItemsView.Refresh();
         });
 
+        CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
+
         RegistrarEntradaCommand = new RelayCommand(RegistrarEntrada,
             () => _sesionActual.Puede(Permisos.Horarios.Crear));
 
@@ -76,8 +88,51 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
     // --- Encabezado de la pantalla ---
 
     public ICommand CambiarFiltroEstadoCommand { get; }
+    public ICommand CambiarVistaCommand { get; }
     public ICommand RegistrarEntradaCommand { get; }
     public ICommand RegistrarSalidaCommand { get; }
+
+    // --- Conmutador de padrón (mismo patrón que EmpleadosViewModel) ---
+
+    /// <summary>
+    /// Padrón que se está mirando. Notifica TODAS las propiedades, como en
+    /// <see cref="EmpleadosViewModel"/>: enumerar aquí un OnPropertyChanged por cada Mostrar… es
+    /// la lista que se queda corta el día que se agrega un padrón más.
+    /// </summary>
+    public string VistaActual
+    {
+        get => _vistaActual;
+        set
+        {
+            if (!SetProperty(ref _vistaActual, value)) return;
+
+            ItemsView.Refresh();
+            OnTodasLasPropiedadesCambiaron();
+        }
+    }
+
+    public bool MostrarAdministrativos => VistaActual == VistaAdministrativos;
+    public bool MostrarCampo => VistaActual == VistaCampo;
+
+    /// <summary>
+    /// Las dos pestañas, enlazadas en DOS VÍAS al <c>IsChecked</c> de su botón, igual que en
+    /// Empleados. El setter solo actúa al marcar: al desmarcar ya hay otro botón encendiéndose.
+    /// </summary>
+    public bool EsAdministrativos
+    {
+        get => MostrarAdministrativos;
+        set { if (value) VistaActual = VistaAdministrativos; }
+    }
+
+    public bool EsCampo
+    {
+        get => MostrarCampo;
+        set { if (value) VistaActual = VistaCampo; }
+    }
+
+    /// <summary>El padrón de la pestaña, que es lo que filtra la tabla y lo que se ficha.</summary>
+    public TipoPersonal PadronActual =>
+        MostrarCampo ? TipoPersonal.Campo : TipoPersonal.Administrativo;
 
     /// <summary>Frentes elegibles; el primero, "Todos los frentes", quita el filtro.</summary>
     public IReadOnlyList<OpcionRemesa> FrentesEnCurso { get; private set; } = [];
@@ -141,30 +196,32 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
         base.Recargar();
     }
 
+    // Los tres indicadores de la cabecera van como CIFRA SUELTA y no como frase. Antes eran dos
+    // propiedades que devolvían oraciones enteras —"12,50 h en los últimos 14 días · 3 jornada(s)
+    // abierta(s)" y "5 movimiento(s) de personal en frentes (7 días)"— y la vista las pegaba con
+    // otro punto medio en medio: una línea larga con tres datos y dos cortes de tiempo distintos,
+    // ilegible de un vistazo. El período es fijo, así que pertenece a la etiqueta de la vista, no
+    // al dato; aquí solo se devuelve el número, como hace Banco con sus tres saldos.
+
     /// <summary>Horas cerradas de las dos últimas semanas: el mismo corte que usa el dashboard.</summary>
-    public string ResumenHoras
-    {
-        get
-        {
-            var horas = _servicio.HorasTotalesEnPeriodo(DateTime.Today.AddDays(-14), DateTime.Today);
-            var abiertas = _jornadas.GetAll().Count(j => j.EstaAbierta);
-            return $"{horas:N2} h en los últimos 14 días · {abiertas} jornada(s) abierta(s)";
-        }
-    }
+    public string HorasQuincenaTexto =>
+        $"{_servicio.HorasTotalesEnPeriodo(DateTime.Today.AddDays(-14), DateTime.Today):N2} h";
+
+    /// <summary>Las que siguen sin cerrar, de cualquier fecha: es trabajo pendiente de resolver.</summary>
+    public string JornadasAbiertasTexto => _jornadas.GetAll().Count(j => j.EstaAbierta).ToString();
 
     /// <summary>
     /// Movimientos de personal en los frentes: los publica <see cref="HorarioService"/> al abrir
     /// y al cerrar cada jornada de campo, y se leen desde la línea de tiempo de la remesa.
     /// </summary>
-    public string ResumenCambiosTurno
+    public string MovimientosSemanaTexto
     {
         get
         {
             var desde = DateTime.Today.AddDays(-7);
-            var movimientos = _eventos.GetAll()
-                .Count(e => e.Tipo == TipoEventoOperacion.CambioTurno && e.FechaHora >= desde);
-
-            return $"{movimientos} movimiento(s) de personal en frentes (7 días)";
+            return _eventos.GetAll()
+                .Count(e => e.Tipo == TipoEventoOperacion.CambioTurno && e.FechaHora >= desde)
+                .ToString();
         }
     }
 
@@ -180,15 +237,19 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
 
     protected override bool PasaFiltroExtra(JornadaTrabajo item)
     {
-        if (Frente is { } frente && item.RemesaId != frente.Id)
+        // La pestaña manda: los dos padrones no se mezclan en la misma tabla.
+        if (item.TipoPersonal != PadronActual)
+            return false;
+
+        // El frente solo acota en campo. Aplicarlo también a los administrativos vaciaría la
+        // tabla entera: su RemesaId es siempre nulo, porque no fichan contra ningún documento.
+        if (MostrarCampo && Frente is { } frente && item.RemesaId != frente.Id)
             return false;
 
         return _filtroEstado switch
         {
             "Abiertas" => item.EstaAbierta,
             "Cerradas" => !item.EstaAbierta,
-            "Campo" => item.TipoPersonal == TipoPersonal.Campo,
-            "Administrativos" => item.TipoPersonal == TipoPersonal.Administrativo,
             _ => true
         };
     }
@@ -213,6 +274,7 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
         var nueva = new JornadaTrabajo
         {
             Fecha = DateTime.Today,
+            TipoPersonal = PadronActual,
             CreadoPorId = _sesionActual.UsuarioActual?.Id ?? 0
         };
 

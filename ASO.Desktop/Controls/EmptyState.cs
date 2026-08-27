@@ -25,6 +25,21 @@ public class EmptyState : ContentControl
         DependencyProperty.Register(nameof(Detalle), typeof(string), typeof(EmptyState),
             new PropertyMetadata(string.Empty));
 
+    public static readonly DependencyProperty CompactoProperty =
+        DependencyProperty.Register(nameof(Compacto), typeof(bool), typeof(EmptyState),
+            new PropertyMetadata(false));
+
+    /// <summary>
+    /// Versión reducida, para fichas y ventanas modales. El bloque de página —glifo de 28 y
+    /// título de subtítulo— se dimensionó para una tabla que ocupa la pantalla; dentro de un
+    /// modal, donde el hueco vacío mide poco más que el propio bloque, sale desproporcionado.
+    /// </summary>
+    public bool Compacto
+    {
+        get => (bool)GetValue(CompactoProperty);
+        set => SetValue(CompactoProperty, value);
+    }
+
     /// <summary>Glifo de Segoe MDL2 Assets. Por defecto, la hoja en blanco.</summary>
     public string Icono
     {

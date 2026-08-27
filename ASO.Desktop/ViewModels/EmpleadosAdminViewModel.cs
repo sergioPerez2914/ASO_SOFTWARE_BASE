@@ -15,23 +15,37 @@ public sealed class EmpleadosAdminViewModel : CrudViewModelBase<Empleado, int>
     private const string FiltroTodos = "Todos";
 
     private readonly IEmpleadoDataSource _empleados;
+    private readonly IServicioDialogo _dialogos;
+    private readonly HorarioService _horarios;
     private string _filtroEstado = FiltroTodos;
 
     public EmpleadosAdminViewModel(IEmpleadoDataSource empleados,
                                    IServicioDialogo dialogos,
-                                   ISesionActual sesion)
+                                   ISesionActual sesion,
+                                   HorarioService horarios)
         : base(empleados, dialogos, sesion)
     {
         _empleados = empleados;
+        _dialogos = dialogos;
+        _horarios = horarios;
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
             _filtroEstado = filtro;
             ItemsView.Refresh();
         });
+
+        VerHistorialCommand = new RelayCommand(VerHistorial, () => SelectedItem is not null);
     }
 
     public ICommand CambiarFiltroEstadoCommand { get; }
+
+    /// <summary>
+    /// Abre las jornadas de la persona seleccionada. No lleva permiso propio: es una ficha de
+    /// solo lectura dentro de una pantalla que ya gobierna <c>Ver.Empleados</c>, igual que la
+    /// ficha de un evento en Seguimiento.
+    /// </summary>
+    public ICommand VerHistorialCommand { get; }
 
     protected override string ModuloPermiso => "Empleados";
 
@@ -51,4 +65,13 @@ public sealed class EmpleadosAdminViewModel : CrudViewModelBase<Empleado, int>
 
     protected override CrudEditorViewModelBase<Empleado> CrearEditor(Empleado item) =>
         new EmpleadoEditorViewModel(item, _empleados);
+
+    private void VerHistorial()
+    {
+        if (SelectedItem is not { } empleado)
+            return;
+
+        _dialogos.MostrarEditor(new HistorialTrabajoViewModel(
+            TipoPersonal.Administrativo, empleado.Id, empleado.Nombre, empleado.Cargo, _horarios));
+    }
 }

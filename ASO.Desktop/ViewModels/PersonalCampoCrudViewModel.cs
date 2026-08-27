@@ -15,23 +15,36 @@ public sealed class PersonalCampoCrudViewModel : CrudViewModelBase<PersonalCampo
     private const string FiltroTodos = "Todos";
 
     private readonly IPersonalCampoDataSource _personal;
+    private readonly IServicioDialogo _dialogos;
+    private readonly HorarioService _horarios;
     private string _filtroRol = FiltroTodos;
 
     public PersonalCampoCrudViewModel(IPersonalCampoDataSource personal,
                                       IServicioDialogo dialogos,
-                                      ISesionActual sesion)
+                                      ISesionActual sesion,
+                                      HorarioService horarios)
         : base(personal, dialogos, sesion)
     {
         _personal = personal;
+        _dialogos = dialogos;
+        _horarios = horarios;
 
         CambiarFiltroRolCommand = new RelayCommand<string>(filtro =>
         {
             _filtroRol = filtro;
             ItemsView.Refresh();
         });
+
+        VerHistorialCommand = new RelayCommand(VerHistorial, () => SelectedItem is not null);
     }
 
     public ICommand CambiarFiltroRolCommand { get; }
+
+    /// <summary>
+    /// Las jornadas de esta persona, que aquí llevan además el frente contra el que se ficharon.
+    /// Sin permiso propio, por lo mismo que en el padrón administrativo.
+    /// </summary>
+    public ICommand VerHistorialCommand { get; }
 
     protected override string ModuloPermiso => "PersonalCampo";
 
@@ -53,4 +66,13 @@ public sealed class PersonalCampoCrudViewModel : CrudViewModelBase<PersonalCampo
 
     protected override CrudEditorViewModelBase<PersonalCampo> CrearEditor(PersonalCampo item) =>
         new PersonalCampoEditorViewModel(item, _personal);
+
+    private void VerHistorial()
+    {
+        if (SelectedItem is not { } persona)
+            return;
+
+        _dialogos.MostrarEditor(new HistorialTrabajoViewModel(
+            TipoPersonal.Campo, persona.Id, persona.Nombre, persona.RolTexto, _horarios));
+    }
 }

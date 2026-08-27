@@ -1,0 +1,80 @@
+<UserControl x:Class="ASO.Desktop.Views.HistorialTrabajoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             mc:Ignorable="d"
+             d:DesignWidth="720">
+
+  <StackPanel>
+
+    <!-- Quién es y cuánto lleva trabajado: el título de la ventana solo dice el nombre. -->
+    <Grid Margin="0,0,0,12">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <TextBlock Grid.Column="0" Text="{Binding Subtitulo}" VerticalAlignment="Center"
+                 TextWrapping="Wrap"
+                 FontSize="{StaticResource FsBody}"
+                 Foreground="{DynamicResource TextSecondaryBrush}" />
+
+      <TextBlock Grid.Column="1" Text="{Binding ResumenHoras}" VerticalAlignment="Center"
+                 Margin="12,0,0,0"
+                 FontSize="{StaticResource FsBody}"
+                 FontWeight="{StaticResource FwMedium}"
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
+    </Grid>
+
+    <!-- La jornada abierta no suma horas arriba; sin este aviso el resumen parecería quedarse corto. -->
+    <Border Style="{StaticResource AlertBoxStyle}" Margin="0,0,0,12"
+            Background="{DynamicResource InfoSoftBrush}"
+            BorderBrush="{DynamicResource InfoTextBrush}"
+            Visibility="{Binding TieneJornadaAbierta, Converter={StaticResource BoolToVis}}">
+      <TextBlock Text="{Binding AvisoJornadaAbierta}" TextWrapping="Wrap"
+                 FontSize="{StaticResource FsBody}"
+                 Foreground="{DynamicResource InfoTextBrush}" />
+    </Border>
+
+    <Border Style="{StaticResource SectionCardStyle}" Padding="0">
+      <Grid>
+        <!-- El alto se acota en el propio DataGrid y NO con un ScrollViewer alrededor: la ventana
+             es SizeToContent="Height", así que un ScrollViewer le daría alto infinito y rompería
+             la virtualización. El DataGrid ya trae su barra.
+
+             Tabla y estado vacío se TURNAN, no se superponen como en las pantallas de página: allí
+             la fila estirada deja sitio de sobra para centrar el bloque, y aquí la caja mide poco
+             más que él, así que el glifo acababa encima del encabezado de columnas. -->
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
+                  MaxHeight="360" IsReadOnly="True"
+                  ItemsSource="{Binding Jornadas}"
+                  Visibility="{Binding HayJornadas, Converter={StaticResource BoolToVis}}">
+          <DataGrid.Columns>
+            <controls:ColumnaTexto Header="Entrada" Binding="{Binding EntradaTexto}" Width="16*" MinWidth="104" />
+            <controls:ColumnaTexto Header="Salida" Binding="{Binding SalidaTexto}" Width="16*" MinWidth="104" />
+            <controls:ColumnaNumero Header="Horas" Binding="{Binding HorasTexto}" Width="10*" MinWidth="64" />
+            <controls:ColumnaTexto Header="Turno" Binding="{Binding TurnoTexto}" Width="11*" MinWidth="70" />
+            <controls:ColumnaTexto Header="Frente" Binding="{Binding RemesaTexto}" Width="10*" MinWidth="64" />
+            <controls:ColumnaTexto Header="Observación" Binding="{Binding Observacion}" Width="21*" MinWidth="120" />
+            <DataGridTemplateColumn Header="Estado" Width="88">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Border Style="{StaticResource ChipJornadaStyle}">
+                    <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
+                  </Border>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <controls:EmptyState Icono="&#xE787;" Compacto="True"
+                             Titulo="Sin jornadas registradas"
+                             Detalle="Todavía no ha fichado ninguna entrada en Gestión de Horarios."
+                             Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
+      </Grid>
+    </Border>
+  </StackPanel>
+</UserControl>

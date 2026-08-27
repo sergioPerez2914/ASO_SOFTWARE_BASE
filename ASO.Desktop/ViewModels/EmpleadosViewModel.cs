@@ -31,8 +31,14 @@ public sealed class EmpleadosViewModel : PantallaViewModelBase
                                ISesionActual sesion)
         : base(modulo, submodulo)
     {
-        Administrativos = new EmpleadosAdminViewModel(DataSourceFactory.CrearEmpleados(), dialogos, sesion);
-        Campo = new PersonalCampoCrudViewModel(DataSourceFactory.CrearPersonalCampo(), dialogos, sesion);
+        // Un solo HorarioService para los dos padrones: es de donde sale el historial de trabajo
+        // de cualquiera de ellos, y la jornada ya sabe a qué padrón pertenece cada persona.
+        var horarios = new HorarioService(DataSourceFactory.CrearJornadas(),
+                                          DataSourceFactory.CrearEventosOperacion(),
+                                          DataSourceFactory.CrearRemesas());
+
+        Administrativos = new EmpleadosAdminViewModel(DataSourceFactory.CrearEmpleados(), dialogos, sesion, horarios);
+        Campo = new PersonalCampoCrudViewModel(DataSourceFactory.CrearPersonalCampo(), dialogos, sesion, horarios);
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }

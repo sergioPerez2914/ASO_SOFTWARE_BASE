@@ -8,16 +8,13 @@
              d:DesignWidth="420">
 
   <StackPanel>
-    <TextBlock Text="Padrón" Style="{StaticResource FormLabelStyle}" />
-    <StackPanel Orientation="Horizontal">
-      <RadioButton Content="Administrativo" GroupName="PadronJornada" Margin="0,0,6,0"
-                   Style="{StaticResource RangeToggleStyle}"
-                   IsChecked="{Binding EsAdministrativo, Mode=OneWay}"
-                   Command="{Binding CambiarPadronCommand}" CommandParameter="Administrativo" />
-      <RadioButton Content="Personal de campo" GroupName="PadronJornada"
-                   Style="{StaticResource RangeToggleStyle}"
-                   IsChecked="{Binding EsCampo, Mode=OneWay}"
-                   Command="{Binding CambiarPadronCommand}" CommandParameter="Campo" />
+    <!-- El padrón llega decidido de la pestaña de la pantalla; aquí solo se enseña, igual que
+         el frente, para que se vea de dónde sale la lista de personas. -->
+    <StackPanel Margin="0,0,0,8">
+      <TextBlock Text="Padrón" Style="{StaticResource FormLabelStyle}" />
+      <TextBlock Text="{Binding PadronTexto}" TextWrapping="Wrap"
+                 FontSize="{StaticResource FsBody}" FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
     </StackPanel>
 
     <controls:FormField Etiqueta="Persona">

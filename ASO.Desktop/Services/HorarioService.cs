@@ -114,6 +114,30 @@ public sealed class HorarioService
             .Where(j => !j.EstaAbierta)
             .Sum(j => j.HorasTrabajadas ?? 0m);
 
+    /// <summary>
+    /// Todo lo que una persona ha trabajado: sus jornadas y lo que se deriva de ellas.
+    ///
+    /// Es la puerta por la que el padrón de Nómina · Empleados abre el historial de alguien, igual
+    /// que <see cref="HorasEnPeriodo"/> lo es para la liquidación: si mañana cambia qué cuenta como
+    /// jornada trabajada, cambia aquí y las dos pantallas se enteran solas.
+    /// </summary>
+    public HistorialTrabajo HistorialDe(TipoPersonal tipo, int personaId)
+    {
+        var jornadas = _jornadas.GetByPersona(tipo, personaId)
+            .OrderByDescending(j => j.HoraEntrada)
+            .ToList();
+
+        // Mismo criterio que HorasEnPeriodo: una jornada abierta todavía no sabe cuánto duró, así
+        // que no suma horas. La abierta se devuelve aparte para poder avisar de ella.
+        var cerradas = jornadas.Where(j => !j.EstaAbierta).ToList();
+
+        return new HistorialTrabajo(
+            jornadas,
+            cerradas.Sum(j => j.HorasTrabajadas ?? 0m),
+            cerradas.Count,
+            jornadas.FirstOrDefault(j => j.EstaAbierta));
+    }
+
     public bool TieneJornadaAbierta(TipoPersonal tipo, int personaId, out JornadaTrabajo? abierta)
     {
         abierta = _jornadas.GetByPersona(tipo, personaId).FirstOrDefault(j => j.EstaAbierta);
@@ -173,3 +197,14 @@ public sealed class HorarioService
     private static string Oficio(JornadaTrabajo jornada) =>
         string.IsNullOrWhiteSpace(jornada.CargoORol) ? string.Empty : $" ({jornada.CargoORol})";
 }
+
+/// <summary>
+/// Lo trabajado por una persona, tal y como lo devuelve <see cref="HorarioService.HistorialDe"/>:
+/// las jornadas y los totales que salen de ellas. Los totales viajan ya calculados y no como
+/// propiedades de la lista porque quien cuenta las horas es el servicio, no quien las pinta.
+/// </summary>
+public sealed record HistorialTrabajo(
+    IReadOnlyList<JornadaTrabajo> Jornadas,
+    decimal HorasTotales,
+    int JornadasCerradas,
+    JornadaTrabajo? Abierta);

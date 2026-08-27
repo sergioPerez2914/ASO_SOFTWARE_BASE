@@ -79,6 +79,8 @@
                     Command="{Binding AgregarCommand}" />
             <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding EditarCommand}" />
+            <Button Content="Historial" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding VerHistorialCommand}" />
             <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
                     Foreground="{DynamicResource DangerTextBrush}"
                     Command="{Binding EliminarCommand}" />
@@ -165,6 +167,8 @@
                     Command="{Binding AgregarCommand}" />
             <Button Content="Editar" Style="{StaticResource SecondaryButtonStyle}"
                     Command="{Binding EditarCommand}" />
+            <Button Content="Historial" Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding VerHistorialCommand}" />
             <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
                     Foreground="{DynamicResource DangerTextBrush}"
                     Command="{Binding EliminarCommand}" />
