@@ -89,6 +89,12 @@ public class RequisicionLinea
     /// <see cref="TipoCombustibleSolicitado"/> es <see cref="TipoCombustible.Lubricante"/>.</summary>
     public string? TipoLubricante { get; set; }
 
+    /// <summary>Mineral/Sintético/Semi-sintético (ver <see cref="Lubricante.Tipos"/>). Solo aplica
+    /// cuando <see cref="TipoCombustibleSolicitado"/> es <see cref="TipoCombustible.Lubricante"/>;
+    /// viaja a <c>OrdenCompraLinea.ClaseLubricante</c> al armar la orden, para no volver a
+    /// pedirlo.</summary>
+    public string? ClaseLubricante { get; set; }
+
     // --- Repuesto ---
     public string? ArticuloCodigo { get; set; }
     public string ArticuloNombre { get; set; } = string.Empty;    // snapshot

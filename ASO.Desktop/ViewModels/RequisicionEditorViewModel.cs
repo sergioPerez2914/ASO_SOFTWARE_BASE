@@ -159,6 +159,7 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
                 TipoInsumo = TipoInsumo.Combustible,
                 TipoCombustibleSolicitado = TipoCombustible.Lubricante,
                 TipoLubricante = GradoViscosidadSeleccionado,
+                ClaseLubricante = TipoLubricanteSeleccionado,
                 Cantidad = cantidad,
                 UnidadTexto = "L"
             });
