@@ -50,7 +50,8 @@
 
         <!-- El frente manda sobre las dos cosas: acota la tabla y es el que se estampa al fichar,
              así que va solo en la primera banda y no compitiendo con los filtros. -->
-        <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,12"
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                    VerticalAlignment="Center" Margin="0,0,0,12"
                     Visibility="{Binding MostrarCampo, Converter={StaticResource BoolToVis}}">
           <StackPanel Orientation="Horizontal">
             <TextBlock Text="Frente" VerticalAlignment="Center" Margin="0,0,8,0"
@@ -71,9 +72,13 @@
         </StackPanel>
 
         <!-- Tres cifras con su etiqueta, como los tres saldos de Banco. Antes eran dos frases
-             pegadas con un punto medio, con dos cortes de tiempo distintos dentro. -->
-        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
-                    VerticalAlignment="Center" Margin="12,0,0,12">
+             pegadas con un punto medio, con dos cortes de tiempo distintos dentro.
+
+             Van en la MISMA banda que los filtros, a la derecha. En su propia fila dejaban la
+             mitad izquierda en blanco, y en la pestaña de administrativos —que no tiene frente—
+             esa fila entera era un hueco vacío encima de la búsqueda. -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal"
+                    VerticalAlignment="Center" Margin="16,0,0,0">
           <StackPanel Margin="0,0,20,0">
             <TextBlock Text="Horas (14 días)" FontSize="{StaticResource FsCaption}"
                        Foreground="{DynamicResource TextMutedBrush}" />
@@ -100,7 +105,7 @@
         <!-- Búsqueda y filtro de estado. El grupo de chips es un StackPanel dentro del
              WrapPanel para que envuelva entero y no se parta por la mitad al estrechar.
              El padrón ya no está aquí: lo decide la pestaña de arriba. -->
-        <WrapPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center">
+        <WrapPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,16,0" VerticalAlignment="Center"
                               Sugerencia="Buscar por persona, cargo, núcleo o remesa"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
