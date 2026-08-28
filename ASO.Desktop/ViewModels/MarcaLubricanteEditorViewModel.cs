@@ -5,7 +5,8 @@ namespace ASO.Desktop.ViewModels;
 /// <summary>
 /// Alta rápida de una marca de lubricante. Sin pantalla de administración propia: se llega
 /// aquí solo por el botón "+ Nuevo" desde donde se elige la marca (Orden de Compra, editor de
-/// <see cref="Lubricante"/>), mismo patrón que <see cref="StockCombustibleEditorViewModel"/>.
+/// <see cref="Lubricante"/>), mismo patrón que <see cref="ProveedorEditorViewModel"/> desde
+/// "Comparar proveedores".
 /// </summary>
 public sealed class MarcaLubricanteEditorViewModel : CrudEditorViewModelBase<MarcaLubricante>
 {

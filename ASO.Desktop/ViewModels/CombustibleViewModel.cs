@@ -10,19 +10,23 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Inventario · Combustible: los vales despachados, el estado del stock de combustible y (pestaña
-/// aparte) el catálogo de lubricantes.
+/// Inventario · Combustible: los vales despachados y, en pestañas aparte, el catálogo de
+/// lubricantes y el historial de diésel recibido por Compras. No hay tarjetas de "cisterna" en
+/// esta pestaña: la empresa no tiene tanques físicos que medir — ese indicador vive ahora en la
+/// pestaña "Combustible" (<see cref="CombustibleRecibidoViewModel"/>), sin barra de capacidad.
 ///
 /// Las reglas de los vales viven en <see cref="CombustibleService"/>; aquí solo se pide la acción
-/// y se refleja el resultado. Tras cada transición se recarga el stock porque su existencia
-/// cambió: la tarjeta de arriba y la grilla miran el mismo hecho desde dos ángulos. Lubricantes es
-/// un padrón CRUD simple colgado al bulto (<see cref="LubricantesCrudViewModel"/>), mismo patrón
-/// que la pestaña "Salidas" de <see cref="RepuestosViewModel"/> — no justifica un submódulo nuevo.
+/// y se refleja el resultado. Lubricantes es un padrón CRUD simple colgado al bulto
+/// (<see cref="LubricantesCrudViewModel"/>), mismo patrón que la pestaña "Salidas" de
+/// <see cref="RepuestosViewModel"/> — no justifica un submódulo nuevo. Combustible (la pestaña) es
+/// de solo lectura: no hay nada que dar de alta, todo nace de una recepción de mercancía
+/// confirmada.
 /// </summary>
 public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible, int>
 {
     public const string VistaVales = "Vales";
     public const string VistaLubricantes = "Lubricantes";
+    public const string VistaCombustibleRecibido = "CombustibleRecibido";
 
     private const string FiltroTodos = "Todos";
 
@@ -56,10 +60,10 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         _servicio = new CombustibleService(
             vales, _stockCombustible, DataSourceFactory.CrearRecargasCombustible(), DataSourceFactory.CrearActivosFlota());
 
-        StocksCombustible = new ObservableCollection<StockCombustible>(_stockCombustible.GetAll());
-
         Lubricantes = new LubricantesCrudViewModel(
             DataSourceFactory.CrearLubricantes(), DataSourceFactory.CrearMarcasLubricante(), dialogos, sesion);
+
+        CombustibleRecibido = new CombustibleRecibidoViewModel(_stockCombustible, DataSourceFactory.CrearRecepcionesMercancia());
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
 
@@ -88,11 +92,13 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
     public ICommand AnularCommand { get; }
     public ICommand RegistrarRecargaCommand { get; }
 
-    public ObservableCollection<StockCombustible> StocksCombustible { get; }
-
     /// <summary>Pestaña "Lubricantes": catálogo propio (Marca + Tipo + Grado), colgado dentro de
     /// esta pantalla en vez de un submódulo nuevo — ver <see cref="LubricantesCrudViewModel"/>.</summary>
     public LubricantesCrudViewModel Lubricantes { get; }
+
+    /// <summary>Pestaña "Combustible": cuánto diésel tiene la empresa y el historial de litros
+    /// recibidos por Compras — ver <see cref="CombustibleRecibidoViewModel"/>.</summary>
+    public CombustibleRecibidoViewModel CombustibleRecibido { get; }
 
     private string _vistaActual = VistaVales;
 
@@ -113,6 +119,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
 
     public bool MostrarVales => VistaActual == VistaVales;
     public bool MostrarLubricantes => VistaActual == VistaLubricantes;
+    public bool MostrarCombustibleRecibido => VistaActual == VistaCombustibleRecibido;
 
     public bool EsVales
     {
@@ -124,6 +131,12 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
     {
         get => MostrarLubricantes;
         set { if (value) VistaActual = VistaLubricantes; }
+    }
+
+    public bool EsCombustibleRecibido
+    {
+        get => MostrarCombustibleRecibido;
+        set { if (value) VistaActual = VistaCombustibleRecibido; }
     }
 
     /// <summary>
@@ -260,16 +273,14 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         }
     }
 
-    /// <summary>Relee los vales y, además, el stock de combustible, el rendimiento y el catálogo
-    /// de lubricantes (una recepción de mercancía puede haber sumado a su existencia).</summary>
+    /// <summary>Relee los vales y, además, el rendimiento, el catálogo de lubricantes y el
+    /// historial de diésel recibido (una recepción de mercancía puede haber sumado a cualquiera
+    /// de sus existencias).</summary>
     public override void Recargar()
     {
         base.Recargar();
 
-        StocksCombustible.Clear();
-        foreach (var stock in _stockCombustible.GetAll())
-            StocksCombustible.Add(stock);
-
         Lubricantes.Recargar();
+        CombustibleRecibido.Recargar();
     }
 }

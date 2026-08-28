@@ -27,6 +27,9 @@
       <RadioButton Content="Lubricantes" GroupName="VistaCombustible"
                    Style="{StaticResource SegmentedTabStyle}"
                    IsChecked="{Binding EsLubricantes, Mode=TwoWay}" />
+      <RadioButton Content="Combustible" GroupName="VistaCombustible"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsCombustibleRecibido, Mode=TwoWay}" />
     </StackPanel>
 
     <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
@@ -37,40 +40,11 @@
           Visibility="{Binding MostrarVales, Converter={StaticResource BoolToVis}}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
-      <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Estado del stock de combustible: lo primero que se mira antes de despachar -->
-    <ItemsControl Grid.Row="0" ItemsSource="{Binding StocksCombustible}" Margin="0,0,0,12">
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <StackPanel Orientation="Horizontal" />
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <Border Style="{StaticResource CardStyle}" Width="280" Margin="0,0,12,0">
-            <StackPanel>
-              <TextBlock Text="{Binding Nombre}" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
-                         Foreground="{DynamicResource TextPrimaryBrush}" />
-              <TextBlock Text="{Binding ExistenciaTexto}" FontSize="{StaticResource FsDisplay}" FontWeight="Bold"
-                         Foreground="{DynamicResource PrimaryBrush}" Margin="0,4,0,0" />
-              <ProgressBar Height="6" Margin="0,8,0,0" Minimum="0" Maximum="100"
-                           Value="{Binding PorcentajeLleno, Mode=OneWay}"
-                           Background="{DynamicResource BorderBrush}"
-                           Foreground="{DynamicResource AccentBlueBrush}"
-                           BorderThickness="0" />
-              <TextBlock Text="{Binding PorcentajeTexto}" FontSize="{StaticResource FsCaption}" Margin="0,4,0,0"
-                         Foreground="{DynamicResource TextMutedBrush}" />
-            </StackPanel>
-          </Border>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
-
     <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -129,7 +103,7 @@
       </Grid>
     </Border>
 
-    <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
+    <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
       <Grid>
         <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
                   ItemsSource="{Binding ItemsView}"
@@ -246,6 +220,49 @@
                                Titulo="No hay lubricantes en el catálogo"
                                Detalle="Da de alta una marca, tipo y grado para controlar su existencia."
                                Visibility="{Binding HasItems, ElementName=TablaLubricantes, Converter={StaticResource SinItemsAVis}}" />
+        </Grid>
+      </Border>
+    </Grid>
+    </Grid>
+
+    <!-- Diésel: cuánto tiene la empresa y el historial de litros recibidos por Compras. De solo
+         lectura — todo nace de una recepción de mercancía confirmada. -->
+    <Grid Grid.Row="2" Margin="0,16,0,0"
+          Visibility="{Binding MostrarCombustibleRecibido, Converter={StaticResource BoolToVis}}">
+    <Grid DataContext="{Binding CombustibleRecibido}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Width="280" HorizontalAlignment="Left" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Text="Diésel en existencia" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="{Binding ExistenciaTotalTexto}" FontSize="{StaticResource FsDisplay}" FontWeight="Bold"
+                     Foreground="{DynamicResource PrimaryBrush}" Margin="0,4,0,0" />
+          <TextBlock Text="Sin especificar en qué envase está." FontSize="{StaticResource FsCaption}" Margin="0,4,0,0"
+                     Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0">
+        <Grid>
+          <DataGrid x:Name="TablaCombustibleRecibido" Style="{StaticResource DataGridStyle}"
+                    ItemsSource="{Binding Recibos}" IsReadOnly="True">
+            <DataGrid.Columns>
+              <controls:ColumnaTexto Header="Fecha" Binding="{Binding FechaTexto}" Width="12*" MinWidth="82" />
+              <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="18*" MinWidth="110" />
+              <controls:ColumnaNumero Header="Litros" Binding="{Binding LitrosTexto}" Width="12*" MinWidth="80" />
+              <controls:ColumnaTexto Header="Proveedor" Binding="{Binding ProveedorNombre}" Width="20*" MinWidth="120" />
+              <controls:ColumnaTexto Header="Orden de compra" Binding="{Binding OrdenTexto}" Width="14*" MinWidth="95" />
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <controls:EmptyState Icono="&#xEB42;"
+                               Titulo="No hay recepciones de diésel"
+                               Detalle="Los litros recibidos aparecen aquí al confirmar una recepción de mercancía de diésel."
+                               Visibility="{Binding HasItems, ElementName=TablaCombustibleRecibido, Converter={StaticResource SinItemsAVis}}" />
         </Grid>
       </Border>
     </Grid>

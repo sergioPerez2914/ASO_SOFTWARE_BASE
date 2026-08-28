@@ -306,7 +306,6 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
 {
     private const string FiltroTodas = "Todas";
 
-    private readonly IStockCombustibleDataSource _stockCombustible;
     private readonly IEmpleadoDataSource _empleados;
     private readonly IServicioDialogo _dialogos;
     private readonly ISesionActual _sesionActual;
@@ -315,14 +314,12 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
     private string _filtroEstado = FiltroTodas;
 
     public RecepcionesCrudViewModel(IRecepcionMercanciaDataSource recepciones,
-                                    IStockCombustibleDataSource stockCombustible,
                                     IEmpleadoDataSource empleados,
                                     ComprasService servicio,
                                     IServicioDialogo dialogos,
                                     ISesionActual sesion)
         : base(recepciones, dialogos, sesion)
     {
-        _stockCombustible = stockCombustible;
         _empleados = empleados;
         _servicio = servicio;
         _dialogos = dialogos;
@@ -368,7 +365,7 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
             "La recepción se registra desde una orden de compra aprobada, con \"Registrar recepción\".");
 
     protected override CrudEditorViewModelBase<RecepcionMercancia> CrearEditor(RecepcionMercancia item) =>
-        new RecepcionMercanciaEditorViewModel(item, _stockCombustible);
+        new RecepcionMercanciaEditorViewModel(item);
 
     private void Confirmar()
     {
@@ -463,7 +460,7 @@ public sealed class ComprasViewModel : PantallaViewModelBase
         OrdenesCompra = new OrdenesCompraCrudViewModel(ordenesCompra, servicio, dialogos, sesion);
         OrdenesCompra.RecepcionCreada += (_, _) => VistaActual = VistaRecepciones;
 
-        Recepciones = new RecepcionesCrudViewModel(recepciones, stockCombustible, empleados, servicio, dialogos, sesion);
+        Recepciones = new RecepcionesCrudViewModel(recepciones, empleados, servicio, dialogos, sesion);
 
         CambiarVistaCommand = new RelayCommand<string>(vista => VistaActual = vista);
     }

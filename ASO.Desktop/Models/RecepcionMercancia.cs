@@ -85,12 +85,23 @@ public class RecepcionMercancia : IEntidad<int>, IDeOrganizacion
 /// realmente llegó. <see cref="CantidadPedida"/> es solo de referencia; <see cref="CantidadRecibida"/>
 /// es la que mueve el stock al confirmar, y puede diferir de la pedida.
 ///
-/// Una línea de combustible necesita, además, decir a qué <see cref="StockCombustible"/> del
-/// catálogo se suma: la orden de compra solo dice diésel/lubricante (<see cref="TipoCombustibleSolicitado"/>),
-/// no un producto concreto — eso lo elige quien recibe, aquí.
+/// Una línea de diésel elige aquí, además, su <see cref="Presentacion"/> — la empresa no tiene una
+/// cisterna común que asignar, así que <c>ComprasService.ConfirmarRecepcion</c> resuelve solo (la
+/// busca o la crea) el único <see cref="StockCombustible"/> general "Diesel" al que se suma la
+/// cantidad recibida.
 /// </summary>
 public class RecepcionMercanciaLinea
 {
+    /// <summary>Presentaciones habituales en que llega el diésel. Solo descriptiva — a diferencia
+    /// de <see cref="Lubricante.Presentaciones"/> no tiene una conversión a litros fija, porque el
+    /// envase real no tiene una capacidad estándar (un tambor puede traer 180 L o 210 L según de
+    /// dónde salga): por eso el litraje siempre se captura aparte, directo, nunca derivado del
+    /// envase. Se elige aquí, al recibir, no antes: a diferencia de Lubricante, el precio del
+    /// diésel no depende de en qué venga envasado, así que no hace falta fijarlo desde la
+    /// cotización.</summary>
+    public static readonly IReadOnlyList<string> PresentacionesDiesel =
+        ["Tambor/Barril", "Cisterna móvil (pipa)", "Bidón/Galonera", "Granel"];
+
     public TipoInsumo TipoInsumo { get; set; }
 
     // --- Combustible ---
@@ -100,11 +111,15 @@ public class RecepcionMercanciaLinea
     public int? StockCombustibleId { get; set; }
     public string StockCombustibleNombre { get; set; } = string.Empty;   // snapshot
 
-    /// <summary>Marca/clase/presentación, heredadas de la orden de compra que decidió qué
-    /// comprar — de solo lectura aquí, no se eligen en la recepción.</summary>
+    /// <summary>Marca/clase, heredadas de la orden de compra que decidió qué comprar — de solo
+    /// lectura aquí, no se eligen en la recepción.</summary>
     public int? MarcaLubricanteId { get; set; }
     public string MarcaLubricanteNombre { get; set; } = string.Empty;   // snapshot
     public string? ClaseLubricante { get; set; }
+
+    /// <summary>Envase de la línea. En Lubricante viene fijado de la orden de compra (solo
+    /// lectura aquí); en Diésel se elige recién aquí, al recibir — ver
+    /// <see cref="PresentacionesDiesel"/>.</summary>
     public string? Presentacion { get; set; }
 
     /// <summary>Marca concreta de lubricante (catálogo <see cref="Lubricante"/>) a la que se

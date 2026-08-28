@@ -1,30 +1,29 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using ASO.Desktop.Models;
-using ASO.Desktop.Services;
 
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
 /// Edición de una recepción en borrador: corregir la cantidad realmente recibida de cada línea
-/// (nace prellenada con la cantidad pedida) y, para las líneas de diésel, elegir a qué
-/// <see cref="StockCombustible"/> del catálogo se suma. Las líneas de lubricante no piden nada
-/// aquí: Marca, Clase y Presentación ya se fijaron al armar la orden de compra, y el
-/// <see cref="Lubricante"/> concreto lo resuelve <c>ComprasService.ConfirmarRecepcion</c> solo
-/// (lo busca o lo crea). Las líneas no se agregan ni se quitan aquí — vienen fijas de la orden
-/// de compra de origen.
+/// (nace prellenada con la cantidad pedida) y, para las líneas de diésel, elegir en qué
+/// presentación llegó — la empresa no tiene una cisterna común que asignar, así que
+/// <c>ComprasService.ConfirmarRecepcion</c> resuelve solo el stock general "Diesel" al que se
+/// suma. Las líneas de lubricante no piden nada aquí: Marca, Clase y Presentación ya se fijaron
+/// al armar la orden de compra, y el <see cref="Lubricante"/> concreto lo resuelve
+/// <c>ComprasService.ConfirmarRecepcion</c> solo (lo busca o lo crea). Las líneas no se agregan
+/// ni se quitan aquí — vienen fijas de la orden de compra de origen.
 /// </summary>
 public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<RecepcionMercancia>
 {
     private readonly RecepcionMercancia _original;
 
-    public RecepcionMercanciaEditorViewModel(RecepcionMercancia original,
-                                             IStockCombustibleDataSource stockCombustible)
+    public RecepcionMercanciaEditorViewModel(RecepcionMercancia original)
     {
         _original = original;
         Notas = original.Notas;
 
-        StocksCombustible = stockCombustible.GetAll().Where(s => s.Activo).OrderBy(s => s.Nombre).ToList();
         Lineas = new ObservableCollection<RecepcionMercanciaLinea>(original.Lineas.Select(l => l.Clonar()));
     }
 
@@ -34,7 +33,7 @@ public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<
 
     public string ResumenProveedor => $"{_original.ProveedorNombre} · orden de compra Nº {_original.OrdenCompraId}";
 
-    public IReadOnlyList<StockCombustible> StocksCombustible { get; }
+    public IReadOnlyList<string> PresentacionesCombustible => RecepcionMercanciaLinea.PresentacionesDiesel;
 
     public ObservableCollection<RecepcionMercanciaLinea> Lineas { get; }
 
@@ -59,9 +58,9 @@ public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<
             return false;
         }
 
-        if (Lineas.Any(l => l.EsDiesel && l.CantidadRecibida > 0 && l.StockCombustibleId is null))
+        if (Lineas.Any(l => l.EsDiesel && l.CantidadRecibida > 0 && string.IsNullOrWhiteSpace(l.Presentacion)))
         {
-            error = "Seleccione a qué stock de combustible se suma cada línea de diésel recibida.";
+            error = "Seleccione la presentación de cada línea de diésel recibida.";
             return false;
         }
 
@@ -73,12 +72,7 @@ public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<
     {
         var recepcion = _original.Clonar();
         recepcion.Notas = Notas.Trim();
-        recepcion.Lineas = Lineas.Select(l =>
-        {
-            var copia = l.Clonar();
-            copia.StockCombustibleNombre = StocksCombustible.FirstOrDefault(s => s.Id == copia.StockCombustibleId)?.Nombre ?? string.Empty;
-            return copia;
-        }).ToList();
+        recepcion.Lineas = Lineas.Select(l => l.Clonar()).ToList();
         return recepcion;
     }
 }

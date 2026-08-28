@@ -174,7 +174,10 @@ public sealed class CombustibleService
         var stock = _stockCombustible.GetById(recarga.StockCombustibleId)
             ?? throw new InvalidOperationException("El stock de combustible indicado ya no existe.");
 
-        if (stock.ExistenciaL + recarga.Litros > stock.CapacidadL)
+        // CapacidadL <= 0 es "sin tope fijo" (mismo criterio que StockCombustible.PorcentajeLleno),
+        // el caso del stock general "Diesel" que resuelve solo ComprasService.ConfirmarRecepcion:
+        // la empresa no tiene una cisterna física cuya capacidad real pudiera desbordarse.
+        if (stock.CapacidadL > 0 && stock.ExistenciaL + recarga.Litros > stock.CapacidadL)
             throw new InvalidOperationException(
                 $"El stock de {stock.Nombre} tiene {stock.ExistenciaL:N2} L de {stock.CapacidadL:N2} L " +
                 $"y no admite {recarga.Litros:N2} L más. Verifique la cantidad recibida.");

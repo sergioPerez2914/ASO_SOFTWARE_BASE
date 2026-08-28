@@ -346,8 +346,8 @@ public sealed class ComprasService
         if (r.Lineas.All(l => l.CantidadRecibida <= 0))
             pendientes.Add("al menos una cantidad recibida mayor que cero");
 
-        if (r.Lineas.Any(l => l.EsDiesel && l.CantidadRecibida > 0 && l.StockCombustibleId is null))
-            pendientes.Add("el stock de combustible al que se suma cada línea de diésel recibida");
+        if (r.Lineas.Any(l => l.EsDiesel && l.CantidadRecibida > 0 && string.IsNullOrWhiteSpace(l.Presentacion)))
+            pendientes.Add("la presentación de cada línea de diésel recibida");
 
         faltantes = pendientes.Count == 0 ? null : string.Join(", ", pendientes);
         return pendientes.Count == 0;
@@ -439,19 +439,12 @@ public sealed class ComprasService
                     throw new InvalidOperationException(
                         $"El artículo {linea.ArticuloCodigo} ya no existe en el catálogo de inventario.");
             }
-            else if (linea.EsDiesel)
-            {
-                var stock = _stockCombustible.GetById(linea.StockCombustibleId!.Value)
-                    ?? throw new InvalidOperationException("El stock de combustible indicado ya no existe.");
-
-                if (stock.ExistenciaL + linea.CantidadRecibida > stock.CapacidadL)
-                    throw new InvalidOperationException(
-                        $"El stock de {stock.Nombre} tiene {stock.ExistenciaL:N2} L de {stock.CapacidadL:N2} L " +
-                        $"y no admite {linea.CantidadRecibida:N2} L más. Verifique la cantidad recibida.");
-            }
-            // La rama de lubricante no valida nada aquí: Marca+Clase+Grado ya se exigieron para
-            // aprobar la orden de compra, y ConfirmarRecepcion la busca o la crea sola más abajo
-            // — a diferencia de Diésel/Repuesto, esta rama no puede fallar.
+            // Ni Diésel ni Lubricante validan nada aquí: para Diésel la Presentación ya se exigió
+            // arriba (RecepcionEstaCompleta) y el stock general "Diesel" lo resuelve solo
+            // ConfirmarRecepcion más abajo (lo busca o lo crea, sin tope de capacidad — la empresa
+            // no tiene una cisterna común que pudiera desbordarse); para Lubricante, Marca+Clase+
+            // Grado ya se exigieron para aprobar la orden de compra. A diferencia de Repuesto,
+            // ninguna de las dos ramas puede fallar aquí.
         }
 
         // Efecto: sumar cada línea a su stock.
@@ -467,10 +460,27 @@ public sealed class ComprasService
             }
             else if (linea.EsDiesel)
             {
-                var stock = _stockCombustible.GetById(linea.StockCombustibleId!.Value)!;
+                // Ya no lo elige quien recibe: la empresa no tiene una cisterna física que
+                // asignar, así que se resuelve solo un único stock general "Diesel" (se crea la
+                // primera vez que llega), sin tope de capacidad — mismo criterio de
+                // "buscar o crear" que la rama de Lubricante, más abajo.
+                var stock = _stockCombustible.GetAll()
+                    .FirstOrDefault(s => s.Nombre.Equals("Diesel", StringComparison.OrdinalIgnoreCase));
+
+                stock ??= _stockCombustible.Add(new StockCombustible
+                {
+                    Nombre = "Diesel",
+                    CapacidadL = 0,
+                    ExistenciaL = 0,
+                    Activo = true
+                });
+
                 var actualizado = stock.Clonar();
                 actualizado.ExistenciaL += linea.CantidadRecibida;
                 _stockCombustible.Update(actualizado);
+
+                linea.StockCombustibleId = actualizado.Id;
+                linea.StockCombustibleNombre = actualizado.Nombre;
             }
             else
             {

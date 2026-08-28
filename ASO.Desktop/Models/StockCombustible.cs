@@ -26,9 +26,16 @@ public class StockCombustible : IEntidad<int>, IDeOrganizacion
     public decimal ExistenciaL { get; set; }
     public bool Activo { get; set; } = true;
 
+    /// <summary>Falso para un producto sin cisterna física (p. ej. el "Diesel" general que
+    /// resuelve solo <c>ComprasService.ConfirmarRecepcion</c>): sin capacidad no hay contra qué
+    /// medir un porcentaje, así que la tarjeta no debe mostrar la barra ni el "/ tope".</summary>
+    public bool TieneCapacidadFija => CapacidadL > 0;
+
     public decimal PorcentajeLleno => CapacidadL <= 0 ? 0 : ExistenciaL * 100m / CapacidadL;
 
-    public string ExistenciaTexto => $"{ExistenciaL:N0} / {CapacidadL:N0} L";
+    public string ExistenciaTexto => TieneCapacidadFija
+        ? $"{ExistenciaL:N0} / {CapacidadL:N0} L"
+        : $"{ExistenciaL:N0} L";
 
     public string PorcentajeTexto => $"{PorcentajeLleno:N0} %";
 

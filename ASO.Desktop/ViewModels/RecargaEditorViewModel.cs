@@ -1,63 +1,40 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
 
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Captura de una recarga de stock de combustible. No hereda de la base genérica porque no edita
+/// Captura de una recarga del stock de diésel. No hereda de la base genérica porque no edita
 /// una entidad existente: solo recoge los datos con los que el servicio construye y aplica la
-/// recarga (el tope de capacidad lo valida <see cref="CombustibleService"/>).
+/// recarga (el tope de capacidad, si lo hubiera, lo valida <see cref="CombustibleService"/>).
+///
+/// No hay stock que elegir: la empresa no tiene cisternas, así que la recarga siempre entra al
+/// único stock general "Diesel", que este editor resuelve solo (lo busca o lo crea) — mismo
+/// criterio que <see cref="ValeCombustibleEditorViewModel"/>.
 /// </summary>
 public sealed class RecargaEditorViewModel : CrudEditorViewModelBase
 {
-    private readonly IStockCombustibleDataSource _stockCombustible;
-    private readonly IServicioDialogo _dialogos;
-    private readonly ISesionActual _sesion;
-
     public RecargaEditorViewModel(IStockCombustibleDataSource stockCombustible, IServicioDialogo dialogos, ISesionActual sesion)
     {
-        _stockCombustible = stockCombustible;
-        _dialogos = dialogos;
-        _sesion = sesion;
+        Stock = stockCombustible.GetAll()
+            .FirstOrDefault(s => s.Nombre.Equals("Diesel", StringComparison.OrdinalIgnoreCase));
 
-        StocksCombustible = new ObservableCollection<StockCombustible>(stockCombustible.GetAll().Where(t => t.Activo));
-        StockSeleccionado = StocksCombustible.FirstOrDefault();
-
-        NuevoStockCommand = new RelayCommand(NuevoStock, () => _sesion.Puede(Permisos.Combustible.CrearStock));
+        Stock ??= stockCombustible.Add(new StockCombustible
+        {
+            Nombre = "Diesel",
+            CapacidadL = 0,
+            ExistenciaL = 0,
+            Activo = true
+        });
     }
 
-    public override string Titulo => "Registrar recarga de stock de combustible";
+    public override string Titulo => "Registrar recarga de diésel";
     public override double AnchoEditor => Ancho.Estandar;
 
-    public ObservableCollection<StockCombustible> StocksCombustible { get; }
-
-    public ICommand NuevoStockCommand { get; }
-
-    private void NuevoStock()
-    {
-        var editor = new StockCombustibleEditorViewModel();
-        if (!_dialogos.MostrarEditor(editor))
-            return;
-
-        var nuevo = _stockCombustible.Add(editor.ObtenerResultado());
-        StocksCombustible.Add(nuevo);
-        StockSeleccionado = nuevo;
-    }
-
-    private StockCombustible? _stockSeleccionado;
-    public StockCombustible? StockSeleccionado
-    {
-        get => _stockSeleccionado;
-        set
-        {
-            if (SetProperty(ref _stockSeleccionado, value))
-                OnPropertyChanged(nameof(EspacioTexto));
-        }
-    }
+    /// <summary>El único stock de destino posible; no hay nada que seleccionar.</summary>
+    public StockCombustible Stock { get; }
 
     private DateTime _fecha = DateTime.Today;
     public DateTime Fecha
@@ -94,18 +71,12 @@ public sealed class RecargaEditorViewModel : CrudEditorViewModelBase
         set => SetProperty(ref _notas, value);
     }
 
-    public string EspacioTexto => StockSeleccionado is { } t
-        ? $"Contiene {t.ExistenciaTexto}; admite {t.CapacidadL - t.ExistenciaL:N0} L más."
-        : "Seleccione el stock de combustible que se recarga.";
+    public string EspacioTexto => Stock.CapacidadL > 0
+        ? $"Contiene {Stock.ExistenciaTexto}; admite {Stock.CapacidadL - Stock.ExistenciaL:N0} L más."
+        : $"Contiene {Stock.ExistenciaL:N0} L; sin tope de capacidad fijo.";
 
     protected override bool Validar(out string? error)
     {
-        if (StockSeleccionado is null)
-        {
-            error = "Seleccione el stock de combustible que se recarga.";
-            return false;
-        }
-
         if (!decimal.TryParse(LitrosTexto, out var litros) || litros <= 0)
         {
             error = "Los litros recibidos deben ser un número mayor que cero.";
@@ -126,8 +97,8 @@ public sealed class RecargaEditorViewModel : CrudEditorViewModelBase
     public RecargaCombustible ObtenerRecarga(int creadoPorId) => new()
     {
         Fecha = Fecha,
-        StockCombustibleId = StockSeleccionado?.Id ?? 0,
-        StockCombustibleNombre = StockSeleccionado?.Nombre ?? string.Empty,
+        StockCombustibleId = Stock.Id,
+        StockCombustibleNombre = Stock.Nombre,
         Litros = decimal.TryParse(LitrosTexto, out var litros) ? litros : 0m,
         CostoTotal = decimal.TryParse(CostoTexto, out var costo) ? costo : null,
         ProveedorNombre = ProveedorNombre.Trim(),

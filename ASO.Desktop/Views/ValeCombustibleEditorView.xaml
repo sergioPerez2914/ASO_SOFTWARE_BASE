@@ -8,24 +8,7 @@
              d:DesignWidth="480">
 
   <StackPanel>
-    <TextBlock Text="Stock de combustible de origen" Style="{StaticResource FormLabelStyle}" />
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-
-      <ComboBox Grid.Column="0" Style="{StaticResource FormComboBoxStyle}"
-                ItemsSource="{Binding StocksCombustible}"
-                DisplayMemberPath="Nombre"
-                SelectedItem="{Binding StockSeleccionado}" />
-
-      <Button Grid.Column="1" Style="{StaticResource BarraBotonStyle}"
-              Content="+ Nuevo" ToolTip="Nuevo stock de combustible"
-              Command="{Binding NuevoStockCommand}" />
-    </Grid>
-    <TextBlock Text="{Binding ExistenciaTexto}" FontSize="11" TextWrapping="Wrap"
-               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+    <TextBlock Text="{Binding ExistenciaTexto}" Style="{StaticResource FormLabelStyle}" />
 
     <controls:FormField Etiqueta="Activo que recibe el combustible">
       <ComboBox Style="{StaticResource FormComboBoxStyle}"

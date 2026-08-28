@@ -95,10 +95,6 @@
     <views:RecargaEditorView />
   </DataTemplate>
 
-  <DataTemplate DataType="{x:Type vm:StockCombustibleEditorViewModel}">
-    <views:StockCombustibleEditorView />
-  </DataTemplate>
-
   <DataTemplate DataType="{x:Type vm:LubricanteEditorViewModel}">
     <views:LubricanteEditorView />
   </DataTemplate>

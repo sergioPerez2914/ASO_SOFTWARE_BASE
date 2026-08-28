@@ -10,8 +10,9 @@ namespace ASO.Desktop.ViewModels;
 /// <summary>
 /// Alta/edición de un lubricante del catálogo (Marca + Tipo + Grado de viscosidad + Presentación).
 /// La marca se elige de <see cref="MarcaLubricante"/> (catálogo propio, no texto libre), con
-/// "+ Nuevo" si falta una — mismo patrón que <see cref="StockCombustibleEditorViewModel"/>. La
-/// existencia en litros no se captura aquí: se deriva de Presentación × Unidades (ver
+/// "+ Nuevo" si falta una — mismo patrón que <see cref="ProveedorEditorViewModel"/> desde
+/// "Comparar proveedores". La existencia en litros no se captura aquí: se deriva de Presentación
+/// × Unidades (ver
 /// <see cref="Lubricante.ExistenciaL"/>), así que se muestra de solo lectura.
 /// </summary>
 public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubricante>

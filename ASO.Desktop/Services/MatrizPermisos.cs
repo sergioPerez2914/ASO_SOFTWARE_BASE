@@ -131,7 +131,6 @@ public static class MatrizPermisos
         Permisos.Combustible.Confirmar,
         Permisos.Combustible.Anular,
         Permisos.Combustible.Recargar,
-        Permisos.Combustible.CrearStock,
 
         Permisos.Lubricantes.Crear,
         Permisos.Lubricantes.Editar,
