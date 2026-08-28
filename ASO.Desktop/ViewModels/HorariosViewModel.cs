@@ -65,7 +65,7 @@ public sealed class HorariosViewModel : PantallaCrudViewModel<JornadaTrabajo, in
         _remesas = remesas;
         _dialogos = dialogos;
         _sesionActual = sesion;
-        _servicio = new HorarioService(jornadas, eventos, remesas);
+        _servicio = new HorarioService(jornadas, eventos, remesas, sesion);
 
         CargarFrentes();
 

@@ -429,7 +429,7 @@ public sealed class BancoViewModel : PantallaViewModelBase
         : base(modulo, submodulo)
     {
         var cuentas = DataSourceFactory.CrearCuentasBancarias();
-        var servicio = new BancoService(DataSourceFactory.CrearMovimientosBanco(), cuentas);
+        var servicio = new BancoService(DataSourceFactory.CrearMovimientosBanco(), cuentas, sesion);
 
         Movimientos = new MovimientosBancoCrudViewModel(
             DataSourceFactory.CrearMovimientosBanco(), cuentas, servicio, dialogos, sesion);

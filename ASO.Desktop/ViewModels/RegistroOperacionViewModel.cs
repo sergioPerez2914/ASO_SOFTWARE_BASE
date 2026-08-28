@@ -21,7 +21,7 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
 
     private readonly RemesaService _servicio;
     private readonly IServicioDialogo _dialogos;
-    private readonly SolicitudesDeCambio _solicitudes = new();
+    private readonly SolicitudesDeCambio _solicitudes;
     private readonly ISesionActual _sesionActual;
     private readonly IFincaDataSource _fincas;
     private readonly IPersonalCampoDataSource _personal;
@@ -41,9 +41,10 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
                                        ISesionActual sesion)
         : base(modulo, submodulo, remesas, dialogos, sesion)
     {
-        _servicio = new RemesaService(remesas, DataSourceFactory.CrearEventosOperacion());
+        _servicio = new RemesaService(remesas, DataSourceFactory.CrearEventosOperacion(), sesion);
         _dialogos = dialogos;
         _sesionActual = sesion;
+        _solicitudes = new SolicitudesDeCambio(sesion, dialogos);
         _fincas = DataSourceFactory.CrearFincas();
         _personal = DataSourceFactory.CrearPersonalCampo();
         _vehiculos = DataSourceFactory.CrearActivosFlota();

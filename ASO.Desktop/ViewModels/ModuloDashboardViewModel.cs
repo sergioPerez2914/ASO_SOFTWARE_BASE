@@ -213,9 +213,15 @@ public sealed class ModuloDashboardViewModel : ViewModelBase, IRecargable
         var liquidaciones = DataSourceFactory.CrearLiquidaciones().GetAll().ToList();
         var pendientes = liquidaciones.Count(l => l.Estado is EstadoLiquidacion.Borrador or EstadoLiquidacion.Cerrada);
 
+        // SesionActual.Instancia explícito: estos indicadores corren en Task.Run sin sesión
+        // propia, y los servicios de dominio ahora la exigen en el constructor. Ninguna llamada
+        // de aquí abajo dispara una transición (son consultas), así que ese objeto nunca llega
+        // a consultarse — no es el antipatrón del default null, es un singleton visible en el
+        // propio call site.
         var horarios = new HorarioService(DataSourceFactory.CrearJornadas(),
                                           DataSourceFactory.CrearEventosOperacion(),
-                                          DataSourceFactory.CrearRemesas());
+                                          DataSourceFactory.CrearRemesas(),
+                                          SesionActual.Instancia);
         var horas = horarios.HorasTotalesEnPeriodo(DateTime.Today.AddDays(-14), DateTime.Today);
 
         var inicioMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
@@ -235,17 +241,20 @@ public sealed class ModuloDashboardViewModel : ViewModelBase, IRecargable
 
     private static IReadOnlyList<Indicador> CalcularFinanzas()
     {
+        // Mismo criterio que en CalcularNomina: SesionActual.Instancia explícito, solo consultas.
+        var sesion = SesionActual.Instancia;
+
         var banco = new BancoService(DataSourceFactory.CrearMovimientosBanco(),
-                                     DataSourceFactory.CrearCuentasBancarias());
+                                     DataSourceFactory.CrearCuentasBancarias(), sesion);
 
         var cobrar = new FacturaClienteService(
             DataSourceFactory.CrearFacturasCliente(),
             DataSourceFactory.CrearRemesas(),
-            new TarifaService(DataSourceFactory.CrearTarifas()),
+            new TarifaService(DataSourceFactory.CrearTarifas(), sesion),
             DataSourceFactory.CrearEventosOperacion(),
-            banco);
+            banco, sesion);
 
-        var pagar = new CuentasPorPagarService(DataSourceFactory.CrearFacturasProveedor(), banco);
+        var pagar = new CuentasPorPagarService(DataSourceFactory.CrearFacturasProveedor(), banco, sesion);
 
         var porCobrar = cobrar.TotalPorCobrar();
         var porPagar = pagar.TotalPorPagar();
@@ -274,12 +283,14 @@ public sealed class ModuloDashboardViewModel : ViewModelBase, IRecargable
     private static IReadOnlyList<Indicador> CalcularFlota()
     {
         var activos = DataSourceFactory.CrearActivosFlota().GetAll().ToList();
+        // Mismo criterio que en CalcularNomina: SesionActual.Instancia explícito, solo consultas.
         var servicio = new MantenimientoService(
             DataSourceFactory.CrearMantenimientos(),
             DataSourceFactory.CrearActivosFlota(),
             DataSourceFactory.CrearReglasMantenimiento(),
             DataSourceFactory.CrearEventosOperacion(),
-            DataSourceFactory.CrearRemesas());
+            DataSourceFactory.CrearRemesas(),
+            SesionActual.Instancia);
 
         var operativos = activos.Count(a => a.Estado == EstadoActivo.Operativo);
         var enTaller = activos.Count(a => a.Estado == EstadoActivo.EnTaller);

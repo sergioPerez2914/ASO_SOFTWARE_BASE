@@ -41,11 +41,11 @@ public sealed class CuentasPorCobrarViewModel : PantallaCrudViewModel<FacturaCli
     {
         _dialogos = dialogos;
         _sesionActual = sesion;
-        _tarifas = new TarifaService(DataSourceFactory.CrearTarifas());
+        _tarifas = new TarifaService(DataSourceFactory.CrearTarifas(), sesion);
         _banco = new BancoService(DataSourceFactory.CrearMovimientosBanco(),
-                                  DataSourceFactory.CrearCuentasBancarias());
+                                  DataSourceFactory.CrearCuentasBancarias(), sesion);
         _servicio = new FacturaClienteService(facturas, DataSourceFactory.CrearRemesas(), _tarifas,
-                                              DataSourceFactory.CrearEventosOperacion(), _banco);
+                                              DataSourceFactory.CrearEventosOperacion(), _banco, sesion);
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {

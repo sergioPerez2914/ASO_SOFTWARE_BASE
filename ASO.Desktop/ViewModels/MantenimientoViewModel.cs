@@ -41,13 +41,16 @@ public sealed class MantenimientoViewModel : PantallaViewModelBase
     public MantenimientoViewModel(Modulo modulo, Submodulo submodulo, ISesionActual? sesion = null)
         : base(modulo, submodulo)
     {
+        // Resuelto ANTES de construir _servicio: mismo bug de orden que ya se corrigió en
+        // GestionFlotaViewModel — asignar _sesion al final la dejaba en null para el servicio.
+        _sesion = sesion ?? SesionActual.Instancia;
+
         _registrosFuente = DataSourceFactory.CrearMantenimientos();
         _activosFuente = DataSourceFactory.CrearActivosFlota();
         _remesas = DataSourceFactory.CrearRemesas();
         _servicio = new MantenimientoService(_registrosFuente, _activosFuente,
-            DataSourceFactory.CrearReglasMantenimiento(), DataSourceFactory.CrearEventosOperacion(), _remesas);
+            DataSourceFactory.CrearReglasMantenimiento(), DataSourceFactory.CrearEventosOperacion(), _remesas, _sesion);
         _dialogos = new ServicioDialogo();
-        _sesion = sesion ?? SesionActual.Instancia;
 
         // El filtro debe tener valor ANTES de cablear la vista: agregar el SortDescription
         // dispara un Refresh que ya ejecuta Filtrar.

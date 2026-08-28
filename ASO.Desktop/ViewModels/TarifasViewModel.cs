@@ -33,7 +33,7 @@ public sealed class TarifasViewModel : PantallaCrudViewModel<Tarifa, int>
                              ISesionActual sesion)
         : base(modulo, submodulo, tarifas, dialogos, sesion)
     {
-        _servicio = new TarifaService(tarifas);
+        _servicio = new TarifaService(tarifas, sesion);
 
         CambiarFiltroAmbitoCommand = new RelayCommand<string>(filtro =>
         {

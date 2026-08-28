@@ -16,26 +16,35 @@ public sealed class FlotaService
     private readonly IRemesaDataSource _remesas;
     private readonly IMantenimientoRegistroDataSource _mantenimientos;
     private readonly IValeCombustibleDataSource? _vales;
+    private readonly ISesionActual _sesion;
 
     public FlotaService(IActivoFlotaDataSource activos,
                         IRemesaDataSource remesas,
                         IMantenimientoRegistroDataSource mantenimientos,
-                        IValeCombustibleDataSource? vales = null)
+                        IValeCombustibleDataSource? vales,
+                        ISesionActual sesion)
     {
         _activos = activos;
         _remesas = remesas;
         _mantenimientos = mantenimientos;
         _vales = vales;
+        _sesion = sesion;
     }
 
     public ActivoFlota Agregar(ActivoFlota activo)
     {
+        if (!_sesion.Puede(Permisos.Flota.Crear))
+            throw new InvalidOperationException("No tienes permiso para dar de alta activos de flota.");
+
         Validar(activo);
         return _activos.Add(activo);
     }
 
     public ActivoFlota Actualizar(ActivoFlota activo)
     {
+        if (!_sesion.Puede(Permisos.Flota.Editar))
+            throw new InvalidOperationException("No tienes permiso para editar activos de flota.");
+
         Validar(activo);
         _activos.Update(activo);
         return activo;
@@ -46,6 +55,9 @@ public sealed class FlotaService
     {
         if (activo.Estado == nuevoEstado)
             throw new InvalidOperationException($"El activo ya está {activo.EstadoTexto.ToLowerInvariant()}.");
+
+        if (!_sesion.Puede(Permisos.Flota.CambiarEstado))
+            throw new InvalidOperationException("No tienes permiso para cambiar el estado de un activo de flota.");
 
         var actualizado = activo.Clonar();
         actualizado.Estado = nuevoEstado;

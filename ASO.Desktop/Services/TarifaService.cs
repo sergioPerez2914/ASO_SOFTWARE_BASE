@@ -9,12 +9,20 @@ namespace ASO.Desktop.Services;
 /// puerta por la que Liquidaciones y Cuentas por Cobrar averiguan cuánto vale un servicio en
 /// una fecha. Ambos copian el monto devuelto dentro del documento; nunca guardan solo el Id,
 /// porque el documento debe poder reimprimirse igual dentro de un año.
+///
+/// No valida ningún permiso: no tiene transiciones mutadoras propias (<see cref="Validar"/>
+/// es validación pura de campos, <see cref="ObtenerVigente"/>/<see cref="ExigirVigente"/> son
+/// consultas). El alta/edición real de una <see cref="Tarifa"/> pasa por el CRUD genérico de
+/// <c>TarifasViewModel</c>, ya protegido por <c>Tarifas.Crear</c>/<c>Tarifas.Editar</c>. Recibe
+/// <see cref="ISesionActual"/> igual que el resto de los servicios de dominio, por consistencia
+/// del constructor — a propósito no la usa, para que quede escrito por qué en vez de que alguien
+/// la agregue "para completar el patrón" sobre una consulta.
 /// </summary>
 public sealed class TarifaService
 {
     private readonly ITarifaDataSource _tarifas;
 
-    public TarifaService(ITarifaDataSource tarifas) => _tarifas = tarifas;
+    public TarifaService(ITarifaDataSource tarifas, ISesionActual sesion) => _tarifas = tarifas;
 
     /// <summary>
     /// Tarifa que rige para un servicio y ámbito en la fecha dada. Si hay varias (porque el

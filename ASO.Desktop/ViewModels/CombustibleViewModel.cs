@@ -58,7 +58,7 @@ public sealed class CombustibleViewModel : PantallaCrudViewModel<ValeCombustible
         _stockCombustible = DataSourceFactory.CrearStockCombustible();
 
         _servicio = new CombustibleService(
-            vales, _stockCombustible, DataSourceFactory.CrearRecargasCombustible(), DataSourceFactory.CrearActivosFlota());
+            vales, _stockCombustible, DataSourceFactory.CrearRecargasCombustible(), DataSourceFactory.CrearActivosFlota(), sesion);
 
         Lubricantes = new LubricantesCrudViewModel(
             DataSourceFactory.CrearLubricantes(), DataSourceFactory.CrearMarcasLubricante(), dialogos, sesion);

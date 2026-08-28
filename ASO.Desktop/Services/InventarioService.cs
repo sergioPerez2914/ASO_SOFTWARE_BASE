@@ -20,14 +20,17 @@ public sealed class InventarioService
     private readonly ISalidaInventarioDataSource _salidas;
     private readonly IInventoryDataSource _articulos;
     private readonly IMantenimientoRegistroDataSource _mantenimientos;
+    private readonly ISesionActual _sesion;
 
     public InventarioService(ISalidaInventarioDataSource salidas,
                              IInventoryDataSource articulos,
-                             IMantenimientoRegistroDataSource mantenimientos)
+                             IMantenimientoRegistroDataSource mantenimientos,
+                             ISesionActual sesion)
     {
         _salidas = salidas;
         _articulos = articulos;
         _mantenimientos = mantenimientos;
+        _sesion = sesion;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -76,6 +79,9 @@ public sealed class InventarioService
         if (!PuedeConfirmar(salida))
             throw new InvalidOperationException("Solo se puede confirmar una salida en borrador.");
 
+        if (!_sesion.Puede(Permisos.Inventario.ConfirmarSalida))
+            throw new InvalidOperationException("No tienes permiso para confirmar salidas de inventario.");
+
         if (!EstaCompleta(salida, out var faltantes))
             throw new InvalidOperationException($"Faltan datos para confirmar la salida: {faltantes}.");
 
@@ -87,6 +93,12 @@ public sealed class InventarioService
             throw new InvalidOperationException(
                 $"Existencia insuficiente de {articulo.Nombre}: quedan {articulo.StockActual:N2} {articulo.Unidad} " +
                 $"y se piden {salida.Cantidad:N2}. Solo un administrador puede autorizar la salida.");
+
+        // Autorización de excepción: forzar la salida bajo stock insuficiente es un permiso
+        // aparte, no algo que cualquiera con permiso de confirmar salidas pueda decidir solo.
+        if (forzarStock && !_sesion.Puede(Permisos.Inventario.OverrideStock))
+            throw new InvalidOperationException(
+                "No tienes permiso para forzar una salida por debajo del stock disponible.");
 
         // Efecto 1: descontar la existencia.
         var actualizado = articulo.Clonar();
@@ -117,6 +129,9 @@ public sealed class InventarioService
     {
         if (!PuedeAnular(salida))
             throw new InvalidOperationException("Solo se puede anular una salida en borrador o confirmada.");
+
+        if (!_sesion.Puede(Permisos.Inventario.AnularSalida))
+            throw new InvalidOperationException("No tienes permiso para anular salidas de inventario.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Indique el motivo de la anulación.");

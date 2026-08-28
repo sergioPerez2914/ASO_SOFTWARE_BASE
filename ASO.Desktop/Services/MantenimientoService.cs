@@ -24,22 +24,28 @@ public sealed class MantenimientoService
     private readonly IReglaMantenimientoDataSource _reglas;
     private readonly IEventoOperacionDataSource _eventos;
     private readonly IRemesaDataSource _remesas;
+    private readonly ISesionActual _sesion;
 
     public MantenimientoService(IMantenimientoRegistroDataSource registros,
                                 IActivoFlotaDataSource activos,
                                 IReglaMantenimientoDataSource reglas,
                                 IEventoOperacionDataSource eventos,
-                                IRemesaDataSource remesas)
+                                IRemesaDataSource remesas,
+                                ISesionActual sesion)
     {
         _registros = registros;
         _activos = activos;
         _reglas = reglas;
         _eventos = eventos;
         _remesas = remesas;
+        _sesion = sesion;
     }
 
     public MantenimientoRegistro Registrar(MantenimientoRegistro registro)
     {
+        if (!_sesion.Puede(Permisos.Mantenimiento.Registrar))
+            throw new InvalidOperationException("No tienes permiso para registrar mantenimientos.");
+
         var activo = _activos.GetById(registro.ActivoId)
             ?? throw new InvalidOperationException("El activo indicado no existe.");
 

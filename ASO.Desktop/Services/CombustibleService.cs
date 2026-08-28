@@ -23,16 +23,19 @@ public sealed class CombustibleService
     private readonly IStockCombustibleDataSource _stockCombustible;
     private readonly IRecargaCombustibleDataSource _recargas;
     private readonly IActivoFlotaDataSource _activos;
+    private readonly ISesionActual _sesion;
 
     public CombustibleService(IValeCombustibleDataSource vales,
                               IStockCombustibleDataSource stockCombustible,
                               IRecargaCombustibleDataSource recargas,
-                              IActivoFlotaDataSource activos)
+                              IActivoFlotaDataSource activos,
+                              ISesionActual sesion)
     {
         _vales = vales;
         _stockCombustible = stockCombustible;
         _recargas = recargas;
         _activos = activos;
+        _sesion = sesion;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -76,6 +79,9 @@ public sealed class CombustibleService
     {
         if (!PuedeConfirmar(vale))
             throw new InvalidOperationException("Solo se puede confirmar un vale en borrador.");
+
+        if (!_sesion.Puede(Permisos.Combustible.Confirmar))
+            throw new InvalidOperationException("No tienes permiso para confirmar vales de combustible.");
 
         if (!EstaCompleto(vale, out var faltantes))
             throw new InvalidOperationException($"Faltan datos para confirmar el vale: {faltantes}.");
@@ -143,6 +149,9 @@ public sealed class CombustibleService
         if (!PuedeAnular(vale))
             throw new InvalidOperationException("Solo se puede anular un vale en borrador o confirmado.");
 
+        if (!_sesion.Puede(Permisos.Combustible.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular vales de combustible.");
+
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Indique el motivo de la anulación.");
 
@@ -165,6 +174,9 @@ public sealed class CombustibleService
     /// <summary>Registra una recarga y suma sus litros al stock de combustible en la misma operación.</summary>
     public RecargaCombustible RegistrarRecarga(RecargaCombustible recarga)
     {
+        if (!_sesion.Puede(Permisos.Combustible.Recargar))
+            throw new InvalidOperationException("No tienes permiso para registrar recargas de combustible.");
+
         if (recarga.StockCombustibleId == 0)
             throw new InvalidOperationException("Seleccione el stock de combustible que se recarga.");
 

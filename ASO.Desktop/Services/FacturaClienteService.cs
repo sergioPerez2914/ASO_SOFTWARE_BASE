@@ -20,6 +20,7 @@ public sealed class FacturaClienteService
     private readonly TarifaService _tarifas;
     private readonly IEventoOperacionDataSource _eventos;
     private readonly BancoService _banco;
+    private readonly ISesionActual _sesion;
 
     /// <summary>
     /// Recibe el <see cref="BancoService"/> como parámetro obligatorio, igual que ya recibía el
@@ -31,13 +32,15 @@ public sealed class FacturaClienteService
                                  IRemesaDataSource remesas,
                                  TarifaService tarifas,
                                  IEventoOperacionDataSource eventos,
-                                 BancoService banco)
+                                 BancoService banco,
+                                 ISesionActual sesion)
     {
         _facturas = facturas;
         _remesas = remesas;
         _tarifas = tarifas;
         _eventos = eventos;
         _banco = banco;
+        _sesion = sesion;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -63,6 +66,9 @@ public sealed class FacturaClienteService
     /// </summary>
     public FacturaCliente GenerarBorrador(IReadOnlyList<Remesa> seleccionadas, int creadoPorId)
     {
+        if (!_sesion.Puede(Permisos.Finanzas.Facturar))
+            throw new InvalidOperationException("No tienes permiso para facturar.");
+
         if (seleccionadas.Count == 0)
             throw new InvalidOperationException("Seleccione al menos una remesa para facturar.");
 
@@ -110,16 +116,14 @@ public sealed class FacturaClienteService
     /// <summary>
     /// Emite la factura: fija fechas, marca cada remesa con el número de factura y la deja
     /// inmutable. Vuelve a comprobar que ninguna remesa se coló en otra factura mientras tanto.
-    ///
-    /// PROVISIONAL: la segregación de funciones que pide el diseño ("quien registra la remesa no
-    /// la factura") se hará efectiva cuando exista la matriz RBAC; hoy el permiso
-    /// <c>Finanzas.Facturar</c> ya se exige en el comando, pero <c>ISesionActual.Puede</c> aún
-    /// devuelve true para cualquier usuario autenticado.
     /// </summary>
     public FacturaCliente Emitir(FacturaCliente factura)
     {
         if (!PuedeEmitir(factura))
             throw new InvalidOperationException("Solo se puede emitir una factura en borrador.");
+
+        if (!_sesion.Puede(Permisos.Finanzas.Facturar))
+            throw new InvalidOperationException("No tienes permiso para facturar.");
 
         if (factura.Lineas.Count == 0)
             throw new InvalidOperationException("La factura no tiene líneas que cobrar.");
@@ -171,6 +175,9 @@ public sealed class FacturaClienteService
         if (!PuedeRegistrarCobro(factura))
             throw new InvalidOperationException("Solo se puede registrar el cobro de una factura emitida.");
 
+        if (!_sesion.Puede(Permisos.Finanzas.RegistrarCobro))
+            throw new InvalidOperationException("No tienes permiso para registrar cobros.");
+
         _banco.RegistrarCobroCliente(factura, asiento, usuarioId);
 
         var copia = factura.Clonar();
@@ -194,6 +201,9 @@ public sealed class FacturaClienteService
                     // de definición del socio.
                     ? "Una factura cobrada no se anula: requiere una nota de crédito."
                     : "Solo se puede anular una factura en borrador o emitida.");
+
+        if (!_sesion.Puede(Permisos.Finanzas.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular facturas.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Indique el motivo de la anulación.");

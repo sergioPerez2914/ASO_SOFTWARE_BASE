@@ -27,14 +27,17 @@ public sealed class HorarioService
     private readonly IJornadaDataSource _jornadas;
     private readonly IEventoOperacionDataSource _eventos;
     private readonly IRemesaDataSource _remesas;
+    private readonly ISesionActual _sesion;
 
     public HorarioService(IJornadaDataSource jornadas,
                           IEventoOperacionDataSource eventos,
-                          IRemesaDataSource remesas)
+                          IRemesaDataSource remesas,
+                          ISesionActual sesion)
     {
         _jornadas = jornadas;
         _eventos = eventos;
         _remesas = remesas;
+        _sesion = sesion;
     }
 
     public bool PuedeRegistrarSalida(JornadaTrabajo jornada) => jornada.EstaAbierta;
@@ -47,6 +50,9 @@ public sealed class HorarioService
     /// </summary>
     public JornadaTrabajo Registrar(JornadaTrabajo jornada)
     {
+        if (!_sesion.Puede(Permisos.Horarios.Crear))
+            throw new InvalidOperationException("No tienes permiso para registrar jornadas.");
+
         if (jornada.PersonaId == 0 || string.IsNullOrWhiteSpace(jornada.PersonaNombre))
             throw new InvalidOperationException("Seleccione la persona que inicia la jornada.");
 
@@ -75,6 +81,9 @@ public sealed class HorarioService
     {
         if (!PuedeRegistrarSalida(jornada))
             throw new InvalidOperationException("La jornada ya está cerrada.");
+
+        if (!_sesion.Puede(Permisos.Horarios.RegistrarSalida))
+            throw new InvalidOperationException("No tienes permiso para registrar la salida de una jornada.");
 
         if (salida <= jornada.HoraEntrada)
             throw new InvalidOperationException(

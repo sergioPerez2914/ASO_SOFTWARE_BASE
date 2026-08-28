@@ -22,6 +22,7 @@ public sealed class LiquidacionService
     private readonly TarifaService _tarifas;
     private readonly HorarioService _horarios;
     private readonly BancoService _banco;
+    private readonly ISesionActual _sesion;
 
     /// <summary>
     /// El <see cref="BancoService"/> es obligatorio: la nómina es la salida de caja más grande
@@ -31,13 +32,15 @@ public sealed class LiquidacionService
                               IRemesaDataSource remesas,
                               TarifaService tarifas,
                               HorarioService horarios,
-                              BancoService banco)
+                              BancoService banco,
+                              ISesionActual sesion)
     {
         _liquidaciones = liquidaciones;
         _remesas = remesas;
         _tarifas = tarifas;
         _horarios = horarios;
         _banco = banco;
+        _sesion = sesion;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -63,6 +66,9 @@ public sealed class LiquidacionService
     public Liquidacion GenerarParaNucleo(string nucleoCodigo, string nucleoNombre,
                                          DateTime desde, DateTime hasta, int creadoPorId)
     {
+        if (!_sesion.Puede(Permisos.Nomina.Generar))
+            throw new InvalidOperationException("No tienes permiso para generar liquidaciones.");
+
         ValidarPeriodo(desde, hasta);
 
         var yaLiquidadas = RemesasYaLiquidadas(SujetoLiquidacion.Nucleo, nucleoCodigo);
@@ -125,6 +131,9 @@ public sealed class LiquidacionService
     /// </summary>
     public Liquidacion GenerarParaEmpleado(Empleado empleado, DateTime desde, DateTime hasta, int creadoPorId)
     {
+        if (!_sesion.Puede(Permisos.Nomina.Generar))
+            throw new InvalidOperationException("No tienes permiso para generar liquidaciones.");
+
         ValidarPeriodo(desde, hasta);
 
         var horas = _horarios.HorasEnPeriodo(TipoPersonal.Administrativo, empleado.Id, desde, hasta);
@@ -169,6 +178,9 @@ public sealed class LiquidacionService
         if (!PuedeEditarLineas(liquidacion))
             throw new InvalidOperationException("Solo se pueden agregar conceptos a una liquidación en borrador.");
 
+        if (!_sesion.Puede(Permisos.Nomina.EditarLineas))
+            throw new InvalidOperationException("No tienes permiso para editar líneas de liquidación.");
+
         if (monto <= 0)
             throw new InvalidOperationException("El monto del concepto debe ser mayor que cero.");
 
@@ -195,6 +207,9 @@ public sealed class LiquidacionService
         if (!PuedeEditarLineas(liquidacion))
             throw new InvalidOperationException("Solo se pueden quitar líneas de una liquidación en borrador.");
 
+        if (!_sesion.Puede(Permisos.Nomina.EditarLineas))
+            throw new InvalidOperationException("No tienes permiso para editar líneas de liquidación.");
+
         if (linea.Origen != OrigenLinea.Concepto)
             throw new InvalidOperationException(
                 "Las líneas de destajo y de horas se calculan desde las remesas y las jornadas: " +
@@ -214,6 +229,9 @@ public sealed class LiquidacionService
     {
         if (!PuedeCerrar(liquidacion))
             throw new InvalidOperationException("Solo se puede cerrar una liquidación en borrador.");
+
+        if (!_sesion.Puede(Permisos.Nomina.Cerrar))
+            throw new InvalidOperationException("No tienes permiso para cerrar liquidaciones.");
 
         if (liquidacion.Lineas.Count == 0)
             throw new InvalidOperationException("La liquidación no tiene líneas que pagar.");
@@ -243,6 +261,9 @@ public sealed class LiquidacionService
         if (!PuedePagar(liquidacion))
             throw new InvalidOperationException("Solo se puede pagar una liquidación cerrada.");
 
+        if (!_sesion.Puede(Permisos.Nomina.Pagar))
+            throw new InvalidOperationException("No tienes permiso para pagar liquidaciones.");
+
         _banco.RegistrarPagoLiquidacion(liquidacion, asiento, usuarioId);
 
         var copia = liquidacion.Clonar();
@@ -264,6 +285,9 @@ public sealed class LiquidacionService
                 liquidacion.Estado == EstadoLiquidacion.Pagada
                     ? "Una liquidación pagada no se anula: registre el ajuste en el período siguiente."
                     : "Solo se puede anular una liquidación en borrador o cerrada.");
+
+        if (!_sesion.Puede(Permisos.Nomina.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular liquidaciones.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Indique el motivo de la anulación.");

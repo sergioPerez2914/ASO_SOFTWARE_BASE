@@ -16,11 +16,20 @@ public class SolicitudesDeCambio
     private readonly IServicioDialogo _dialogos;
     private readonly PeticionService _servicio;
 
-    public SolicitudesDeCambio(ISesionActual? sesion = null,
+    /// <summary>
+    /// La sesión es obligatoria, no un parámetro opcional con default null: un default a
+    /// <see cref="SesionActual.Instancia"/> sería el mismo hueco silencioso que el proyecto evita
+    /// en los servicios de dominio (ver <see cref="PeticionService"/>) — aquí ya hubo un caso real
+    /// de esa discrepancia (<c>RegistroOperacionViewModel</c> construía con <c>new()</c> en vez de
+    /// pasar la sesión que el propio ViewModel ya tenía inyectada). <paramref name="dialogos"/> y
+    /// <paramref name="servicio"/> sí quedan opcionales: no son datos de autorización, solo
+    /// conveniencia de composición.
+    /// </summary>
+    public SolicitudesDeCambio(ISesionActual sesion,
                                IServicioDialogo? dialogos = null,
                                PeticionService? servicio = null)
     {
-        _sesion = sesion ?? SesionActual.Instancia;
+        _sesion = sesion;
         _dialogos = dialogos ?? new ServicioDialogo();
         _servicio = servicio ?? new PeticionService(DataSourceFactory.CrearPeticiones(), _sesion);
     }

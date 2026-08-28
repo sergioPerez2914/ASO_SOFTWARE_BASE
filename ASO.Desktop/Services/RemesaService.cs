@@ -20,11 +20,13 @@ public sealed class RemesaService
 {
     private readonly IRemesaDataSource _source;
     private readonly IEventoOperacionDataSource _eventos;
+    private readonly ISesionActual _sesion;
 
-    public RemesaService(IRemesaDataSource source, IEventoOperacionDataSource eventos)
+    public RemesaService(IRemesaDataSource source, IEventoOperacionDataSource eventos, ISesionActual sesion)
     {
         _source = source;
         _eventos = eventos;
+        _sesion = sesion;
     }
 
     public bool PuedeEditar(Remesa remesa) => remesa.Estado == EstadoRemesa.Borrador;
@@ -49,6 +51,9 @@ public sealed class RemesaService
     {
         if (!PuedeEditar(original))
             throw new InvalidOperationException($"No se puede editar una remesa en estado {original.EstadoTexto}.");
+
+        if (!_sesion.Puede(Permisos.Remesas.Editar))
+            throw new InvalidOperationException("No tienes permiso para editar remesas.");
 
         _source.Update(editada);
 
@@ -81,6 +86,9 @@ public sealed class RemesaService
     {
         if (!PuedeEliminar(remesa))
             throw new InvalidOperationException($"No se puede eliminar una remesa en estado {remesa.EstadoTexto}.");
+
+        if (!_sesion.Puede(Permisos.Remesas.Eliminar))
+            throw new InvalidOperationException("No tienes permiso para eliminar remesas.");
 
         _source.Delete(remesa.Id);
         _eventos.EliminarDeRemesa(remesa.Id);
@@ -126,6 +134,9 @@ public sealed class RemesaService
         if (!PuedeConfirmar(remesa))
             throw new InvalidOperationException($"No se puede confirmar una remesa en estado {remesa.EstadoTexto}.");
 
+        if (!_sesion.Puede(Permisos.Remesas.Confirmar))
+            throw new InvalidOperationException("No tienes permiso para confirmar remesas.");
+
         if (!EstaCompleta(remesa, out var faltantes))
             throw new InvalidOperationException($"La remesa está incompleta. Faltan: {faltantes}.");
 
@@ -141,6 +152,9 @@ public sealed class RemesaService
     {
         if (!PuedeAnular(remesa))
             throw new InvalidOperationException($"No se puede anular una remesa en estado {remesa.EstadoTexto}.");
+
+        if (!_sesion.Puede(Permisos.Remesas.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular remesas.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Debe indicar el motivo de la anulación.");
@@ -161,6 +175,9 @@ public sealed class RemesaService
     {
         if (!PuedeRegistrarRecepcion(remesa))
             throw new InvalidOperationException($"Solo se registra la recepción de una remesa confirmada; esta está {remesa.EstadoTexto}.");
+
+        if (!_sesion.Puede(Permisos.Remesas.Recepcion))
+            throw new InvalidOperationException("No tienes permiso para registrar la recepción de remesas.");
 
         if (llegada < remesa.FinCarga)
             throw new InvalidOperationException("La llegada al central no puede ser anterior al fin de carga.");

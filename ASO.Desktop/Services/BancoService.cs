@@ -35,11 +35,13 @@ public sealed class BancoService
 {
     private readonly IMovimientoBancoDataSource _movimientos;
     private readonly ICuentaBancariaDataSource _cuentas;
+    private readonly ISesionActual _sesion;
 
-    public BancoService(IMovimientoBancoDataSource movimientos, ICuentaBancariaDataSource cuentas)
+    public BancoService(IMovimientoBancoDataSource movimientos, ICuentaBancariaDataSource cuentas, ISesionActual sesion)
     {
         _movimientos = movimientos;
         _cuentas = cuentas;
+        _sesion = sesion;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -152,6 +154,12 @@ public sealed class BancoService
     /// Entrada por el cobro de una factura al ingenio. Lo llama
     /// <see cref="FacturaClienteService.RegistrarCobro"/> en la misma operación que marca la
     /// factura como cobrada: el usuario no teclea nada aquí.
+    ///
+    /// Ninguno de los tres <c>Registrar…</c> valida <c>_sesion.Puede</c> aquí adentro a propósito
+    /// (composición, no doble chequeo): el permiso ya lo exigió el servicio que llama —
+    /// <c>Finanzas.RegistrarCobro</c>, <c>Finanzas.Pagar</c> o <c>Nomina.Pagar</c>, según el caso—
+    /// y ese es justamente el reparto de roles documentado más arriba: quien paga nómina no
+    /// necesita ningún permiso de <c>Banco.*</c> para hacerlo.
     /// </summary>
     public MovimientoBanco RegistrarCobroCliente(FacturaCliente factura, AsientoBanco datos, int usuarioId)
         => Asentar(TipoMovimientoBanco.Entrada,
@@ -251,6 +259,9 @@ public sealed class BancoService
                                                                        string referencia,
                                                                        int usuarioId)
     {
+        if (!_sesion.Puede(Permisos.Banco.Transferir))
+            throw new InvalidOperationException("No tienes permiso para transferir entre cuentas.");
+
         if (cuentaOrigenId == cuentaDestinoId)
             throw new InvalidOperationException("La cuenta de origen y la de destino deben ser distintas.");
 
@@ -325,6 +336,9 @@ public sealed class BancoService
                     ? "Este movimiento ya está conciliado."
                     : "Un movimiento anulado no se concilia.");
 
+        if (!_sesion.Puede(Permisos.Banco.Conciliar))
+            throw new InvalidOperationException("No tienes permiso para conciliar movimientos de banco.");
+
         var copia = movimiento.Clonar();
         copia.Estado = EstadoMovimientoBanco.Conciliado;
         copia.FechaConciliacion = DateTime.Now;
@@ -338,6 +352,9 @@ public sealed class BancoService
     {
         if (!PuedeDesconciliar(movimiento))
             throw new InvalidOperationException("Solo se puede desconciliar un movimiento conciliado.");
+
+        if (!_sesion.Puede(Permisos.Banco.Conciliar))
+            throw new InvalidOperationException("No tienes permiso para desconciliar movimientos de banco.");
 
         var copia = movimiento.Clonar();
         copia.Estado = EstadoMovimientoBanco.Registrado;
@@ -355,6 +372,9 @@ public sealed class BancoService
     {
         if (!PuedeAnular(movimiento))
             throw new InvalidOperationException("Este movimiento ya está anulado.");
+
+        if (!_sesion.Puede(Permisos.Banco.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular movimientos de banco.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Indique el motivo de la anulación.");

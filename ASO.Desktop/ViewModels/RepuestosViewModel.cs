@@ -56,7 +56,7 @@ public sealed class RepuestosViewModel : PantallaCrudViewModel<InventoryItem, st
         _sesionActual = sesion;
         _fuenteSalidas = DataSourceFactory.CrearSalidasInventario();
 
-        _servicio = new InventarioService(_fuenteSalidas, articulos, DataSourceFactory.CrearMantenimientos());
+        _servicio = new InventarioService(_fuenteSalidas, articulos, DataSourceFactory.CrearMantenimientos(), sesion);
 
         Salidas = new ObservableCollection<SalidaInventario>(
             _fuenteSalidas.GetAll().OrderByDescending(s => s.Fecha));

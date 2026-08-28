@@ -13,15 +13,17 @@ public sealed class CuentasPorPagarService
 {
     private readonly IFacturaProveedorDataSource _facturas;
     private readonly BancoService _banco;
+    private readonly ISesionActual _sesion;
 
     /// <summary>
     /// El <see cref="BancoService"/> es obligatorio: pagar la factura y anotar la salida en el
     /// libro son la misma operación (ver <see cref="RegistrarPago"/>).
     /// </summary>
-    public CuentasPorPagarService(IFacturaProveedorDataSource facturas, BancoService banco)
+    public CuentasPorPagarService(IFacturaProveedorDataSource facturas, BancoService banco, ISesionActual sesion)
     {
         _facturas = facturas;
         _banco = banco;
+        _sesion = sesion;
     }
 
     // --- Reglas de transición (alimentan el CanExecute) ---
@@ -95,6 +97,9 @@ public sealed class CuentasPorPagarService
         if (!PuedeRegistrarPago(factura))
             throw new InvalidOperationException("Solo se puede pagar una factura pendiente.");
 
+        if (!_sesion.Puede(Permisos.Finanzas.Pagar))
+            throw new InvalidOperationException("No tienes permiso para pagar facturas de proveedor.");
+
         _banco.RegistrarPagoProveedor(factura, asiento, usuarioId);
 
         var copia = factura.Clonar();
@@ -115,6 +120,9 @@ public sealed class CuentasPorPagarService
         if (!PuedeCompletarBorrador(factura))
             throw new InvalidOperationException(
                 "Solo se completan facturas generadas automáticamente desde una recepción de mercancía.");
+
+        if (!_sesion.Puede(Permisos.FacturasProveedor.Editar))
+            throw new InvalidOperationException("No tienes permiso para completar facturas de proveedor.");
 
         if (string.IsNullOrWhiteSpace(numeroDocumento))
             throw new InvalidOperationException("Indique el número de la factura del proveedor.");
@@ -146,6 +154,9 @@ public sealed class CuentasPorPagarService
                 factura.Estado == EstadoFacturaProveedor.Pagada
                     ? "Una factura ya pagada no se anula: registre la nota de crédito del proveedor."
                     : "Solo se puede anular una factura pendiente o generada automáticamente.");
+
+        if (!_sesion.Puede(Permisos.Finanzas.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular facturas de proveedor.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Indique el motivo de la anulación.");

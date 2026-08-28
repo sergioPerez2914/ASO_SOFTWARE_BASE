@@ -35,17 +35,22 @@ public sealed class GestionFlotaViewModel : PantallaViewModelBase
     public GestionFlotaViewModel(Modulo modulo, Submodulo submodulo, ISesionActual? sesion = null)
         : base(modulo, submodulo)
     {
+        // Resuelto ANTES de usarse: _flota y _solicitudes lo necesitan de entrada, y asignar
+        // _sesion recién al final (como estaba) lo dejaba en null para ambos — bug real de
+        // orden de inicialización, no hipotético, porque el shell construye esta pantalla sin
+        // pasar sesion (ver Pantallas en MainWindow.xaml.cs) y el parámetro cae en su default.
+        _sesion = sesion ?? SesionActual.Instancia;
+
         var activos = DataSourceFactory.CrearActivosFlota();
         _activos = activos;
         var mantenimientos = DataSourceFactory.CrearMantenimientos();
         _remesas = DataSourceFactory.CrearRemesas();
 
-        _flota = new FlotaService(activos, _remesas, mantenimientos, DataSourceFactory.CrearValesCombustible());
+        _flota = new FlotaService(activos, _remesas, mantenimientos, DataSourceFactory.CrearValesCombustible(), _sesion);
         _mantenimiento = new MantenimientoService(mantenimientos, activos,
-            DataSourceFactory.CrearReglasMantenimiento(), DataSourceFactory.CrearEventosOperacion(), _remesas);
+            DataSourceFactory.CrearReglasMantenimiento(), DataSourceFactory.CrearEventosOperacion(), _remesas, _sesion);
         _dialogos = new ServicioDialogo();
         _solicitudes = new SolicitudesDeCambio(_sesion, _dialogos);
-        _sesion = sesion ?? SesionActual.Instancia;
 
         Activos = new ObservableCollection<ActivoFlota>(activos.GetAll());
         ActivosView = CollectionViewSource.GetDefaultView(Activos);

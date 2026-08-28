@@ -43,16 +43,17 @@ public sealed class LiquidacionesViewModel : PantallaCrudViewModel<Liquidacion, 
         _sesionActual = sesion;
 
         _banco = new BancoService(DataSourceFactory.CrearMovimientosBanco(),
-                                  DataSourceFactory.CrearCuentasBancarias());
+                                  DataSourceFactory.CrearCuentasBancarias(), sesion);
 
         _servicio = new LiquidacionService(
             liquidaciones,
             DataSourceFactory.CrearRemesas(),
-            new TarifaService(DataSourceFactory.CrearTarifas()),
+            new TarifaService(DataSourceFactory.CrearTarifas(), sesion),
             new HorarioService(DataSourceFactory.CrearJornadas(),
                                DataSourceFactory.CrearEventosOperacion(),
-                               DataSourceFactory.CrearRemesas()),
-            _banco);
+                               DataSourceFactory.CrearRemesas(),
+                               sesion),
+            _banco, sesion);
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {

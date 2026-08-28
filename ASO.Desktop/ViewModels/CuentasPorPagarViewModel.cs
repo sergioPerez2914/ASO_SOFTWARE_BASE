@@ -33,8 +33,8 @@ public sealed class FacturasProveedorCrudViewModel : CrudViewModelBase<FacturaPr
         _dialogos = dialogos;
         _sesionActual = sesion;
         _banco = new BancoService(DataSourceFactory.CrearMovimientosBanco(),
-                                  DataSourceFactory.CrearCuentasBancarias());
-        _servicio = new CuentasPorPagarService(facturas, _banco);
+                                  DataSourceFactory.CrearCuentasBancarias(), sesion);
+        _servicio = new CuentasPorPagarService(facturas, _banco, sesion);
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {

@@ -35,7 +35,8 @@ public sealed class EmpleadosViewModel : PantallaViewModelBase
         // de cualquiera de ellos, y la jornada ya sabe a qué padrón pertenece cada persona.
         var horarios = new HorarioService(DataSourceFactory.CrearJornadas(),
                                           DataSourceFactory.CrearEventosOperacion(),
-                                          DataSourceFactory.CrearRemesas());
+                                          DataSourceFactory.CrearRemesas(),
+                                          sesion);
 
         Administrativos = new EmpleadosAdminViewModel(DataSourceFactory.CrearEmpleados(), dialogos, sesion, horarios);
         Campo = new PersonalCampoCrudViewModel(DataSourceFactory.CrearPersonalCampo(), dialogos, sesion, horarios);
