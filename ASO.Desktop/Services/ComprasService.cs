@@ -29,6 +29,7 @@ public sealed class ComprasService
     private readonly IStockCombustibleDataSource _stockCombustible;
     private readonly ILubricanteDataSource _lubricantes;
     private readonly IFacturaProveedorDataSource _facturasProveedor;
+    private readonly ISesionActual _sesion;
 
     public ComprasService(IRequisicionDataSource requisiciones,
                           ICotizacionProveedorDataSource cotizaciones,
@@ -37,7 +38,8 @@ public sealed class ComprasService
                           IInventoryDataSource articulos,
                           IStockCombustibleDataSource stockCombustible,
                           ILubricanteDataSource lubricantes,
-                          IFacturaProveedorDataSource facturasProveedor)
+                          IFacturaProveedorDataSource facturasProveedor,
+                          ISesionActual sesion)
     {
         _requisiciones = requisiciones;
         _cotizaciones = cotizaciones;
@@ -47,6 +49,7 @@ public sealed class ComprasService
         _stockCombustible = stockCombustible;
         _lubricantes = lubricantes;
         _facturasProveedor = facturasProveedor;
+        _sesion = sesion;
     }
 
     // --- Requisición: reglas de transición ---
@@ -97,6 +100,9 @@ public sealed class ComprasService
             throw new InvalidOperationException(
                 $"No se puede enviar una requisición en estado {requisicion.EstadoTexto}.");
 
+        if (!_sesion.Puede(Permisos.Requisicion.Enviar))
+            throw new InvalidOperationException("No tienes permiso para enviar requisiciones.");
+
         if (!RequisicionEstaCompleta(requisicion, out var faltantes))
             throw new InvalidOperationException($"La requisición está incompleta. Faltan: {faltantes}.");
 
@@ -112,6 +118,9 @@ public sealed class ComprasService
         if (!PuedeAnularRequisicion(requisicion))
             throw new InvalidOperationException(
                 $"No se puede anular una requisición en estado {requisicion.EstadoTexto}.");
+
+        if (!_sesion.Puede(Permisos.Requisicion.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular requisiciones.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Debe indicar el motivo de la anulación.");
@@ -239,6 +248,9 @@ public sealed class ComprasService
             throw new InvalidOperationException(
                 $"Solo se arma una orden de compra a partir de una requisición enviada; esta está {requisicion.EstadoTexto}.");
 
+        if (!_sesion.Puede(Permisos.OrdenCompra.Crear))
+            throw new InvalidOperationException("No tienes permiso para armar órdenes de compra.");
+
         if (cotizacionGanadora.RequisicionId != requisicion.Id)
             throw new InvalidOperationException("La cotización elegida no pertenece a esta requisición.");
 
@@ -294,6 +306,9 @@ public sealed class ComprasService
             throw new InvalidOperationException(
                 $"No se puede aprobar una orden de compra en estado {orden.EstadoTexto}.");
 
+        if (!_sesion.Puede(Permisos.OrdenCompra.Aprobar))
+            throw new InvalidOperationException("No tienes permiso para aprobar órdenes de compra.");
+
         if (!OrdenCompraEstaCompleta(orden, out var faltantes))
             throw new InvalidOperationException($"La orden de compra está incompleta. Faltan: {faltantes}.");
 
@@ -310,6 +325,9 @@ public sealed class ComprasService
         if (!PuedeAnularOrdenCompra(orden))
             throw new InvalidOperationException(
                 $"No se puede anular una orden de compra en estado {orden.EstadoTexto}.");
+
+        if (!_sesion.Puede(Permisos.OrdenCompra.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular órdenes de compra.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Debe indicar el motivo de la anulación.");
@@ -367,6 +385,9 @@ public sealed class ComprasService
                 ? $"La orden de compra Nº {orden.Id} ya tiene una recepción registrada."
                 : $"Solo se registra una recepción para una orden aprobada; esta está {orden.EstadoTexto}.");
 
+        if (!_sesion.Puede(Permisos.RecepcionMercancia.Crear))
+            throw new InvalidOperationException("No tienes permiso para registrar una recepción de mercancía.");
+
         var lineas = orden.Lineas.Select(l => new RecepcionMercanciaLinea
         {
             TipoInsumo = l.TipoInsumo,
@@ -413,7 +434,8 @@ public sealed class ComprasService
     /// medias si una línea falla (mismo criterio que CombustibleService.Confirmar).
     ///
     /// <paramref name="recibidoPor"/> se pide en este mismo paso (ver
-    /// <c>ResponsableRecepcionEditorViewModel</c>), no al editar el borrador: es la firma de quien
+    /// <c>ConfirmarRecepcionEditorViewModel</c>, que junta la corrección de líneas y el
+    /// responsable en una sola ventana), no al editar el borrador aparte: es la firma de quien
     /// tuvo la carga enfrente al momento de confirmar, no un dato de las líneas.
     /// </summary>
     public RecepcionMercancia ConfirmarRecepcion(RecepcionMercancia recepcion, string recibidoPor, int usuarioId)
@@ -421,6 +443,9 @@ public sealed class ComprasService
         if (!PuedeConfirmarRecepcion(recepcion))
             throw new InvalidOperationException(
                 $"Solo se puede confirmar una recepción en borrador; esta está {recepcion.EstadoTexto}.");
+
+        if (!_sesion.Puede(Permisos.RecepcionMercancia.Confirmar))
+            throw new InvalidOperationException("No tienes permiso para confirmar recepciones de mercancía.");
 
         if (string.IsNullOrWhiteSpace(recibidoPor))
             throw new InvalidOperationException("Debe indicar quién recibió la mercancía.");
@@ -587,6 +612,9 @@ public sealed class ComprasService
         if (!PuedeAnularRecepcion(recepcion))
             throw new InvalidOperationException(
                 $"No se puede anular una recepción en estado {recepcion.EstadoTexto}.");
+
+        if (!_sesion.Puede(Permisos.RecepcionMercancia.Anular))
+            throw new InvalidOperationException("No tienes permiso para anular recepciones de mercancía.");
 
         if (string.IsNullOrWhiteSpace(motivo))
             throw new InvalidOperationException("Debe indicar el motivo de la anulación.");

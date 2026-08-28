@@ -41,7 +41,7 @@ public class RecepcionMercancia : IEntidad<int>, IDeOrganizacion
     public List<RecepcionMercanciaLinea> Lineas { get; set; } = [];
 
     /// <summary>Quién firmó al recibir. Snapshot de texto del <c>Empleado</c> elegido al confirmar
-    /// (<c>ComprasService.ConfirmarRecepcion</c>, vía <c>ResponsableRecepcionEditorViewModel</c>)
+    /// (<c>ComprasService.ConfirmarRecepcion</c>, vía <c>ConfirmarRecepcionEditorViewModel</c>)
     /// — no se teclea a mano.</summary>
     public string RecibidoPor { get; set; } = string.Empty;
 

@@ -374,16 +374,13 @@ public sealed class RecepcionesCrudViewModel : CrudViewModelBase<RecepcionMercan
 
         var empleadosActivos = _empleados.GetAll().Where(e => e.Activo).OrderBy(e => e.Nombre).ToList();
 
-        var editor = new ResponsableRecepcionEditorViewModel(
-            $"Confirmar recepción Nº {recepcion.Id}",
-            $"{recepcion.ProveedorNombre} — orden de compra Nº {recepcion.OrdenCompraId}",
-            empleadosActivos);
-
+        var editor = new ConfirmarRecepcionEditorViewModel(recepcion, empleadosActivos);
         if (!_dialogos.MostrarEditor(editor))
             return;
 
+        var actualizada = editor.ObtenerResultado();
         Aplicar(() => _servicio.ConfirmarRecepcion(
-            recepcion, editor.ResponsableNombre, _sesionActual.UsuarioActual?.Id ?? 0));
+            actualizada, editor.ResponsableNombre, _sesionActual.UsuarioActual?.Id ?? 0));
     }
 
     private void Anular()
@@ -451,7 +448,7 @@ public sealed class ComprasViewModel : PantallaViewModelBase
 
         var servicio = new ComprasService(
             requisiciones, cotizaciones, ordenesCompra, recepciones, articulos, stockCombustible,
-            lubricantes, facturasProveedor);
+            lubricantes, facturasProveedor, sesion);
 
         Requisiciones = new RequisicionesCrudViewModel(
             requisiciones, articulos, proveedores, cotizaciones, marcasLubricante, servicio, dialogos, sesion);

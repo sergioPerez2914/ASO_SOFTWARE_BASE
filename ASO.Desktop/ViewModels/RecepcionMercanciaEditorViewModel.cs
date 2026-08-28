@@ -14,6 +14,10 @@ namespace ASO.Desktop.ViewModels;
 /// al armar la orden de compra, y el <see cref="Lubricante"/> concreto lo resuelve
 /// <c>ComprasService.ConfirmarRecepcion</c> solo (lo busca o lo crea). Las líneas no se agregan
 /// ni se quitan aquí — vienen fijas de la orden de compra de origen.
+///
+/// Es el botón "Editar": deja corregido un dato sin confirmar todavía. Quien va a confirmar de
+/// una vez no necesita pasar por aquí — <see cref="ConfirmarRecepcionEditorViewModel"/> repite
+/// esta misma grilla dentro de su propia ventana, para no obligar a los dos pasos por separado.
 /// </summary>
 public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<RecepcionMercancia>
 {

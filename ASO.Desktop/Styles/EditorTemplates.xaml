@@ -52,6 +52,10 @@
     <views:TarifaEditorView />
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type vm:ZafraEditorViewModel}">
+    <views:ZafraEditorView />
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type vm:InventoryItemEditorViewModel}">
     <views:InventoryItemEditorView />
   </DataTemplate>
@@ -147,8 +151,8 @@
     <views:RecepcionMercanciaEditorView />
   </DataTemplate>
 
-  <DataTemplate DataType="{x:Type vm:ResponsableRecepcionEditorViewModel}">
-    <views:ResponsableRecepcionEditorView />
+  <DataTemplate DataType="{x:Type vm:ConfirmarRecepcionEditorViewModel}">
+    <views:ConfirmarRecepcionEditorView />
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type vm:UsuarioEditorViewModel}">
