@@ -138,7 +138,7 @@
 
     <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0">
       <Grid>
-        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}" MaxHeight="480"
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
                   ItemsSource="{Binding ItemsView}"
                   SelectedItem="{Binding SelectedItem}">
           <DataGrid.Columns>

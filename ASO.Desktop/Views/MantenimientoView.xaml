@@ -111,7 +111,7 @@
     <!-- Historial -->
     <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0">
       <Grid>
-        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}" MaxHeight="420"
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
                   ItemsSource="{Binding RegistrosView}">
           <DataGrid.Columns>
             <controls:ColumnaTexto Header="Fecha" Width="13*" MinWidth="84"

@@ -96,7 +96,7 @@
 
     <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0">
       <Grid>
-        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}" IsReadOnly="True" MaxHeight="480"
+        <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}" IsReadOnly="True"
                   ItemsSource="{Binding EntregasView}">
           <DataGrid.Columns>
             <controls:ColumnaTexto Header="Remesa" Binding="{Binding RemesaId}" Width="8*" MinWidth="72" />
