@@ -8,8 +8,8 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Administración del sistema: los usuarios del núcleo con sus permisos, y la ficha del propio
-/// núcleo.
+/// Administración del sistema: los usuarios del núcleo con sus permisos, la ficha del propio
+/// núcleo, y el catálogo de zafras (temporadas de cosecha).
 ///
 /// Los permisos NO son una pestaña aparte. Eran un CRUD de ajustes sueltos, y obligaba a trabajar
 /// al revés: para saber qué podía hacer alguien había que recordar qué trae su rol y cruzarlo con
@@ -20,6 +20,7 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
 {
     public const string VistaNucleo = "Nucleo";
     public const string VistaUsuarios = "Usuarios";
+    public const string VistaZafra = "Zafra";
 
     private readonly IServicioDialogo _dialogos;
 
@@ -45,6 +46,7 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
         Usuarios = new UsuariosCrudViewModel(DataSourceFactory.CrearUsuarios(), dialogos, sesion);
         PermisosDeUsuario = new PermisosDeUsuarioViewModel(
             DataSourceFactory.CrearPermisosUsuario(), dialogos, sesion);
+        Zafras = new ZafraCrudViewModel(DataSourceFactory.CrearZafras(), dialogos, sesion);
 
         Usuarios.PropertyChanged += OnUsuarioSeleccionado;
 
@@ -54,6 +56,7 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
     public DatosNucleoViewModel Nucleo { get; }
     public UsuariosCrudViewModel Usuarios { get; }
     public PermisosDeUsuarioViewModel PermisosDeUsuario { get; }
+    public ZafraCrudViewModel Zafras { get; }
 
     /// <summary>
     /// El panel de permisos sigue a la selección del padrón. Si hay cambios sin guardar se
@@ -106,6 +109,8 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
         // Un panel con cambios a medio hacer no se pisa; se recarga cuando ya se guardaron.
         if (!PermisosDeUsuario.HayCambios)
             PermisosDeUsuario.Cargar(_usuarioMostrado);
+
+        Zafras.Recargar();
     }
 
     private string _vistaActual = VistaUsuarios;
@@ -123,6 +128,7 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
 
     public bool MostrarNucleo => VistaActual == VistaNucleo;
     public bool MostrarUsuarios => VistaActual == VistaUsuarios;
+    public bool MostrarZafra => VistaActual == VistaZafra;
 
     /// <summary>
     /// Las dos pestanas, enlazadas en DOS VIAS al IsChecked de su boton. Antes la seleccion
@@ -141,6 +147,12 @@ public sealed class AdministracionViewModel : PantallaViewModelBase
     {
         get => MostrarNucleo;
         set { if (value) VistaActual = VistaNucleo; }
+    }
+
+    public bool EsZafra
+    {
+        get => MostrarZafra;
+        set { if (value) VistaActual = VistaZafra; }
     }
 
     public ICommand CambiarVistaCommand { get; }

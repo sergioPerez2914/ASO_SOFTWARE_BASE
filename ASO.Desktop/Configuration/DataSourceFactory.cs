@@ -48,6 +48,7 @@ public static class DataSourceFactory
     private static IRecepcionMercanciaDataSource? _recepcionesMercancia;
     private static ICuentaBancariaDataSource? _cuentasBancarias;
     private static IMovimientoBancoDataSource? _movimientosBanco;
+    private static IZafraDataSource? _zafras;
     private static IAuthService? _auth;
     private static IAjustesStore? _ajustesStore;
 
@@ -146,6 +147,9 @@ public static class DataSourceFactory
 
     public static IMovimientoBancoDataSource CrearMovimientosBanco() =>
         _movimientosBanco ??= new SqlMovimientoBancoDataSource();
+
+    public static IZafraDataSource CrearZafras() =>
+        _zafras ??= new SqlZafraDataSource();
 
     public static IAuthService CrearAuth() =>
         _auth ??= new AuthService(CrearUsuarios());

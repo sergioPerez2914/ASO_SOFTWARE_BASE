@@ -40,6 +40,14 @@ public class SesionActual : ISesionActual
 
         Ambito.Fijar(nucleo);
 
+        // La zafra Abierta del núcleo, si hay una. A diferencia del ámbito, esto NO es fijo de
+        // por vida de la sesión: ZafraService la vuelve a fijar cada vez que se abre, cierra o
+        // reabre una zafra. Sin ninguna Abierta (instalación nueva, o quedó cerrada sin abrir la
+        // siguiente) queda en null — fail-closed, mismo criterio que Ambito.
+        var zafraAbierta = DataSourceFactory.CrearZafras().GetAll()
+            .FirstOrDefault(z => z.Estado == EstadoZafra.Abierta);
+        ZafraActiva.Fijar(zafraAbierta);
+
         CommandManager.InvalidateRequerySuggested();
     }
 
@@ -48,6 +56,7 @@ public class SesionActual : ISesionActual
         UsuarioActual = null;
         _permisos = _sinPermisos;
         Ambito.Fijar(null);
+        ZafraActiva.Fijar(null);
         CommandManager.InvalidateRequerySuggested();
     }
 

@@ -72,6 +72,21 @@
                        Foreground="{DynamicResource InfoTextBrush}" />
           </Border>
 
+          <!-- Sobre que zafra se esta escribiendo: la misma razon que el NucleoChip. Igual que
+               el, colapsado si no hay ninguna abierta (instalacion nueva, o quedo cerrada sin
+               abrir la siguiente). -->
+          <Border x:Name="ZafraChip" VerticalAlignment="Center" Margin="0,0,12,0"
+                  CornerRadius="{StaticResource RadPill}" Padding="{StaticResource TkChip}"
+                  Visibility="Collapsed"
+                  BorderThickness="{StaticResource BdFino}"
+                  Background="{DynamicResource InfoSoftBrush}"
+                  BorderBrush="{DynamicResource InfoTextBrush}">
+            <TextBlock x:Name="ZafraActualLabel"
+                       FontSize="{StaticResource FsMicro}"
+                       FontWeight="{StaticResource FwMedium}"
+                       Foreground="{DynamicResource InfoTextBrush}" />
+          </Border>
+
           <TextBlock x:Name="UsuarioActualLabel" VerticalAlignment="Center"
                      FontSize="{StaticResource FsBody}"
                      Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" />

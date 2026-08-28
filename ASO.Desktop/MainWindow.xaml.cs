@@ -29,6 +29,12 @@ public partial class MainWindow : Window
         Navegar(SeccionDeArranque(), null);
 
         MostrarCabecera();
+
+        // La zafra puede cambiar en caliente (ZafraService la fija de nuevo al abrir/cerrar),
+        // así que el chip necesita releerse con el bus de cambios y no solo al abrir la ventana
+        // — a diferencia del núcleo, que es fijo de por vida de la sesión. De paso, el
+        // NucleoChip se beneficia de la misma suscripción: antes tampoco se refrescaba solo.
+        CambiosDeDatos.Ocurrieron += MostrarCabecera;
     }
 
     /// <summary>
@@ -43,6 +49,7 @@ public partial class MainWindow : Window
     private void OnCerrada(object? sender, EventArgs e)
     {
         Ajustes.Cambiaron -= AplicarEscala;
+        CambiosDeDatos.Ocurrieron -= MostrarCabecera;
         DesconectarPantallaActual();
 
         if (Ajustes.Actual.AbrirEnUltimaSeccion)
@@ -70,8 +77,8 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Quién está dentro y sobre qué núcleo. El núcleo se muestra siempre porque saber
-    /// dónde se está escribiendo importa antes de guardar nada.
+    /// Quién está dentro y sobre qué núcleo y zafra. Se muestran siempre porque saber dónde y
+    /// cuándo se está escribiendo importa antes de guardar nada.
     /// </summary>
     private void MostrarCabecera()
     {
@@ -84,6 +91,16 @@ public partial class MainWindow : Window
         {
             NucleoActualLabel.Text = nucleo.Etiqueta;
             NucleoChip.Visibility = Visibility.Visible;
+        }
+
+        if (ZafraActiva.Actual is { } zafra)
+        {
+            ZafraActualLabel.Text = $"Zafra {zafra.Codigo}";
+            ZafraChip.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            ZafraChip.Visibility = Visibility.Collapsed;
         }
     }
 

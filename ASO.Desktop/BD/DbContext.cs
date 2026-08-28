@@ -68,6 +68,9 @@ public class AsoDbContext : DbContext
     public DbSet<PermisoUsuario> PermisosUsuario { get; set; }
     public DbSet<PeticionCambio> PeticionesCambio { get; set; }
 
+    // Fase 22 (catálogo de zafras — todavía sin el filtro por IDeZafra, ver Services/ZafraActiva.cs)
+    public DbSet<Zafra> Zafras { get; set; }
+
     /// <summary>
     /// Organización sobre la que trabaja ESTE contexto. Se toma del ámbito al construirlo y no
     /// cambia después: cada método de las fuentes Sql abre su propio contexto, así que un cambio
@@ -169,6 +172,7 @@ public class AsoDbContext : DbContext
             entity.Ignore(t => t.PorcentajeLleno);
             entity.Ignore(t => t.ExistenciaTexto);
             entity.Ignore(t => t.PorcentajeTexto);
+            entity.Ignore(t => t.TieneCapacidadFija);
         });
 
         // --- Fase 2 (catálogos con relaciones livianas) ---
@@ -227,6 +231,19 @@ public class AsoDbContext : DbContext
             entity.Ignore(t => t.MontoTexto);
             entity.Ignore(t => t.VigenciaTexto);
             entity.Ignore(t => t.EstadoTexto);
+        });
+
+        // --- Fase 22 (catálogo de zafras) ---
+
+        modelBuilder.Entity<Zafra>(entity =>
+        {
+            entity.HasKey(z => z.Id);
+            entity.Property(z => z.Codigo).IsRequired().HasMaxLength(30);
+            entity.Property(z => z.MotivoCierre).HasMaxLength(500);
+            entity.Property(z => z.Notas).HasMaxLength(500);
+
+            entity.Ignore(z => z.EstadoTexto);
+            entity.Ignore(z => z.VigenciaTexto);
         });
 
         // --- Fase 3 (documentos planos) ---

@@ -1,0 +1,49 @@
+<UserControl x:Class="ASO.Desktop.Views.ZafraEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             mc:Ignorable="d"
+             d:DesignWidth="440">
+
+  <StackPanel>
+    <controls:FormField Etiqueta="Código (p. ej. 2026-2027)">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="Fecha de inicio">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding FechaInicio}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <controls:FormField Etiqueta="Fin previsto (opcional)">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}"
+                      SelectedDate="{Binding FechaFinPrevista}" />
+        </controls:FormField>
+      </StackPanel>
+    </Grid>
+
+    <TextBlock Text="El fin previsto es solo informativo. El cierre real de la zafra se hace con &quot;Cerrar zafra&quot;."
+               FontSize="11" TextWrapping="Wrap"
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
+
+    <controls:FormField Etiqueta="Notas">
+      <TextBox Style="{StaticResource FormTextBoxStyle}"
+               AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
+               VerticalContentAlignment="Top"
+               Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
+    </controls:FormField>
+  </StackPanel>
+</UserControl>

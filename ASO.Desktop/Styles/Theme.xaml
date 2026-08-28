@@ -259,6 +259,22 @@
     </Style.Triggers>
   </Style>
 
+  <!-- Chip de estado de una zafra -->
+  <Style x:Key="ChipEstadoZafraStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoZafra.Abierta}">
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoZafra.Cerrada}">
+        <Setter Property="Background" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextMutedBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource TextMutedBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
   <!-- Chip de estado de una jornada de trabajo -->
   <Style x:Key="ChipJornadaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />

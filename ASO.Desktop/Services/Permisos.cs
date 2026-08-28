@@ -235,6 +235,19 @@ public static class Permisos
     }
 
     /// <summary>
+    /// El catálogo de temporadas de cosecha. No hay <c>Eliminar</c> a propósito: con documentos
+    /// asociados dejaría filas huérfanas, y para corregir un dato mal cargado alcanza con
+    /// <see cref="Editar"/>.
+    /// </summary>
+    public static class Zafra
+    {
+        public const string Crear = "Zafra.Crear";
+        public const string Editar = "Zafra.Editar";
+        public const string Cerrar = "Zafra.Cerrar";
+        public const string Reabrir = "Zafra.Reabrir";
+    }
+
+    /// <summary>
     /// La pantalla de Configuracion no pide permiso para entrar: el tema, la escala y la
     /// propia contrasenna son de quien esta sentado delante. Lo que si lo pide es tocar los
     /// ajustes que cambian como se comporta la aplicacion para todos los que la usan en esa
