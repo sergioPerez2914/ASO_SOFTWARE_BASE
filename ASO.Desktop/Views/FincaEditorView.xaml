@@ -29,6 +29,28 @@
                Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
+    <Grid Margin="0,8,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="140" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="Dueño">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Dueno, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <controls:FormField Etiqueta="Hectáreas">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding HectareasTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+    </Grid>
+
     <Grid Margin="0,18,0,0">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />

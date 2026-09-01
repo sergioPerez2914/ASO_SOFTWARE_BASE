@@ -56,28 +56,21 @@
       </Grid.ColumnDefinitions>
 
       <StackPanel Grid.Column="0">
-        <controls:FormField Etiqueta="Presentación">
-          <ComboBox Style="{StaticResource FormComboBoxStyle}"
-                    ItemsSource="{Binding Presentaciones}" SelectedItem="{Binding PresentacionSeleccionada}" />
+        <controls:FormField Etiqueta="Existencia (litros)">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding ExistenciaLTexto, UpdateSourceTrigger=PropertyChanged}" />
         </controls:FormField>
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <controls:FormField Etiqueta="Unidades">
+        <controls:FormField Etiqueta="Costo unitario (por litro)">
           <TextBox Style="{StaticResource FormTextBoxStyle}"
-                   Text="{Binding UnidadesTexto, UpdateSourceTrigger=PropertyChanged}" />
+                   Text="{Binding CostoUnitarioTexto, UpdateSourceTrigger=PropertyChanged}" />
         </controls:FormField>
       </StackPanel>
     </Grid>
 
-    <controls:FormField Etiqueta="Costo unitario (por envase)" Margin="0,10,0,0">
-      <TextBox Style="{StaticResource FormTextBoxStyle}"
-               Text="{Binding CostoUnitarioTexto, UpdateSourceTrigger=PropertyChanged}" />
-    </controls:FormField>
-
     <TextBlock Margin="0,6,0,0" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12">
-      <Run Text="{Binding ExistenciaPreviewTexto, StringFormat='Existencia: {0}', Mode=OneWay}" />
-      <Run Text=" · " />
       <Run Text="{Binding ValorPreviewTexto, StringFormat='Valor: {0}', Mode=OneWay}" />
     </TextBlock>
 

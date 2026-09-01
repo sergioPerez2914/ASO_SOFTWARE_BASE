@@ -10,14 +10,16 @@ namespace ASO.Desktop.ViewModels;
 /// (nace prellenada con la cantidad pedida) y, para las líneas de diésel, elegir en qué
 /// presentación llegó — la empresa no tiene una cisterna común que asignar, así que
 /// <c>ComprasService.ConfirmarRecepcion</c> resuelve solo el stock general "Diesel" al que se
-/// suma. Las líneas de lubricante no piden nada aquí: Marca, Clase y Presentación ya se fijaron
-/// al armar la orden de compra, y el <see cref="Lubricante"/> concreto lo resuelve
-/// <c>ComprasService.ConfirmarRecepcion</c> solo (lo busca o lo crea). Las líneas no se agregan
-/// ni se quitan aquí — vienen fijas de la orden de compra de origen.
+/// suma. Las líneas de lubricante no piden presentación aquí: ya viene fijada desde la orden de
+/// compra (Marca, Clase, Grado y Presentación se deciden al armar la orden, no al recibir) — el
+/// <see cref="Lubricante"/> concreto lo resuelve <c>ComprasService.ConfirmarRecepcion</c> solo (lo
+/// busca o lo crea) por Marca+Clase+Grado. Las líneas no se agregan ni se quitan aquí — vienen
+/// fijas de la orden de compra de origen.
 ///
-/// Es el botón "Editar": deja corregido un dato sin confirmar todavía. Quien va a confirmar de
-/// una vez no necesita pasar por aquí — <see cref="ConfirmarRecepcionEditorViewModel"/> repite
-/// esta misma grilla dentro de su propia ventana, para no obligar a los dos pasos por separado.
+/// Es el único lugar para corregir estos datos: la ventana de "Confirmar"
+/// (<see cref="ConfirmarRecepcionEditorViewModel"/>) ya no repite esta grilla — solo pide quién
+/// recibió. Si algo queda incompleto (p. ej. la presentación de una línea de diésel), Confirmar lo
+/// rechaza señalando que se corrija aquí.
 /// </summary>
 public sealed class RecepcionMercanciaEditorViewModel : CrudEditorViewModelBase<RecepcionMercancia>
 {

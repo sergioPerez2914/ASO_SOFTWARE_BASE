@@ -417,7 +417,10 @@ public class AsoDbContext : DbContext
             entity.HasKey(f => f.Id);
             entity.Property(f => f.CodigoCam).IsRequired().HasMaxLength(30);
             entity.Property(f => f.Nombre).IsRequired().HasMaxLength(150);
+            entity.Property(f => f.Dueno).IsRequired().HasMaxLength(150);
+            entity.Property(f => f.Hectareas).HasColumnType("decimal(18,2)").IsRequired();
             entity.Ignore(f => f.Etiqueta);
+            entity.Ignore(f => f.HectareasTexto);
 
             entity.OwnsMany(f => f.Lotes, lote =>
             {
@@ -642,12 +645,13 @@ public class AsoDbContext : DbContext
                 linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
                 linea.Property(x => x.UnidadTexto).HasMaxLength(20);
                 linea.Property(x => x.Cantidad).HasColumnType("decimal(18,2)");
-                linea.Property(x => x.Unidades).HasColumnType("decimal(18,2)");
                 linea.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
 
                 linea.Property(x => x.MarcaLubricanteNombre).HasMaxLength(100);
                 linea.Property(x => x.ClaseLubricante).HasMaxLength(20);
                 linea.Property(x => x.Presentacion).HasMaxLength(20);
+                linea.Property(x => x.LitrosPorEnvase).HasColumnType("decimal(18,2)");
+                linea.Property(x => x.Unidades).HasColumnType("decimal(18,2)");
 
                 linea.Ignore(x => x.Subtotal);
                 linea.Ignore(x => x.TipoInsumoTexto);
@@ -689,12 +693,13 @@ public class AsoDbContext : DbContext
                 linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
                 linea.Property(x => x.UnidadTexto).HasMaxLength(20);
                 linea.Property(x => x.Cantidad).HasColumnType("decimal(18,2)");
-                linea.Property(x => x.Unidades).HasColumnType("decimal(18,2)");
                 linea.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
 
                 linea.Property(x => x.MarcaLubricanteNombre).HasMaxLength(100);
                 linea.Property(x => x.ClaseLubricante).HasMaxLength(20);
                 linea.Property(x => x.Presentacion).HasMaxLength(20);
+                linea.Property(x => x.LitrosPorEnvase).HasColumnType("decimal(18,2)");
+                linea.Property(x => x.Unidades).HasColumnType("decimal(18,2)");
 
                 linea.Ignore(x => x.Subtotal);
                 linea.Ignore(x => x.TipoInsumoTexto);
@@ -740,6 +745,7 @@ public class AsoDbContext : DbContext
                 linea.Property(x => x.MarcaLubricanteNombre).HasMaxLength(100);
                 linea.Property(x => x.ClaseLubricante).HasMaxLength(20);
                 linea.Property(x => x.Presentacion).HasMaxLength(20);
+                linea.Property(x => x.PrecioUnitario).HasColumnType("decimal(18,2)");
 
                 linea.Ignore(x => x.EsCombustible);
                 linea.Ignore(x => x.EsDiesel);
@@ -759,14 +765,11 @@ public class AsoDbContext : DbContext
             entity.Property(l => l.MarcaLubricanteNombre).IsRequired().HasMaxLength(100);
             entity.Property(l => l.Tipo).IsRequired().HasMaxLength(20);
             entity.Property(l => l.GradoViscosidad).IsRequired().HasMaxLength(20);
-            entity.Property(l => l.Presentacion).IsRequired().HasMaxLength(20);
-            entity.Property(l => l.Unidades).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(l => l.ExistenciaL).HasColumnType("decimal(18,2)").IsRequired();
             entity.Property(l => l.CostoUnitario).HasColumnType("decimal(18,2)").IsRequired();
 
             entity.Ignore(l => l.Etiqueta);
-            entity.Ignore(l => l.ExistenciaL);
             entity.Ignore(l => l.ExistenciaTexto);
-            entity.Ignore(l => l.UnidadesTexto);
             entity.Ignore(l => l.ValorTotal);
             entity.Ignore(l => l.ValorTotalTexto);
             entity.Ignore(l => l.CostoUnitarioTexto);

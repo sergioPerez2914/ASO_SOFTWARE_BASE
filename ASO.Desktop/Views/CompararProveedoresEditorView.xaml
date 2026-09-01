@@ -11,6 +11,36 @@
     <TextBlock Text="{Binding Requisicion.LineasTexto}" TextWrapping="Wrap"
                FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" />
 
+    <Border Style="{StaticResource SectionCardStyle}" BorderBrush="{DynamicResource PrimaryBrush}"
+            BorderThickness="2" Margin="0,0,0,14">
+      <StackPanel>
+        <TextBlock Text="¿Cuándo dejar de agregar líneas?" FontSize="{StaticResource FsSubtitle}"
+                   FontWeight="{StaticResource FwBold}" Foreground="{DynamicResource TextPrimaryBrush}" />
+        <TextBlock Text="Cuando el chip de cada necesidad diga &quot;Completo&quot;, ya no hace falta agregar más líneas contra ella."
+                   FontSize="11" TextWrapping="Wrap"
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,10" />
+
+        <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="140" IsReadOnly="True"
+                  ItemsSource="{Binding NecesidadesCobertura}" AutoGenerateColumns="False"
+                  CanUserAddRows="False" CanUserDeleteRows="False">
+          <DataGrid.Columns>
+            <controls:ColumnaTexto Header="Necesidad" Binding="{Binding DestinoTexto}" Width="34*" MinWidth="170" />
+            <controls:ColumnaTexto Header="Pedido" Binding="{Binding PedidoTexto}" Width="17*" MinWidth="90" />
+            <controls:ColumnaTexto Header="Cubierto" Binding="{Binding CubiertoTexto}" Width="17*" MinWidth="90" />
+            <DataGridTemplateColumn Header="Estado" Width="18*" MinWidth="110">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Border Style="{StaticResource ChipCoberturaStyle}">
+                    <TextBlock Text="{Binding EstadoTexto}" FontWeight="{StaticResource FwMedium}" />
+                  </Border>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+      </StackPanel>
+    </Border>
+
     <TextBlock Text="Cotizar proveedor" Style="{StaticResource FormLabelStyle}" />
 
     <Grid>
@@ -48,63 +78,150 @@
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="Complete el detalle como en una factura. En lubricante, primero elija marca, clase y presentación (el envase), y diga cuántas unidades de ese envase compra: el precio es por envase, y el total se calcula solo."
-               FontSize="11" TextWrapping="Wrap"
-               Foreground="{DynamicResource TextMutedBrush}" Margin="0,10,0,4" />
+    <TextBlock Text="Agregar línea" Style="{StaticResource FormLabelStyle}" Margin="0,12,0,4" />
 
-    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="260" IsReadOnly="False"
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="Necesidad (de la requisición)">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Requisicion.Lineas}"
+                    DisplayMemberPath="DestinoTexto"
+                    SelectedItem="{Binding NecesidadSeleccionada}" />
+        </controls:FormField>
+      </StackPanel>
+    </Grid>
+
+    <!-- Lubricante: marca, clase, presentación, litros/envase y envases — todo lo que hace falta
+         para comprar se define aquí, no al recibir. -->
+    <Grid Visibility="{Binding EsNecesidadLubricante, Converter={StaticResource BoolToVis}}" Margin="0,8,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="Marca">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Column="0" Style="{StaticResource FormComboBoxStyle}"
+                      ItemsSource="{Binding MarcasLubricante}"
+                      DisplayMemberPath="Nombre"
+                      SelectedItem="{Binding MarcaLineaSeleccionada}" />
+            <Button Grid.Column="1" Content="+ Nuevo" Style="{StaticResource BarraBotonStyle}"
+                    Command="{Binding NuevoMarcaCommand}" />
+          </Grid>
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <controls:FormField Etiqueta="Clase">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding ClasesLubricante}"
+                    SelectedItem="{Binding ClaseLubricanteLineaSeleccionada}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="4">
+        <controls:FormField Etiqueta="Presentación">
+          <ComboBox Style="{StaticResource FormComboBoxStyle}"
+                    ItemsSource="{Binding Presentaciones}"
+                    SelectedItem="{Binding PresentacionLineaSeleccionada}" />
+        </controls:FormField>
+      </StackPanel>
+    </Grid>
+
+    <!-- Envases y litros por envase: opcionales, y solo entre los dos — si se completan ambos y
+         se deja Cantidad vacío, "Agregar línea" calcula la cantidad sola. -->
+    <Grid Visibility="{Binding EsNecesidadLubricante, Converter={StaticResource BoolToVis}}" Margin="0,8,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="Envases (opcional)">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding UnidadesLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2">
+        <controls:FormField Etiqueta="Litros que trae cada envase (opcional)">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding LitrosPorEnvaseLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="4" VerticalAlignment="Bottom">
+        <TextBlock Text="{Binding EquivalenciaLineaTexto}" Margin="0,0,0,8"
+                   FontWeight="{StaticResource FwMedium}"
+                   Foreground="{DynamicResource TextSecondaryBrush}" />
+      </StackPanel>
+    </Grid>
+
+    <Grid Margin="0,8,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="180" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Column="0">
+        <controls:FormField Etiqueta="{Binding EtiquetaCantidadLinea}">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding CantidadLineaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+      </StackPanel>
+
+      <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
+        <Button Content="Agregar línea" Style="{StaticResource SecondaryButtonStyle}"
+                Command="{Binding AgregarLineaCotizacionCommand}" Margin="0,0,0,4" />
+      </StackPanel>
+    </Grid>
+
+    <TextBlock Text="No hace falta que la cantidad de cada línea iguale lo pedido: una misma necesidad puede cubrirse con varias líneas (distinta marca o presentación). El precio se completa abajo, por línea."
+               FontSize="11" TextWrapping="Wrap"
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,4" />
+
+    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="220" IsReadOnly="False"
               ItemsSource="{Binding LineasCotizacion}" AutoGenerateColumns="False"
               CanUserAddRows="False" CanUserDeleteRows="False">
       <DataGrid.Columns>
-        <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoInsumoTexto}" Width="6*" MinWidth="60" IsReadOnly="True" />
-        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="14*" MinWidth="110" IsReadOnly="True" />
-        <controls:ColumnaNumero Header="Pedido (L)" Binding="{Binding CantidadTexto}" Width="8*" MinWidth="70" IsReadOnly="True" />
-        <DataGridTemplateColumn Header="Marca" Width="16*" MinWidth="160">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
-              <StackPanel Orientation="Horizontal">
-                <ComboBox ItemsSource="{Binding DataContext.MarcasLubricante, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          DisplayMemberPath="Nombre" SelectedValuePath="Id"
-                          SelectedValue="{Binding MarcaLubricanteId, UpdateSourceTrigger=PropertyChanged}"
-                          Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-                <Button Content="+ Nuevo" Style="{StaticResource BarraBotonStyle}" Margin="4,0,0,0"
-                        Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}"
-                        Command="{Binding DataContext.NuevoMarcaCommand,
-                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        CommandParameter="{Binding}" />
-              </StackPanel>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTemplateColumn Header="Clase" Width="10*" MinWidth="90">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
-              <ComboBox ItemsSource="{Binding DataContext.ClasesLubricante, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        SelectedItem="{Binding ClaseLubricante, UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTemplateColumn Header="Presentación" Width="11*" MinWidth="95">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
-              <ComboBox ItemsSource="{Binding DataContext.Presentaciones, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        SelectedItem="{Binding Presentacion, UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTemplateColumn Header="Unidades" Width="9*" MinWidth="75">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
-              <TextBox Text="{Binding Unidades, StringFormat=N2, UpdateSourceTrigger=LostFocus}"
-                       Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Precio/envase (USD)" Width="12*" MinWidth="95"
+        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="16*" MinWidth="120" IsReadOnly="True" />
+        <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="14*" MinWidth="100" IsReadOnly="True" />
+        <controls:ColumnaTexto Header="Clase" Binding="{Binding ClaseLubricante}" Width="10*" MinWidth="85" IsReadOnly="True" />
+        <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="12*" MinWidth="95" IsReadOnly="True" />
+        <controls:ColumnaTexto Header="Envases" Binding="{Binding UnidadesTexto}" Width="10*" MinWidth="85" IsReadOnly="True" />
+        <controls:ColumnaNumero Header="Cantidad" Binding="{Binding CantidadTexto}" Width="11*" MinWidth="85" IsReadOnly="True" />
+        <DataGridTextColumn Header="Precio/L (USD)" Width="11*" MinWidth="90"
                              Binding="{Binding PrecioUnitario, StringFormat=N2, UpdateSourceTrigger=LostFocus}" />
-        <controls:ColumnaNumero Header="Subtotal" Binding="{Binding SubtotalTexto}" Width="11*" MinWidth="90" IsReadOnly="True" />
+        <controls:ColumnaNumero Header="Subtotal" Binding="{Binding SubtotalTexto}" Width="10*" MinWidth="85" IsReadOnly="True" />
+        <DataGridTemplateColumn Width="65">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Button Content="Quitar" Style="{StaticResource BarraBotonStyle}"
+                      Foreground="{DynamicResource DangerTextBrush}"
+                      Command="{Binding DataContext.QuitarLineaCotizacionCommand,
+                                RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                      CommandParameter="{Binding}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
       </DataGrid.Columns>
     </DataGrid>
 
@@ -146,11 +263,12 @@
                 CanUserAddRows="False" CanUserDeleteRows="False">
         <DataGrid.Columns>
           <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="16*" MinWidth="120" />
-          <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="14*" MinWidth="110" />
-          <controls:ColumnaTexto Header="Clase" Binding="{Binding ClaseLubricante}" Width="9*" MinWidth="85" />
-          <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="11*" MinWidth="95" />
-          <controls:ColumnaNumero Header="Unidades" Binding="{Binding UnidadesTexto}" Width="10*" MinWidth="80" />
-          <controls:ColumnaNumero Header="Precio/envase" Binding="{Binding PrecioUnitarioTexto}" Width="11*" MinWidth="90" />
+          <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="13*" MinWidth="100" />
+          <controls:ColumnaTexto Header="Clase" Binding="{Binding ClaseLubricante}" Width="9*" MinWidth="80" />
+          <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="11*" MinWidth="90" />
+          <controls:ColumnaTexto Header="Envases" Binding="{Binding UnidadesTexto}" Width="9*" MinWidth="80" />
+          <controls:ColumnaNumero Header="Cantidad" Binding="{Binding CantidadTexto}" Width="10*" MinWidth="85" />
+          <controls:ColumnaNumero Header="Precio/L" Binding="{Binding PrecioUnitarioTexto}" Width="10*" MinWidth="85" />
           <controls:ColumnaNumero Header="Subtotal" Binding="{Binding SubtotalTexto}" Width="10*" MinWidth="85" />
         </DataGrid.Columns>
       </DataGrid>

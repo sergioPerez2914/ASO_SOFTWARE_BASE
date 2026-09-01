@@ -117,10 +117,18 @@ public class RecepcionMercanciaLinea
     public string MarcaLubricanteNombre { get; set; } = string.Empty;   // snapshot
     public string? ClaseLubricante { get; set; }
 
-    /// <summary>Envase de la línea. En Lubricante viene fijado de la orden de compra (solo
-    /// lectura aquí); en Diésel se elige recién aquí, al recibir — ver
-    /// <see cref="PresentacionesDiesel"/>.</summary>
+    /// <summary>Envase de la línea. En Diésel se elige aquí, al recibir (ver
+    /// <see cref="PresentacionesDiesel"/>); en Lubricante viene fijado de la orden de compra (solo
+    /// lectura aquí) — ahí es donde se sabe a qué proveedor y en qué presentación se está
+    /// comprando. No participa en ningún cálculo de stock.</summary>
     public string? Presentacion { get; set; }
+
+    /// <summary>Precio por litro de esta línea, copiado 1:1 de la línea de la orden de compra de
+    /// origen al armar la recepción (<c>ComprasService.CrearRecepcionDesdeOrdenCompra</c>) — no se
+    /// vuelve a buscar por Marca+Clase+Grado al confirmar, porque una necesidad puede cubrirse con
+    /// varias líneas que comparten esa combinación (mismo lubricante en dos presentaciones), y ahí
+    /// una búsqueda por contenido sería ambigua. Solo aplica a Lubricante.</summary>
+    public decimal PrecioUnitario { get; set; }
 
     /// <summary>Marca concreta de lubricante (catálogo <see cref="Lubricante"/>) a la que se
     /// suma la cantidad recibida. Ya no lo elige el almacenista: <c>ComprasService.ConfirmarRecepcion</c>

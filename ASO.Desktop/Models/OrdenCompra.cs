@@ -135,8 +135,17 @@ public class OrdenCompraLinea
     /// <summary>Mineral/Sintético/Semi-sintético. Lista cerrada: ver <see cref="Lubricante.Tipos"/>.</summary>
     public string? ClaseLubricante { get; set; }
 
-    /// <summary>Envase en que viene. Lista cerrada: ver <see cref="Lubricante.Presentaciones"/>.</summary>
+    /// <summary>Envase en que viene, copiado tal cual de la cotización ganadora. De solo lectura
+    /// a partir de aquí: Recepción ya no lo vuelve a pedir para Lubricante.</summary>
     public string? Presentacion { get; set; }
+
+    /// <summary>Litros que trae el envase de <see cref="Presentacion"/>, copiado de la cotización
+    /// ganadora. Ver <see cref="CotizacionProveedorLinea.LitrosPorEnvase"/>.</summary>
+    public decimal? LitrosPorEnvase { get; set; }
+
+    /// <summary>Envases comprados en esta línea, copiado de la cotización ganadora. Ver
+    /// <see cref="CotizacionProveedorLinea.Unidades"/>.</summary>
+    public decimal? Unidades { get; set; }
 
     // --- Repuesto ---
     public string? ArticuloCodigo { get; set; }
@@ -144,21 +153,17 @@ public class OrdenCompraLinea
     public int? ActivoId { get; set; }
     public string ActivoEtiqueta { get; set; } = string.Empty;    // snapshot
 
-    /// <summary>Litros pedidos, de referencia (copiados de la cotización ganadora, que a su vez
-    /// los copió de la requisición). Para Lubricante, lo que de verdad se compró es
-    /// <see cref="Unidades"/>.</summary>
+    /// <summary>Litros/unidades comprados en esta línea, copiados tal cual de la cotización
+    /// ganadora. No tiene que igualar lo pedido en la requisición: puede ser una de varias líneas
+    /// que juntas cubren la misma necesidad.</summary>
     public decimal Cantidad { get; set; }
     public string UnidadTexto { get; set; } = string.Empty;
 
-    /// <summary>Cuántos envases de <see cref="Presentacion"/> se compraron. Solo aplica a
-    /// Lubricante; viene tal cual de <c>CotizacionProveedorLinea.Unidades</c>.</summary>
-    public decimal Unidades { get; set; }
-
-    /// <summary>Precio por envase en Lubricante (por <see cref="Unidades"/>), precio por litro/
-    /// unidad de repuesto en Diésel/Repuesto (por <see cref="Cantidad"/>).</summary>
+    /// <summary>Precio por litro en combustible, por unidad de repuesto en Repuesto — siempre
+    /// por <see cref="Cantidad"/>.</summary>
     public decimal PrecioUnitario { get; set; }
 
-    public decimal Subtotal => (EsLubricante ? Unidades : Cantidad) * PrecioUnitario;
+    public decimal Subtotal => Cantidad * PrecioUnitario;
 
     public string TipoInsumoTexto => TipoInsumo == TipoInsumo.Combustible ? "Combustible" : "Repuesto";
 
@@ -180,11 +185,7 @@ public class OrdenCompraLinea
 
     public string CantidadTexto => $"{Cantidad:N2} {UnidadTexto}".Trim();
 
-    public string UnidadesTexto => $"{Unidades:N2} {Presentacion}".Trim();
-
-    /// <summary>Cantidad a mostrar en tablas compactas: envases si es Lubricante, litros/unidades
-    /// en el resto — evita repetir el <c>EsLubricante ? Unidades : Cantidad</c> en cada XAML.</summary>
-    public string CantidadMostrarTexto => EsLubricante ? UnidadesTexto : CantidadTexto;
+    public string UnidadesTexto => Unidades is > 0 ? $"{Unidades:N2} {Presentacion}".Trim() : "—";
 
     public string PrecioUnitarioTexto => PrecioUnitario.ToString("N2");
 

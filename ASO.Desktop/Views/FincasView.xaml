@@ -31,7 +31,7 @@
 
         <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por código CAM o nombre"
+                              Sugerencia="Buscar por código CAM, nombre o dueño"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
         </WrapPanel>
 
@@ -56,7 +56,9 @@
           <DataGrid.Columns>
             <controls:ColumnaTexto Header="Nº" Binding="{Binding Id}" Width="44" />
             <controls:ColumnaTexto Header="Código CAM" Binding="{Binding CodigoCam}" Width="14*" MinWidth="110" />
-            <controls:ColumnaTexto Header="Nombre" Binding="{Binding Nombre}" Width="30*" MinWidth="160" />
+            <controls:ColumnaTexto Header="Nombre" Binding="{Binding Nombre}" Width="24*" MinWidth="140" />
+            <controls:ColumnaTexto Header="Dueño" Binding="{Binding Dueno}" Width="20*" MinWidth="130" />
+            <controls:ColumnaNumero Header="Hectáreas" Binding="{Binding HectareasTexto}" Width="12*" MinWidth="90" />
             <controls:ColumnaTexto Header="Lotes" Binding="{Binding Lotes.Count}" Width="9*" MinWidth="72" />
           </DataGrid.Columns>
         </DataGrid>

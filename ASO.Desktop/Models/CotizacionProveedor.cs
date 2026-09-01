@@ -63,6 +63,12 @@ public class CotizacionProveedor : IEntidad<int>, IDeOrganizacion
 /// </summary>
 public class CotizacionProveedorLinea
 {
+    /// <summary>Índice (0-based) de la línea de <see cref="Requisicion.Lineas"/> que esta línea de
+    /// compra cubre. Una necesidad puede tener varias líneas de compra — p. ej. 150 L de un grado
+    /// cubiertos con 100 L de una marca en barril más 50 L de otra en galón — así que la relación
+    /// no es 1:1 como antes; esto es lo que permite agruparlas y calcular la cobertura.</summary>
+    public int RequisicionLineaIndex { get; set; }
+
     public TipoInsumo TipoInsumo { get; set; }
 
     // --- Combustible ---
@@ -75,8 +81,21 @@ public class CotizacionProveedorLinea
     /// <summary>Mineral/Sintético/Semi-sintético. Lista cerrada: ver <see cref="Lubricante.Tipos"/>.</summary>
     public string? ClaseLubricante { get; set; }
 
-    /// <summary>Envase en que viene. Lista cerrada: ver <see cref="Lubricante.Presentaciones"/>.</summary>
+    /// <summary>Envase en que viene. Lista cerrada: ver <see cref="Lubricante.Presentaciones"/>.
+    /// Se define aquí, al armar la orden de compra — es donde se sabe qué se está comprando a cada
+    /// proveedor, no al recibir.</summary>
     public string? Presentacion { get; set; }
+
+    /// <summary>Litros que trae el envase de <see cref="Presentacion"/> en esta compra en
+    /// particular — no es una tabla fija, el envase real varía según el proveedor. Opcional.</summary>
+    public decimal? LitrosPorEnvase { get; set; }
+
+    /// <summary>Cuántos envases de <see cref="Presentacion"/> se compran en esta línea. Opcional y
+    /// puramente informativo — junto con <see cref="LitrosPorEnvase"/> ayuda a calcular
+    /// <see cref="Cantidad"/> al agregar la línea (envases × litros por envase), pero no la
+    /// reemplaza: <see cref="Cantidad"/> sigue siendo lo que de verdad se guarda y se puede
+    /// corregir a mano si el envase real no coincide con lo estimado aquí.</summary>
+    public decimal? Unidades { get; set; }
 
     // --- Repuesto ---
     public string? ArticuloCodigo { get; set; }
@@ -84,22 +103,16 @@ public class CotizacionProveedorLinea
     public int? ActivoId { get; set; }
     public string ActivoEtiqueta { get; set; } = string.Empty;    // snapshot
 
-    /// <summary>Litros pedidos, de referencia (viene de la requisición y no se toca aquí). Para
-    /// Lubricante, lo que de verdad se compra es <see cref="Unidades"/> — esto solo ayuda a saber
-    /// cuánto volumen hay que cubrir con envases.</summary>
+    /// <summary>Litros/unidades de ESTA línea de compra — no tiene que igualar lo pedido en la
+    /// requisición: varias líneas contra la misma necesidad se suman para cubrirla.</summary>
     public decimal Cantidad { get; set; }
     public string UnidadTexto { get; set; } = string.Empty;
 
-    /// <summary>Cuántos envases de <see cref="Presentacion"/> se cotizan. Solo aplica a
-    /// Lubricante — es el dato que faltaba: sin él, "Precio unitario" quedaba ambiguo entre
-    /// precio por litro y precio por envase.</summary>
-    public decimal Unidades { get; set; }
-
-    /// <summary>Precio por envase en Lubricante (por <see cref="Unidades"/>), precio por litro/
-    /// unidad de repuesto en Diésel/Repuesto (por <see cref="Cantidad"/>).</summary>
+    /// <summary>Precio por litro en combustible, por unidad de repuesto en Repuesto — siempre
+    /// por <see cref="Cantidad"/>.</summary>
     public decimal PrecioUnitario { get; set; }
 
-    public decimal Subtotal => (EsLubricante ? Unidades : Cantidad) * PrecioUnitario;
+    public decimal Subtotal => Cantidad * PrecioUnitario;
 
     public string TipoInsumoTexto => TipoInsumo == TipoInsumo.Combustible ? "Combustible" : "Repuesto";
 
@@ -121,7 +134,7 @@ public class CotizacionProveedorLinea
 
     public string CantidadTexto => $"{Cantidad:N2} {UnidadTexto}".Trim();
 
-    public string UnidadesTexto => $"{Unidades:N2} {Presentacion}".Trim();
+    public string UnidadesTexto => Unidades is > 0 ? $"{Unidades:N2} {Presentacion}".Trim() : "—";
 
     public string PrecioUnitarioTexto => PrecioUnitario.ToString("N2");
 

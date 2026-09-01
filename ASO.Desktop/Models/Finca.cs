@@ -16,9 +16,13 @@ public class Finca : IEntidad<int>, IDeOrganizacion
     public int Id { get; set; }
     public string CodigoCam { get; set; } = string.Empty;
     public string Nombre { get; set; } = string.Empty;
+    public string Dueno { get; set; } = string.Empty;
+    public decimal Hectareas { get; set; }
     public List<Lote> Lotes { get; set; } = new();
 
     public string Etiqueta => $"{CodigoCam} · {Nombre}";
+
+    public string HectareasTexto => $"{Hectareas:N2} ha";
 }
 
 /// <summary>Área de corte dentro de una parcela.</summary>

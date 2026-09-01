@@ -43,23 +43,22 @@ public sealed class LubricantesCrudViewModel : CrudViewModelBase<Lubricante, int
 
     protected override string ModuloPermiso => "Lubricantes";
 
-    /// <summary>Suma de Unidades × CostoUnitario de lo que se ve en la tabla ahora mismo (con el
-    /// buscador aplicado), no del catálogo completo.</summary>
+    /// <summary>Suma de ExistenciaL × CostoUnitario de lo que se ve en la tabla ahora mismo (con
+    /// el buscador aplicado), no del catálogo completo.</summary>
     public decimal ValorTotalCatalogo => ItemsView.Cast<Lubricante>().Sum(l => l.ValorTotal);
 
     /// <summary>Título de la tarjeta de valor: el total del catálogo visible, o la fila
     /// seleccionada cuando hay una.</summary>
     public string TituloValorTexto => SelectedItem is null
         ? "Valor total del catálogo"
-        : $"Valor de {SelectedItem.MarcaLubricanteNombre} · {SelectedItem.Tipo} {SelectedItem.GradoViscosidad} ({SelectedItem.Presentacion})";
+        : $"Valor de {SelectedItem.MarcaLubricanteNombre} · {SelectedItem.Tipo} {SelectedItem.GradoViscosidad}";
 
     public string ValorMostradoTexto => (SelectedItem?.ValorTotal ?? ValorTotalCatalogo).ToString("N2");
 
     protected override bool CoincideBusqueda(Lubricante item, string texto) =>
         item.MarcaLubricanteNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
         || item.Tipo.Contains(texto, StringComparison.OrdinalIgnoreCase)
-        || item.GradoViscosidad.Contains(texto, StringComparison.OrdinalIgnoreCase)
-        || item.Presentacion.Contains(texto, StringComparison.OrdinalIgnoreCase);
+        || item.GradoViscosidad.Contains(texto, StringComparison.OrdinalIgnoreCase);
 
     protected override Lubricante CrearNuevo() => new() { Activo = true };
 

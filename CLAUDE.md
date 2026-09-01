@@ -194,10 +194,11 @@ en paralelo a propósito — se retira cuando el cotejo a tres vías (ver más a
   un `InventoryItem` con `Categoria = "Lubricantes"` y código `LUB-{tipo}-{grado}` por cada
   combinación — se veía como "Repuesto" y sus características quedaban aplanadas en el `Nombre`.
   Se identifica por **Marca + Tipo + Grado**: cada marca es su propia fila de existencia (un
-  Castrol 20W50 y un Mobil 20W50 son productos distintos). La Requisición sigue sin referenciarlo
-  (solo pide Tipo+Grado); la marca concreta se elige — o se crea al vuelo, botón "+ Nuevo" — recién
-  al confirmar la `RecepcionMercancia`, que es cuando se sabe qué trajo el proveedor
-  (`RecepcionMercanciaLinea.LubricanteId`, paralelo a `StockCombustibleId` para Diésel).
+  Castrol 20W50 y un Mobil 20W50 son productos distintos), sin que la presentación (envase) sea
+  parte de esa identidad — ver "Lubricante en litros" más abajo. La Requisición sigue sin
+  referenciarlo (solo pide Tipo+Grado); la marca concreta se elige — o se crea al vuelo, botón
+  "+ Nuevo" — recién al confirmar la `RecepcionMercancia`, que es cuando se sabe qué trajo el
+  proveedor (`RecepcionMercanciaLinea.LubricanteId`, paralelo a `StockCombustibleId` para Diésel).
   `ComprasService.ConfirmarRecepcion`/`AnularRecepcion` tienen ahora tres ramas de stock
   (Repuesto → `InventoryItem`, Diésel → `StockCombustible`, Lubricante → `Lubricante`) en vez de
   dos. Permiso `Lubricantes.*`: maestro simple, mismo trato que `Proveedores.*` — el remesero ve la
@@ -237,6 +238,71 @@ en paralelo a propósito — se retira cuando el cotejo a tres vías (ver más a
 - **Pendiente**: el cotejo a tres vías (Orden de Compra + Recepción + factura del proveedor) antes
   de que la deuda aparezca en Cuentas por Pagar — es lo que de verdad retiraría `RecargaCombustible`.
   `OrdenCompra.Estado.Cerrada` existe pero nada la dispara todavía.
+
+**Lubricante en litros, sin traducir a envases (2026-08-31, ajustado el mismo día):** el lubricante
+se llegó a pedir y cotizar por **envase** (Presentación + Unidades, con una tabla fija de litros
+por envase — Galón = 3.785 L, Barril = 208 L…), pisando lo pedido en la Requisición y obligando a
+traducir mentalmente "cuántos litros necesito" a "cuántos galones son". Al cliente le confundía, y
+además "Granel" —que es la ausencia de envase— tenía una entrada en esa tabla como si fuera uno
+más. `Lubricante.ExistenciaL` pasó de derivarse (`Unidades × litros`) a capturarse directo, mismo
+criterio que `StockCombustible.ExistenciaL`, y su identidad pasó de Marca+Tipo+Grado+Presentación a
+solo **Marca+Tipo+Grado** — una sola fila de existencia por producto, sin importar en qué envase
+haya llegado cada compra.
+
+Dónde se define la Presentación y los litros que trae el envase se decidió dos veces el mismo día:
+primero se probó igualando a Diésel (elegirla recién al **recibir** la mercancía, con
+`RecepcionMercanciaLinea.LitrosPorEnvase` como calculadora de "cuántos envases hacen falta"), pero
+el cliente la quiso de vuelta en **"Comparar proveedores" (armar la Orden de Compra)** — esa
+pantalla funciona como una factura del proveedor, y ahí es donde tiene sentido decidir marca,
+clase, presentación y litros por envase. `CotizacionProveedorLinea`/`OrdenCompraLinea` llevan
+`Presentacion` (obligatoria para lubricante) y `LitrosPorEnvase` (opcional, solo ayuda visual —
+nunca recalcula la cantidad ni el precio); Recepción vuelve a mostrar la Presentación de Lubricante
+de solo lectura, heredada de la orden. Diésel no cambió en ningún momento: sigue sin marca, y su
+Presentación se sigue eligiendo recién al recibir (nunca tuvo tabla de conversión).
+
+**Una necesidad de la requisición admite varias líneas de compra (2026-08-31):** pedir 150 L de un
+grado de lubricante y cubrirlos con 100 L de una marca en barril más 50 L de otra en galón, dentro
+de la misma cotización/orden, antes no se podía — "Comparar proveedores" armaba exactamente una
+línea por línea de requisición. Ahora la captura es "Agregar línea" (mismo arquetipo que
+`RequisicionEditorViewModel`): se elige contra qué necesidad va cada línea
+(`CotizacionProveedorLinea.RequisicionLineaIndex`, el índice de `Requisicion.Lineas` — no hizo
+falta un Id nuevo) y se pueden agregar varias contra la misma. Un panel de solo lectura muestra
+pedido vs. cubierto por necesidad, sin bloquear si no coincide exacto (mismo criterio que
+`CantidadPedida` vs. `CantidadRecibida` en Recepción); lo único que sí exige
+`ComprasService.CotizacionEstaCompleta` es que ninguna necesidad quede sin una sola línea de
+compra. Como dos líneas de compra ahora pueden compartir Marca+Clase+Grado con distinta
+presentación, `ConfirmarRecepcion` dejó de buscar el precio del lubricante por esa combinación (era
+ambiguo) — `RecepcionMercanciaLinea.PrecioUnitario` es un snapshot copiado 1:1 al armar la recepción
+desde la línea de la orden de compra de origen.
+
+Al probarlo, "Cantidad" en el formulario no dejaba claro si eran litros o unidades de repuesto, y
+faltaba dónde anotar cuántos envases se compran — solo estaba "litros que trae cada envase". Se
+agregó `CotizacionProveedorLinea.Unidades`/`OrdenCompraLinea.Unidades` (envases, opcional, mismo
+criterio que `LitrosPorEnvase`: no fuerza nada) y la etiqueta de "Cantidad" ahora dice "(litros)" o
+"(unidades)" según el tipo de la necesidad elegida
+(`CompararProveedoresEditorViewModel.EtiquetaCantidadLinea`). Si se completan Envases y Litros por
+envase y se deja Cantidad vacío, "Agregar línea" calcula la cantidad sola (envases × litros por
+envase) — Cantidad se puede seguir escribiendo directo si no se sabe la conversión exacta. El panel
+de cobertura ("¿Cuándo dejar de agregar líneas?") se resaltó con una tarjeta propia y un chip de
+color por necesidad (`ChipCoberturaStyle`: rojo sin cubrir, ámbar a medias, verde completo) — es el
+indicativo de cuándo parar, y se perdía entre el resto de la pantalla.
+
+**Recepción vuelve a separar "Editar" de "Confirmar" (2026-08-31):** el commit `be9df11` las había
+fusionado porque la Presentación de Lubricante vivía en Recepción, y si no se cargaba en "Editar",
+"Confirmar" la rechazaba sin decir dónde corregirla. Con la Presentación de Lubricante fija desde
+la Orden de Compra, ese motivo desapareció — el único caso que sigue pendiente de completarse en
+Recepción es la Presentación de Diésel. Se separaron de nuevo: "Editar"
+(`RecepcionMercanciaEditorViewModel`) es el único lugar para corregir `CantidadRecibida` y la
+Presentación de Diésel; "Confirmar" (`ConfirmarRecepcionEditorViewModel`) ya no muestra ninguna
+grilla de líneas, solo pide quién recibió. Si algo queda incompleto, `ComprasService.ConfirmarRecepcion`
+lo rechaza con un mensaje que señala ir a "Editar" — para no reintroducir el problema original sin
+la ventana fusionada.
+
+La migración `Fase23_LubricanteEnLitros` convirtió la existencia previa con la fórmula de la tabla
+fija, pero **no fusionó** las filas que quedaron duplicadas por Marca+Clase+Grado (antes
+distinguidas por Presentación, ahora parte del mismo producto) — revisar y fusionar a mano en
+Inventario · Combustible · Lubricantes (sumar `ExistenciaL`, decidir qué `CostoUnitario` prevalece)
+antes de repartir esta build.
 
 **Corrección "cisterna" no existe (2026-08-24):** el modelo original (`TanqueCombustible`) asumía
 que el combustible/aceite se vacía en una cisterna física elegible de una lista. La empresa real
@@ -353,7 +419,12 @@ hay mocks: `Configuration/DataSourceFactory.cs` devuelve siempre la implementaci
   `Fase8_RequisicionYOrdenCompra` → `Fase9_RenombrarCisternaAStock` →
   `Fase10_RequisicionCombustibleYUnidad` → `Fase11_MontoCotizadoYLineasOrdenCompra` →
   `Fase12_RecepcionMercancia` → `Fase13_JornadaEnFrente` → `Fase14_Lubricantes` →
-  `Fase14_OrigenDelEvento` → `Fase15_Banco`.
+  `Fase14_OrigenDelEvento` → `Fase15_MarcaYPresentacionLubricante` → `Fase15_Banco` →
+  `Fase16_UnidadesLubricante` → `Fase17_CostoUnitarioLubricante` →
+  `Fase18_ClaseLubricanteEnRequisicion` → `Fase19_LineasCotizacionProveedor` →
+  `Fase20_UnidadesEnCotizacionYOrden` → `Fase21_FacturaProveedorBorradorYLineas` →
+  `Fase22_Zafra` → `Fase23_LubricanteEnLitros` → `Fase24_VariasLineasPorNecesidad` →
+  `Fase25_EnvasesEnCotizacionYOrden`.
 - **La cadena de conexión vive solo en `appsettings.local.json`** (por máquina, en `.gitignore`).
 - **No hay claves foráneas reales** en las tablas planas: las relaciones son `int` sueltos y la
   integridad es de la aplicación, con snapshots de texto (`…Nombre`, `…Codigo`) en cada documento.
@@ -666,6 +737,10 @@ no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
    nuevos; no repara los que ya quedaron en 0 antes de esa fecha. Un vistazo rápido a la base local
    de desarrollo (2026-08-25) encontró 3 `Fincas` y 3 `Empleados` en ese estado — revisar si hay más
    antes de repartir esta build.
+7. **Fusionar a mano los `Lubricante` duplicados** que dejó la migración `Fase23_LubricanteEnLitros`
+   (ver "Lubricante en litros" más arriba): filas con el mismo Marca+Clase+Grado que antes se
+   distinguían por Presentación. Un vistazo rápido a la base local de desarrollo (2026-08-31)
+   encontró al menos dos pares en ese estado.
 
 El catálogo completo de permisos está en `Services/Permisos.cs` (98 acciones, más 21 de navegación
 derivadas del catálogo de módulos = 119) y el reparto por rol en

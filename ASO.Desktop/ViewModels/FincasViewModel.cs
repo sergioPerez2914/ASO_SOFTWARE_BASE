@@ -36,7 +36,8 @@ public sealed class FincasViewModel : PantallaCrudViewModel<Finca, int>
 
     protected override bool CoincideBusqueda(Finca item, string texto) =>
         item.CodigoCam.Contains(texto, StringComparison.OrdinalIgnoreCase)
-        || item.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase);
+        || item.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
+        || item.Dueno.Contains(texto, StringComparison.OrdinalIgnoreCase);
 
     protected override Finca CrearNuevo() => new();
 

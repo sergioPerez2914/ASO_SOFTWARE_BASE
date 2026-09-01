@@ -207,12 +207,10 @@
                     ItemsSource="{Binding ItemsView}"
                     SelectedItem="{Binding SelectedItem}">
             <DataGrid.Columns>
-              <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="20*" MinWidth="110" />
-              <controls:ColumnaTexto Header="Tipo" Binding="{Binding Tipo}" Width="16*" MinWidth="100" />
-              <controls:ColumnaTexto Header="Grado" Binding="{Binding GradoViscosidad}" Width="13*" MinWidth="80" />
-              <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="15*" MinWidth="95" />
-              <controls:ColumnaNumero Header="Unidades" Binding="{Binding Unidades, StringFormat=N2}" Width="12*" MinWidth="80" />
-              <controls:ColumnaNumero Header="Existencia" Binding="{Binding ExistenciaTexto}" Width="14*" MinWidth="90" />
+              <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="24*" MinWidth="120" />
+              <controls:ColumnaTexto Header="Tipo" Binding="{Binding Tipo}" Width="18*" MinWidth="100" />
+              <controls:ColumnaTexto Header="Grado" Binding="{Binding GradoViscosidad}" Width="15*" MinWidth="80" />
+              <controls:ColumnaNumero Header="Existencia" Binding="{Binding ExistenciaTexto}" Width="16*" MinWidth="90" />
             </DataGrid.Columns>
           </DataGrid>
 

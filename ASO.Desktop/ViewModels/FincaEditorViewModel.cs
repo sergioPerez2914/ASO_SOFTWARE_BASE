@@ -77,6 +77,8 @@ public sealed class FincaEditorViewModel : CrudEditorViewModelBase<Finca>
 
         CodigoCam = original.CodigoCam;
         Nombre = original.Nombre;
+        Dueno = original.Dueno;
+        HectareasTexto = original.Id == 0 ? string.Empty : original.Hectareas.ToString("0.##");
 
         foreach (var lote in original.Lotes)
             Lotes.Add(new LoteEditorRow(lote));
@@ -103,6 +105,20 @@ public sealed class FincaEditorViewModel : CrudEditorViewModelBase<Finca>
         set => SetProperty(ref _nombre, value);
     }
 
+    private string _dueno = string.Empty;
+    public string Dueno
+    {
+        get => _dueno;
+        set => SetProperty(ref _dueno, value);
+    }
+
+    private string _hectareasTexto = string.Empty;
+    public string HectareasTexto
+    {
+        get => _hectareasTexto;
+        set => SetProperty(ref _hectareasTexto, value);
+    }
+
     public ObservableCollection<LoteEditorRow> Lotes { get; } = new();
 
     public ICommand AgregarLoteCommand { get; }
@@ -119,6 +135,18 @@ public sealed class FincaEditorViewModel : CrudEditorViewModelBase<Finca>
         if (string.IsNullOrWhiteSpace(Nombre))
         {
             error = "Indique el nombre de la finca.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(Dueno))
+        {
+            error = "Indique el nombre del dueño de la finca.";
+            return false;
+        }
+
+        if (!decimal.TryParse(HectareasTexto, out var hectareas) || hectareas <= 0)
+        {
+            error = "Indique las hectáreas de la finca, un número mayor que cero.";
             return false;
         }
 
@@ -153,6 +181,8 @@ public sealed class FincaEditorViewModel : CrudEditorViewModelBase<Finca>
         Id = _original.Id,
         CodigoCam = CodigoCam.Trim(),
         Nombre = Nombre.Trim(),
+        Dueno = Dueno.Trim(),
+        Hectareas = decimal.TryParse(HectareasTexto, out var hectareas) ? hectareas : 0m,
         Lotes = Lotes.Select(l => new Lote
         {
             Nombre = l.Nombre.Trim(),

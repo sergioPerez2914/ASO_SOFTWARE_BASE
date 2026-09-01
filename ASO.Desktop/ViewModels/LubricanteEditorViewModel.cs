@@ -8,12 +8,13 @@ using ASO.Desktop.Services;
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Alta/edición de un lubricante del catálogo (Marca + Tipo + Grado de viscosidad + Presentación).
-/// La marca se elige de <see cref="MarcaLubricante"/> (catálogo propio, no texto libre), con
-/// "+ Nuevo" si falta una — mismo patrón que <see cref="ProveedorEditorViewModel"/> desde
-/// "Comparar proveedores". La existencia en litros no se captura aquí: se deriva de Presentación
-/// × Unidades (ver
-/// <see cref="Lubricante.ExistenciaL"/>), así que se muestra de solo lectura.
+/// Alta/edición de un lubricante del catálogo (Marca + Tipo + Grado de viscosidad). La marca se
+/// elige de <see cref="MarcaLubricante"/> (catálogo propio, no texto libre), con "+ Nuevo" si
+/// falta una — mismo patrón que <see cref="ProveedorEditorViewModel"/> desde "Comparar
+/// proveedores". La existencia se captura directo en litros (<see cref="Lubricante.ExistenciaL"/>,
+/// mismo criterio que <see cref="StockCombustible.ExistenciaL"/>) — normalmente la estampa
+/// <c>ComprasService.ConfirmarRecepcion</c> sola; este editor sirve para corregirla a mano o para
+/// completar filas que ya existían.
 /// </summary>
 public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubricante>
 {
@@ -37,8 +38,7 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
 
         TipoSeleccionado = string.IsNullOrWhiteSpace(original.Tipo) ? Lubricante.Tipos[0] : original.Tipo;
         GradoSeleccionado = string.IsNullOrWhiteSpace(original.GradoViscosidad) ? Lubricante.GradosViscosidad[0] : original.GradoViscosidad;
-        PresentacionSeleccionada = string.IsNullOrWhiteSpace(original.Presentacion) ? Lubricante.Presentaciones[0] : original.Presentacion;
-        UnidadesTexto = original.Id == 0 ? "0" : original.Unidades.ToString("0.##");
+        ExistenciaLTexto = original.Id == 0 ? "0" : original.ExistenciaL.ToString("0.##");
         CostoUnitarioTexto = original.CostoUnitario.ToString("0.##");
         Activo = original.Id == 0 || original.Activo;
 
@@ -49,7 +49,6 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
 
     public IReadOnlyList<string> Tipos => Lubricante.Tipos;
     public IReadOnlyList<string> Grados => Lubricante.GradosViscosidad;
-    public IReadOnlyList<string> Presentaciones => Lubricante.Presentaciones;
 
     public ObservableCollection<MarcaLubricante> MarcasLubricante { get; }
 
@@ -87,46 +86,23 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
         set => SetProperty(ref _gradoSeleccionado, value);
     }
 
-    private string _presentacionSeleccionada = string.Empty;
-    public string PresentacionSeleccionada
+    private string _existenciaLTexto = string.Empty;
+    /// <summary>Litros en existencia, capturados directo — sin pasar por ninguna tabla de
+    /// conversión de envase.</summary>
+    public string ExistenciaLTexto
     {
-        get => _presentacionSeleccionada;
+        get => _existenciaLTexto;
         set
         {
-            if (SetProperty(ref _presentacionSeleccionada, value))
-                OnPropertyChanged(nameof(ExistenciaPreviewTexto));
-        }
-    }
-
-    private string _unidadesTexto = string.Empty;
-    public string UnidadesTexto
-    {
-        get => _unidadesTexto;
-        set
-        {
-            if (SetProperty(ref _unidadesTexto, value))
-            {
-                OnPropertyChanged(nameof(ExistenciaPreviewTexto));
+            if (SetProperty(ref _existenciaLTexto, value))
                 OnPropertyChanged(nameof(ValorPreviewTexto));
-            }
-        }
-    }
-
-    /// <summary>Vista previa en litros mientras se edita, misma fórmula que <see cref="Lubricante.ExistenciaL"/>.</summary>
-    public string ExistenciaPreviewTexto
-    {
-        get
-        {
-            var unidades = decimal.TryParse(UnidadesTexto, out var u) ? u : 0m;
-            var litros = Lubricante.LitrosPorPresentacion.TryGetValue(PresentacionSeleccionada, out var l) ? l : 0m;
-            return $"{unidades * litros:N0} L";
         }
     }
 
     private string _costoUnitarioTexto = string.Empty;
-    /// <summary>Precio por envase de esta presentación. Normalmente lo estampa
-    /// <c>ComprasService.ConfirmarRecepcion</c> solo; se edita a mano aquí para completar el
-    /// costo de las filas que ya existían antes de que ese campo se agregara.</summary>
+    /// <summary>Precio por litro. Normalmente lo estampa <c>ComprasService.ConfirmarRecepcion</c>
+    /// solo; se edita a mano aquí para completar el costo de las filas que ya existían antes de
+    /// que ese campo se agregara.</summary>
     public string CostoUnitarioTexto
     {
         get => _costoUnitarioTexto;
@@ -143,9 +119,9 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
     {
         get
         {
-            var unidades = decimal.TryParse(UnidadesTexto, out var u) ? u : 0m;
+            var existencia = decimal.TryParse(ExistenciaLTexto, out var e) ? e : 0m;
             var costo = decimal.TryParse(CostoUnitarioTexto, out var c) ? c : 0m;
-            return (unidades * costo).ToString("N2");
+            return (existencia * costo).ToString("N2");
         }
     }
 
@@ -164,9 +140,9 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
             return false;
         }
 
-        if (!decimal.TryParse(UnidadesTexto, out var unidades) || unidades < 0)
+        if (!decimal.TryParse(ExistenciaLTexto, out var existencia) || existencia < 0)
         {
-            error = "Las unidades deben ser un número mayor o igual a cero.";
+            error = "La existencia en litros debe ser un número mayor o igual a cero.";
             return false;
         }
 
@@ -187,8 +163,7 @@ public sealed class LubricanteEditorViewModel : CrudEditorViewModelBase<Lubrican
         lubricante.MarcaLubricanteNombre = MarcaSeleccionada.Nombre;
         lubricante.Tipo = TipoSeleccionado;
         lubricante.GradoViscosidad = GradoSeleccionado;
-        lubricante.Presentacion = PresentacionSeleccionada;
-        lubricante.Unidades = decimal.TryParse(UnidadesTexto, out var unidades) ? unidades : 0m;
+        lubricante.ExistenciaL = decimal.TryParse(ExistenciaLTexto, out var existencia) ? existencia : 0m;
         lubricante.CostoUnitario = decimal.TryParse(CostoUnitarioTexto, out var costo) ? costo : 0m;
         lubricante.Activo = Activo;
         return lubricante;

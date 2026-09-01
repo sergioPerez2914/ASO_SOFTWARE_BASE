@@ -4,6 +4,7 @@ using ASO.Desktop.BD;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASO.Desktop.Migrations
 {
     [DbContext(typeof(AsoDbContext))]
-    partial class AsoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260831230100_Fase23_LubricanteEnLitros")]
+    partial class Fase23_LubricanteEnLitros
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -396,14 +399,6 @@ namespace ASO.Desktop.Migrations
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("Dueno")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<decimal>("Hectareas")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -1839,9 +1834,6 @@ namespace ASO.Desktop.Migrations
                             b1.Property<int>("CotizacionProveedorId")
                                 .HasColumnType("int");
 
-                            b1.Property<decimal?>("LitrosPorEnvase")
-                                .HasColumnType("decimal(18,2)");
-
                             b1.Property<int?>("MarcaLubricanteId")
                                 .HasColumnType("int");
 
@@ -1852,13 +1844,6 @@ namespace ASO.Desktop.Migrations
 
                             b1.Property<decimal>("PrecioUnitario")
                                 .HasColumnType("decimal(18,2)");
-
-                            b1.Property<string>("Presentacion")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
-
-                            b1.Property<int>("RequisicionLineaIndex")
-                                .HasColumnType("int");
 
                             b1.Property<int?>("TipoCombustibleSolicitado")
                                 .HasColumnType("int");
@@ -1874,9 +1859,6 @@ namespace ASO.Desktop.Migrations
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)");
-
-                            b1.Property<decimal?>("Unidades")
-                                .HasColumnType("decimal(18,2)");
 
                             b1.HasKey("Id");
 
@@ -2128,9 +2110,6 @@ namespace ASO.Desktop.Migrations
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)");
 
-                            b1.Property<decimal?>("LitrosPorEnvase")
-                                .HasColumnType("decimal(18,2)");
-
                             b1.Property<int?>("MarcaLubricanteId")
                                 .HasColumnType("int");
 
@@ -2144,10 +2123,6 @@ namespace ASO.Desktop.Migrations
 
                             b1.Property<decimal>("PrecioUnitario")
                                 .HasColumnType("decimal(18,2)");
-
-                            b1.Property<string>("Presentacion")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)");
 
                             b1.Property<int?>("TipoCombustibleSolicitado")
                                 .HasColumnType("int");
@@ -2163,9 +2138,6 @@ namespace ASO.Desktop.Migrations
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)");
-
-                            b1.Property<decimal?>("Unidades")
-                                .HasColumnType("decimal(18,2)");
 
                             b1.HasKey("Id");
 
@@ -2217,6 +2189,9 @@ namespace ASO.Desktop.Migrations
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)");
 
+                            b1.Property<decimal?>("LitrosPorEnvase")
+                                .HasColumnType("decimal(18,2)");
+
                             b1.Property<int?>("LubricanteId")
                                 .HasColumnType("int");
 
@@ -2232,9 +2207,6 @@ namespace ASO.Desktop.Migrations
                                 .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("nvarchar(100)");
-
-                            b1.Property<decimal>("PrecioUnitario")
-                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Presentacion")
                                 .HasMaxLength(20)

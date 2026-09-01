@@ -139,32 +139,12 @@ public sealed class ComprasService
     public IEnumerable<CotizacionProveedor> CotizacionesDe(int requisicionId) =>
         _cotizaciones.GetByRequisicion(requisicionId);
 
-    /// <summary>
-    /// Construye las líneas de arranque para cotizar (precio en cero, marca y presentación
-    /// vacíos — a completar por quien cotiza; la clase de lubricante ya viene de la requisición).
-    /// Método puro, sin efectos: lo usa <see cref="CompararProveedoresEditorViewModel"/> para
-    /// poblar la grilla de detalle de cada proveedor que se cotiza, y no toca la requisición ni
-    /// crea nada todavía.
-    /// </summary>
-    public static List<CotizacionProveedorLinea> ArmarLineasCotizacion(Requisicion requisicion) =>
-        requisicion.Lineas.Select(l => new CotizacionProveedorLinea
-        {
-            TipoInsumo = l.TipoInsumo,
-            TipoCombustibleSolicitado = l.TipoCombustibleSolicitado,
-            TipoLubricante = l.TipoLubricante,
-            ClaseLubricante = l.ClaseLubricante,
-            ArticuloCodigo = l.ArticuloCodigo,
-            ArticuloNombre = l.ArticuloNombre,
-            ActivoId = l.ActivoId,
-            ActivoEtiqueta = l.ActivoEtiqueta,
-            Cantidad = l.Cantidad,
-            UnidadTexto = l.UnidadTexto,
-            PrecioUnitario = 0m
-        }).ToList();
-
     /// <summary>Mismo criterio que <see cref="OrdenCompraEstaCompleta"/>: lo usa la pantalla antes
-    /// de dejar guardar la cotización de un proveedor.</summary>
-    public static bool CotizacionEstaCompleta(List<CotizacionProveedorLinea> lineas, out string? faltantes)
+    /// de dejar guardar la cotización de un proveedor. <paramref name="requisicion"/> es lo que
+    /// permite exigir cobertura: cada línea de la requisición (una "necesidad") debe tener al
+    /// menos una línea de compra que la cubra — una requisición con una línea sin ninguna compra
+    /// asociada quedaría comprada a medias sin que nadie lo note.</summary>
+    public static bool CotizacionEstaCompleta(Requisicion requisicion, List<CotizacionProveedorLinea> lineas, out string? faltantes)
     {
         var pendientes = new List<string>();
 
@@ -183,8 +163,9 @@ public sealed class ComprasService
         if (lineas.Any(l => l.EsLubricante && string.IsNullOrWhiteSpace(l.Presentacion)))
             pendientes.Add("la presentación de cada línea de lubricante");
 
-        if (lineas.Any(l => l.EsLubricante && l.Unidades <= 0))
-            pendientes.Add("las unidades (envases) de cada línea de lubricante");
+        var indicesCubiertos = lineas.Select(l => l.RequisicionLineaIndex).ToHashSet();
+        if (Enumerable.Range(0, requisicion.Lineas.Count).Any(i => !indicesCubiertos.Contains(i)))
+            pendientes.Add("al menos una línea de compra por cada necesidad de la requisición");
 
         faltantes = pendientes.Count == 0 ? null : string.Join(", ", pendientes);
         return pendientes.Count == 0;
@@ -225,9 +206,6 @@ public sealed class ComprasService
         if (orden.Lineas.Any(l => l.EsLubricante && string.IsNullOrWhiteSpace(l.Presentacion)))
             pendientes.Add("la presentación de cada línea de lubricante");
 
-        if (orden.Lineas.Any(l => l.EsLubricante && l.Unidades <= 0))
-            pendientes.Add("las unidades (envases) de cada línea de lubricante");
-
         faltantes = pendientes.Count == 0 ? null : string.Join(", ", pendientes);
         return pendientes.Count == 0;
     }
@@ -263,12 +241,13 @@ public sealed class ComprasService
             MarcaLubricanteNombre = l.MarcaLubricanteNombre,
             ClaseLubricante = l.ClaseLubricante,
             Presentacion = l.Presentacion,
+            LitrosPorEnvase = l.LitrosPorEnvase,
+            Unidades = l.Unidades,
             ArticuloCodigo = l.ArticuloCodigo,
             ArticuloNombre = l.ArticuloNombre,
             ActivoId = l.ActivoId,
             ActivoEtiqueta = l.ActivoEtiqueta,
             Cantidad = l.Cantidad,
-            Unidades = l.Unidades,
             UnidadTexto = l.UnidadTexto,
             PrecioUnitario = l.PrecioUnitario
         }).ToList();
@@ -396,7 +375,13 @@ public sealed class ComprasService
             MarcaLubricanteId = l.MarcaLubricanteId,
             MarcaLubricanteNombre = l.MarcaLubricanteNombre,
             ClaseLubricante = l.ClaseLubricante,
+            // Para Lubricante, la presentación ya viene fijada de la orden de compra (de solo
+            // lectura de aquí en adelante); para Diésel nace vacía, se elige recién al recibir.
             Presentacion = l.Presentacion,
+            // Snapshot 1:1 de esta línea, no una búsqueda posterior por Marca+Clase+Grado: una
+            // necesidad puede cubrirse con varias líneas que comparten esa combinación (mismo
+            // lubricante en dos presentaciones), y ahí buscar por contenido sería ambiguo.
+            PrecioUnitario = l.PrecioUnitario,
             ArticuloCodigo = l.ArticuloCodigo,
             ArticuloNombre = l.ArticuloNombre,
             ActivoId = l.ActivoId,
@@ -434,9 +419,11 @@ public sealed class ComprasService
     /// medias si una línea falla (mismo criterio que CombustibleService.Confirmar).
     ///
     /// <paramref name="recibidoPor"/> se pide en este mismo paso (ver
-    /// <c>ConfirmarRecepcionEditorViewModel</c>, que junta la corrección de líneas y el
-    /// responsable en una sola ventana), no al editar el borrador aparte: es la firma de quien
-    /// tuvo la carga enfrente al momento de confirmar, no un dato de las líneas.
+    /// <c>ConfirmarRecepcionEditorViewModel</c>), no al editar el borrador aparte: es la firma de
+    /// quien tuvo la carga enfrente al momento de confirmar, no un dato de las líneas. Confirmar ya
+    /// no corrige líneas — eso es lo único que hace "Editar" (<see cref="CrearRecepcionDesdeOrdenCompra"/>
+    /// prellena todo lo necesario); si algo queda incompleto, este método lo rechaza señalando que
+    /// se corrija ahí.
     /// </summary>
     public RecepcionMercancia ConfirmarRecepcion(RecepcionMercancia recepcion, string recibidoPor, int usuarioId)
     {
@@ -451,7 +438,8 @@ public sealed class ComprasService
             throw new InvalidOperationException("Debe indicar quién recibió la mercancía.");
 
         if (!RecepcionEstaCompleta(recepcion, out var faltantes))
-            throw new InvalidOperationException($"Faltan datos para confirmar la recepción: {faltantes}.");
+            throw new InvalidOperationException(
+                $"Faltan datos para confirmar la recepción: {faltantes}. Corríjalo con \"Editar\" antes de confirmar.");
 
         var aAplicar = recepcion.Lineas.Where(l => l.CantidadRecibida > 0).ToList();
 
@@ -509,16 +497,14 @@ public sealed class ComprasService
             }
             else
             {
-                // Ya no lo elige el almacenista: se busca por Marca+Clase+Grado+Presentación (todo
-                // ya fijado desde la orden de compra) y se crea si es la primera vez que llega esa
-                // combinación. La presentación entra en la búsqueda porque Unidades solo tiene
-                // sentido dentro de un mismo envase — mezclar barriles y galones en una sola fila
-                // rompería la cuenta.
+                // Ya no lo elige el almacenista: se busca por Marca+Clase+Grado (una sola fila de
+                // existencia por producto, sin importar en qué envase haya llegado cada recepción
+                // — mismo criterio que el "Diesel" general de arriba) y se crea si es la primera
+                // vez que llega ese producto.
                 var lubricante = _lubricantes.GetAll().FirstOrDefault(l =>
                     l.MarcaLubricanteId == linea.MarcaLubricanteId
                     && l.Tipo == linea.ClaseLubricante
-                    && l.GradoViscosidad == linea.TipoLubricante
-                    && l.Presentacion == linea.Presentacion);
+                    && l.GradoViscosidad == linea.TipoLubricante);
 
                 lubricante ??= _lubricantes.Add(new Lubricante
                 {
@@ -526,30 +512,23 @@ public sealed class ComprasService
                     MarcaLubricanteNombre = linea.MarcaLubricanteNombre,
                     Tipo = linea.ClaseLubricante!,
                     GradoViscosidad = linea.TipoLubricante!,
-                    Presentacion = linea.Presentacion!,
-                    Unidades = 0,
+                    ExistenciaL = 0,
                     Activo = true
                 });
 
-                // CantidadRecibida sigue en litros (como toda la cadena Requisición → Orden de
-                // Compra → Recepción); Unidades de Lubricante es la cuenta de envases, así que se
-                // convierte dividiendo por los litros que tiene la presentación elegida.
-                var litrosPorUnidad = Lubricante.LitrosPorPresentacion.GetValueOrDefault(linea.Presentacion!, 1m);
+                // CantidadRecibida ya está en litros (como toda la cadena Requisición → Orden de
+                // Compra → Recepción): se suma directo, sin pasar por ningún envase. La
+                // presentación y LitrosPorEnvase de la línea son solo descriptivos.
                 var actualizado = lubricante.Clonar();
-                actualizado.Unidades += linea.CantidadRecibida / litrosPorUnidad;
+                actualizado.ExistenciaL += linea.CantidadRecibida;
 
-                // El precio de la orden ya es por envase (mismo criterio que Unidades, cargado al
-                // cotizar): se copia tal cual, sin convertir. Es un snapshot del último precio
-                // pagado, no un promedio: la próxima recepción lo vuelve a pisar.
-                var ordenLinea = orden?.Lineas.FirstOrDefault(ol =>
-                    ol.EsLubricante
-                    && ol.MarcaLubricanteId == linea.MarcaLubricanteId
-                    && ol.ClaseLubricante == linea.ClaseLubricante
-                    && ol.TipoLubricante == linea.TipoLubricante
-                    && ol.Presentacion == linea.Presentacion);
-
-                if (ordenLinea is not null)
-                    actualizado.CostoUnitario = ordenLinea.PrecioUnitario;
+                // El precio ya viene copiado 1:1 desde la línea de la orden de compra de origen
+                // (CrearRecepcionDesdeOrdenCompra) — no se busca por Marca+Clase+Grado aquí, porque
+                // una necesidad puede cubrirse con varias líneas que comparten esa combinación
+                // (mismo lubricante en dos presentaciones) y esa búsqueda sería ambigua. Es un
+                // snapshot del último precio pagado, no un promedio: la próxima recepción lo
+                // vuelve a pisar.
+                actualizado.CostoUnitario = linea.PrecioUnitario;
 
                 _lubricantes.Update(actualizado);
 
@@ -579,7 +558,7 @@ public sealed class ComprasService
                 Lineas = orden.Lineas.Select(l => new FacturaProveedorLinea
                 {
                     DestinoTexto = l.DestinoTexto,
-                    CantidadTexto = l.CantidadMostrarTexto,
+                    CantidadTexto = l.CantidadTexto,
                     PrecioUnitario = l.PrecioUnitario,
                     Subtotal = l.Subtotal
                 }).ToList()
@@ -639,9 +618,8 @@ public sealed class ComprasService
                 else if (linea.EsLubricante && linea.LubricanteId is { } lubricanteId
                          && _lubricantes.GetById(lubricanteId) is { } lubricante)
                 {
-                    var litrosPorUnidad = Lubricante.LitrosPorPresentacion.GetValueOrDefault(linea.Presentacion!, 1m);
                     var actualizado = lubricante.Clonar();
-                    actualizado.Unidades -= linea.CantidadRecibida / litrosPorUnidad;
+                    actualizado.ExistenciaL -= linea.CantidadRecibida;
                     _lubricantes.Update(actualizado);
                 }
             }

@@ -217,6 +217,28 @@
     </Style.Triggers>
   </Style>
 
+  <!-- Chip de cobertura de una necesidad en "Comparar proveedores": amarillo por defecto (falta
+       una parte), rojo si no lleva ninguna línea de compra todavía, verde si ya está completa. Es
+       el indicativo de cuándo dejar de agregar líneas contra esa necesidad, así que necesita
+       notarse sin tener que leer los números. -->
+  <Style x:Key="ChipCoberturaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
+    <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding SinCubrir}" Value="True">
+        <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Completo}" Value="True">
+        <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+
   <!-- Chip de estado de una salida de almacén -->
   <Style x:Key="ChipEstadoSalidaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Style.Triggers>

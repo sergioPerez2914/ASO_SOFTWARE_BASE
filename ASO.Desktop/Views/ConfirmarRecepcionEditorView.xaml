@@ -5,46 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:ASO.Desktop.Controls"
              mc:Ignorable="d"
-             d:DesignWidth="760">
+             d:DesignWidth="420">
 
   <StackPanel>
     <TextBlock Text="{Binding ResumenProveedor}" FontSize="12"
                Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" />
 
-    <TextBlock Text="Corrija la cantidad realmente recibida y, si hace falta, la presentación de cada línea de diésel."
-               Style="{StaticResource FormLabelStyle}" />
-
-    <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="240" IsReadOnly="False"
-              ItemsSource="{Binding Lineas}" AutoGenerateColumns="False"
-              CanUserAddRows="False" CanUserDeleteRows="False">
-      <DataGrid.Columns>
-        <controls:ColumnaTexto Header="Tipo" Binding="{Binding TipoInsumoTexto}" Width="7*" MinWidth="55" IsReadOnly="True" />
-        <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="14*" MinWidth="95" IsReadOnly="True" />
-        <controls:ColumnaNumero Header="Pedido" Binding="{Binding CantidadPedidaTexto}" Width="8*" MinWidth="55" IsReadOnly="True" />
-        <DataGridTextColumn Header="Recibido" Width="8*" MinWidth="55"
-                             Binding="{Binding CantidadRecibida, StringFormat=N2, UpdateSourceTrigger=LostFocus}" />
-        <controls:ColumnaTexto Header="Diferencia" Binding="{Binding DiferenciaTexto}" Width="9*" MinWidth="65" IsReadOnly="True" />
-        <controls:ColumnaTexto Header="Marca" Binding="{Binding MarcaLubricanteNombre}" Width="11*" MinWidth="85" IsReadOnly="True" />
-        <controls:ColumnaTexto Header="Clase" Binding="{Binding ClaseLubricante}" Width="9*" MinWidth="65" IsReadOnly="True" />
-        <DataGridTemplateColumn Header="Presentación" Width="14*" MinWidth="110">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate>
-              <Grid>
-                <!-- Diésel: se elige aquí, al confirmar (no hay cisterna que asignar). Lubricante:
-                     ya viene fijada de la orden de compra, solo lectura. -->
-                <ComboBox ItemsSource="{Binding DataContext.PresentacionesCombustible, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          SelectedItem="{Binding Presentacion, UpdateSourceTrigger=PropertyChanged}"
-                          Visibility="{Binding EsDiesel, Converter={StaticResource BoolToVis}}" />
-                <TextBlock Text="{Binding Presentacion}" VerticalAlignment="Center"
-                           Visibility="{Binding EsLubricante, Converter={StaticResource BoolToVis}}" />
-              </Grid>
-            </DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-      </DataGrid.Columns>
-    </DataGrid>
-
-    <controls:FormField Etiqueta="Notas" Margin="0,12,0,0">
+    <controls:FormField Etiqueta="Notas">
       <TextBox Style="{StaticResource FormTextBoxStyle}"
                AcceptsReturn="True" MinLines="2" TextWrapping="Wrap"
                VerticalContentAlignment="Top"
@@ -65,7 +32,7 @@
       </controls:FormField>
     </StackPanel>
 
-    <TextBlock Text="Al confirmar se suma cada línea al stock que le corresponde por lo realmente recibido, no por lo pedido."
+    <TextBlock Text="Al confirmar se suma cada línea al stock que le corresponde por lo realmente recibido, no por lo pedido. Si hace falta corregir una cantidad o una presentación, use &quot;Editar&quot; antes de confirmar."
                FontSize="11" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
