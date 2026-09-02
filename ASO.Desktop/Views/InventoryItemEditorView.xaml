@@ -94,7 +94,7 @@
     </Grid>
 
     <TextBlock Text="Al bajar de la existencia mínima el artículo aparece como «Stock bajo» en el almacén y en el resumen del módulo."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

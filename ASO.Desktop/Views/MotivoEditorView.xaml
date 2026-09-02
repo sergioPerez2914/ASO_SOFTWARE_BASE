@@ -8,7 +8,7 @@
              d:DesignWidth="380">
 
   <StackPanel>
-    <TextBlock Text="{Binding Descripcion}" FontSize="12" TextWrapping="Wrap"
+    <TextBlock Text="{Binding Descripcion}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextSecondaryBrush}" />
 
     <controls:FormField Etiqueta="{Binding EtiquetaMotivo}">
@@ -19,6 +19,6 @@
     </controls:FormField>
 
     <TextBlock Text="Queda registrado junto con la decisión."
-               FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
+               FontSize="{StaticResource FsCaption}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

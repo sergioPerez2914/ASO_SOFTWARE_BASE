@@ -1,4 +1,5 @@
 using System;
+using ASO.Desktop.Controls;
 
 namespace ASO.Desktop.Models;
 
@@ -96,24 +97,24 @@ public class EventoOperacion : IEntidad<int>, IDeOrganizacion
         TipoEventoOperacion.Peticion => "Petición de cambio"
     };
 
-    /// <summary>Glifo de Segoe MDL2 Assets que representa el tipo.</summary>
+    /// <summary>Glifo que representa el tipo. Ver <see cref="Iconos"/>.</summary>
     public string Glifo => Tipo switch
     {
-        TipoEventoOperacion.Registro => "",        // Document
-        TipoEventoOperacion.InicioCarga => "",     // StockUp
-        TipoEventoOperacion.FinCarga => "",        // Package
-        TipoEventoOperacion.CambioTurno => "",     // People
-        TipoEventoOperacion.Mantenimiento => "",   // Repair
-        TipoEventoOperacion.Nota => "",            // ClipboardList
-        TipoEventoOperacion.Confirmacion => "",    // CheckMark
-        TipoEventoOperacion.LlegadaCentral => "",  // MapPin
-        TipoEventoOperacion.Pesaje => "",          // Calculator
-        TipoEventoOperacion.Anulacion => "",       // Cancel
-        TipoEventoOperacion.Facturacion => "",     // Banco
-        TipoEventoOperacion.Cobro => "",           // Finanzas
-        TipoEventoOperacion.Liquidacion => "",     // Liquidaciones
-        TipoEventoOperacion.Edicion => "",         // Edit
-        TipoEventoOperacion.Peticion => ""         // Peticiones
+        TipoEventoOperacion.Registro => Iconos.Registro,
+        TipoEventoOperacion.InicioCarga => Iconos.CargaInicio,
+        TipoEventoOperacion.FinCarga => Iconos.CargaFin,
+        TipoEventoOperacion.CambioTurno => Iconos.CambioTurno,
+        TipoEventoOperacion.Mantenimiento => Iconos.Mantenimiento,
+        TipoEventoOperacion.Nota => Iconos.Nota,
+        TipoEventoOperacion.Confirmacion => Iconos.Confirmacion,
+        TipoEventoOperacion.LlegadaCentral => Iconos.Ubicacion,
+        TipoEventoOperacion.Pesaje => Iconos.Pesaje,
+        TipoEventoOperacion.Anulacion => Iconos.Anulacion,
+        TipoEventoOperacion.Facturacion => Iconos.Factura,
+        TipoEventoOperacion.Cobro => Iconos.Cobro,
+        TipoEventoOperacion.Liquidacion => Iconos.Liquidaciones,
+        TipoEventoOperacion.Edicion => Iconos.Edicion,
+        TipoEventoOperacion.Peticion => Iconos.Peticiones
     };
 
     /// <summary>

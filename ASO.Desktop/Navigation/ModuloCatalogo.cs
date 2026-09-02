@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ASO.Desktop.Controls;
 
 namespace ASO.Desktop.Navigation;
 
@@ -28,7 +29,7 @@ public sealed record Modulo(
 /// Fuente única de la estructura de navegación: cinco módulos, cada uno con sus submódulos.
 /// El sidebar, el lanzador de inicio, los dashboards y el enrutado de MainWindow leen de aquí,
 /// así que agregar o renombrar un submódulo se hace en un solo lugar.
-/// Los iconos son glifos de la fuente Segoe MDL2 Assets.
+/// Los iconos salen de <see cref="Iconos"/> (fuente Phosphor).
 /// </summary>
 public static class ModuloCatalogo
 {
@@ -36,7 +37,7 @@ public static class ModuloCatalogo
         "Inicio",
         "Inicio",
         "Punto de entrada a los cinco módulos del sistema.",
-        "",
+        Iconos.Inicio,
         []);
 
     /// <summary>
@@ -48,7 +49,7 @@ public static class ModuloCatalogo
         "Peticiones",
         "Peticiones",
         "Solicitudes de cambio pendientes de aprobación.",
-        "",
+        Iconos.Peticiones,
         []);
 
     public static IReadOnlyList<Modulo> Modulos { get; } =
@@ -57,74 +58,74 @@ public static class ModuloCatalogo
             "Operaciones",
             "Operaciones",
             "Registro y seguimiento de la operación diaria de cosecha y transporte.",
-            "",
+            Iconos.Operaciones,
             [
                 new Submodulo("Operaciones.Registro", "Registro de Operación",
-                    "Remesas de caña: finca, núcleos, carga y pesaje en el central.", ""),
+                    "Remesas de caña: finca, núcleos, carga y pesaje en el central.", Iconos.Registro),
                 new Submodulo("Operaciones.Seguimiento", "Seguimiento",
-                    "Estado y avance de las operaciones en curso.", ""),
+                    "Estado y avance de las operaciones en curso.", Iconos.Seguimiento),
                 new Submodulo("Operaciones.Fincas", "Fincas",
-                    "Catálogo de fincas del núcleo, con sus lotes y tablones.", "")
+                    "Catálogo de fincas del núcleo, con sus lotes y tablones.", Iconos.Fincas)
             ]),
 
         new Modulo(
             "Flota",
             "Flota",
             "Máquinas y vehículos: disponibilidad, mantenimiento y datos de campo.",
-            "",
+            Iconos.Flota,
             [
                 new Submodulo("Flota.Gestion", "Gestión de Flota",
-                    "Ficha e historial de cada máquina y vehículo.", ""),
+                    "Ficha e historial de cada máquina y vehículo.", Iconos.GestionFlota),
                 new Submodulo("Flota.Mantenimiento", "Mantenimiento",
-                    "Registro de mantenimientos y revisiones recomendadas por uso.", ""),
+                    "Registro de mantenimientos y revisiones recomendadas por uso.", Iconos.Mantenimiento),
                 new Submodulo("Flota.Telemetria", "Telemetría",
-                    "Horómetros, odómetros y lecturas de campo.", "")
+                    "Horómetros, odómetros y lecturas de campo.", Iconos.Telemetria)
             ]),
 
         new Modulo(
             "Inventario",
             "Inventario",
             "Existencias de repuestos, combustible y producto.",
-            "",
+            Iconos.Inventario,
             [
                 new Submodulo("Inventario.Repuestos", "Repuestos",
-                    "Stock de repuestos y consumibles de taller.", ""),
+                    "Stock de repuestos y consumibles de taller.", Iconos.Repuestos),
                 new Submodulo("Inventario.Combustible", "Combustible",
-                    "Existencia en stock, despachos y rendimiento.",""),
+                    "Existencia en stock, despachos y rendimiento.", Iconos.Combustible),
                 new Submodulo("Inventario.Producto", "Producto",
-                    "Caña cosechada y entregada al ingenio.", ""),
+                    "Caña cosechada y entregada al ingenio.", Iconos.Producto),
                 new Submodulo("Inventario.Compras", "Compras",
-                    "Requisiciones y órdenes de compra de combustible y repuestos.", "")
+                    "Requisiciones y órdenes de compra de combustible y repuestos.", Iconos.Compras)
             ]),
 
         new Modulo(
             "Nomina",
             "Nómina",
             "Personal, jornadas y liquidación por destajo.",
-            "",
+            Iconos.Nomina,
             [
                 new Submodulo("Nomina.Liquidaciones", "Liquidaciones",
-                    "Cálculo y cierre de nómina por período.", ""),
+                    "Cálculo y cierre de nómina por período.", Iconos.Liquidaciones),
                 new Submodulo("Nomina.Empleados", "Empleados",
-                    "Padrón de personal, cargos y datos de contratación.", ""),
+                    "Padrón de personal, cargos y datos de contratación.", Iconos.Empleados),
                 new Submodulo("Nomina.Horarios", "Gestión de Horarios",
-                    "Turnos, jornadas y asistencia.", "")
+                    "Turnos, jornadas y asistencia.", Iconos.Horarios)
             ]),
 
         new Modulo(
             "Finanzas",
             "Finanzas",
             "Cobranza, pagos a proveedores y tarifas del servicio.",
-            "",
+            Iconos.Finanzas,
             [
                 new Submodulo("Finanzas.CuentasPorCobrar", "Cuentas por Cobrar",
-                    "Facturación al ingenio y seguimiento de cobros.", ""),
+                    "Facturación al ingenio y seguimiento de cobros.", Iconos.CuentasPorCobrar),
                 new Submodulo("Finanzas.CuentasPorPagar", "Cuentas por Pagar",
-                    "Obligaciones con proveedores y su vencimiento.", ""),
+                    "Obligaciones con proveedores y su vencimiento.", Iconos.CuentasPorPagar),
                 new Submodulo("Finanzas.Tarifas", "Tarifas",
-                    "Precios por tonelada, kilómetro y servicio.", ""),
+                    "Precios por tonelada, kilómetro y servicio.", Iconos.Tarifas),
                 new Submodulo("Finanzas.Banco", "Banco",
-                    "Estado de la cuenta según lo cobrado y pagado en la aplicación.", "")
+                    "Estado de la cuenta según lo cobrado y pagado en la aplicación.", Iconos.Banco)
             ])
     ];
 
@@ -137,9 +138,9 @@ public static class ModuloCatalogo
         "Administracion",
         "Administración",
         "Núcleos, usuarios, roles y permisos.",
-        // Era , el mismo glifo que Nomina - Empleados: dos entradas del menu con el
-        // mismo icono. Este (Permissions) dice ademas de que va la seccion.
-        "",
+        // Era el mismo glifo que Nomina - Empleados: dos entradas del menu con el mismo
+        // icono. El escudo dice ademas de que va la seccion.
+        Iconos.Administracion,
         []);
 
     /// <summary>
@@ -152,7 +153,7 @@ public static class ModuloCatalogo
         "Configuracion",
         "Configuración",
         "Apariencia, tu cuenta y las preferencias de la aplicación.",
-        "",
+        Iconos.Configuracion,
         []);
 
     /// <summary>Los módulos fijados que se listan arriba, en orden de menú.</summary>

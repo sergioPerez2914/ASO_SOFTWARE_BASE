@@ -23,7 +23,7 @@ public class SearchBox : Control
 
     public static readonly DependencyProperty SugerenciaProperty =
         DependencyProperty.Register(nameof(Sugerencia), typeof(string), typeof(SearchBox),
-            new PropertyMetadata("Buscar…"));
+            new PropertyMetadata("Buscar"));
 
     public string Texto
     {
@@ -31,7 +31,13 @@ public class SearchBox : Control
         set => SetValue(TextoProperty, value);
     }
 
-    /// <summary>Lo que se lee dentro de la caja vacía. Debe decir sobre qué campos busca.</summary>
+    /// <summary>
+    /// Lo que se lee dentro de la caja vacía. Por defecto "Buscar", y las pantallas NO lo
+    /// sobrescriben: las veinticinco cajas decían cada una sobre qué campos buscaba
+    /// ("Buscar por código, nombre, categoría o ubicación"), un rótulo largo y distinto en cada
+    /// pantalla que llenaba de texto la barra de herramientas para decir algo que se descubre
+    /// escribiendo. La propiedad se conserva por si alguna caja necesita otra cosa.
+    /// </summary>
     public string Sugerencia
     {
         get => (string)GetValue(SugerenciaProperty);

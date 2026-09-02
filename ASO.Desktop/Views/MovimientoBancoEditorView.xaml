@@ -84,7 +84,7 @@
       </StackPanel>
     </Grid>
 
-    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,10,0,0"
+    <TextBlock TextWrapping="Wrap" FontSize="{StaticResource FsCaption}" Margin="0,8,0,0"
                Foreground="{DynamicResource TextMutedBrush}"
                Text="Aquí solo se registra lo que no viene de ningún documento. Un cobro o un pago se registran desde su factura y bajan solos al libro: tecleárlos otra vez contaría el mismo dinero dos veces." />
   </StackPanel>

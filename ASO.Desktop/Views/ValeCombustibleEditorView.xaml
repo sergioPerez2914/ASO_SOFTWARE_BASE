@@ -48,7 +48,7 @@
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="{Binding AyudaLectura}" FontSize="11" TextWrapping="Wrap"
+    <TextBlock Text="{Binding AyudaLectura}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <controls:FormField Etiqueta="Responsable del despacho">
@@ -64,7 +64,7 @@
     </controls:FormField>
 
     <TextBlock Text="Al confirmar el vale se descuenta el stock de combustible, se calcula el consumo del período y se actualiza la lectura del activo."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

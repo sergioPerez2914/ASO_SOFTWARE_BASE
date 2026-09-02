@@ -7,7 +7,7 @@
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -18,7 +18,7 @@
                          Titulo="{Binding Submodulo.Nombre}"
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -31,7 +31,6 @@
 
         <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por código CAM, nombre o dueño"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
         </WrapPanel>
 
@@ -63,7 +62,7 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xE707;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Fincas}"
                              Titulo="No hay fincas registradas"
                              Detalle="Una finca agrupa sus lotes y tablones; registra la primera."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />

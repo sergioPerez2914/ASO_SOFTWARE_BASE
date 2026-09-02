@@ -11,7 +11,7 @@
         MinHeight="640" MinWidth="1024"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}"
-        FontFamily="Segoe UI">
+        FontFamily="{StaticResource AppFont}">
 
   <!-- Recarga manual. Las pantallas se actualizan solas tras cada escritura (ver
        Services/CambiosDeDatos.cs) y por eso ninguna barra trae ya un boton "Actualizar"; F5
@@ -46,10 +46,12 @@
          sin hijos, sin Click y sin Command: decoracion inerte en el sitio mas visible de la
          ventana. Ese espacio es ahora la ruta de la seccion abierta, que es lo unico que hacia
          falta y no estaba: donde estoy y como vuelvo. -->
-    <Border Grid.Row="0" Grid.ColumnSpan="2"
+    <!-- MinHeight: sin el, la barra crecia y encogia segun que chips estuvieran visibles, asi que
+         entrar a una pantalla podia mover toda la interfaz un par de pixeles hacia abajo. -->
+    <Border Grid.Row="0" Grid.ColumnSpan="2" MinHeight="44"
             Background="{DynamicResource SurfaceBrush}"
             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
-            Padding="20,8">
+            Padding="16,6">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*" />
@@ -59,37 +61,32 @@
         <controls:Breadcrumb x:Name="Ruta" Grid.Column="0" />
 
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-          <!-- Saber sobre que nucleo se esta escribiendo importa antes de guardar nada. -->
-          <Border x:Name="NucleoChip" VerticalAlignment="Center" Margin="0,0,12,0"
-                  CornerRadius="{StaticResource RadPill}" Padding="{StaticResource TkChip}"
-                  Visibility="Collapsed"
-                  BorderThickness="{StaticResource BdFino}"
-                  Background="{DynamicResource InfoSoftBrush}"
-                  BorderBrush="{DynamicResource InfoTextBrush}">
+          <!-- Saber sobre que nucleo y que zafra se esta escribiendo importa antes de guardar
+               nada. Los dos chips estaban escritos dos veces con el mismo marcado; ahora
+               comparten ChipContextoStyle. Colapsados si no hay nada que decir (instalacion
+               nueva, o la zafra quedo cerrada sin abrir la siguiente). -->
+          <Border x:Name="NucleoChip" Style="{StaticResource ChipContextoStyle}"
+                  Visibility="Collapsed">
             <TextBlock x:Name="NucleoActualLabel"
                        FontSize="{StaticResource FsMicro}"
-                       FontWeight="{StaticResource FwMedium}"
-                       Foreground="{DynamicResource InfoTextBrush}" />
+                       FontWeight="{StaticResource FwMedium}" />
           </Border>
 
-          <!-- Sobre que zafra se esta escribiendo: la misma razon que el NucleoChip. Igual que
-               el, colapsado si no hay ninguna abierta (instalacion nueva, o quedo cerrada sin
-               abrir la siguiente). -->
-          <Border x:Name="ZafraChip" VerticalAlignment="Center" Margin="0,0,12,0"
-                  CornerRadius="{StaticResource RadPill}" Padding="{StaticResource TkChip}"
-                  Visibility="Collapsed"
-                  BorderThickness="{StaticResource BdFino}"
-                  Background="{DynamicResource InfoSoftBrush}"
-                  BorderBrush="{DynamicResource InfoTextBrush}">
+          <Border x:Name="ZafraChip" Style="{StaticResource ChipContextoStyle}"
+                  Visibility="Collapsed">
             <TextBlock x:Name="ZafraActualLabel"
                        FontSize="{StaticResource FsMicro}"
-                       FontWeight="{StaticResource FwMedium}"
-                       Foreground="{DynamicResource InfoTextBrush}" />
+                       FontWeight="{StaticResource FwMedium}" />
           </Border>
 
+          <!-- Separador: quien eres y como sales son una cosa aparte del contexto de la
+               izquierda, y sin nada que los agrupe la barra era una fila de trastos sueltos. -->
+          <Border Width="1" Margin="4,0,12,0" VerticalAlignment="Stretch"
+                  Background="{DynamicResource BorderBrush}" />
+
           <TextBlock x:Name="UsuarioActualLabel" VerticalAlignment="Center"
-                     FontSize="{StaticResource FsBody}"
-                     Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0" />
+                     FontSize="{StaticResource FsCaption}"
+                     Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,4,0" />
 
           <Button Content="Cerrar sesión" Style="{StaticResource SecondaryButtonStyle}"
                   ToolTip="Salir de la sesión y volver al inicio de sesión"

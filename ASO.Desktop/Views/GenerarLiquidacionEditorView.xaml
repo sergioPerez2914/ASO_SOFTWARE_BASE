@@ -10,7 +10,7 @@
   <StackPanel>
     <TextBlock Text="A quién se liquida" Style="{StaticResource FormLabelStyle}" />
     <StackPanel Orientation="Horizontal">
-      <RadioButton Content="Núcleo (destajo)" GroupName="SujetoLiquidacion" Margin="0,0,6,0"
+      <RadioButton Content="Núcleo (destajo)" GroupName="SujetoLiquidacion" Margin="0,0,8,0"
                    Style="{StaticResource RangeToggleStyle}"
                    IsChecked="{Binding EsNucleo, Mode=OneWay}"
                    Command="{Binding CambiarSujetoCommand}" CommandParameter="Nucleo" />
@@ -57,11 +57,11 @@
       </StackPanel>
     </Grid>
 
-    <TextBlock Text="{Binding AyudaSujeto}" FontSize="11" TextWrapping="Wrap"
+    <TextBlock Text="{Binding AyudaSujeto}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
 
     <TextBlock Text="Las remesas ya incluidas en otra liquidación no se vuelven a contar."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
   </StackPanel>
 </UserControl>

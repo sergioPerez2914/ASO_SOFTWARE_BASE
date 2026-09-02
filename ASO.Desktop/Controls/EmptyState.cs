@@ -15,7 +15,7 @@ public class EmptyState : ContentControl
 {
     public static readonly DependencyProperty IconoProperty =
         DependencyProperty.Register(nameof(Icono), typeof(string), typeof(EmptyState),
-            new PropertyMetadata("\uE7C3"));
+            new PropertyMetadata(Iconos.Registro));
 
     public static readonly DependencyProperty TituloProperty =
         DependencyProperty.Register(nameof(Titulo), typeof(string), typeof(EmptyState),
@@ -40,7 +40,7 @@ public class EmptyState : ContentControl
         set => SetValue(CompactoProperty, value);
     }
 
-    /// <summary>Glifo de Segoe MDL2 Assets. Por defecto, la hoja en blanco.</summary>
+    /// <summary>Glifo de <see cref="Iconos"/>. Por defecto, la hoja en blanco.</summary>
     public string Icono
     {
         get => (string)GetValue(IconoProperty);

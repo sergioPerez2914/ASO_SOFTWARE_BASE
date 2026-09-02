@@ -8,7 +8,7 @@
              d:DesignHeight="640" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -20,7 +20,7 @@
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
     <!-- Barra de herramientas: búsqueda, filtro por ámbito y acciones -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -33,7 +33,6 @@
 
         <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por concepto, servicio, unidad o ámbito"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -85,7 +84,7 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xE8EF;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Tarifas}"
                              Titulo="No hay tarifas cargadas"
                              Detalle="Sin tarifario no se puede facturar ni liquidar: carga la primera."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />

@@ -8,7 +8,7 @@
              d:DesignHeight="640" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -34,8 +34,7 @@
                    IsChecked="{Binding EsSalidas, Mode=TwoWay}" />
     </StackPanel>
 
-    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
-            Background="{DynamicResource BorderBrush}" />
+    <Border Grid.Row="1" Style="{StaticResource TabStripStyle}" VerticalAlignment="Bottom" />
 
     <!-- Existencias del almacén -->
     <Grid Grid.Row="2" Margin="0,16,0,0"
@@ -45,7 +44,7 @@
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -58,7 +57,6 @@
 
           <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
             <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                                Sugerencia="Buscar por código, nombre, categoría o ubicación"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
             <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -118,7 +116,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <controls:EmptyState Icono="&#xE950;"
+          <controls:EmptyState Icono="{x:Static controls:Iconos.Repuestos}"
                                Titulo="No hay artículos en el catálogo"
                                Detalle="Da de alta un repuesto o consumible para controlar su existencia."
                                Visibility="{Binding HasItems, ElementName=Tabla1, Converter={StaticResource SinItemsAVis}}" />
@@ -134,7 +132,7 @@
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -147,7 +145,6 @@
 
           <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
             <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                                Sugerencia="Buscar por artículo, destino o motivo"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
             <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -204,7 +201,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <controls:EmptyState Icono="&#xE7B8;"
+          <controls:EmptyState Icono="{x:Static controls:Iconos.Inventario}"
                                Titulo="No hay salidas de almacén"
                                Detalle="Las salidas descuentan existencia y cargan el costo al activo."
                                Visibility="{Binding HasItems, ElementName=Tabla2, Converter={StaticResource SinItemsAVis}}" />

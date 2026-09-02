@@ -1,0 +1,249 @@
+﻿<UserControl x:Class="ASO.Desktop.Views.BoletoCentralEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:ASO.Desktop.Controls"
+             mc:Ignorable="d"
+             d:DesignWidth="900">
+
+  <UserControl.Resources>
+    <!-- Una diferencia contra el tarifario se lee de un vistazo por el color, no leyendo el número. -->
+    <Style x:Key="DiferenciaStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource FsBody}" />
+      <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Cuadra}" Value="True">
+          <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Resources>
+
+  <StackPanel>
+    <TextBlock Text="{Binding ResumenRemesa}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
+               Foreground="{DynamicResource TextSecondaryBrush}" />
+    <TextBlock Text="{Binding FinCargaTexto}" FontSize="{StaticResource FsMicro}" Margin="0,4,0,0"
+               Foreground="{DynamicResource TextMutedBrush}" />
+
+    <Grid Margin="0,12,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="12" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <!-- ===== Identificación y pesaje ===== -->
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="El boleto" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,4" />
+
+        <controls:FormField Etiqueta="Nº de boleto">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding Numero, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="El número de formulario impreso en el boleto del central" />
+        </controls:FormField>
+
+        <TextBlock Text="Llegada al central (fecha y hora)" Style="{StaticResource FormLabelStyle}" />
+        <StackPanel Orientation="Horizontal">
+          <DatePicker Style="{StaticResource FormDatePickerStyle}" Width="150"
+                      SelectedDate="{Binding LlegadaFecha}" />
+          <TextBox Style="{StaticResource FormTextBoxStyle}" Width="70" Margin="8,0,0,0"
+                   Text="{Binding LlegadaHora, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Hora en formato HH:mm" />
+        </StackPanel>
+
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <controls:FormField Grid.Column="0" Etiqueta="Peso bruto (t)">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding PesoBrutoTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+          <controls:FormField Grid.Column="2" Etiqueta="Tara (t)">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding TaraTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+        </Grid>
+
+        <Border Style="{StaticResource AlertBoxStyle}" Margin="0,12,0,0"
+                Background="{DynamicResource BackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Peso neto (t):" FontSize="{StaticResource FsCaption}" VerticalAlignment="Center"
+                       Foreground="{DynamicResource TextSecondaryBrush}" />
+            <TextBlock Text="{Binding PesoNetoTexto}" Style="{StaticResource FormValorCalculadoStyle}"
+                       Margin="8,0,0,0" />
+          </StackPanel>
+        </Border>
+
+        <!-- ===== Calidad ===== -->
+        <TextBlock Text="Calidad de la caña" Style="{StaticResource CardTitleStyle}" Margin="0,24,0,0" />
+        <TextBlock Text="Lo que reporta el laboratorio. Se guarda como referencia: el cobro sigue siendo tarifa × toneladas netas."
+                   FontSize="{StaticResource FsMicro}" TextWrapping="Wrap" Margin="0,4,0,0"
+                   Foreground="{DynamicResource TextMutedBrush}" />
+
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <controls:FormField Grid.Column="0" Etiqueta="ATR">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding AtrTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+          <controls:FormField Grid.Column="2" Etiqueta="Fibra (%)">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding FibraTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+          <controls:FormField Grid.Column="4" Etiqueta="Pureza (%)">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding PurezaTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+        </Grid>
+
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <controls:FormField Grid.Column="0" Etiqueta="Trash mineral (%)">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding TrashMineralTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+          <controls:FormField Grid.Column="2" Etiqueta="Trash vegetal (%)">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding TrashVegetalTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+        </Grid>
+      </StackPanel>
+
+      <!-- ===== Montos del central ===== -->
+      <StackPanel Grid.Column="2">
+        <TextBlock Text="Montos que declara el central" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,4" />
+
+        <controls:FormField Etiqueta="Caña entregada">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding CanaEntregadaTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+
+        <TextBlock Text="Descuentos" Style="{StaticResource FormLabelStyle}" Margin="0,12,0,0" />
+
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <controls:FormField Grid.Column="0" Etiqueta="Corte">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding DescuentoCorteTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+          <controls:FormField Grid.Column="2" Etiqueta="Alza y empuje">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding DescuentoAlzaEmpujeTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+          <controls:FormField Grid.Column="4" Etiqueta="Transporte">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding DescuentoTransporteTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+        </Grid>
+
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <controls:FormField Grid.Column="0" Etiqueta="Administración">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding DescuentoAdministracionTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+          <controls:FormField Grid.Column="2" Etiqueta="Rural">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding DescuentoRuralTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+          <controls:FormField Grid.Column="4" Etiqueta="Investigación">
+            <TextBox Style="{StaticResource FormTextBoxStyle}"
+                     Text="{Binding DescuentoInvestigacionTexto, UpdateSourceTrigger=PropertyChanged}" />
+          </controls:FormField>
+        </Grid>
+
+        <controls:FormField Etiqueta="Valor líquido">
+          <TextBox Style="{StaticResource FormTextBoxStyle}"
+                   Text="{Binding ValorLiquidoTexto, UpdateSourceTrigger=PropertyChanged}" />
+        </controls:FormField>
+
+        <!-- ===== Comparación con el tarifario ===== -->
+        <Border Style="{StaticResource CardStyle}" Margin="0,24,0,0">
+          <StackPanel>
+            <TextBlock Text="¿Cuadra con el tarifario?" Style="{StaticResource CardTitleStyle}" />
+            <TextBlock Text="{Binding AvisoComparacion}" FontSize="{StaticResource FsCaption}"
+                       TextWrapping="Wrap" Margin="0,4,0,0">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                  <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding HayDiferencia}" Value="True">
+                      <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+                      <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+
+            <Grid Margin="0,8,0,4">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="90" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="1" Text="Tarifario" HorizontalAlignment="Right"
+                         FontSize="{StaticResource FsMicro}" Foreground="{DynamicResource TextMutedBrush}" />
+              <TextBlock Grid.Column="2" Text="Boleto" HorizontalAlignment="Right"
+                         FontSize="{StaticResource FsMicro}" Foreground="{DynamicResource TextMutedBrush}" />
+              <TextBlock Grid.Column="3" Text="Diferencia" HorizontalAlignment="Right"
+                         FontSize="{StaticResource FsMicro}" Foreground="{DynamicResource TextMutedBrush}" />
+            </Grid>
+
+            <ItemsControl ItemsSource="{Binding Comparacion}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid Margin="0,4">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="90" />
+                      <ColumnDefinition Width="90" />
+                      <ColumnDefinition Width="90" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Servicio}" FontSize="{StaticResource FsBody}"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <TextBlock Grid.Column="1" Text="{Binding EsperadoTexto}" HorizontalAlignment="Right"
+                               FontSize="{StaticResource FsBody}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                    <TextBlock Grid.Column="2" Text="{Binding DeclaradoTexto}" HorizontalAlignment="Right"
+                               FontSize="{StaticResource FsBody}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                    <TextBlock Grid.Column="3" Text="{Binding DiferenciaTexto}" Style="{StaticResource DiferenciaStyle}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </Grid>
+  </StackPanel>
+</UserControl>

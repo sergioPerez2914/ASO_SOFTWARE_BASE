@@ -9,7 +9,7 @@ namespace ASO.Desktop.ViewModels;
 
 /// <summary>
 /// Operaciones · Registro de Operación: listado de Remesas de caña con su alta/edición y las
-/// transiciones de estado (confirmar, anular, registrar recepción).
+/// transiciones de estado (confirmar, anular, cargar el boleto del central).
 ///
 /// Las reglas viven en <see cref="RemesaService"/>; aquí solo se pide la acción y se refleja
 /// el resultado. Si el servicio rechaza una transición, se informa al usuario en vez de tragarse
@@ -26,6 +26,9 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
     private readonly IFincaDataSource _fincas;
     private readonly IPersonalCampoDataSource _personal;
     private readonly IActivoFlotaDataSource _vehiculos;
+
+    /// <summary>Lo usa el boleto para comparar lo que reconoce el central con lo que dice el tarifario.</summary>
+    private readonly TarifaService _tarifas;
 
     /// <summary>Se dispara al pedir volver al dashboard del módulo; la ventana principal navega.</summary>
 
@@ -48,6 +51,7 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
         _fincas = DataSourceFactory.CrearFincas();
         _personal = DataSourceFactory.CrearPersonalCampo();
         _vehiculos = DataSourceFactory.CrearActivosFlota();
+        _tarifas = new TarifaService(DataSourceFactory.CrearTarifas(), sesion);
 
         ConfirmarCommand = new RelayCommand(Confirmar,
             () => SelectedItem is { } r && _servicio.PuedeConfirmar(r) && _sesionActual.Puede("Remesas.Confirmar"));
@@ -57,8 +61,8 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
         AnularCommand = new RelayCommand(Anular,
             () => SelectedItem is { } r && _servicio.PuedeAnular(r) && _solicitudes.PuedeIntentar(Permisos.Remesas.Anular));
 
-        RegistrarRecepcionCommand = new RelayCommand(RegistrarRecepcion,
-            () => SelectedItem is { } r && _servicio.PuedeRegistrarRecepcion(r) && _solicitudes.PuedeIntentar(Permisos.Remesas.Recepcion));
+        CargarBoletoCommand = new RelayCommand(CargarBoleto,
+            () => SelectedItem is { } r && _servicio.PuedeCargarBoleto(r) && _solicitudes.PuedeIntentar(Permisos.Remesas.Recepcion));
 
         CambiarFiltroEstadoCommand = new RelayCommand<string>(filtro =>
         {
@@ -71,7 +75,7 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
 
     public ICommand ConfirmarCommand { get; }
     public ICommand AnularCommand { get; }
-    public ICommand RegistrarRecepcionCommand { get; }
+    public ICommand CargarBoletoCommand { get; }
     public ICommand CambiarFiltroEstadoCommand { get; }
 
     protected override string ModuloPermiso => "Remesas";
@@ -101,8 +105,14 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
         CreadoPorId = _sesionActual.UsuarioActual?.Id ?? 0
     };
 
+    /// <summary>
+    /// El alta y la edición no piden lo mismo. Al crear, lo único que se sabe es cuándo empezó la
+    /// carga; el resto del papel se conoce después y se completa con "Editar" antes de confirmar.
+    /// </summary>
     protected override CrudEditorViewModelBase<Remesa> CrearEditor(Remesa item)
-        => new RemesaEditorViewModel(item, _fincas, _personal, _vehiculos);
+        => item.Id == 0
+            ? new NuevaRemesaEditorViewModel(item)
+            : new RemesaEditorViewModel(item, _fincas, _personal, _vehiculos);
 
     // Una remesa deja de ser editable en cuanto se confirma.
     protected override bool PuedeEditar(Remesa item) => _servicio.PuedeEditar(item);
@@ -146,23 +156,24 @@ public sealed class RegistroOperacionViewModel : PantallaCrudViewModel<Remesa, i
         Aplicar(() => _servicio.Anular(remesa, editor.Motivo));
     }
 
-    private void RegistrarRecepcion()
+    private void CargarBoleto()
     {
         if (SelectedItem is not { } remesa)
             return;
 
         if (_solicitudes.RequierePeticion(Permisos.Remesas.Recepcion))
         {
-            _solicitudes.Solicitar(Permisos.Remesas.Recepcion, "Registrar recepción de remesa",
+            _solicitudes.Solicitar(Permisos.Remesas.Recepcion, "Cargar el boleto del central",
                 nameof(Remesa), remesa.Id.ToString(), Describir(remesa));
             return;
         }
 
-        var editor = new RecepcionRemesaEditorViewModel(remesa);
+        var editor = new BoletoCentralEditorViewModel(remesa, _tarifas);
         if (!_dialogos.MostrarEditor(editor))
             return;
 
-        Aplicar(() => _servicio.RegistrarRecepcion(remesa, editor.Llegada, editor.PesoBrutoT, editor.TaraT));
+        Aplicar(() => _servicio.RegistrarBoleto(remesa, editor.Llegada, editor.PesoBrutoT, editor.TaraT,
+                                                editor.Boleto));
     }
 
     /// <summary>

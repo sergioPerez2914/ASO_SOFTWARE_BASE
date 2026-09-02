@@ -7,7 +7,7 @@
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -29,19 +29,18 @@
                    IsChecked="{Binding EsZafra, Mode=TwoWay}" />
     </StackPanel>
 
-    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
-            Background="{DynamicResource BorderBrush}" />
+    <Border Grid.Row="1" Style="{StaticResource TabStripStyle}" VerticalAlignment="Bottom" />
 
     <!-- Ficha del nucleo instalado: no es un padron, es la unica fila -->
-    <Grid Grid.Row="2" Margin="0,20,0,0" Visibility="{Binding MostrarNucleo, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,24,0,0" Visibility="{Binding MostrarNucleo, Converter={StaticResource BoolToVis}}">
       <Border DataContext="{Binding Nucleo}" Style="{StaticResource CardStyle}"
               VerticalAlignment="Top" HorizontalAlignment="Left" Width="460">
         <StackPanel>
-          <TextBlock Text="Datos del núcleo" FontSize="{StaticResource FsTitle}" FontWeight="Bold"
+          <TextBlock Text="Datos del núcleo" FontSize="{StaticResource FsTitle}" FontWeight="{StaticResource FwBold}"
                      Foreground="{DynamicResource TextPrimaryBrush}" />
           <TextBlock Text="Una instalación atiende a un solo núcleo. El C.O.D es el que estampan las remesas, las liquidaciones y las facturas."
                      FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
-                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,10" />
+                     Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,8" />
 
           <TextBlock Text="Nombre" Style="{StaticResource FormLabelStyle}" />
           <TextBox Style="{StaticResource FormTextBoxStyle}"
@@ -64,7 +63,7 @@
     </Grid>
 
     <!-- Usuarios y sus permisos: maestro-detalle, se ve a quien se esta editando todo el tiempo -->
-    <Grid Grid.Row="2" Margin="0,20,0,0" Visibility="{Binding MostrarUsuarios, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,24,0,0" Visibility="{Binding MostrarUsuarios, Converter={StaticResource BoolToVis}}">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="380" />
         <ColumnDefinition Width="12" />
@@ -78,7 +77,7 @@
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+        <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
           <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto" />
@@ -87,7 +86,6 @@
 
             <WrapPanel Grid.Row="0" VerticalAlignment="Center">
               <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                                  Sugerencia="Buscar por usuario, nombre o rol"
                                   Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
             </WrapPanel>
 
@@ -114,7 +112,7 @@
               </DataGrid.Columns>
             </DataGrid>
 
-            <controls:EmptyState Icono="&#xE77B;"
+            <controls:EmptyState Icono="{x:Static controls:Iconos.Usuarios}"
                                  Titulo="No hay usuarios que mostrar"
                                  Detalle="Cambia la búsqueda, o crea el primer usuario del núcleo."
                                  Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
@@ -149,9 +147,9 @@
             </TextBlock.Style>
           </TextBlock>
 
-          <StackPanel Grid.Row="0" Margin="0,0,0,10"
+          <StackPanel Grid.Row="0" Margin="0,0,0,8"
                       Visibility="{Binding HayUsuario, Converter={StaticResource BoolToVis}}">
-            <TextBlock Text="{Binding Encabezado}" FontSize="{StaticResource FsTitle}" FontWeight="Bold"
+            <TextBlock Text="{Binding Encabezado}" FontSize="{StaticResource FsTitle}" FontWeight="{StaticResource FwBold}"
                        Foreground="{DynamicResource TextPrimaryBrush}" />
             <TextBlock Text="Marcado = lo puede hacer. Lo que se aparta de su rol queda señalado como concedido o revocado."
                        FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
@@ -168,7 +166,7 @@
                 <GroupStyle>
                   <GroupStyle.HeaderTemplate>
                     <DataTemplate>
-                      <TextBlock Text="{Binding Name}" FontSize="{StaticResource FsBody}" FontWeight="Bold"
+                      <TextBlock Text="{Binding Name}" FontSize="{StaticResource FsBody}" FontWeight="{StaticResource FwBold}"
                                  Foreground="{DynamicResource TextSecondaryBrush}"
                                  Margin="0,12,0,4" />
                     </DataTemplate>
@@ -178,7 +176,7 @@
 
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Grid Margin="8,2,0,2">
+                  <Grid Margin="8,4,0,4">
                     <Grid.ColumnDefinitions>
                       <ColumnDefinition Width="*" />
                       <ColumnDefinition Width="Auto" />
@@ -218,14 +216,14 @@
     </Grid>
 
     <!-- Catálogo de zafras: a lo sumo una Abierta a la vez -->
-    <Grid Grid.Row="2" Margin="0,20,0,0" Visibility="{Binding MostrarZafra, Converter={StaticResource BoolToVis}}">
+    <Grid Grid.Row="2" Margin="0,24,0,0" Visibility="{Binding MostrarZafra, Converter={StaticResource BoolToVis}}">
     <Grid DataContext="{Binding Zafras}">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -233,7 +231,6 @@
           </Grid.RowDefinitions>
 
           <controls:SearchBox Grid.Row="0" Width="280" HorizontalAlignment="Left"
-                              Sugerencia="Buscar por código"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
@@ -270,7 +267,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <controls:EmptyState Icono="&#xE787;"
+          <controls:EmptyState Icono="{x:Static controls:Iconos.Zafra}"
                                Titulo="No hay zafras registradas"
                                Detalle="Da de alta la primera con &quot;Nueva zafra&quot;."
                                Visibility="{Binding HasItems, ElementName=TablaZafras, Converter={StaticResource SinItemsAVis}}" />

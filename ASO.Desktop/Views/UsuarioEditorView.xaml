@@ -26,14 +26,14 @@
     </controls:FormField>
 
     <controls:FormField Etiqueta="{Binding EtiquetaPassword}">
-      <PasswordBox x:Name="PasswordBox" Padding="8,6" PasswordChanged="OnPasswordChanged" />
+      <PasswordBox x:Name="PasswordBox" Padding="8,8" PasswordChanged="OnPasswordChanged" />
     </controls:FormField>
 
-    <CheckBox Content="Activo" Margin="0,14,0,0" Cursor="Hand"
+    <CheckBox Content="Activo" Margin="0,16,0,0" Cursor="Hand"
               IsChecked="{Binding Activo}" />
 
     <TextBlock Text="El usuario queda en el núcleo activo y solo verá los datos de ese núcleo. La contraseña se guarda cifrada; no se puede consultar después, solo reemplazar."
-               FontSize="11" TextWrapping="Wrap"
-               Foreground="{DynamicResource TextMutedBrush}" Margin="0,10,0,0" />
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

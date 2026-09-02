@@ -14,7 +14,7 @@
          Acciones sobre la fila seleccionada
          Tarjeta con la tabla y su estado vacio encima      -->
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -32,7 +32,7 @@
 
          El WrapPanel no es adorno: el buscador ocupa 280 px y detras van cinco pastillas, que en
          la ventana minima no caben en una linea. Asi bajan de fila en vez de recortarse. -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -45,7 +45,6 @@
 
         <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por Nº, finca, placa, personal o núcleo"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -69,8 +68,9 @@
                   Command="{Binding EditarCommand}" />
           <Button Content="Confirmar" Style="{StaticResource SecondaryButtonStyle}"
                   Command="{Binding ConfirmarCommand}" />
-          <Button Content="Registrar recepción" Style="{StaticResource SecondaryButtonStyle}"
-                  Command="{Binding RegistrarRecepcionCommand}" />
+          <Button Content="Cargar boleto" Style="{StaticResource SecondaryButtonStyle}"
+                  ToolTip="Cerrar la remesa con el boleto que emitió el central"
+                  Command="{Binding CargarBoletoCommand}" />
           <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
                   Foreground="{DynamicResource DangerTextBrush}"
                   Command="{Binding AnularCommand}" />
@@ -111,7 +111,7 @@
 
         <!-- Una tabla sin filas se veia como un encabezado de columnas y espacio en blanco
              debajo, sin distinguir "todavia no hay nada" de "el filtro no encontro nada". -->
-        <controls:EmptyState Icono="&#xE7C3;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Registro}"
                              Titulo="No hay remesas que mostrar"
                              Detalle="Cambia el filtro o la búsqueda, o registra la primera remesa del día."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}">

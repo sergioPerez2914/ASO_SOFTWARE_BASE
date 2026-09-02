@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.ModuloDashboardView"
+﻿<UserControl x:Class="ASO.Desktop.Views.ModuloDashboardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -62,7 +62,7 @@
                Margin="{StaticResource TkEtiqueta}" />
 
     <ItemsControl Grid.Row="4" ItemsSource="{Binding Submodulos}" VerticalAlignment="Top"
-                  Margin="0,6,0,0">
+                  Margin="0,8,0,0">
       <ItemsControl.ItemsPanel>
         <ItemsPanelTemplate>
           <WrapPanel />
@@ -70,8 +70,7 @@
       </ItemsControl.ItemsPanel>
       <ItemsControl.ItemTemplate>
         <DataTemplate>
-          <Button Style="{StaticResource CardButtonStyle}" Margin="0,0,12,12"
-                  Padding="{StaticResource TkTarjeta}"
+          <Button Style="{StaticResource CardButtonStyle}" Margin="{StaticResource TkEntreTarjetas}"
                   Width="280" VerticalAlignment="Top"
                   AutomationProperties.Name="{Binding Nombre}"
                   ToolTip="{Binding Descripcion}"
@@ -82,15 +81,16 @@
               <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding Icono}" FontFamily="{StaticResource IconFont}"
                            FontSize="{StaticResource FsTitle}"
-                           Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center" />
+                           Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding Nombre}"
                            FontSize="{StaticResource FsSubtitle}"
                            FontWeight="{StaticResource FwMedium}"
                            Foreground="{DynamicResource TextPrimaryBrush}"
-                           VerticalAlignment="Center" Margin="10,0,0,0" TextWrapping="Wrap" />
+                           VerticalAlignment="Center" Margin="8,0,0,0" TextWrapping="Wrap" />
               </StackPanel>
               <TextBlock Text="{Binding Descripcion}"
                          FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
+                         LineHeight="16" LineStackingStrategy="BlockLineHeight"
                          Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,0" />
             </StackPanel>
           </Button>

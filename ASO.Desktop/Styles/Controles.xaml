@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:p="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
                     xmlns:c="clr-namespace:ASO.Desktop.Controls">
@@ -40,25 +40,35 @@
          volvia una pastilla clara. Solo Flota se libraba, porque define su propio estilo.
 
          El realce va en un VELO translucido encima y no cambiando el Background, porque cada
-         boton trae el suyo (azul primario, transparente, rojo de emergencia) y sustituirlo lo
-         perderia. El velo oscurece en el tema claro y aclara en el oscuro. -->
+         boton trae el suyo (verde primario, transparente, rojo de emergencia) y sustituirlo lo
+         perderia. El velo oscurece en el tema claro y aclara en el oscuro.
+
+         El velo entra y sale con un fundido de 120 ms, y lo que se anima es su OPACIDAD, no su
+         color: los brushes de la paleta estan congelados y animarlos lanza (ver Services/Tema.cs).
+         El pulsado, en cambio, cambia en seco: una pulsacion tiene que sentirse inmediata.
+
+         MinHeight fija el alto de todos los botones. Con solo Padding, dos botones con textos de
+         distinta altura de linea salian de distinto tamano y la barra de acciones quedaba
+         dentada. -->
     <Style TargetType="Button">
         <Setter Property="FontFamily" Value="{DynamicResource AppFont}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="MinHeight" Value="{DynamicResource AltoControl}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid SnapsToDevicePixels="True">
-                        <Border x:Name="Fondo" CornerRadius="4"
+                        <Border x:Name="Fondo" CornerRadius="{DynamicResource RadSm}"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}" />
-                        <Border x:Name="Velo" CornerRadius="4" Background="Transparent" />
+                        <Border x:Name="Velo" CornerRadius="{DynamicResource RadSm}" Opacity="0"
+                                Background="{DynamicResource HoverOverlayBrush}" />
                         <ContentPresenter Margin="{TemplateBinding Padding}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -66,8 +76,24 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Velo" Property="Background"
-                                    Value="{DynamicResource HoverOverlayBrush}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Velo"
+                                                         Storyboard.TargetProperty="Opacity" To="1"
+                                                         Duration="0:0:0.12" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Velo"
+                                                         Storyboard.TargetProperty="Opacity" To="0"
+                                                         Duration="0:0:0.12" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Velo" Property="Background"
@@ -75,7 +101,7 @@
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="Fondo" Property="BorderBrush"
-                                    Value="{DynamicResource AccentBlueBrush}" />
+                                    Value="{DynamicResource FocusRingBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.45" />
@@ -270,7 +296,14 @@
                                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                     CornerRadius="{DynamicResource RadSm}" Padding="2"
                                     MinWidth="{TemplateBinding ActualWidth}"
-                                    MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                    Margin="0,0,8,8"
+                                    Effect="{DynamicResource SombraFlotante}">
+                                <!-- El desplegable SI flota sobre la pagina, y es de las pocas
+                                     cosas que llevan sombra. El margen de la derecha y abajo
+                                     existe para que el desenfoque tenga sitio; sin el, la ventana
+                                     del Popup lo recorta a ras del borde. -->
+
                                 <ScrollViewer>
                                     <ItemsPresenter SnapsToDevicePixels="True" />
                                 </ScrollViewer>
@@ -329,7 +362,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
                     <StackPanel Orientation="Horizontal" Background="Transparent">
-                        <Border x:Name="Caja" Width="15" Height="15" CornerRadius="3"
+                        <Border x:Name="Caja" Width="15" Height="15" CornerRadius="{DynamicResource RadSm}"
                                 VerticalAlignment="Center" SnapsToDevicePixels="True"
                                 Background="{DynamicResource SurfaceBrush}"
                                 BorderBrush="{DynamicResource TextMutedBrush}" BorderThickness="1">
@@ -397,20 +430,25 @@
 
     <!-- ============================ DataGrid ============================ -->
 
+    <!-- Cabecera de columna. Es un ROTULO, no una fila mas: va en minuscula pequena, en gris y
+         sin relleno propio, y lo unico que la separa del cuerpo es una linea mas marcada que las
+         de las filas. Antes se pintaba con FilaAlternaBrush —el mismo color que la fila alterna—,
+         asi que a media tabla la cabecera y una fila cualquiera eran indistinguibles. -->
     <Style TargetType="p:DataGridColumnHeader">
-        <Setter Property="Background" Value="{DynamicResource FilaAlternaBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Padding" Value="8,7" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+        <Setter Property="FontSize" Value="{DynamicResource FsCaption}" />
+        <Setter Property="FontWeight" Value="{DynamicResource FwMedium}" />
+        <Setter Property="Padding" Value="10,8" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="p:DataGridColumnHeader">
-                    <!-- Separador a la derecha ademas del de abajo: el cuerpo de la tabla lleva
-                         rejilla vertical, y sin esto las divisiones de columna arrancaban por
-                         debajo del rotulo, como si la cabecera fuera de otra tabla. -->
+                    <!-- Solo la linea de abajo, y del escalon fuerte: el cuerpo dejo de llevar
+                         rejilla vertical, asi que un separador a la derecha del rotulo ya no
+                         continuaba en ninguna parte. -->
                     <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1"
+                            BorderBrush="{DynamicResource BorderStrongBrush}" BorderThickness="0,0,0,1"
                             Padding="{TemplateBinding Padding}">
                         <!-- HorizontalAlignment enlazado y no fijo: el Setter de arriba pone
                              Left, pero la plantilla lo ignoraba y ninguna cabecera podia
@@ -435,9 +473,13 @@
         <Setter Property="HorizontalContentAlignment" Value="Right" />
     </Style>
 
+    <!-- MinHeight, y no solo el relleno de la celda: con filas de 28 px las tablas de ocho
+         columnas se leian como un bloque compacto de texto. 32 px es lo que separa las lineas lo
+         justo para seguir una con la vista sin perder densidad. -->
     <Style TargetType="DataGridRow">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="MinHeight" Value="{DynamicResource AltoFila}" />
     </Style>
 
     <!-- La fila bajo el raton. No existia: en las diecinueve tablas de la aplicacion, pasar el
@@ -450,27 +492,54 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="Padding" Value="10,6" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="DataGridCell">
-                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
-                            Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
-                        <ContentPresenter VerticalAlignment="Center" />
-                    </Border>
+                    <Grid SnapsToDevicePixels="True">
+                        <!-- El senalado es un velo con la opacidad animada, como en los botones, y
+                             la seleccion un fondo propio debajo. Van en capas separadas porque
+                             hacen cosas distintas: el senalado acompana al raton y se funde; la
+                             seleccion dice donde estas y tiene que aparecer en seco. -->
+                        <Border x:Name="Seleccion" Background="{DynamicResource InfoSoftBrush}"
+                                Opacity="0" />
+                        <Border x:Name="Velo" Background="{DynamicResource HoverOverlayBrush}"
+                                Opacity="0" />
+                        <Border Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
                     <ControlTemplate.Triggers>
                         <DataTrigger Value="True"
                                      Binding="{Binding IsMouseOver,
                                                        RelativeSource={RelativeSource AncestorType=DataGridRow}}">
-                            <Setter TargetName="Bd" Property="Background"
-                                    Value="{DynamicResource CardHoverBrush}" />
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Velo"
+                                                         Storyboard.TargetProperty="Opacity" To="1"
+                                                         Duration="0:0:0.12" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Velo"
+                                                         Storyboard.TargetProperty="Opacity" To="0"
+                                                         Duration="0:0:0.12" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
                         </DataTrigger>
-                        <!-- Despues del hover: la seleccion gana sobre el senalado. -->
+                        <!-- La fila elegida se tine de verde suave. Antes usaba NavSelectedBrush,
+                             que es el color del modulo activo del menu: significa otra cosa, y
+                             ademas se separaba del senalado por un 4 % de luminancia, o sea nada. -->
                         <DataTrigger Value="True"
                                      Binding="{Binding IsSelected,
                                                        RelativeSource={RelativeSource AncestorType=DataGridRow}}">
-                            <Setter TargetName="Bd" Property="Background"
-                                    Value="{DynamicResource NavSelectedBrush}" />
+                            <Setter TargetName="Seleccion" Property="Opacity" Value="1" />
                         </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -508,7 +577,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Border x:Name="Bd" CornerRadius="4" Margin="2"
+                    <Border x:Name="Bd" CornerRadius="{DynamicResource RadSm}" Margin="2"
                             Background="{DynamicResource TextMutedBrush}" />
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -602,8 +671,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bd" Background="Transparent" Padding="8,0">
-                        <TextBlock Text="&#xE787;" FontFamily="{DynamicResource IconFont}"
-                                   FontSize="14" VerticalAlignment="Center"
+                        <TextBlock Text="{x:Static c:Iconos.Calendario}" FontFamily="{DynamicResource IconFont}"
+                                   FontSize="{DynamicResource FsSubtitle}" VerticalAlignment="Center"
                                    Foreground="{DynamicResource TextSecondaryBrush}" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -670,7 +739,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CalendarDayButton">
-                    <Border x:Name="Bd" Background="Transparent" CornerRadius="4" Margin="1">
+                    <Border x:Name="Bd" Background="Transparent" CornerRadius="{DynamicResource RadSm}" Margin="1">
                         <TextBlock x:Name="Numero" Text="{TemplateBinding Content}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -709,7 +778,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CalendarButton">
-                    <Border x:Name="Bd" Background="Transparent" CornerRadius="4" Margin="1">
+                    <Border x:Name="Bd" Background="Transparent" CornerRadius="{DynamicResource RadSm}" Margin="1">
                         <TextBlock x:Name="Etiqueta" Text="{TemplateBinding Content}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -739,7 +808,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd" Background="Transparent" CornerRadius="4" Padding="6,3">
+                    <Border x:Name="Bd" Background="Transparent" CornerRadius="{DynamicResource RadSm}" Padding="6,3">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Border>
@@ -762,7 +831,7 @@
                 <ControlTemplate TargetType="CalendarItem">
                     <ControlTemplate.Resources>
                         <DataTemplate x:Key="{x:Static p:CalendarItem.DayTitleTemplateResourceKey}">
-                            <TextBlock Text="{Binding}" FontSize="10" FontWeight="SemiBold"
+                            <TextBlock Text="{Binding}" FontSize="{DynamicResource FsMicro}" FontWeight="{DynamicResource FwMedium}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Margin="0,0,0,4"
                                        Foreground="{DynamicResource TextSecondaryBrush}" />
@@ -770,7 +839,8 @@
                     </ControlTemplate.Resources>
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                            CornerRadius="6" Padding="8">
+                            CornerRadius="{DynamicResource RadMd}" Padding="8" Margin="0,0,8,8"
+                            Effect="{DynamicResource SombraFlotante}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -786,16 +856,18 @@
 
                                 <Button x:Name="PART_PreviousButton" Grid.Column="0"
                                         Style="{StaticResource CalendarNavegarStyle}"
-                                        Content="&#x25C0;" FontSize="9" />
+                                        FontFamily="{DynamicResource IconFont}"
+                                        Content="{x:Static c:Iconos.ChevronIzquierda}" FontSize="{DynamicResource FsBody}" />
 
                                 <Button x:Name="PART_HeaderButton" Grid.Column="1"
                                         Style="{StaticResource CalendarNavegarStyle}"
                                         Foreground="{DynamicResource TextPrimaryBrush}"
-                                        FontWeight="SemiBold" FontSize="12" />
+                                        FontWeight="{DynamicResource FwMedium}" FontSize="{DynamicResource FsBody}" />
 
                                 <Button x:Name="PART_NextButton" Grid.Column="2"
                                         Style="{StaticResource CalendarNavegarStyle}"
-                                        Content="&#x25B6;" FontSize="9" />
+                                        FontFamily="{DynamicResource IconFont}"
+                                        Content="{x:Static c:Iconos.ChevronDerecha}" FontSize="{DynamicResource FsBody}" />
                             </Grid>
 
                             <Grid Grid.Row="1">
@@ -866,6 +938,7 @@
     <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
 
     <Style TargetType="ToolTip">
+        <Setter Property="HasDropShadow" Value="True" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
@@ -874,6 +947,7 @@
     </Style>
 
     <Style TargetType="ContextMenu">
+        <Setter Property="HasDropShadow" Value="True" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />

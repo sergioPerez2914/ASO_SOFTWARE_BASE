@@ -12,8 +12,11 @@ namespace ASO.Desktop.ViewModels;
 /// Alta y edición de la cabecera de una Remesa de caña. Los campos y su obligatoriedad
 /// salen del reglamento de remesas del CAM ("Todos los datos deben ser llenados").
 ///
-/// La llegada al central y el pesaje NO se editan aquí: los registra personal del central
-/// en el paso de recepción (ver <see cref="RecepcionRemesaEditorViewModel"/>).
+/// La llegada al central y el pesaje NO se editan aquí: los registra personal del central al
+/// cargar el boleto (ver <see cref="BoletoCentralEditorViewModel"/>).
+///
+/// Este formulario es el de EDICIÓN. El alta solo pregunta el inicio de carga
+/// (ver <see cref="NuevaRemesaEditorViewModel"/>): en campo el resto todavía no se sabe.
 /// </summary>
 public sealed class RemesaEditorViewModel : CrudEditorViewModelBase<Remesa>
 {

@@ -8,7 +8,7 @@
              d:DesignWidth="460">
 
   <StackPanel>
-    <TextBlock Text="{Binding AvisoCuentasInsuficientes}" FontSize="12" TextWrapping="Wrap"
+    <TextBlock Text="{Binding AvisoCuentasInsuficientes}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                Foreground="{DynamicResource DangerTextBrush}" Margin="0,0,0,8"
                Visibility="{Binding NoHayDondeTransferir, Converter={StaticResource BoolToVis}}" />
 
@@ -76,7 +76,7 @@
                  ToolTip="Opcional: si se deja vacío se escribe «Transferencia origen → destino»" />
       </controls:FormField>
 
-      <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,10,0,0"
+      <TextBlock TextWrapping="Wrap" FontSize="{StaticResource FsCaption}" Margin="0,8,0,0"
                  Foreground="{DynamicResource TextMutedBrush}"
                  Text="Se escriben dos movimientos enlazados, una salida y una entrada: el disponible total del centro no cambia. Anular uno anula el otro." />
     </StackPanel>

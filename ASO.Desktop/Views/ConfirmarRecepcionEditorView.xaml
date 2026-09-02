@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.ConfirmarRecepcionEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.ConfirmarRecepcionEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -8,7 +8,7 @@
              d:DesignWidth="420">
 
   <StackPanel>
-    <TextBlock Text="{Binding ResumenProveedor}" FontSize="12"
+    <TextBlock Text="{Binding ResumenProveedor}" FontSize="{StaticResource FsBody}"
                Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" />
 
     <controls:FormField Etiqueta="Notas">
@@ -18,7 +18,7 @@
                Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
-    <TextBlock Text="{Binding AvisoSinEmpleados}" FontSize="12" TextWrapping="Wrap"
+    <TextBlock Text="{Binding AvisoSinEmpleados}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                Margin="0,12,0,0"
                Foreground="{DynamicResource DangerTextBrush}"
                Visibility="{Binding NoHayEmpleados, Converter={StaticResource BoolToVis}}" />
@@ -33,7 +33,7 @@
     </StackPanel>
 
     <TextBlock Text="Al confirmar se suma cada línea al stock que le corresponde por lo realmente recibido, no por lo pedido. Si hace falta corregir una cantidad o una presentación, use &quot;Editar&quot; antes de confirmar."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

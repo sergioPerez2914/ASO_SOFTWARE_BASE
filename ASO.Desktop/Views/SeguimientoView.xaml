@@ -9,11 +9,13 @@
              d:DesignHeight="640" d:DesignWidth="1100">
 
   <UserControl.Resources>
-    <!-- Punto de la línea de tiempo: el color lo decide el tipo de evento -->
+    <!-- Punto de la línea de tiempo: el color lo decide el tipo de evento.
+         Radio de tarjeta (RadMd), no un círculo: mismo lenguaje visual que el resto
+         de la aplicación (tarjetas, chips cuadrados), no un badge redondo suelto. -->
     <Style x:Key="PuntoTimelineStyle" TargetType="Border">
       <Setter Property="Width" Value="26" />
       <Setter Property="Height" Value="26" />
-      <Setter Property="CornerRadius" Value="13" />
+      <Setter Property="CornerRadius" Value="{StaticResource RadMd}" />
       <Setter Property="Background" Value="{DynamicResource TextMutedBrush}" />
       <Style.Triggers>
         <DataTrigger Binding="{Binding Evento.Tipo}" Value="{x:Static models:TipoEventoOperacion.InicioCarga}">
@@ -72,7 +74,12 @@
     </Style>
   </UserControl.Resources>
 
-  <Grid>
+  <!-- Alto explícito, tomado del ScrollViewer del shell: sin él, un Grid con fila "*" dentro de un
+       ScrollViewer recibe alto infinito y sus filas "*" se comportan como Auto (todo su contenido
+       se mide de una vez). Eso hacía que el maestro y la línea de tiempo nunca activaran su propio
+       ScrollViewer interno y el módulo entero se desplazara como una sola pieza en vez de que el
+       scroll quedara dentro de la card de la operación. -->
+  <Grid Height="{Binding ViewportHeight, RelativeSource={RelativeSource AncestorType=ScrollViewer}}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
@@ -100,14 +107,13 @@
           <!-- Barra de parametros. Aqui la lista es un ListBox en una columna estrecha, asi que
                el buscador y las pastillas caen en la misma columna y el recuadro las agrupa
                igual que en el resto de modulos. -->
-          <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+          <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
             <WrapPanel VerticalAlignment="Center">
-              <controls:SearchBox Width="280" Margin="0,0,12,6" VerticalAlignment="Center"
-                                  Sugerencia="Buscar por Nº, finca o placa"
+              <controls:SearchBox Width="280" Margin="0,0,12,8" VerticalAlignment="Center"
                                   Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
               <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
-                                       Margin="0,0,12,6" VerticalAlignment="Center"
+                                       Margin="0,0,12,8" VerticalAlignment="Center"
                                        Command="{Binding CambiarFiltroEstadoCommand}">
                 <ComboBoxItem Content="Todas" />
                 <ComboBoxItem Content="Borrador" />
@@ -132,13 +138,13 @@
                   </Grid.ColumnDefinitions>
 
                   <StackPanel Grid.Column="0">
-                    <TextBlock FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
+                    <TextBlock FontSize="{StaticResource FsSubtitle}" FontWeight="{StaticResource FwMedium}"
                                Foreground="{DynamicResource TextPrimaryBrush}"
                                TextTrimming="CharacterEllipsis">
                       <Run Text="Nº" /><Run Text="{Binding Id, Mode=OneWay}" />
                       <Run Text=" · " /><Run Text="{Binding FincaNombre, Mode=OneWay}" />
                     </TextBlock>
-                    <TextBlock FontSize="{StaticResource FsCaption}" Margin="0,2,0,0"
+                    <TextBlock FontSize="{StaticResource FsCaption}" Margin="0,4,0,0"
                                Foreground="{DynamicResource TextMutedBrush}">
                       <Run Text="{Binding InicioCarga, Mode=OneWay, StringFormat={}{0:dd/MM/yyyy HH:mm}}" />
                       <Run Text=" · " /><Run Text="{Binding VehiculoPlaca, Mode=OneWay}" />
@@ -176,7 +182,7 @@
                 <TextBlock Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
                   <Run Text="Remesa Nº" /><Run Text="{Binding Id, Mode=OneWay}" />
                 </TextBlock>
-                <Border Style="{StaticResource ChipEstadoStyle}" Margin="10,0,0,0" VerticalAlignment="Center">
+                <Border Style="{StaticResource ChipEstadoStyle}" Margin="8,0,0,0" VerticalAlignment="Center">
                   <TextBlock Text="{Binding EstadoTexto}" FontSize="{StaticResource FsCaption}" />
                 </Border>
               </StackPanel>
@@ -207,7 +213,7 @@
                 </Style.Triggers>
               </Style>
             </StackPanel.Style>
-            <TextBlock Text="&#xEADF;" Style="{StaticResource NavIconStyle}" FontSize="40"
+            <TextBlock Text="{x:Static controls:Iconos.Seguimiento}" Style="{StaticResource NavIconStyle}" FontSize="{StaticResource FsHero}"
                        Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
             <TextBlock Text="Seleccione una remesa para ver su línea de tiempo."
                        FontSize="{StaticResource FsBody}" Margin="0,12,0,0" HorizontalAlignment="Center"
@@ -278,10 +284,10 @@
                       <StackPanel>
                         <TextBlock Text="{Binding Evento.FechaHoraTexto}" FontSize="{StaticResource FsCaption}"
                                    Foreground="{DynamicResource TextMutedBrush}" />
-                        <TextBlock Text="{Binding Evento.EtiquetaTipo}" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding Evento.EtiquetaTipo}" FontSize="{StaticResource FsSubtitle}" FontWeight="{StaticResource FwMedium}"
                                    Foreground="{DynamicResource TextPrimaryBrush}" />
                         <TextBlock Text="{Binding Evento.Descripcion}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
-                                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0" />
                         <TextBlock FontSize="{StaticResource FsCaption}" Margin="0,4,0,0"
                                    Foreground="{DynamicResource TextMutedBrush}"
                                    Visibility="{Binding TieneAutor, Converter={StaticResource BoolToVis}}"

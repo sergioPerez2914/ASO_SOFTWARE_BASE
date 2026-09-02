@@ -8,7 +8,7 @@
              d:DesignHeight="640" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -22,7 +22,7 @@
          acciones arriba a la derecha; bajan a su fila para seguir el mismo orden que las demás.
          La nota va DEBAJO de las acciones y no en la columna del resumen: es un texto que se
          ajusta a varias líneas, no un contador corto. -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -83,7 +83,7 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xE715;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Peticiones}"
                              Titulo="No hay peticiones que mostrar"
                              Detalle="Aquí llegan las solicitudes de cambio del personal de campo."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />

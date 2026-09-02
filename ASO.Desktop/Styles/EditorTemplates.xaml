@@ -11,8 +11,12 @@
     <views:RemesaEditorView />
   </DataTemplate>
 
-  <DataTemplate DataType="{x:Type vm:RecepcionRemesaEditorViewModel}">
-    <views:RecepcionRemesaEditorView />
+  <DataTemplate DataType="{x:Type vm:NuevaRemesaEditorViewModel}">
+    <views:NuevaRemesaEditorView />
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type vm:BoletoCentralEditorViewModel}">
+    <views:BoletoCentralEditorView />
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type vm:AnularRemesaEditorViewModel}">

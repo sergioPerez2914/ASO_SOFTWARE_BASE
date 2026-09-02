@@ -1,0 +1,27 @@
+<UserControl x:Class="ASO.Desktop.Views.NuevaRemesaEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="380">
+
+  <StackPanel>
+    <TextBlock Text="Inicio de carga (fecha y hora)" Style="{StaticResource FormLabelStyle}" />
+    <StackPanel Orientation="Horizontal">
+      <DatePicker Style="{StaticResource FormDatePickerStyle}" Width="150"
+                  SelectedDate="{Binding InicioFecha}" />
+      <TextBox Style="{StaticResource FormTextBoxStyle}" Width="70" Margin="8,0,0,0"
+               Text="{Binding InicioHora, UpdateSourceTrigger=PropertyChanged}"
+               ToolTip="Hora en formato HH:mm" />
+    </StackPanel>
+
+    <Border Style="{StaticResource AlertBoxStyle}" Margin="0,16,0,0"
+            Background="{DynamicResource BackgroundBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+      <TextBlock FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
+                 Foreground="{DynamicResource TextSecondaryBrush}"
+                 Text="La finca, el lote, el personal y la placa se completan después con «Editar». La remesa no se puede confirmar hasta tener todos los datos del reglamento." />
+    </Border>
+  </StackPanel>
+</UserControl>

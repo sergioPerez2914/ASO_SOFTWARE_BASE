@@ -13,7 +13,7 @@
     <StackPanel Margin="0,0,0,8">
       <TextBlock Text="Padrón" Style="{StaticResource FormLabelStyle}" />
       <TextBlock Text="{Binding PadronTexto}" TextWrapping="Wrap"
-                 FontSize="{StaticResource FsBody}" FontWeight="SemiBold"
+                 FontSize="{StaticResource FsBody}" FontWeight="{StaticResource FwMedium}"
                  Foreground="{DynamicResource TextPrimaryBrush}" />
     </StackPanel>
 
@@ -28,7 +28,7 @@
                 Margin="0,4,0,8">
       <TextBlock Text="Frente de trabajo" Style="{StaticResource FormLabelStyle}" />
       <TextBlock Text="{Binding FrenteTexto}" TextWrapping="Wrap"
-                 FontSize="{StaticResource FsBody}" FontWeight="SemiBold"
+                 FontSize="{StaticResource FsBody}" FontWeight="{StaticResource FwMedium}"
                  Foreground="{DynamicResource TextPrimaryBrush}" />
     </StackPanel>
 
@@ -72,7 +72,7 @@
     </controls:FormField>
 
     <TextBlock Text="La jornada queda abierta hasta que se registre la salida. Una persona no puede tener dos jornadas abiertas a la vez. En campo, la entrada y la salida quedan registradas en el seguimiento del frente; para cambiar de frente, ciérrelo arriba antes de registrar."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

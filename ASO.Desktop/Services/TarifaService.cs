@@ -1,8 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ASO.Desktop.Models;
 
 namespace ASO.Desktop.Services;
+
+/// <summary>
+/// Lo que se cobra por un servicio de una remesa: toneladas × tarifa vigente, con el núcleo que
+/// lo prestó. El monto va redondeado igual que en la línea de factura, para que comparar el
+/// estimado contra la factura emitida no arroje diferencias de céntimos.
+/// </summary>
+public readonly record struct CobroDeServicio(ServicioZafra Servicio, string NucleoCodigo,
+                                              decimal Toneladas, decimal TarifaMonto)
+{
+    public decimal Monto => Math.Round(Toneladas * TarifaMonto, 2);
+}
 
 /// <summary>
 /// Reglas del tarifario. Su método importante es <see cref="ObtenerVigente"/>: es la única
@@ -54,6 +66,31 @@ public sealed class TarifaService
         }
 
         return tarifa;
+    }
+
+    /// <summary>
+    /// Lo que hay que cobrarle al central por una remesa, servicio por servicio, con la tarifa
+    /// vigente a la fecha en que se recibió la caña.
+    ///
+    /// Vive aquí y no en <c>FacturaClienteService</c> porque tiene dos consumidores: la factura,
+    /// que lo convierte en líneas, y el boleto del central, que lo compara contra lo que el
+    /// central dice que va a pagar. Dos implementaciones darían dos cifras distintas para lo
+    /// mismo, y la comparación dejaría de servir para reclamar.
+    /// </summary>
+    public IReadOnlyList<CobroDeServicio> CalcularCobroPorServicio(Remesa remesa, decimal toneladas,
+                                                                  DateTime fecha) =>
+        [.. ServiciosDe(remesa).Select(s => new CobroDeServicio(
+            s.Servicio,
+            s.Nucleo,
+            toneladas,
+            ExigirVigente(s.Servicio, AmbitoTarifa.Cobro, fecha, UnidadTarifa.Tonelada).MontoPorUnidad))];
+
+    /// <summary>Los tres servicios de una remesa, cada uno con el núcleo que lo prestó.</summary>
+    private static IEnumerable<(ServicioZafra Servicio, string Nucleo)> ServiciosDe(Remesa remesa)
+    {
+        yield return (ServicioZafra.Corte, remesa.NucleoCorteCodigo);
+        yield return (ServicioZafra.AlzaEmpuje, remesa.NucleoAlzaEmpujeCodigo);
+        yield return (ServicioZafra.Transporte, remesa.NucleoTransporteCodigo);
     }
 
     /// <summary>

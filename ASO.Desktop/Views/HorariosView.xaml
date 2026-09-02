@@ -8,7 +8,7 @@
              d:DesignHeight="640" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -31,12 +31,11 @@
                    IsChecked="{Binding EsCampo, Mode=TwoWay}" />
     </StackPanel>
 
-    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
-            Background="{DynamicResource BorderBrush}" />
+    <Border Grid.Row="1" Style="{StaticResource TabStripStyle}" VerticalAlignment="Bottom" />
 
     <!-- Barra de herramientas, en tres bandas: qué frente se mira, cómo se acota lo que se ve,
          y qué se puede hacer. Antes las tres se pisaban en la misma fila. -->
-    <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,16,0,12">
+    <Border Grid.Row="2" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -55,7 +54,7 @@
                     Visibility="{Binding MostrarCampo, Converter={StaticResource BoolToVis}}">
           <StackPanel Orientation="Horizontal">
             <TextBlock Text="Frente" VerticalAlignment="Center" Margin="0,0,8,0"
-                       FontSize="{StaticResource FsBody}" FontWeight="SemiBold"
+                       FontSize="{StaticResource FsBody}" FontWeight="{StaticResource FwMedium}"
                        Foreground="{DynamicResource TextPrimaryBrush}" />
             <ComboBox Width="320" VerticalAlignment="Center"
                       Style="{StaticResource FormComboBoxStyle}"
@@ -79,24 +78,24 @@
              esa fila entera era un hueco vacío encima de la búsqueda. -->
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="16,0,0,0">
-          <StackPanel Margin="0,0,20,0">
+          <StackPanel Margin="0,0,24,0">
             <TextBlock Text="Horas (14 días)" FontSize="{StaticResource FsCaption}"
                        Foreground="{DynamicResource TextMutedBrush}" />
-            <TextBlock Text="{Binding HorasQuincenaTexto}" FontWeight="SemiBold"
+            <TextBlock Text="{Binding HorasQuincenaTexto}" FontWeight="{StaticResource FwMedium}"
                        FontSize="{StaticResource FsSubtitle}"
                        Foreground="{DynamicResource TextPrimaryBrush}" />
           </StackPanel>
-          <StackPanel Margin="0,0,20,0">
+          <StackPanel Margin="0,0,24,0">
             <TextBlock Text="Jornadas abiertas" FontSize="{StaticResource FsCaption}"
                        Foreground="{DynamicResource TextMutedBrush}" />
-            <TextBlock Text="{Binding JornadasAbiertasTexto}" FontWeight="SemiBold"
+            <TextBlock Text="{Binding JornadasAbiertasTexto}" FontWeight="{StaticResource FwMedium}"
                        FontSize="{StaticResource FsSubtitle}"
                        Foreground="{DynamicResource InfoTextBrush}" />
           </StackPanel>
           <StackPanel>
             <TextBlock Text="Movimientos (7 días)" FontSize="{StaticResource FsCaption}"
                        Foreground="{DynamicResource TextMutedBrush}" />
-            <TextBlock Text="{Binding MovimientosSemanaTexto}" FontWeight="SemiBold"
+            <TextBlock Text="{Binding MovimientosSemanaTexto}" FontWeight="{StaticResource FwMedium}"
                        FontSize="{StaticResource FsSubtitle}"
                        Foreground="{DynamicResource TextSecondaryBrush}" />
           </StackPanel>
@@ -107,7 +106,6 @@
              El padrón ya no está aquí: lo decide la pestaña de arriba. -->
         <WrapPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,16,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por persona, cargo, núcleo o remesa"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -160,7 +158,7 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xE787;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Horarios}"
                              Titulo="No hay jornadas registradas"
                              Detalle="Las jornadas se registran al marcar entrada y salida."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />

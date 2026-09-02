@@ -79,9 +79,10 @@
 
   <!-- Contenedor de datos: la tabla, el panel de detalle, un grupo de campos.
 
-       Sin sombra: CardStyle traia un DropShadowEffect con el color negro a fuego, y sobre el
-       fondo oscuro quedaba una mancha sucia en vez de una elevacion. En una interfaz densa el
-       borde de 1 px separa mejor, cuesta menos de pintar y si respeta el tema. -->
+       Sin sombra, y sigue sin llevarla: una tarjeta no flota, esta pegada a la pagina. En una
+       interfaz densa el borde de 1 px separa mejor, cuesta menos de pintar y respeta el tema.
+       La sombra existe (ElevacionColor) pero solo para lo que se abre POR ENCIMA de la pagina y
+       hay que poder ignorar: desplegable, calendario, tooltip, menu. -->
   <Style x:Key="SectionCardStyle" TargetType="Border">
     <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
@@ -90,11 +91,24 @@
     <Setter Property="Padding" Value="{StaticResource TkTarjeta}" />
   </Style>
 
-  <!-- Barra de acciones. No es una tarjeta: no contiene datos, solo los filtra. -->
+  <!-- Barra de acciones. No es una tarjeta: no contiene datos, solo los filtra.
+
+       Que el buscador, los filtros y los botones vinieran dentro de una caja blanca con borde,
+       identica a la de la tabla, es lo que dejaba una pantalla de listado con dos cajas del mismo
+       peso donde solo una tiene datos. Sin caja, la unica tarjeta con borde de la pantalla es la
+       que importa. -->
   <Style x:Key="ToolbarStyle" TargetType="Border">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="Padding" Value="0,0,0,12" />
+    <Setter Property="Padding" Value="{StaticResource TkBarra}" />
+  </Style>
+
+  <!-- Tira de pestanas: la linea que corre por debajo de todas. SegmentedTabStyle solo pinta el
+       subrayado del activo, asi que esta linea se copiaba a mano en las diez pantallas con
+       pestanas — y con dos valores distintos segun quien la escribiera. -->
+  <Style x:Key="TabStripStyle" TargetType="Border">
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
   </Style>
 
   <!-- Forma comun de los chips de estado: fondo tenido + texto fuerte del mismo tono.
@@ -110,13 +124,29 @@
 
        Cada chip concreto solo aporta sus DataTrigger, que es lo unico en lo que se diferencian. -->
   <Style x:Key="ChipBaseStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="{StaticResource RadPill}" />
+    <!-- Radio de control (RadSm), no pastilla. Con RadPill los chips eran la unica forma
+         completamente redonda de la aplicacion: al lado de tarjetas, botones y celdas —todos de
+         esquina suave— una pastilla se lee como un adorno pegado encima y no como parte del
+         sistema. Es la forma que ya tenia el chip de nucleo de la barra superior, y ahora la
+         comparten los veinte chips de estado. -->
+    <Setter Property="CornerRadius" Value="{StaticResource RadSm}" />
     <Setter Property="Padding" Value="{StaticResource TkChip}" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="BorderThickness" Value="{StaticResource BdFino}" />
     <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource NeutralBordeBrush}" />
     <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
+  </Style>
+
+  <!-- Chip de contexto de la barra superior (nucleo, zafra): sobre que se esta escribiendo.
+       Misma forma que los chips de estado —hereda de la base— y solo cambia el color y su sitio
+       en la barra. Los dos chips de MainWindow eran el mismo marcado escrito dos veces. -->
+  <Style x:Key="ChipContextoStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Margin" Value="0,0,8,0" />
+    <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
   </Style>
 
   <!-- Chip de estado de una remesa. El color lo decide el enum, no el texto.
@@ -125,22 +155,22 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Confirmada}">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Recibida}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRemesa.Anulada}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -151,7 +181,7 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Activo}" Value="True">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -162,17 +192,17 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Vigente">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Futura">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Inactiva">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -183,17 +213,17 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Pendiente">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Aprobada">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstadoTexto}" Value="Rechazada">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -202,17 +232,17 @@
   <!-- Chip de existencia de un artículo de almacén -->
   <Style x:Key="ChipStockStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
     <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:StockStatus.Bajo}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:StockStatus.Agotado}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -224,17 +254,17 @@
        notarse sin tener que leer los números. -->
   <Style x:Key="ChipCoberturaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
     <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
     <Style.Triggers>
       <DataTrigger Binding="{Binding SinCubrir}" Value="True">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Completo}" Value="True">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -245,17 +275,17 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoSalida.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoSalida.Confirmada}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoSalida.Anulada}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -266,17 +296,17 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoVale.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoVale.Confirmado}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoVale.Anulado}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -287,7 +317,7 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoZafra.Abierta}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoZafra.Cerrada}">
@@ -301,12 +331,12 @@
   <!-- Chip de estado de una jornada de trabajo -->
   <Style x:Key="ChipJornadaStyle" TargetType="Border" BasedOn="{StaticResource ChipBaseStyle}">
     <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
     <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstaAbierta}" Value="True">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -317,22 +347,22 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Cerrada}">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Pagada}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoLiquidacion.Anulada}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -344,27 +374,27 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Emitida}">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Cobrada}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaCliente.Anulada}">
         <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NeutralBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstaVencida}" Value="True">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -376,27 +406,27 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Pendiente}">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Pagada}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Anulada}">
         <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NeutralBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoFacturaProveedor.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding EstaVencida}" Value="True">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -409,17 +439,17 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoMovimientoBanco.Registrado}">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoMovimientoBanco.Conciliado}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoMovimientoBanco.Anulado}">
         <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource NeutralTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource NeutralBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource NeutralTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -432,7 +462,7 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Activa}" Value="True">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -443,22 +473,22 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRequisicion.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRequisicion.Enviada}">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRequisicion.Atendida}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRequisicion.Anulada}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -469,22 +499,22 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoOrdenCompra.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoOrdenCompra.Aprobada}">
         <Setter Property="Background" Value="{DynamicResource InfoSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource InfoTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource InfoTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoOrdenCompra.Cerrada}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoOrdenCompra.Anulada}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -495,17 +525,17 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecepcionMercancia.Borrador}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecepcionMercancia.Confirmada}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecepcionMercancia.Anulada}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -516,17 +546,17 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.Operativo}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.EnTaller}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoActivo.FueraDeServicio}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -537,17 +567,17 @@
     <Style.Triggers>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.Vencido}">
         <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource DangerTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.Proximo}">
         <Setter Property="Background" Value="{DynamicResource WarningSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource WarningTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource WarningTextBrush}" />
       </DataTrigger>
       <DataTrigger Binding="{Binding Estado}" Value="{x:Static models:EstadoRecomendacion.AlDia}">
         <Setter Property="Background" Value="{DynamicResource SuccessSoftBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SuccessTextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBordeBrush}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource SuccessTextBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -561,8 +591,8 @@
   <!-- Título de sección en tarjeta -->
   <Style x:Key="CardTitleStyle" TargetType="TextBlock">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="14" />
-    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="{StaticResource FsTitle}" />
+    <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
   </Style>
 
@@ -570,15 +600,16 @@
        para heredar el comportamiento nativo de cada control. -->
   <Style x:Key="FormLabelStyle" TargetType="TextBlock">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontSize" Value="{StaticResource FsCaption}" />
+    <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
     <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-    <Setter Property="Margin" Value="0,10,0,4" />
+    <Setter Property="Margin" Value="0,12,0,4" />
   </Style>
 
   <Style x:Key="FormTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
-    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="FontSize" Value="{StaticResource FsBody}" />
+    <Setter Property="Padding" Value="{StaticResource TkControl}" />
     <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
@@ -590,8 +621,8 @@
        con los colores del sistema: sobre el tema oscuro saldria una caja blanca. -->
   <Style x:Key="FormPasswordBoxStyle" TargetType="PasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
-    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="FontSize" Value="{StaticResource FsBody}" />
+    <Setter Property="Padding" Value="{StaticResource TkControl}" />
     <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
@@ -601,8 +632,8 @@
 
   <Style x:Key="FormComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
-    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="FontSize" Value="{StaticResource FsBody}" />
+    <Setter Property="Padding" Value="{StaticResource TkControl}" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -610,7 +641,7 @@
 
   <Style x:Key="FormDatePickerStyle" TargetType="DatePicker" BasedOn="{StaticResource {x:Type DatePicker}}">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontSize" Value="{StaticResource FsBody}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>
@@ -618,13 +649,13 @@
   <!-- Valor calculado de solo lectura dentro de un formulario (p. ej. el peso neto). -->
   <Style x:Key="FormValorCalculadoStyle" TargetType="TextBlock">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="14" />
-    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="{StaticResource FsSubtitle}" />
+    <Setter Property="FontWeight" Value="{StaticResource FwBold}" />
     <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
 
-  <!-- Icono de la navegación lateral (glifo MDL2).
+  <!-- Icono de la navegación lateral (glifo Phosphor, ver Controls/Iconos.cs).
        FontWeight fijo en Normal: la fuente no tiene cara bold y WPF la sintetiza,
        ensuciando el glifo justo en el estado seleccionado. -->
   <Style x:Key="NavIconStyle" TargetType="TextBlock">
@@ -650,7 +681,7 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Button">
-          <Border x:Name="Root" Background="{TemplateBinding Background}" CornerRadius="4"
+          <Border x:Name="Root" Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadSm}"
                   SnapsToDevicePixels="True">
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
           </Border>
@@ -672,11 +703,11 @@
        si no el hover la tapa. -->
   <Style x:Key="NavItemStyle" TargetType="Button">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontSize" Value="{StaticResource FsBody}" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="Padding" Value="20,11,16,11" />
+    <Setter Property="Padding" Value="20,9,12,9" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -685,26 +716,55 @@
       <Setter.Value>
         <ControlTemplate TargetType="Button">
           <Grid SnapsToDevicePixels="True">
-            <Border x:Name="Root" Background="{TemplateBinding Background}" />
-            <Border x:Name="FocusRing" BorderBrush="{DynamicResource NavIndicatorBrush}"
-                    BorderThickness="0" SnapsToDevicePixels="True" />
-            <Border x:Name="ActiveBar" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch"
-                    Margin="0,6" CornerRadius="0,2,2,0" SnapsToDevicePixels="True"
-                    Background="{DynamicResource NavIndicatorBrush}" Visibility="Collapsed" />
+            <!-- La pastilla va METIDA hacia dentro (Margin) en vez de ocupar de borde a borde:
+                 el relleno de borde a borde convierte el menu en una sucesion de bandas y hace
+                 que el sidebar pese mas que el contenido. -->
+            <Border x:Name="Seleccion" Margin="8,1" Opacity="0"
+                    CornerRadius="{StaticResource RadSm}"
+                    Background="{DynamicResource NavSelectedBrush}" />
+            <Border x:Name="Velo" Margin="8,1" Opacity="0"
+                    CornerRadius="{StaticResource RadSm}"
+                    Background="{DynamicResource NavHoverBrush}" />
+            <Border x:Name="FocusRing" Margin="8,1" BorderThickness="0"
+                    CornerRadius="{StaticResource RadSm}" SnapsToDevicePixels="True"
+                    BorderBrush="{DynamicResource FocusRingBrush}" />
             <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
           </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{DynamicResource NavHoverBrush}" />
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Velo"
+                                     Storyboard.TargetProperty="Opacity" To="1"
+                                     Duration="{StaticResource DurRapida}"
+                                     EasingFunction="{StaticResource CurvaSalida}" />
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Velo"
+                                     Storyboard.TargetProperty="Opacity" To="0"
+                                     Duration="{StaticResource DurRapida}"
+                                     EasingFunction="{StaticResource CurvaSalida}" />
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{DynamicResource NavPressedBrush}" />
+              <Setter TargetName="Velo" Property="Background" Value="{DynamicResource NavPressedBrush}" />
+              <Setter TargetName="Velo" Property="Opacity" Value="1" />
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
-              <Setter TargetName="FocusRing" Property="BorderThickness" Value="1" />
+              <Setter TargetName="FocusRing" Property="BorderThickness" Value="{StaticResource BdFino}" />
             </Trigger>
+            <!-- La pastilla es la UNICA senal de elegido, junto con el color del rotulo. Antes
+                 eran tres a la vez: relleno de borde a borde, barra de 3 px a la izquierda y
+                 color. Con tres senales para un solo hecho, ninguna manda. -->
             <DataTrigger Binding="{Binding EstaSeleccionado}" Value="True">
-              <Setter TargetName="ActiveBar" Property="Visibility" Value="Visible" />
+              <Setter TargetName="Seleccion" Property="Opacity" Value="1" />
             </DataTrigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -721,7 +781,6 @@
         <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
       </MultiDataTrigger>
       <DataTrigger Binding="{Binding EstaSeleccionado}" Value="True">
-        <Setter Property="Background" Value="{DynamicResource NavSelectedBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
       </DataTrigger>
     </Style.Triggers>
@@ -731,11 +790,11 @@
        Misma plantilla que el módulo; sólo cambian tamaño, color base y sangría. -->
   <Style x:Key="NavSubItemStyle" TargetType="Button">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontSize" Value="{StaticResource FsCaption}" />
     <Setter Property="Foreground" Value="{DynamicResource NavTextSecondaryBrush}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="Padding" Value="44,8,16,8" />
+    <Setter Property="Padding" Value="46,7,12,7" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -744,26 +803,55 @@
       <Setter.Value>
         <ControlTemplate TargetType="Button">
           <Grid SnapsToDevicePixels="True">
-            <Border x:Name="Root" Background="{TemplateBinding Background}" />
-            <Border x:Name="FocusRing" BorderBrush="{DynamicResource NavIndicatorBrush}"
-                    BorderThickness="0" SnapsToDevicePixels="True" />
-            <Border x:Name="ActiveBar" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch"
-                    Margin="0,5" CornerRadius="0,2,2,0" SnapsToDevicePixels="True"
-                    Background="{DynamicResource NavIndicatorBrush}" Visibility="Collapsed" />
+            <!-- La pastilla va METIDA hacia dentro (Margin) en vez de ocupar de borde a borde:
+                 el relleno de borde a borde convierte el menu en una sucesion de bandas y hace
+                 que el sidebar pese mas que el contenido. -->
+            <Border x:Name="Seleccion" Margin="36,1,8,1" Opacity="0"
+                    CornerRadius="{StaticResource RadSm}"
+                    Background="{DynamicResource NavSelectedBrush}" />
+            <Border x:Name="Velo" Margin="36,1,8,1" Opacity="0"
+                    CornerRadius="{StaticResource RadSm}"
+                    Background="{DynamicResource NavHoverBrush}" />
+            <Border x:Name="FocusRing" Margin="36,1,8,1" BorderThickness="0"
+                    CornerRadius="{StaticResource RadSm}" SnapsToDevicePixels="True"
+                    BorderBrush="{DynamicResource FocusRingBrush}" />
             <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
           </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{DynamicResource NavHoverBrush}" />
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Velo"
+                                     Storyboard.TargetProperty="Opacity" To="1"
+                                     Duration="{StaticResource DurRapida}"
+                                     EasingFunction="{StaticResource CurvaSalida}" />
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Velo"
+                                     Storyboard.TargetProperty="Opacity" To="0"
+                                     Duration="{StaticResource DurRapida}"
+                                     EasingFunction="{StaticResource CurvaSalida}" />
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-              <Setter TargetName="Root" Property="Background" Value="{DynamicResource NavPressedBrush}" />
+              <Setter TargetName="Velo" Property="Background" Value="{DynamicResource NavPressedBrush}" />
+              <Setter TargetName="Velo" Property="Opacity" Value="1" />
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
-              <Setter TargetName="FocusRing" Property="BorderThickness" Value="1" />
+              <Setter TargetName="FocusRing" Property="BorderThickness" Value="{StaticResource BdFino}" />
             </Trigger>
+            <!-- La pastilla es la UNICA senal de elegido, junto con el color del rotulo. Antes
+                 eran tres a la vez: relleno de borde a borde, barra de 3 px a la izquierda y
+                 color. Con tres senales para un solo hecho, ninguna manda. -->
             <DataTrigger Binding="{Binding EstaSeleccionado}" Value="True">
-              <Setter TargetName="ActiveBar" Property="Visibility" Value="Visible" />
+              <Setter TargetName="Seleccion" Property="Opacity" Value="1" />
             </DataTrigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -771,34 +859,72 @@
     </Setter>
     <Style.Triggers>
       <DataTrigger Binding="{Binding EstaSeleccionado}" Value="True">
-        <Setter Property="Background" Value="{DynamicResource NavSelectedBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
       </DataTrigger>
     </Style.Triggers>
   </Style>
 
-  <!-- Tarjeta pulsable (módulo en Inicio, submódulo en el dashboard) -->
+  <!-- Tarjeta pulsable (módulo en Inicio, submódulo en el dashboard).
+
+       Al senalarla se funde un borde MAS MARCADO encima del suyo, en vez de ponerse verde: el
+       verde deberia significar algo, y una tarjeta bajo el raton no significa nada todavia. El
+       borde superpuesto va aparte porque lo que se anima es su opacidad; el BorderBrush del
+       Border de abajo es un brush de la paleta y no se puede animar. -->
   <Style x:Key="CardButtonStyle" TargetType="Button">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
     <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="Padding" Value="16" />
+    <Setter Property="BorderThickness" Value="{StaticResource BdFino}" />
+    <Setter Property="Padding" Value="{StaticResource TkTarjeta}" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="Button">
-          <Border x:Name="Root" Background="{TemplateBinding Background}"
-                  BorderBrush="{TemplateBinding BorderBrush}"
-                  BorderThickness="{TemplateBinding BorderThickness}"
-                  CornerRadius="8" Padding="{TemplateBinding Padding}">
-            <ContentPresenter />
-          </Border>
+          <Grid>
+            <Border x:Name="Root" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{StaticResource RadMd}" Padding="{TemplateBinding Padding}">
+              <ContentPresenter />
+            </Border>
+            <Border x:Name="Realce" Opacity="0" IsHitTestVisible="False"
+                    Background="{DynamicResource HoverOverlayBrush}"
+                    BorderBrush="{DynamicResource BorderStrongBrush}"
+                    BorderThickness="{StaticResource BdFino}"
+                    CornerRadius="{StaticResource RadMd}" />
+            <Border x:Name="Foco" Opacity="0" IsHitTestVisible="False"
+                    BorderBrush="{DynamicResource FocusRingBrush}"
+                    BorderThickness="{StaticResource BdFoco}"
+                    CornerRadius="{StaticResource RadMd}" />
+          </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Root" Property="BorderBrush" Value="{DynamicResource AccentBlueBrush}" />
-              <Setter TargetName="Root" Property="Background" Value="{DynamicResource CardHoverBrush}" />
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Realce"
+                                     Storyboard.TargetProperty="Opacity" To="1"
+                                     Duration="{StaticResource DurNormal}"
+                                     EasingFunction="{StaticResource CurvaSalida}" />
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Realce"
+                                     Storyboard.TargetProperty="Opacity" To="0"
+                                     Duration="{StaticResource DurNormal}"
+                                     EasingFunction="{StaticResource CurvaSalida}" />
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
+            </Trigger>
+            <!-- Con el teclado no hay raton que senale: sin esto, tabular por el lanzador de
+                 Inicio no mostraba en que tarjeta estabas. -->
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Foco" Property="Opacity" Value="1" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -818,7 +944,7 @@
        filtro se queda con el chip tenido, que es como se marca un filtro. -->
 
   <!-- Pestana de seccion. Sin relleno: la subraya. -->
-  <Style x:Key="SegmentedTabStyle" TargetType="ToggleButton">
+  <Style x:Key="SegmentedTabStyle" TargetType="RadioButton">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
     <Setter Property="FontSize" Value="{StaticResource FsSubtitle}" />
     <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
@@ -828,7 +954,7 @@
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Template">
       <Setter.Value>
-        <ControlTemplate TargetType="ToggleButton">
+        <ControlTemplate TargetType="RadioButton">
           <Grid SnapsToDevicePixels="True">
             <Grid.RowDefinitions>
               <RowDefinition Height="*" />
@@ -836,19 +962,40 @@
             </Grid.RowDefinitions>
             <ContentPresenter Grid.Row="0" Margin="{TemplateBinding Padding}"
                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <Border x:Name="Subrayado" Grid.Row="1" Height="2"
-                    Background="Transparent" CornerRadius="{StaticResource RadPill}" />
+            <Border x:Name="Subrayado" Grid.Row="1" Height="2" Opacity="0"
+                    Background="{DynamicResource NavIndicatorBrush}"
+                    CornerRadius="{StaticResource RadPill}" />
           </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
-              <Setter TargetName="Subrayado" Property="Background" Value="{DynamicResource NavIndicatorBrush}" />
               <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
               <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Subrayado"
+                                     Storyboard.TargetProperty="Opacity" To="1"
+                                     Duration="{StaticResource DurNormal}"
+                                     EasingFunction="{StaticResource CurvaSalida}" />
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Subrayado"
+                                     Storyboard.TargetProperty="Opacity" To="0"
+                                     Duration="{StaticResource DurRapida}"
+                                     EasingFunction="{StaticResource CurvaSalida}" />
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
               <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Subrayado" Property="Opacity" Value="1" />
               <Setter TargetName="Subrayado" Property="Background" Value="{DynamicResource FocusRingBrush}" />
             </Trigger>
           </ControlTemplate.Triggers>
@@ -961,7 +1108,7 @@
 
   <Style x:Key="RangeToggleStyle" TargetType="ToggleButton">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontSize" Value="{StaticResource FsCaption}" />
     <Setter Property="Padding" Value="10,5" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
@@ -974,7 +1121,7 @@
           <Border x:Name="Bd" Background="{TemplateBinding Background}"
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}"
-                  CornerRadius="4" Padding="{TemplateBinding Padding}">
+                  CornerRadius="{StaticResource RadSm}" Padding="{TemplateBinding Padding}">
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
           </Border>
           <ControlTemplate.Triggers>
@@ -1001,32 +1148,68 @@
 
   <!-- Alerta de proceso -->
   <Style x:Key="AlertBoxStyle" TargetType="Border">
-    <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadMd}" />
+    <Setter Property="Padding" Value="{StaticResource TkTarjetaCompacta}" />
     <Setter Property="Margin" Value="0,0,0,8" />
-    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderThickness" Value="{StaticResource BdFino}" />
+    <!-- Fondo y borde por defecto. Sin ellos el Border salia transparente y con el borde a nulo,
+         asi que el aviso del dashboard de modulo era texto rojo suelto donde el nombre del estilo
+         promete una caja. Quien quiera otro color (peligro, aviso) lo sobrescribe. -->
+    <Setter Property="Background" Value="{DynamicResource NeutralSoftBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+  </Style>
+
+  <!-- Pantalla que ocupa el alto disponible en vez de crecer hacia abajo.
+
+       La fila "*" de una pantalla de listado solo mide algo si alguien acota el alto, y el
+       ScrollViewer del shell (MainWindow.xaml) mide con alto INFINITO: sin esto, la fila "*"
+       degenera en Auto, la tabla pide el alto de todas sus filas y quien se desplaza es la
+       pagina entera, llevandose de vista los filtros y la cabecera de columnas.
+
+       Acotado el alto, la fila "*" reparte de verdad y el DataGrid activa su propia barra
+       dentro del recuadro. Es la via compatible con 5f5eb36, que quito el MaxHeight fijo de
+       las tablas justamente para que el alto lo decidiera el contenedor y no un numero.
+
+       Va SOLO en las pantallas de listado, no en el shell: las vistas que son formularios
+       largos siguen necesitando crecer y desplazarse con la barra del shell. -->
+  <Style x:Key="PantallaPlenaStyle" TargetType="Grid">
+    <Setter Property="MaxHeight"
+            Value="{Binding ViewportHeight,
+                            RelativeSource={RelativeSource AncestorType=ScrollViewer}}" />
   </Style>
 
   <!-- DataGrid -->
   <Style x:Key="DataGridStyle" TargetType="DataGrid">
     <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontSize" Value="{StaticResource FsBody}" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
+    <!-- El desplazamiento de la tabla es SUYO, no de la pagina: la pantalla se acota con
+         PantallaPlenaStyle y lo que no cabe se resuelve aqui dentro. Horizontal en Auto: con
+         columnas "N*" el DataGrid reparte el ancho y no desborda; solo aparece si la suma de
+         los MinWidth no entra (ventana en su minimo a escala 125 %). -->
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
     <!-- La tabla va dentro de una tarjeta con Padding="0", pegada al marco. Un Border de WPF no
          recorta a sus hijos, asi que la cabecera —que pinta un rectangulo solido— tapaba las
          esquinas redondeadas y la tarjeta se veia cuadrada. 5 = radio de la tarjeta (RadMd, 6)
          menos su borde (1). Aqui y no en cada vista: lo comparten las veinte pantallas. -->
     <Setter Property="controls:RecorteRedondeado.Radio" Value="5" />
-    <!-- Rejilla completa: la horizontal separa registros y la vertical separa DATOS. En una tabla
-         de nueve columnas donde conviven codigos, nombres y cifras, sin la vertical la vista salta
-         de una columna a la de al lado y se leen dos datos como si fueran uno. Las dos van con
-         BorderBrush, que es la linea de pelo del sistema (1,28:1 sobre la superficie): marca la
-         division sin dibujar una cuadricula de hoja de calculo encima de los datos. -->
-    <Setter Property="GridLinesVisibility" Value="All" />
+    <!-- Solo la rejilla horizontal, y sin cebra.
+
+         Antes iban las dos cosas a la vez: rejilla completa MAS filas alternas tenidas. Son dos
+         mecanismos para lo mismo —separar registros— sumados uno encima del otro, y el resultado
+         es que los datos se leian dentro de una cuadricula de hoja de calculo en vez de en una
+         tabla. Queda un solo separador de registro, la linea horizontal.
+
+         La vertical se defendia porque en una tabla de nueve columnas la vista salta de una
+         columna a la de al lado. Ese trabajo lo hacen ahora el relleno de celda (10 px por lado,
+         era 8) y la alineacion: los rotulos a la izquierda, las cifras a la derecha con digitos
+         tabulares (ver Controls/ColumnaNumero.cs). Separar con aire en vez de con lineas es lo
+         que distingue una tabla de un formulario impreso. -->
+    <Setter Property="GridLinesVisibility" Value="Horizontal" />
     <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource BorderBrush}" />
-    <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource BorderBrush}" />
     <Setter Property="HeadersVisibility" Value="Column" />
     <Setter Property="AutoGenerateColumns" Value="False" />
     <Setter Property="IsReadOnly" Value="True" />
@@ -1042,7 +1225,6 @@
     <Setter Property="CanUserResizeRows" Value="False" />
     <Setter Property="SelectionMode" Value="Single" />
     <Setter Property="RowBackground" Value="Transparent" />
-    <Setter Property="AlternatingRowBackground" Value="{DynamicResource FilaAlternaBrush}" />
   </Style>
 
 </ResourceDictionary>

@@ -68,7 +68,7 @@
     </Grid>
 
     <TextBlock Text="Pasado el vencimiento, la factura aparece como vencida en el listado y en el resumen del módulo."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

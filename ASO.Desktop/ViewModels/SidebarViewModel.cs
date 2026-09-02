@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ASO.Desktop.Configuration;
+using ASO.Desktop.Controls;
 using ASO.Desktop.Navigation;
 using ASO.Desktop.Services;
 
@@ -99,7 +100,7 @@ public sealed class ModuloNavItem : ViewModelBase
     /// <summary>Etiqueta del chevron para lectores de pantalla y tooltip.</summary>
     public string TextoChevron => EstaExpandido ? $"Contraer {Nombre}" : $"Expandir {Nombre}";
 
-    public string GlifoChevron => EstaExpandido ? "" : "";
+    public string GlifoChevron => EstaExpandido ? Iconos.ChevronArriba : Iconos.ChevronAbajo;
 }
 
 /// <summary>

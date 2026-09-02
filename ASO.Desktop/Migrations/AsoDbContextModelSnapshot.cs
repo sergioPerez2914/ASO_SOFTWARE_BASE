@@ -2279,6 +2279,68 @@ namespace ASO.Desktop.Migrations
                     b.Navigation("Lineas");
                 });
 
+            modelBuilder.Entity("ASO.Desktop.Models.Remesa", b =>
+                {
+                    b.OwnsOne("ASO.Desktop.Models.BoletoCentral", "Boleto", b1 =>
+                        {
+                            b1.Property<int>("RemesaId")
+                                .HasColumnType("int");
+
+                            b1.Property<decimal?>("Atr")
+                                .HasColumnType("decimal(18,4)");
+
+                            b1.Property<decimal>("DescuentoAdministracion")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal>("DescuentoAlzaEmpuje")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal>("DescuentoCorte")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal>("DescuentoInvestigacion")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal>("DescuentoRural")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal>("DescuentoTransporte")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal?>("Fibra")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal>("MontoCanaEntregada")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<string>("Numero")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<decimal?>("Pureza")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal?>("TrashMineral")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal?>("TrashVegetal")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<decimal>("ValorLiquido")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.HasKey("RemesaId");
+
+                            b1.ToTable("Remesas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RemesaId");
+                        });
+
+                    b.Navigation("Boleto");
+                });
+
             modelBuilder.Entity("ASO.Desktop.Models.Requisicion", b =>
                 {
                     b.OwnsMany("ASO.Desktop.Models.RequisicionLinea", "Lineas", b1 =>

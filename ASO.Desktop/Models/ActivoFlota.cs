@@ -1,4 +1,5 @@
 using System;
+using ASO.Desktop.Controls;
 
 namespace ASO.Desktop.Models;
 
@@ -81,14 +82,14 @@ public class ActivoFlota : IEntidad<int>, IDeOrganizacion
         _ => "—"
     };
 
-    /// <summary>Glifo de Segoe MDL2 Assets que representa el tipo.</summary>
+    /// <summary>Glifo que representa el tipo. Ver <see cref="Iconos"/>.</summary>
     public string Glifo => Tipo switch
     {
-        TipoActivo.Cosechadora => "",   // Robot
-        TipoActivo.Tractor => "",       // Train
-        TipoActivo.Alzadora => "",      // StockUp
-        TipoActivo.Camion => "",        // Bus
-        _ => ""                         // BusSolid
+        TipoActivo.Cosechadora => Iconos.Cosechadora,
+        TipoActivo.Tractor => Iconos.Tractor,
+        TipoActivo.Alzadora => Iconos.Alzadora,
+        TipoActivo.Camion => Iconos.Camion,
+        _ => Iconos.Vehiculo
     };
 
     /// <summary>Copia superficial (solo tipos de valor y cadenas) para no mutar el original en la lista.</summary>

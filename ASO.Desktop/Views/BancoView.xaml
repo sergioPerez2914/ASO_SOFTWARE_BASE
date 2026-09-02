@@ -7,7 +7,7 @@
              mc:Ignorable="d"
              d:DesignHeight="640" d:DesignWidth="1100">
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -29,8 +29,7 @@
                    IsChecked="{Binding EsCuentas, Mode=TwoWay}" />
     </StackPanel>
 
-    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
-            Background="{DynamicResource BorderBrush}" />
+    <Border Grid.Row="1" Style="{StaticResource TabStripStyle}" VerticalAlignment="Bottom" />
 
     <!-- ===================== Movimientos: el extracto ===================== -->
     <Grid Grid.Row="2" Margin="0,16,0,0"
@@ -43,7 +42,7 @@
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+        <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
           <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto" />
@@ -73,24 +72,24 @@
                  falta por cuadrar. La diferencia es el dato que se busca al conciliar. -->
             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal"
                         VerticalAlignment="Center" Margin="12,0,0,0">
-              <StackPanel Margin="0,0,20,0">
+              <StackPanel Margin="0,0,24,0">
                 <TextBlock Text="Saldo de libro" FontSize="{StaticResource FsCaption}"
                            Foreground="{DynamicResource TextMutedBrush}" />
-                <TextBlock Text="{Binding SaldoLibroTexto}" FontWeight="SemiBold"
+                <TextBlock Text="{Binding SaldoLibroTexto}" FontWeight="{StaticResource FwMedium}"
                            FontSize="{StaticResource FsSubtitle}"
                            Foreground="{DynamicResource TextPrimaryBrush}" />
               </StackPanel>
-              <StackPanel Margin="0,0,20,0">
+              <StackPanel Margin="0,0,24,0">
                 <TextBlock Text="Conciliado" FontSize="{StaticResource FsCaption}"
                            Foreground="{DynamicResource TextMutedBrush}" />
-                <TextBlock Text="{Binding SaldoConciliadoTexto}" FontWeight="SemiBold"
+                <TextBlock Text="{Binding SaldoConciliadoTexto}" FontWeight="{StaticResource FwMedium}"
                            FontSize="{StaticResource FsSubtitle}"
                            Foreground="{DynamicResource SuccessTextBrush}" />
               </StackPanel>
               <StackPanel>
                 <TextBlock Text="Sin cuadrar" FontSize="{StaticResource FsCaption}"
                            Foreground="{DynamicResource TextMutedBrush}" />
-                <TextBlock Text="{Binding DiferenciaTexto}" FontWeight="SemiBold"
+                <TextBlock Text="{Binding DiferenciaTexto}" FontWeight="{StaticResource FwMedium}"
                            FontSize="{StaticResource FsSubtitle}"
                            Foreground="{DynamicResource TextSecondaryBrush}" />
               </StackPanel>
@@ -99,7 +98,6 @@
             <WrapPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,12,0,0"
                        VerticalAlignment="Center">
               <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                                  Sugerencia="Buscar por concepto, referencia o documento"
                                   Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
               <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -114,13 +112,13 @@
               </controls:FiltroDropdown>
 
               <!-- Período: vacío = sin límite por ese lado, que es como arranca. -->
-              <TextBlock Text="Desde" VerticalAlignment="Center" Margin="12,0,6,0"
+              <TextBlock Text="Desde" VerticalAlignment="Center" Margin="12,0,8,0"
                          FontSize="{StaticResource FsCaption}"
                          Foreground="{DynamicResource TextMutedBrush}" />
               <DatePicker Width="130" VerticalAlignment="Center"
                           Style="{StaticResource FormDatePickerStyle}"
                           SelectedDate="{Binding Desde}" />
-              <TextBlock Text="hasta" VerticalAlignment="Center" Margin="8,0,6,0"
+              <TextBlock Text="hasta" VerticalAlignment="Center" Margin="8,0,8,0"
                          FontSize="{StaticResource FsCaption}"
                          Foreground="{DynamicResource TextMutedBrush}" />
               <DatePicker Width="130" VerticalAlignment="Center"
@@ -164,7 +162,7 @@
                 <controls:ColumnaNumero Header="Entrada" Binding="{Binding EntradaTexto}" Width="10*" MinWidth="80">
                   <controls:ColumnaNumero.ElementStyle>
                     <Style TargetType="TextBlock">
-                      <Setter Property="FontWeight" Value="SemiBold" />
+                      <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
                       <Setter Property="Foreground" Value="{DynamicResource SuccessTextBrush}" />
                     </Style>
                   </controls:ColumnaNumero.ElementStyle>
@@ -172,7 +170,7 @@
                 <controls:ColumnaNumero Header="Salida" Binding="{Binding SalidaTexto}" Width="10*" MinWidth="80">
                   <controls:ColumnaNumero.ElementStyle>
                     <Style TargetType="TextBlock">
-                      <Setter Property="FontWeight" Value="SemiBold" />
+                      <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
                       <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
                     </Style>
                   </controls:ColumnaNumero.ElementStyle>
@@ -190,7 +188,7 @@
               </DataGrid.Columns>
             </DataGrid>
 
-            <controls:EmptyState Icono="&#xE8C7;"
+            <controls:EmptyState Icono="{x:Static controls:Iconos.Banco}"
                                  Titulo="{Binding TituloVacio}"
                                  Detalle="{Binding DetalleVacio}"
                                  Visibility="{Binding HasItems, ElementName=TablaMovimientos, Converter={StaticResource SinItemsAVis}}" />
@@ -208,7 +206,7 @@
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+        <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
           <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto" />
@@ -221,7 +219,6 @@
 
             <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
               <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                                  Sugerencia="Buscar por nombre, banco o número"
                                   Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
             </WrapPanel>
 
@@ -257,7 +254,7 @@
                 <controls:ColumnaNumero Header="Saldo actual" Binding="{Binding SaldoActualTexto}" Width="13*" MinWidth="92">
                   <controls:ColumnaNumero.ElementStyle>
                     <Style TargetType="TextBlock">
-                      <Setter Property="FontWeight" Value="SemiBold" />
+                      <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
                     </Style>
                   </controls:ColumnaNumero.ElementStyle>
                 </controls:ColumnaNumero>
@@ -273,7 +270,7 @@
               </DataGrid.Columns>
             </DataGrid>
 
-            <controls:EmptyState Icono="&#xE825;"
+            <controls:EmptyState Icono="{x:Static controls:Iconos.Cuenta}"
                                  Titulo="No hay cuentas"
                                  Detalle="Cree la primera cuenta —el banco, la caja chica— con el saldo que tiene hoy, y el libro empieza a contar desde ahí."
                                  Visibility="{Binding HasItems, ElementName=TablaCuentas, Converter={StaticResource SinItemsAVis}}" />

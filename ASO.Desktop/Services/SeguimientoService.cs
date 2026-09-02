@@ -147,7 +147,11 @@ public sealed class SeguimientoService
 
             if (remesa.PesoNetoT is { } neto)
                 yield return Crear(remesa.Id, TipoEventoOperacion.Pesaje, llegada,
-                    $"Bruto {remesa.PesoBrutoT:N2} t − tara {remesa.TaraT:N2} t = neto {neto:N2} t.");
+                    $"Bruto {remesa.PesoBrutoT:N2} t − tara {remesa.TaraT:N2} t = neto {neto:N2} t." +
+                    (remesa.Boleto is { } boleto
+                        ? $" Boleto {boleto.NumeroTexto} · {boleto.CalidadTexto}" +
+                          $" · valor líquido {boleto.ValorLiquido:N2}."
+                        : string.Empty));
         }
 
         if (remesa.FechaAnulacion is { } anulacion)

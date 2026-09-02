@@ -11,7 +11,7 @@
     <Style x:Key="MiniBotonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
       <Setter Property="Padding" Value="10,4" />
       <Setter Property="Cursor" Value="Hand" />
-      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontSize" Value="{StaticResource FsCaption}" />
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
       <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
@@ -51,7 +51,7 @@
       </StackPanel>
     </Grid>
 
-    <Grid Margin="0,18,0,0">
+    <Grid Margin="0,16,0,0">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="Auto" />
@@ -62,12 +62,12 @@
               Command="{Binding AgregarLoteCommand}" />
     </Grid>
 
-    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Margin="0,6,0,0">
+    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="{StaticResource RadSm}" Margin="0,8,0,0">
       <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding Lotes}">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
-              <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="10">
+              <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="8">
                 <StackPanel>
                   <Grid>
                     <Grid.ColumnDefinitions>
@@ -115,7 +115,7 @@
     </Border>
 
     <TextBlock Text="Un lote sin tablones o una finca sin lotes se pueden completar más adelante; no bloquea el guardado."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

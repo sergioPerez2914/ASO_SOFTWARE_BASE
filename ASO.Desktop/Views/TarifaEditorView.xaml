@@ -36,7 +36,7 @@
     </Grid>
 
     <TextBlock Text="Cobro = lo que se le factura al ingenio. Pago por destajo = lo que se le paga al núcleo o al trabajador."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <Grid>
@@ -84,7 +84,7 @@
     </Grid>
 
     <TextBlock Text="Sin fecha de fin, la tarifa rige indefinidamente. Las facturas y liquidaciones ya emitidas conservan el monto que se les aplicó."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <controls:FormField Etiqueta="Notas">
@@ -94,7 +94,7 @@
                Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
-    <CheckBox Content="Activa" Margin="0,14,0,0" Cursor="Hand"
+    <CheckBox Content="Activa" Margin="0,16,0,0" Cursor="Hand"
               Foreground="{DynamicResource TextPrimaryBrush}"
               IsChecked="{Binding Activa}" />
   </StackPanel>

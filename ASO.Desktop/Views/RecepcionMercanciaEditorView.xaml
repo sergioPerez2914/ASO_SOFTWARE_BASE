@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.RecepcionMercanciaEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.RecepcionMercanciaEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -8,7 +8,7 @@
              d:DesignWidth="760">
 
   <StackPanel>
-    <TextBlock Text="{Binding ResumenProveedor}" FontSize="12"
+    <TextBlock Text="{Binding ResumenProveedor}" FontSize="{StaticResource FsBody}"
                Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" />
 
     <TextBlock Text="Corrija la cantidad realmente recibida de cada línea; nace igual a lo pedido."
@@ -52,7 +52,7 @@
     </controls:FormField>
 
     <TextBlock Text="Al confirmar la recepción se suma cada línea al stock que le corresponde por lo realmente recibido, no por lo pedido."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

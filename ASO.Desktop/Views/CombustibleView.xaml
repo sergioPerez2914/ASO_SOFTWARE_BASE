@@ -8,7 +8,7 @@
              d:DesignHeight="640" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -32,8 +32,7 @@
                    IsChecked="{Binding EsCombustibleRecibido, Mode=TwoWay}" />
     </StackPanel>
 
-    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
-            Background="{DynamicResource BorderBrush}" />
+    <Border Grid.Row="1" Style="{StaticResource TabStripStyle}" VerticalAlignment="Bottom" />
 
     <!-- Vales de combustible -->
     <Grid Grid.Row="2" Margin="0,16,0,0"
@@ -44,7 +43,7 @@
     </Grid.RowDefinitions>
 
     <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -57,7 +56,6 @@
 
         <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por activo, stock de combustible o responsable"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -116,7 +114,7 @@
                   <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding ConsumoTexto}" FontSize="{StaticResource FsBody}"
                                Foreground="{DynamicResource TextPrimaryBrush}" />
-                    <TextBlock Text="Consumo alto" FontSize="{StaticResource FsCaption}" Margin="8,0,0,0" FontWeight="SemiBold"
+                    <TextBlock Text="Consumo alto" FontSize="{StaticResource FsCaption}" Margin="8,0,0,0" FontWeight="{StaticResource FwMedium}"
                                Foreground="{DynamicResource WarningBrush}" Visibility="Collapsed">
                       <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -145,7 +143,7 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xEB42;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Combustible}"
                              Titulo="No hay vales de combustible"
                              Detalle="Los vales aparecen aquí al despachar desde un stock de combustible."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
@@ -165,14 +163,14 @@
 
       <Border Grid.Row="0" Style="{StaticResource CardStyle}" Width="280" HorizontalAlignment="Left" Margin="0,0,0,12">
         <StackPanel>
-          <TextBlock Text="{Binding TituloValorTexto}" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
+          <TextBlock Text="{Binding TituloValorTexto}" FontSize="{StaticResource FsSubtitle}" FontWeight="{StaticResource FwMedium}"
                      Foreground="{DynamicResource TextPrimaryBrush}" />
-          <TextBlock Text="{Binding ValorMostradoTexto}" FontSize="{StaticResource FsDisplay}" FontWeight="Bold"
+          <TextBlock Text="{Binding ValorMostradoTexto}" FontSize="{StaticResource FsDisplay}" FontWeight="{StaticResource FwBold}"
                      Foreground="{DynamicResource PrimaryBrush}" Margin="0,4,0,0" />
         </StackPanel>
       </Border>
 
-      <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -180,7 +178,6 @@
           </Grid.RowDefinitions>
 
           <controls:SearchBox Grid.Row="0" Width="280" HorizontalAlignment="Left"
-                              Sugerencia="Buscar por marca, tipo o grado"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
@@ -208,7 +205,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <controls:EmptyState Icono="&#xE7B8;"
+          <controls:EmptyState Icono="{x:Static controls:Iconos.Lubricante}"
                                Titulo="No hay lubricantes en el catálogo"
                                Detalle="Da de alta una marca, tipo y grado para controlar su existencia."
                                Visibility="{Binding HasItems, ElementName=TablaLubricantes, Converter={StaticResource SinItemsAVis}}" />
@@ -229,9 +226,9 @@
 
       <Border Grid.Row="0" Style="{StaticResource CardStyle}" Width="280" HorizontalAlignment="Left" Margin="0,0,0,12">
         <StackPanel>
-          <TextBlock Text="Diésel en existencia" FontSize="{StaticResource FsSubtitle}" FontWeight="SemiBold"
+          <TextBlock Text="Diésel en existencia" FontSize="{StaticResource FsSubtitle}" FontWeight="{StaticResource FwMedium}"
                      Foreground="{DynamicResource TextPrimaryBrush}" />
-          <TextBlock Text="{Binding ExistenciaTotalTexto}" FontSize="{StaticResource FsDisplay}" FontWeight="Bold"
+          <TextBlock Text="{Binding ExistenciaTotalTexto}" FontSize="{StaticResource FsDisplay}" FontWeight="{StaticResource FwBold}"
                      Foreground="{DynamicResource PrimaryBrush}" Margin="0,4,0,0" />
           <TextBlock Text="Sin especificar en qué envase está." FontSize="{StaticResource FsCaption}" Margin="0,4,0,0"
                      Foreground="{DynamicResource TextMutedBrush}" />
@@ -251,7 +248,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <controls:EmptyState Icono="&#xEB42;"
+          <controls:EmptyState Icono="{x:Static controls:Iconos.Recepcion}"
                                Titulo="No hay recepciones de diésel"
                                Detalle="Los litros recibidos aparecen aquí al confirmar una recepción de mercancía de diésel."
                                Visibility="{Binding HasItems, ElementName=TablaCombustibleRecibido, Converter={StaticResource SinItemsAVis}}" />

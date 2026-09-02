@@ -81,6 +81,14 @@ public class Remesa : IEntidad<int>, IDeOrganizacion
     public decimal? TaraT { get; set; }
     public decimal? PesoNetoT => PesoBrutoT - TaraT;
 
+    /// <summary>
+    /// El boleto que emite el central al recibir la carga. Sin él la remesa no se cierra: es el
+    /// papel que dice qué calidad tenía la caña y cuánto reconoce pagar el central.
+    /// </summary>
+    public BoletoCentral? Boleto { get; set; }
+
+    public bool TieneBoleto => Boleto is not null;
+
     // --- Documento ---
     public EstadoRemesa Estado { get; set; }
     public string? MotivoAnulacion { get; set; }
@@ -118,6 +126,15 @@ public class Remesa : IEntidad<int>, IDeOrganizacion
 
     public string FacturadaTexto => FacturaClienteId is { } id ? $"FC-{id:D4}" : "No facturada";
 
-    /// <summary>Copia superficial (solo hay tipos de valor y cadenas) para no mutar el original en la lista.</summary>
-    public Remesa Clonar() => (Remesa)MemberwiseClone();
+    /// <summary>
+    /// Copia para no mutar el original que está en la lista. El boleto se clona aparte:
+    /// <c>MemberwiseClone</c> compartiría la misma instancia y editar la copia cambiaría lo que
+    /// hay en pantalla, igual que pasa con las líneas de los documentos que las llevan.
+    /// </summary>
+    public Remesa Clonar()
+    {
+        var copia = (Remesa)MemberwiseClone();
+        copia.Boleto = Boleto?.Clonar();
+        return copia;
+    }
 }

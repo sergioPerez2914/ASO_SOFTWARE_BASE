@@ -8,7 +8,7 @@
              d:DesignWidth="380">
 
   <StackPanel>
-    <TextBlock Text="{Binding Resumen}" FontSize="12" TextWrapping="Wrap"
+    <TextBlock Text="{Binding Resumen}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextSecondaryBrush}" />
 
     <controls:FormField Etiqueta="Concepto">
@@ -23,7 +23,7 @@
                Text="{Binding Monto, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
-    <TextBlock Text="{Binding EfectoTexto}" FontSize="11" TextWrapping="Wrap"
-               Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
+    <TextBlock Text="{Binding EfectoTexto}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
+               Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

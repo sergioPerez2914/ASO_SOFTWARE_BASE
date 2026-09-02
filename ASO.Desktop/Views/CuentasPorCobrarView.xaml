@@ -8,8 +8,9 @@
              d:DesignHeight="700" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
@@ -20,8 +21,19 @@
                          Titulo="{Binding Submodulo.Nombre}"
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
+    <!-- Los dos padrones: lo ya facturado y lo que espera factura. -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
+      <RadioButton Content="Facturas" GroupName="VistaCxC"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsFacturas, Mode=TwoWay}" />
+      <RadioButton Content="{Binding PendientesTexto}" GroupName="VistaCxC"
+                   Style="{StaticResource SegmentedTabStyle}"
+                   IsChecked="{Binding EsPendientes, Mode=TwoWay}" />
+    </StackPanel>
+    <Border Grid.Row="1" Style="{StaticResource TabStripStyle}" VerticalAlignment="Bottom" />
+
     <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="2" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -32,9 +44,9 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
+        <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                   Visibility="{Binding MostrarFacturas, Converter={StaticResource BoolToVis}}">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por número de factura, cliente o finca"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -58,20 +70,25 @@
           <Button Content="Generar factura" Style="{StaticResource PrimaryButtonStyle}"
                   Command="{Binding GenerarCommand}" />
           <Button Content="Emitir" Style="{StaticResource SecondaryButtonStyle}"
-                  Command="{Binding EmitirCommand}" />
+                  Command="{Binding EmitirCommand}"
+                  Visibility="{Binding MostrarFacturas, Converter={StaticResource BoolToVis}}" />
           <Button Content="Registrar cobro" Style="{StaticResource SecondaryButtonStyle}"
-                  Command="{Binding RegistrarCobroCommand}" />
+                  Command="{Binding RegistrarCobroCommand}"
+                  Visibility="{Binding MostrarFacturas, Converter={StaticResource BoolToVis}}" />
           <Button Content="Anular" Style="{StaticResource SecondaryButtonStyle}"
                   Foreground="{DynamicResource DangerTextBrush}"
-                  Command="{Binding AnularCommand}" />
+                  Command="{Binding AnularCommand}"
+                  Visibility="{Binding MostrarFacturas, Converter={StaticResource BoolToVis}}" />
           <Button Content="Eliminar" Style="{StaticResource SecondaryButtonStyle}"
                   Foreground="{DynamicResource DangerTextBrush}"
-                  Command="{Binding EliminarCommand}" />
+                  Command="{Binding EliminarCommand}"
+                  Visibility="{Binding MostrarFacturas, Converter={StaticResource BoolToVis}}" />
         </StackPanel>
       </Grid>
     </Border>
 
-    <Border Grid.Row="2" Style="{StaticResource SectionCardStyle}" Padding="0">
+    <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0"
+            Visibility="{Binding MostrarFacturas, Converter={StaticResource BoolToVis}}">
       <Grid>
         <DataGrid x:Name="Tabla" Style="{StaticResource DataGridStyle}"
                   ItemsSource="{Binding ItemsView}"
@@ -87,7 +104,7 @@
             <controls:ColumnaNumero Header="Total" Binding="{Binding TotalTexto}" Width="13*" MinWidth="92">
               <controls:ColumnaNumero.ElementStyle>
                 <Style TargetType="TextBlock">
-                  <Setter Property="FontWeight" Value="SemiBold" />
+                  <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
                 </Style>
               </controls:ColumnaNumero.ElementStyle>
             </controls:ColumnaNumero>
@@ -103,15 +120,55 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xEB11;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.CuentasPorCobrar}"
                              Titulo="No hay facturas al ingenio"
                              Detalle="Se generan a partir de las remesas recibidas y no facturadas."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />
       </Grid>
     </Border>
 
+    <!-- Remesas cerradas que todavía esperan factura: esto es dinero por cobrar, no una lista de
+         operaciones. La diferencia es contra el tarifario, según el boleto con que se cerró. -->
+    <Border Grid.Row="3" Style="{StaticResource SectionCardStyle}" Padding="0"
+            Visibility="{Binding MostrarPendientes, Converter={StaticResource BoolToVis}}">
+      <Grid>
+        <DataGrid x:Name="TablaPendientes" Style="{StaticResource DataGridStyle}"
+                  ItemsSource="{Binding RemesasPorFacturar}" IsReadOnly="True">
+          <DataGrid.Columns>
+            <controls:ColumnaTexto Header="Remesa" Binding="{Binding Id}" Width="8*" MinWidth="72" />
+            <controls:ColumnaTexto Header="Recibida" Binding="{Binding FechaTexto}" Width="11*" MinWidth="82" />
+            <controls:ColumnaTexto Header="Finca" Binding="{Binding FincaNombre}" Width="22*" MinWidth="130" />
+            <controls:ColumnaTexto Header="Boleto" Binding="{Binding BoletoTexto}" Width="11*" MinWidth="82" />
+            <controls:ColumnaNumero Header="Neto (t)" Binding="{Binding ToneladasTexto}" Width="11*" MinWidth="76" />
+            <controls:ColumnaNumero Header="Según tarifario" Binding="{Binding CobroEstimadoTexto}" Width="13*" MinWidth="96" />
+            <controls:ColumnaNumero Header="Según boleto" Binding="{Binding DeclaradoTexto}" Width="13*" MinWidth="96" />
+            <controls:ColumnaNumero Header="Diferencia" Binding="{Binding DiferenciaTexto}" Width="12*" MinWidth="88">
+              <controls:ColumnaNumero.ElementStyle>
+                <Style TargetType="TextBlock">
+                  <Setter Property="HorizontalAlignment" Value="Right" />
+                  <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
+                  <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Cuadra}" Value="True">
+                      <Setter Property="FontWeight" Value="Normal" />
+                      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </controls:ColumnaNumero.ElementStyle>
+            </controls:ColumnaNumero>
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <controls:EmptyState Icono="{x:Static controls:Iconos.CuentasPorCobrar}"
+                             Titulo="No hay remesas esperando factura"
+                             Detalle="Las remesas aparecen aquí al cerrarlas con el boleto del central, en Operaciones · Registro de Operación."
+                             Visibility="{Binding HasItems, ElementName=TablaPendientes, Converter={StaticResource SinItemsAVis}}" />
+      </Grid>
+    </Border>
+
     <!-- Detalle: las líneas de la factura seleccionada -->
-    <Border Grid.Row="3" Style="{StaticResource CardStyle}" Margin="0,12,0,0"
+    <Border Grid.Row="4" Style="{StaticResource CardStyle}" Margin="0,12,0,0"
             Visibility="{Binding HayDetalle, Converter={StaticResource BoolToVis}}">
       <StackPanel>
         <Grid>

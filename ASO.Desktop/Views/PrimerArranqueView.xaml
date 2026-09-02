@@ -10,16 +10,16 @@
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
         Background="{DynamicResource BackgroundBrush}"
-        FontFamily="Segoe UI">
+        FontFamily="{StaticResource AppFont}">
 
-  <Grid Margin="28">
+  <Grid Margin="24">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
     <StackPanel Grid.Row="0" Margin="0,0,0,16">
-      <TextBlock Text="Configuración inicial" FontSize="{StaticResource FsDisplay}" FontWeight="Bold"
+      <TextBlock Text="Configuración inicial" FontSize="{StaticResource FsDisplay}" FontWeight="{StaticResource FwBold}"
                  Foreground="{DynamicResource PrimaryBrush}" />
       <TextBlock TextWrapping="Wrap" FontSize="{StaticResource FsBody}" Margin="0,4,0,0"
                  Foreground="{DynamicResource TextSecondaryBrush}"
@@ -52,12 +52,12 @@
                  Text="{Binding NombreCompleto, UpdateSourceTrigger=PropertyChanged}" />
 
         <TextBlock Text="Contraseña" Style="{StaticResource FormLabelStyle}" />
-        <PasswordBox x:Name="PasswordBox" Padding="8,6" />
+        <PasswordBox x:Name="PasswordBox" Padding="8,8" />
 
         <TextBlock Text="{Binding MensajeError}" Foreground="{DynamicResource DangerBrush}"
-                   FontSize="{StaticResource FsBody}" TextWrapping="Wrap" Margin="0,10,0,0" />
+                   FontSize="{StaticResource FsBody}" TextWrapping="Wrap" Margin="0,8,0,0" />
 
-        <Button Content="Crear y continuar" Style="{StaticResource PrimaryButtonStyle}" Margin="0,18,0,0" Click="OnCrear" />
+        <Button Content="Crear y continuar" Style="{StaticResource PrimaryButtonStyle}" Margin="0,16,0,0" Click="OnCrear" />
       </StackPanel>
     </Border>
   </Grid>

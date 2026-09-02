@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.CompararProveedoresEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.CompararProveedoresEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,16 +9,16 @@
 
   <StackPanel>
     <TextBlock Text="{Binding Requisicion.LineasTexto}" TextWrapping="Wrap"
-               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" />
+               FontSize="{StaticResource FsBody}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8" />
 
     <Border Style="{StaticResource SectionCardStyle}" BorderBrush="{DynamicResource PrimaryBrush}"
-            BorderThickness="2" Margin="0,0,0,14">
+            BorderThickness="2" Margin="0,0,0,16">
       <StackPanel>
         <TextBlock Text="¿Cuándo dejar de agregar líneas?" FontSize="{StaticResource FsSubtitle}"
                    FontWeight="{StaticResource FwBold}" Foreground="{DynamicResource TextPrimaryBrush}" />
         <TextBlock Text="Cuando el chip de cada necesidad diga &quot;Completo&quot;, ya no hace falta agregar más líneas contra ella."
-                   FontSize="11" TextWrapping="Wrap"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,10" />
+                   FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,8" />
 
         <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="140" IsReadOnly="True"
                   ItemsSource="{Binding NecesidadesCobertura}" AutoGenerateColumns="False"
@@ -195,7 +195,7 @@
     </Grid>
 
     <TextBlock Text="No hace falta que la cantidad de cada línea iguale lo pedido: una misma necesidad puede cubrirse con varias líneas (distinta marca o presentación). El precio se completa abajo, por línea."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,4" />
 
     <DataGrid Style="{StaticResource DataGridStyle}" MaxHeight="220" IsReadOnly="False"
@@ -252,7 +252,7 @@
     </DataGrid>
 
     <TextBlock Text="La fila seleccionada en la grilla es la cotización ganadora. Cada cotización queda registrada, con su detalle, al agregarla, aunque al final no se arme la orden en este momento."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
 
     <StackPanel Visibility="{Binding HayGanadora, Converter={StaticResource BoolToVis}}" Margin="0,16,0,0">
@@ -277,7 +277,7 @@
                  FontWeight="{StaticResource FwMedium}" Margin="0,8,0,0" />
 
       <TextBlock Text="Ya está completo: viene tal cual se cargó al cotizar a este proveedor."
-                 FontSize="11" TextWrapping="Wrap"
+                 FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                  Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
     </StackPanel>
   </StackPanel>

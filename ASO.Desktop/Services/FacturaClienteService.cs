@@ -93,19 +93,17 @@ public sealed class FacturaClienteService
                 throw new InvalidOperationException(
                     $"La remesa Nº {remesa.Id} no tiene pesaje registrado: no hay toneladas que facturar.");
 
-            foreach (var (servicio, nucleo) in ServiciosDe(remesa))
+            foreach (var cobro in _tarifas.CalcularCobroPorServicio(remesa, toneladas, fecha))
             {
-                var tarifa = _tarifas.ExigirVigente(servicio, AmbitoTarifa.Cobro, fecha, UnidadTarifa.Tonelada);
-
                 factura.Lineas.Add(new FacturaClienteLinea
                 {
                     RemesaId = remesa.Id,
                     FincaNombre = remesa.FincaNombre,
                     FechaRecepcion = fecha,
-                    Servicio = servicio,
-                    NucleoCodigo = nucleo,
-                    Toneladas = toneladas,
-                    TarifaMonto = tarifa.MontoPorUnidad
+                    Servicio = cobro.Servicio,
+                    NucleoCodigo = cobro.NucleoCodigo,
+                    Toneladas = cobro.Toneladas,
+                    TarifaMonto = cobro.TarifaMonto
                 });
             }
         }
@@ -229,14 +227,6 @@ public sealed class FacturaClienteService
         _facturas.GetAll()
             .Where(f => f.EstaVencida)
             .Sum(f => f.Total);
-
-    /// <summary>Los tres servicios de una remesa, cada uno con el núcleo que lo prestó.</summary>
-    private static IEnumerable<(ServicioZafra Servicio, string Nucleo)> ServiciosDe(Remesa remesa)
-    {
-        yield return (ServicioZafra.Corte, remesa.NucleoCorteCodigo);
-        yield return (ServicioZafra.AlzaEmpuje, remesa.NucleoAlzaEmpujeCodigo);
-        yield return (ServicioZafra.Transporte, remesa.NucleoTransporteCodigo);
-    }
 
     /// <summary>
     /// Devuelve las remesas de la factura al estado de facturables.

@@ -24,7 +24,7 @@
       </ComboBox>
     </controls:FormField>
 
-    <TextBlock Text="{Binding ExistenciaTexto}" FontSize="11" TextWrapping="Wrap"
+    <TextBlock Text="{Binding ExistenciaTexto}" FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <Grid>
@@ -76,7 +76,7 @@
     </controls:FormField>
 
     <TextBlock Text="Al confirmar la salida, su costo se suma al del mantenimiento elegido. Elija primero el activo para ver sus mantenimientos."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,4,0,0" />
 
     <controls:FormField Etiqueta="Motivo">

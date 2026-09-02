@@ -54,7 +54,7 @@
     </controls:FormField>
 
     <TextBlock Text="La recarga suma los litros al stock de combustible al guardarse: se registra cuando el combustible ya está descargado."
-               FontSize="11" TextWrapping="Wrap"
+               FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

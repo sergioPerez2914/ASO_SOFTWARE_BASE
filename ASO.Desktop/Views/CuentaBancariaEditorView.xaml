@@ -95,11 +95,11 @@
                Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
-    <CheckBox Content="Activa" Margin="0,10,0,0"
+    <CheckBox Content="Activa" Margin="0,8,0,0"
               IsChecked="{Binding Activa}"
               ToolTip="Una cuenta cerrada deja de ofrecerse al registrar, pero conserva su historial" />
 
-    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,10,0,0"
+    <TextBlock TextWrapping="Wrap" FontSize="{StaticResource FsCaption}" Margin="0,8,0,0"
                Foreground="{DynamicResource TextMutedBrush}"
                Text="El saldo inicial absorbe todo lo anterior a la fecha de apertura y solo se fija al crear la cuenta: cambiarlo después movería de un plumazo todos los saldos calculados, sin ningún asiento que lo explicara. Para corregirlo, registre un movimiento de ajuste." />
   </StackPanel>

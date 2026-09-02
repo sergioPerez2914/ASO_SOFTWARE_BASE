@@ -8,7 +8,7 @@
              d:DesignHeight="700" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -21,7 +21,7 @@
                          Descripcion="{Binding Submodulo.Descripcion}" />
 
     <!-- Barra de herramientas: búsqueda, filtro por estado y acciones -->
-    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="1" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -34,7 +34,6 @@
 
         <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por núcleo o empleado"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -88,7 +87,7 @@
             <controls:ColumnaNumero Header="Neto" Binding="{Binding NetoTexto}" Width="12*" MinWidth="88">
               <controls:ColumnaNumero.ElementStyle>
                 <Style TargetType="TextBlock">
-                  <Setter Property="FontWeight" Value="SemiBold" />
+                  <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
                 </Style>
               </controls:ColumnaNumero.ElementStyle>
             </controls:ColumnaNumero>
@@ -104,7 +103,7 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xE9F9;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Liquidaciones}"
                              Titulo="No hay liquidaciones"
                              Detalle="Se generan a partir de las remesas y jornadas del período."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />

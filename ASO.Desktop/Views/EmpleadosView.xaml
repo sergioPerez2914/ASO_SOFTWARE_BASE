@@ -8,7 +8,7 @@
              d:DesignHeight="640" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -32,8 +32,7 @@
                    IsChecked="{Binding EsCampo, Mode=TwoWay}" />
     </StackPanel>
 
-    <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
-            Background="{DynamicResource BorderBrush}" />
+    <Border Grid.Row="1" Style="{StaticResource TabStripStyle}" VerticalAlignment="Bottom" />
 
     <!-- Padrón administrativo: empleados de nómina del centro -->
     <Grid Grid.Row="2" Margin="0,16,0,0"
@@ -46,7 +45,7 @@
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -59,7 +58,6 @@
 
           <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
             <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                                Sugerencia="Buscar por nombre, cédula o cargo"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
             <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -108,7 +106,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <controls:EmptyState Icono="&#xE716;"
+          <controls:EmptyState Icono="{x:Static controls:Iconos.Empleados}"
                                Titulo="No hay empleados"
                                Detalle="Da de alta al personal de nómina y de taller."
                                Visibility="{Binding HasItems, ElementName=Tabla1, Converter={StaticResource SinItemsAVis}}" />
@@ -126,7 +124,7 @@
         <RowDefinition Height="*" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+      <Border Grid.Row="0" Style="{StaticResource ToolbarStyle}">
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -139,7 +137,6 @@
 
           <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
             <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                                Sugerencia="Buscar por nombre, cédula, rol o núcleo"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
             <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -190,7 +187,7 @@
             </DataGrid.Columns>
           </DataGrid>
 
-          <controls:EmptyState Icono="&#xE716;"
+          <controls:EmptyState Icono="{x:Static controls:Iconos.Empleados}"
                                Titulo="No hay personal de campo"
                                Detalle="Es quien firma las remesas: da de alta al primero."
                                Visibility="{Binding HasItems, ElementName=Tabla2, Converter={StaticResource SinItemsAVis}}" />

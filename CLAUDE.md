@@ -77,8 +77,10 @@ porque el socio todavía no aportó tarifario real ni formatos de liquidación y
   los calcula `ModuloDashboardViewModel.CalcularIndicadores` (un `switch` por clave de módulo); todos
   los módulos tienen datos reales salvo el "Tiempo muerto" de Operaciones, sin definir.
 - `Views/SubmoduloView` — submódulo en construcción, con ruta `Módulo · Submódulo` y "Volver al módulo".
-- `Styles/Colors.xaml` + `Theme.xaml` — paleta y estilos (CardStyle, CardButtonStyle, NavItemStyle,
-  NavSubItemStyle, DataGridStyle). Iconos = Segoe MDL2 Assets.
+- `Styles/Tokens.xaml` + `Colors.xaml` + `Theme.xaml` — el sistema visual (ver "El sistema visual"
+  más abajo). Iconos = fuente Phosphor empotrada en Assets/Fonts/Phosphor.ttf; los puntos de
+  codigo tienen nombre en Controls/Iconos.cs y se usan como {x:Static controls:Iconos.Loque} —
+  nunca &#x…; a mano.
 - `Views/ConfiguracionView` — apariencia, la propia cuenta y las preferencias de la máquina
   (ver "Configuración y preferencias").
 - Framework CRUD reutilizable (`CrudViewModelBase`, `CrudEditorViewModelBase`, `CrudEditorWindow`,
@@ -316,6 +318,97 @@ grado, como se explica arriba. **Sigue pendiente con el socio cómo se van a ras
 presentaciones reales** (por barril/garrafa, con su propio conteo) — `StockCombustible` es un
 número general mientras tanto, ver `Models/StockCombustible.cs`.
 
+## El sistema visual (refinado el 2026-09-02)
+
+Las cuatro reglas que hay que respetar al escribir XAML nuevo:
+
+1. **Color por `DynamicResource`** a una clave de `Colors.xaml`, nunca un hex a mano — es lo único
+   que sobrevive al cambio de tema (ver `Services/Tema.cs`). **Forma y tamaño por `StaticResource`**
+   a `Tokens.xaml`. La excepción son los diccionarios HERMANOS (`Controles.xaml`,
+   `Componentes.xaml`): ahí TODO va por `DynamicResource`, incluidos los tokens, porque un
+   `StaticResource` dentro de una `ControlTemplate` no alcanza al hermano y revienta la primera vez
+   que se pinta ese control, no al arrancar.
+2. **Una clave nueva de color va en LAS DOS paletas.** `ColorsOscuro.xaml` no hereda de
+   `Colors.xaml`: la que falte se resuelve contra la clara y sale un parche claro sobre fondo oscuro.
+3. **No se anima un brush: se anima la opacidad** de un velo o de un borde superpuesto. Los brushes
+   de los diccionarios se congelan al cargarse y mutarlos lanza. Además la opacidad vale igual en
+   los dos temas sin escribir la animación dos veces. Duraciones en `DurRapida` (120 ms) y
+   `DurNormal` (180 ms); nada pasa de ahí y nada mueve contenido salvo el sidebar.
+4. **Sombra solo en lo que flota** (desplegable, calendario, tooltip, menú), por
+   `Effect="{DynamicResource SombraFlotante}"` — el efecto entero por clave, no su color: un
+   `DropShadowEffect` es `Freezable` y un `DynamicResource` sobre su `Color` no se resuelve desde
+   dentro de una plantilla. Una tarjeta de datos NO lleva sombra: se separa por su borde.
+
+Lo que se hizo en el refinamiento, y por qué:
+
+- **Satoshi con sus tres cortes** (Regular, Medium, Bold), no solo Bold. Con un peso único no hay
+  jerarquía y el título, el cuerpo y el pie pesan igual. `FwMedium` es **Medium** y no SemiBold
+  porque Satoshi no trae SemiBold y WPF lo sintetizaría engordando el Medium.
+- **Escala tipográfica con los escalones de arriba separados** (10/11/13/14/16/22/28, más
+  `FsHero` 36). El cuerpo subió de 12 a 13: el texto en Regular pesa menos en pantalla que el mismo
+  texto en Bold. El sitio lo devuelve el espaciado, más compacto (`TkControl 8,4`, `TkBoton 12,4`).
+- **`AltoControl` (28) y `AltoFila` (32) como `MinHeight`**, no solo relleno: con relleno solo, dos
+  botones con textos de distinta altura de línea salían de distinto tamaño y la barra quedaba dentada.
+- **La barra de herramientas dejó de ser tarjeta** (`ToolbarStyle`, que existía sin usarse). Una
+  pantalla de listado tenía dos cajas blancas idénticas donde solo una tiene datos.
+- **La tabla dejó la rejilla completa y la cebra**, que son dos mecanismos para lo mismo sumados:
+  queda la línea horizontal. La cabecera es un rótulo (`FsCaption`, gris, sobre `SurfaceBrush`) y
+  no otra fila más; separar columnas lo hacen ahora el relleno y la alineación. La fila elegida se
+  tiñe con `InfoSoftBrush` — antes usaba `NavSelectedBrush`, que significa "módulo activo del menú"
+  y se separaba del hover por un 4 % de luminancia.
+- **El ítem del sidebar es una pastilla metida hacia dentro**, y esa es la ÚNICA señal de elegido
+  junto con el color del rótulo. Antes eran tres a la vez (relleno de borde a borde, barra de 3 px
+  y color): con tres señales para un solo hecho, ninguna manda.
+- **`BorderStrongBrush`**, un escalón más de borde, para lo que el borde fino no separa (cabecera de
+  tabla, tarjeta señalada). Sin él había que recurrir al verde, y el verde debería significar algo:
+  por eso el hover de `CardButtonStyle` y el icono de la tarjeta de dashboard dejaron de ser verdes.
+- **Los tintes suaves de estado** eran los Tailwind de fábrica en una paleta derivada del CC-20; se
+  bajaron de saturación. Los pares de texto no se tocan: su contraste ya estaba medido.
+
+## Operaciones · el boleto del central cierra la remesa (2026-09-02)
+
+Antes la remesa se abría con ~18 campos de una sentada y se cerraba con tres (llegada, bruto,
+tara). Las dos puntas cambiaron:
+
+- **El alta solo pregunta el inicio de carga** (`NuevaRemesaEditorViewModel`). Es lo único que se
+  sabe en el campo cuando arranca la carga; lo demás se completa con "Editar", que sigue abriendo
+  el formulario largo de siempre (`RemesaEditorViewModel`). `RegistroOperacionViewModel.CrearEditor`
+  ramifica por `item.Id == 0`. **La normativa se sigue cumpliendo donde toca**:
+  `RemesaService.EstaCompleta` no deja confirmar un documento a medias y enumera qué falta —
+  ya trataba `default` y `0` como faltante, así que no hizo falta tocarla.
+- **Cerrar la remesa exige el boleto que emite el central** (`Models/BoletoCentral.cs`, tipo
+  *owned* de `Remesa`, con la migración `Fase27_BoletoCentral` que suma columnas `Boleto_*`
+  nullable a `Remesas`). Los campos salen del ejemplar de `docs/boleto.pdf`: número de formulario,
+  calidad (ATR, fibra, pureza, trash mineral y vegetal) y los montos que el central reconoce —
+  caña entregada, seis descuentos (corte, alza y empuje, transporte, administración, rural,
+  investigación) y valor líquido. `RemesaService.RegistrarRecepcion` pasó a ser
+  `RegistrarBoleto`; el estado terminal sigue siendo `Recibida` (no se agregó ni se renombró
+  ningún estado) y el permiso sigue siendo `Remesas.Recepcion`.
+- **El pesaje NO se mudó al boleto.** `PesoBrutoT`/`TaraT`/`PesoNetoT` siguen en `Remesa` porque
+  son las toneladas operativas que leen la facturación, la liquidación y el seguimiento; moverlas
+  habría tocado cuatro consumidores y migrado las filas existentes sin ganar nada. La fecha del
+  boleto tampoco se guarda: es `LlegadaCentral`, y guardarla dos veces daría dos versiones del
+  mismo dato.
+- **Se comparan las dos cifras, y la diferencia avisa pero no bloquea.** El cálculo de cobro por
+  servicio salió de `FacturaClienteService.GenerarBorrador` a
+  `TarifaService.CalcularCobroPorServicio`, que ahora usan la factura y el boleto: **dos
+  implementaciones darían dos cifras para lo mismo y la comparación dejaría de servir para
+  reclamar**. La comparación vive en el ViewModel del editor y no en `RemesaService` a propósito —
+  es un dato para reclamarle al central, no una regla del documento. Sin tarifario cargado se
+  muestra por qué no se puede comparar y el boleto se registra igual.
+- **La calidad es informativa**: el cobro sigue siendo tarifa × toneladas netas. Se captura desde
+  ya para que el día que el socio defina la fórmula del ATR los datos estén desde el principio.
+- **Finanzas · Cuentas por Cobrar enseña dos padrones** (pestañas, como Cuentas por Pagar): las
+  facturas y **las remesas cerradas que esperan factura**, con lo que dice el tarifario, lo que
+  dice el boleto y la diferencia. Antes esas remesas solo existían dentro del diálogo de generar y
+  como un número suelto en el resumen de cartera, cuando son dinero por cobrar. La consulta ya
+  existía (`FacturaClienteService.RemesasFacturables`); lo que faltaba era enseñarla.
+- **Facturar por lotes ya funcionaba** —`FacturaCliente` nace con tres líneas por remesa y la
+  selección es una lista de casillas—; lo que se agregó es el caso real de "las cinco de la
+  semana": filtro por rango de fechas y marcar/desmarcar en bloque. El filtro **esconde filas pero
+  no las desmarca**, y una marcada que quedó fuera del rango se avisa en el total en vez de
+  descontarse sola.
+
 ## Finanzas · Banco: el libro de entradas y salidas (2026-08-26)
 
 **El sistema no se conecta con ningún banco.** Banco es un libro interno de caja: dice cuánto
@@ -424,7 +517,7 @@ hay mocks: `Configuration/DataSourceFactory.cs` devuelve siempre la implementaci
   `Fase18_ClaseLubricanteEnRequisicion` → `Fase19_LineasCotizacionProveedor` →
   `Fase20_UnidadesEnCotizacionYOrden` → `Fase21_FacturaProveedorBorradorYLineas` →
   `Fase22_Zafra` → `Fase23_LubricanteEnLitros` → `Fase24_VariasLineasPorNecesidad` →
-  `Fase25_EnvasesEnCotizacionYOrden`.
+  `Fase25_EnvasesEnCotizacionYOrden` → `Fase26_DuenoYHectareasFinca` → `Fase27_BoletoCentral`.
 - **La cadena de conexión vive solo en `appsettings.local.json`** (por máquina, en `.gitignore`).
 - **No hay claves foráneas reales** en las tablas planas: las relaciones son `int` sueltos y la
   integridad es de la aplicación, con snapshots de texto (`…Nombre`, `…Codigo`) en cada documento.
@@ -544,12 +637,12 @@ pero no en la primera):
   entidad `IDeOrganizacion` más y una migración, para algo que ni siquiera es dato del negocio.
   `Leer()` **nunca lanza**: archivo ausente, corrupto o sin permisos caen en los valores por
   defecto — corre en el arranque, antes del login, y ahí no hay dónde informar de nada.
-- **El tema cambia en caliente superponiendo un diccionario.** `Styles/ColorsOscuro.xaml` define
-  las 26 claves de brush de la paleta oscura, y `Services/Tema.cs` lo agrega o lo quita del final de
-  `Application.Resources.MergedDictionaries`: los diccionarios fusionados se recorren en orden
-  inverso, así que el último puesto tapa a `Colors.xaml`. `ColorsOscuro.xaml` **no** mergea
-  `Colors.xaml` y define las 26 completas — una clave que faltara se resolvería contra la paleta
-  clara y saldría un recuadro blanco sobre fondo oscuro.
+- **El tema cambia en caliente superponiendo un diccionario.** `Styles/ColorsOscuro.xaml` define la
+  paleta oscura (43 brushes más el efecto `SombraFlotante`), y `Services/Tema.cs` lo agrega o lo
+  quita del final de `Application.Resources.MergedDictionaries`: los diccionarios fusionados se
+  recorren en orden inverso, así que el último puesto tapa a `Colors.xaml`. `ColorsOscuro.xaml`
+  **no** mergea `Colors.xaml` y las define TODAS — una clave que faltara se resolvería contra la
+  paleta clara y saldría un recuadro claro sobre fondo oscuro.
 
   **Todas las referencias a color del XAML son `DynamicResource`, y las nuevas también tienen que
   serlo.** No es preferencia de estilo, es lo único que funciona, y costó un intento fallido
@@ -649,7 +742,9 @@ Lo que hace falta para cerrarlas:
    períodos y desglose.
 4. **Cuadro de turnos** real (hoy solo Diurno/Nocturno) y qué cuenta como "tiempo muerto".
 5. Si el chofer lleva núcleo (C.O.D) y si una persona puede estar en los dos padrones.
-6. Qué pasa con las remesas confirmadas **sin pesaje**: hoy no aportan toneladas y no se liquidan.
+6. ~~Qué pasa con las remesas confirmadas **sin pesaje**~~ — resuelto el 2026-09-02: no hay remesa
+   cerrada sin pesaje, porque cerrarla exige el boleto del central (ver "Operaciones · el boleto"
+   más abajo). Una remesa confirmada y sin boleto se queda en Confirmada, a la vista.
 7. Cliente único vs. maestro de clientes, plazo de crédito real, y el tratamiento de notas de crédito
    y reverso de cobros.
 8. Medición de la cisterna (contómetro vs. aforo) y de dónde saldría el kilometraje para la unidad
@@ -680,7 +775,10 @@ Los tres tickets comparten un mismo patrón: cabecera + líneas, máquina de est
 confirmar, efectos en una sola transacción, auditoría, `ZafraId`.
 
 1. **Ticket de pesaje** (caña): bruto − tara = neto → toneladas. Efectos: acumula destajo, marca
-   "no facturado" (→ FacturaCxC, sin doble facturación), KPIs de producción.
+   "no facturado" (→ FacturaCxC, sin doble facturación), KPIs de producción. **Se construyó como
+   el boleto del central** (2026-09-02), y no como documento con su propia máquina de estados:
+   hay exactamente uno por remesa y su ciclo de vida es el de ella, así que es un tipo *owned*
+   dentro de `Remesa` en vez de una entidad aparte. Ver "Operaciones · el boleto del central".
 2. **Vale de combustible**: litros + horómetro. Efectos: descuenta cisterna, calcula L/ton y L/h,
    alerta si supera el promedio histórico × (1 + umbral%).
 3. **Salida de inventario**: artículo + cantidad. Efectos: descuenta `StockActual`, costo a la hoja de

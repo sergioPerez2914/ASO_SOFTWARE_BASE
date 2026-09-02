@@ -8,7 +8,7 @@
              d:DesignHeight="640" d:DesignWidth="1100">
 
 
-  <Grid>
+  <Grid Style="{StaticResource PantallaPlenaStyle}">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -26,7 +26,7 @@
         <StackPanel>
           <TextBlock Text="Toneladas entregadas" FontSize="{StaticResource FsBody}"
                      Foreground="{DynamicResource TextSecondaryBrush}" />
-          <TextBlock Text="{Binding ToneladasTexto}" FontSize="{StaticResource FsMetric}" FontWeight="Bold"
+          <TextBlock Text="{Binding ToneladasTexto}" FontSize="{StaticResource FsMetric}" FontWeight="{StaticResource FwBold}"
                      Foreground="{DynamicResource PrimaryBrush}" />
           <TextBlock Text="netas, en el período mostrado" FontSize="{StaticResource FsCaption}"
                      Foreground="{DynamicResource TextMutedBrush}" />
@@ -37,7 +37,7 @@
         <StackPanel>
           <TextBlock Text="Entregas" FontSize="{StaticResource FsBody}"
                      Foreground="{DynamicResource TextSecondaryBrush}" />
-          <TextBlock Text="{Binding EntregasTexto}" FontSize="{StaticResource FsMetric}" FontWeight="Bold"
+          <TextBlock Text="{Binding EntregasTexto}" FontSize="{StaticResource FsMetric}" FontWeight="{StaticResource FwBold}"
                      Foreground="{DynamicResource PrimaryBrush}" />
           <TextBlock Text="remesas recibidas en el central" FontSize="{StaticResource FsCaption}"
                      Foreground="{DynamicResource TextMutedBrush}" />
@@ -48,7 +48,7 @@
         <StackPanel>
           <TextBlock Text="Toneladas de hoy" FontSize="{StaticResource FsBody}"
                      Foreground="{DynamicResource TextSecondaryBrush}" />
-          <TextBlock Text="{Binding ToneladasHoyTexto}" FontSize="{StaticResource FsMetric}" FontWeight="Bold"
+          <TextBlock Text="{Binding ToneladasHoyTexto}" FontSize="{StaticResource FsMetric}" FontWeight="{StaticResource FwBold}"
                      Foreground="{DynamicResource PrimaryBrush}" />
           <TextBlock Text="entregadas en la jornada" FontSize="{StaticResource FsCaption}"
                      Foreground="{DynamicResource TextMutedBrush}" />
@@ -59,7 +59,7 @@
         <StackPanel>
           <TextBlock Text="Sin facturar" FontSize="{StaticResource FsBody}"
                      Foreground="{DynamicResource TextSecondaryBrush}" />
-          <TextBlock Text="{Binding SinFacturarTexto}" FontSize="{StaticResource FsMetric}" FontWeight="Bold"
+          <TextBlock Text="{Binding SinFacturarTexto}" FontSize="{StaticResource FsMetric}" FontWeight="{StaticResource FwBold}"
                      Foreground="{DynamicResource WarningBrush}" />
           <TextBlock Text="toneladas pendientes de cobro" FontSize="{StaticResource FsCaption}"
                      Foreground="{DynamicResource TextMutedBrush}" />
@@ -69,7 +69,7 @@
 
     <!-- Barra: búsqueda y rango -->
     <!-- Reporte de solo lectura: la barra no lleva fila de acciones porque no hay ninguna. -->
-    <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+    <Border Grid.Row="2" Style="{StaticResource ToolbarStyle}">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*" />
@@ -78,7 +78,6 @@
 
         <WrapPanel Grid.Column="0" VerticalAlignment="Center">
           <controls:SearchBox Width="280" Margin="0,0,12,0" VerticalAlignment="Center"
-                              Sugerencia="Buscar por finca, lote o núcleo de transporte"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
           <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
@@ -104,7 +103,7 @@
             <controls:ColumnaNumero Header="Toneladas" Binding="{Binding ToneladasTexto}" Width="12*" MinWidth="88">
               <controls:ColumnaNumero.ElementStyle>
                 <Style TargetType="TextBlock">
-                  <Setter Property="FontWeight" Value="SemiBold" />
+                  <Setter Property="FontWeight" Value="{StaticResource FwMedium}" />
                 </Style>
               </controls:ColumnaNumero.ElementStyle>
             </controls:ColumnaNumero>
@@ -112,7 +111,7 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xEAFC;"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Producto}"
                              Titulo="No hay producción que mostrar"
                              Detalle="Los datos salen de las remesas recibidas en el central."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />

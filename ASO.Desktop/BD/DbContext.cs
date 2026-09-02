@@ -271,10 +271,39 @@ public class AsoDbContext : DbContext
 
             entity.Ignore(r => r.PesoNetoT);
             entity.Ignore(r => r.Facturada);
+            entity.Ignore(r => r.TieneBoleto);
             entity.Ignore(r => r.EstadoTexto);
             entity.Ignore(r => r.TipoCosechaTexto);
             entity.Ignore(r => r.UbicacionTexto);
             entity.Ignore(r => r.FacturadaTexto);
+
+            // El boleto va en la misma tabla (OwnsOne, no una tabla aparte): hay exactamente uno
+            // por remesa y no se consulta por su cuenta. Todas sus columnas quedan nullable, que
+            // es lo que permite que una remesa sin cerrar no tenga boleto.
+            entity.OwnsOne(r => r.Boleto, boleto =>
+            {
+                boleto.Property(b => b.Numero).HasMaxLength(50);
+
+                boleto.Property(b => b.Atr).HasColumnType("decimal(18,4)");
+                boleto.Property(b => b.Fibra).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.Pureza).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.TrashMineral).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.TrashVegetal).HasColumnType("decimal(18,2)");
+
+                boleto.Property(b => b.MontoCanaEntregada).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.DescuentoCorte).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.DescuentoAlzaEmpuje).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.DescuentoTransporte).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.DescuentoAdministracion).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.DescuentoRural).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.DescuentoInvestigacion).HasColumnType("decimal(18,2)");
+                boleto.Property(b => b.ValorLiquido).HasColumnType("decimal(18,2)");
+
+                boleto.Ignore(b => b.TotalDescuentos);
+                boleto.Ignore(b => b.DescuentosDeServicio);
+                boleto.Ignore(b => b.NumeroTexto);
+                boleto.Ignore(b => b.CalidadTexto);
+            });
         });
 
         modelBuilder.Entity<JornadaTrabajo>(entity =>

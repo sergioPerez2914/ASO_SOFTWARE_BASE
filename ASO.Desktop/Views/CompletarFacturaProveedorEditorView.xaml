@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.CompletarFacturaProveedorEditorView"
+﻿<UserControl x:Class="ASO.Desktop.Views.CompletarFacturaProveedorEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -8,7 +8,7 @@
              d:DesignWidth="380">
 
   <StackPanel>
-    <TextBlock Text="{Binding Resumen}" FontSize="12" TextWrapping="Wrap"
+    <TextBlock Text="{Binding Resumen}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                Foreground="{DynamicResource TextSecondaryBrush}" />
 
     <controls:FormField Etiqueta="Nº de documento">
@@ -23,6 +23,6 @@
     </controls:FormField>
 
     <TextBlock Text="El proveedor, las líneas y el monto ya vienen de la orden de compra."
-               FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,6,0,0" />
+               FontSize="{StaticResource FsCaption}" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0" />
   </StackPanel>
 </UserControl>

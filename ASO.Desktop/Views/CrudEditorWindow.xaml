@@ -10,9 +10,9 @@
         ResizeMode="NoResize"
         WindowStyle="SingleBorderWindow"
         Background="{DynamicResource BackgroundBrush}"
-        FontFamily="Segoe UI">
+        FontFamily="{StaticResource AppFont}">
 
-  <Grid Margin="20">
+  <Grid Margin="24">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />

@@ -70,7 +70,7 @@
           </DataGrid.Columns>
         </DataGrid>
 
-        <controls:EmptyState Icono="&#xE787;" Compacto="True"
+        <controls:EmptyState Icono="{x:Static controls:Iconos.Calendario}" Compacto="True"
                              Titulo="Sin jornadas registradas"
                              Detalle="Todavía no ha fichado ninguna entrada en Gestión de Horarios."
                              Visibility="{Binding HasItems, ElementName=Tabla, Converter={StaticResource SinItemsAVis}}" />

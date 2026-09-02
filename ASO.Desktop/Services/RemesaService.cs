@@ -38,7 +38,7 @@ public sealed class RemesaService
     public bool PuedeAnular(Remesa remesa)
         => remesa.Estado is EstadoRemesa.Borrador or EstadoRemesa.Confirmada;
 
-    public bool PuedeRegistrarRecepcion(Remesa remesa) => remesa.Estado == EstadoRemesa.Confirmada;
+    public bool PuedeCargarBoleto(Remesa remesa) => remesa.Estado == EstadoRemesa.Confirmada;
 
     /// <summary>
     /// Guarda una edición del borrador dejando constancia de QUÉ cambió.
@@ -168,13 +168,18 @@ public sealed class RemesaService
     }
 
     /// <summary>
-    /// Registra la llegada al central y el pesaje en la romana. Es el paso que hace personal
-    /// del CAM en la Pre-Romana, no quien registró la remesa en el campo.
+    /// Cierra la remesa con el boleto que emite el central: llegada, pesaje en la romana y los
+    /// datos del papel (calidad y montos que reconoce pagar). Es el paso que hace personal del
+    /// CAM en la Pre-Romana, no quien registró la remesa en el campo.
+    ///
+    /// El boleto es obligatorio: sin él la remesa no se cierra, porque es el único documento que
+    /// respalda lo que después se le cobra al central.
     /// </summary>
-    public Remesa RegistrarRecepcion(Remesa remesa, DateTime llegada, decimal pesoBrutoT, decimal taraT)
+    public Remesa RegistrarBoleto(Remesa remesa, DateTime llegada, decimal pesoBrutoT, decimal taraT,
+                                  BoletoCentral boleto)
     {
-        if (!PuedeRegistrarRecepcion(remesa))
-            throw new InvalidOperationException($"Solo se registra la recepción de una remesa confirmada; esta está {remesa.EstadoTexto}.");
+        if (!PuedeCargarBoleto(remesa))
+            throw new InvalidOperationException($"Solo se carga el boleto de una remesa confirmada; esta está {remesa.EstadoTexto}.");
 
         if (!_sesion.Puede(Permisos.Remesas.Recepcion))
             throw new InvalidOperationException("No tienes permiso para registrar la recepción de remesas.");
@@ -188,14 +193,33 @@ public sealed class RemesaService
         if (pesoBrutoT <= taraT)
             throw new InvalidOperationException("El peso bruto debe ser mayor que la tara.");
 
+        if (string.IsNullOrWhiteSpace(boleto.Numero))
+            throw new InvalidOperationException("Indique el número del boleto del central.");
+
+        if (MontosNegativos(boleto))
+            throw new InvalidOperationException("Los montos del boleto no pueden ser negativos.");
+
+        var copiaBoleto = boleto.Clonar();
+        copiaBoleto.Numero = boleto.Numero.Trim();
+
         var actualizada = remesa.Clonar();
         actualizada.LlegadaCentral = llegada;
         actualizada.PesoBrutoT = pesoBrutoT;
         actualizada.TaraT = taraT;
+        actualizada.Boleto = copiaBoleto;
         actualizada.Estado = EstadoRemesa.Recibida;
         _source.Update(actualizada);
         return actualizada;
     }
+
+    /// <summary>
+    /// El boleto se transcribe de un papel, así que un signo menos solo puede ser un desliz al
+    /// teclear: los descuentos ya restan por su sitio en el documento, no por su signo.
+    /// </summary>
+    private static bool MontosNegativos(BoletoCentral boleto) =>
+        boleto.MontoCanaEntregada < 0 || boleto.ValorLiquido < 0
+        || boleto.DescuentoCorte < 0 || boleto.DescuentoAlzaEmpuje < 0 || boleto.DescuentoTransporte < 0
+        || boleto.DescuentoAdministracion < 0 || boleto.DescuentoRural < 0 || boleto.DescuentoInvestigacion < 0;
 
     /// <summary>
     /// Campos que la normativa exige tener llenos ("Todos los datos de la Remesa de caña deben ser

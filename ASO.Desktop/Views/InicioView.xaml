@@ -1,4 +1,4 @@
-<UserControl x:Class="ASO.Desktop.Views.InicioView"
+﻿<UserControl x:Class="ASO.Desktop.Views.InicioView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -27,9 +27,8 @@
       </ItemsControl.ItemsPanel>
       <ItemsControl.ItemTemplate>
         <DataTemplate>
-          <Button Style="{StaticResource CardButtonStyle}" Margin="0,0,12,12"
-                  Padding="{StaticResource TkTarjeta}"
-                  Width="300" VerticalAlignment="Top"
+          <Button Style="{StaticResource CardButtonStyle}" Margin="{StaticResource TkEntreTarjetas}"
+                  Width="280" VerticalAlignment="Top"
                   AutomationProperties.Name="{Binding Nombre}"
                   ToolTip="{Binding Descripcion}"
                   Command="{Binding DataContext.AbrirModuloCommand,
@@ -38,22 +37,23 @@
             <StackPanel>
               <StackPanel Orientation="Horizontal">
                 <TextBlock Text="{Binding Icono}" FontFamily="{StaticResource IconFont}"
-                           FontSize="{StaticResource FsDisplay}"
+                           FontSize="{StaticResource FsTitle}"
                            Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding Nombre}"
-                           FontSize="{StaticResource FsTitle}"
+                           FontSize="{StaticResource FsSubtitle}"
                            FontWeight="{StaticResource FwMedium}"
                            Foreground="{DynamicResource TextPrimaryBrush}"
-                           VerticalAlignment="Center" Margin="10,0,0,0" />
+                           VerticalAlignment="Center" Margin="8,0,0,0" />
               </StackPanel>
 
               <TextBlock Text="{Binding Descripcion}"
-                         FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
-                         Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,0" />
+                         FontSize="{StaticResource FsCaption}" TextWrapping="Wrap"
+                         LineHeight="16" LineStackingStrategy="BlockLineHeight"
+                         Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,8,0,0" />
 
               <!-- Los submodulos, en fila y separados por punto medio. Antes iban uno por linea,
                    lo que hacia la tarjeta el doble de alta para decir lo mismo. -->
-              <ItemsControl ItemsSource="{Binding Submodulos}" Margin="0,10,0,0">
+              <ItemsControl ItemsSource="{Binding Submodulos}" Margin="0,8,0,0">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
                     <WrapPanel />
