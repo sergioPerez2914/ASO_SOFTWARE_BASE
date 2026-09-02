@@ -142,6 +142,19 @@
       </StackPanel>
     </Grid>
 
+    <!-- Repuesto que la Requisición pidió por descripción, sin catálogo: se resuelve solo al
+         agregar la línea (se busca por ese nombre en Inventario o se crea) — nada que elegir acá. -->
+    <Border Style="{StaticResource SectionCardStyle}"
+            Visibility="{Binding EsNecesidadRepuestoSinCatalogar, Converter={StaticResource BoolToVis}}"
+            Margin="0,8,0,0">
+      <TextBlock TextWrapping="Wrap" FontSize="{StaticResource FsCaption}"
+                 Foreground="{DynamicResource TextSecondaryBrush}">
+        <Run Text="Se creará (o reutilizará) el artículo «" />
+        <Run Text="{Binding NecesidadSeleccionada.ArticuloNombre, Mode=OneWay}" FontWeight="{StaticResource FwMedium}" />
+        <Run Text="» en el catálogo de Inventario." />
+      </TextBlock>
+    </Border>
+
     <!-- Envases y litros por envase: opcionales, y solo entre los dos — si se completan ambos y
          se deja Cantidad vacío, "Agregar línea" calcula la cantidad sola. -->
     <Grid Visibility="{Binding EsNecesidadLubricante, Converter={StaticResource BoolToVis}}" Margin="0,8,0,0">

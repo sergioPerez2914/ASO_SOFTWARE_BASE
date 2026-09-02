@@ -1,25 +1,49 @@
 using System.Collections.Generic;
+using System.Linq;
 using ASO.Desktop.Models;
 
 namespace ASO.Desktop.ViewModels;
 
 /// <summary>
-/// Confirmar una recepción: decir quién recibió la mercancía. No corrige líneas — eso es
-/// responsabilidad exclusiva de "Editar" (<see cref="RecepcionMercanciaEditorViewModel"/>), que
-/// sigue existiendo aparte para quien necesite corregir la cantidad recibida o, en Diésel, su
-/// presentación antes de confirmar. Si algo queda incompleto,
+/// Confirmar una recepción: decir quién recibió la mercancía y, si hay líneas de repuesto, dónde
+/// quedan en el almacén — es lo único de una línea que se corrige acá, porque es lo único que
+/// solo se sabe en este momento, con el repuesto físico enfrente. Todo lo demás (cantidad
+/// recibida, presentación de diésel) sigue siendo responsabilidad exclusiva de "Editar"
+/// (<see cref="RecepcionMercanciaEditorViewModel"/>). Si algo queda incompleto,
 /// <c>ComprasService.ConfirmarRecepcion</c> lo rechaza señalando que se corrija con "Editar".
 /// </summary>
 public sealed class ConfirmarRecepcionEditorViewModel : CrudEditorViewModelBase<RecepcionMercancia>
 {
     private readonly RecepcionMercancia _original;
 
+    /// <summary>Posición de cada línea de <see cref="LineasRepuesto"/> dentro de
+    /// <c>_original.Lineas</c> — las líneas no tienen identidad propia en C# (el Id es una shadow
+    /// property de EF), así que es la única forma de devolverlas a su lugar en
+    /// <see cref="ObtenerResultado"/>.</summary>
+    private readonly List<int> _indicesLineasRepuesto;
+
     public ConfirmarRecepcionEditorViewModel(RecepcionMercancia original, IReadOnlyList<Empleado> empleados)
     {
         _original = original;
         Notas = original.Notas;
         Empleados = empleados;
+
+        // Solo las que de verdad se van a aplicar al confirmar — mismo filtro "aAplicar" que usa
+        // ComprasService.ConfirmarRecepcion. Pedir la ubicación de una línea en cero no tendría
+        // sentido: no va a mover stock.
+        var conIndice = original.Lineas
+            .Select((linea, indice) => (linea, indice))
+            .Where(x => x.linea.TipoInsumo == TipoInsumo.Repuesto && x.linea.CantidadRecibida > 0)
+            .ToList();
+
+        _indicesLineasRepuesto = conIndice.Select(x => x.indice).ToList();
+        LineasRepuesto = conIndice.Select(x => x.linea.Clonar()).ToList();
     }
+
+    public List<RecepcionMercanciaLinea> LineasRepuesto { get; }
+
+    /// <summary>Para no mostrar una sección vacía en recepciones que son solo combustible.</summary>
+    public bool HayLineasRepuesto => LineasRepuesto.Count > 0;
 
     public override string Titulo => $"Confirmar recepción Nº {_original.Id}";
     public override string TextoAccion => "Confirmar";
@@ -72,6 +96,10 @@ public sealed class ConfirmarRecepcionEditorViewModel : CrudEditorViewModelBase<
     {
         var recepcion = _original.Clonar();
         recepcion.Notas = Notas.Trim();
+
+        for (var i = 0; i < _indicesLineasRepuesto.Count; i++)
+            recepcion.Lineas[_indicesLineasRepuesto[i]].UbicacionArticulo = LineasRepuesto[i].UbicacionArticulo;
+
         return recepcion;
     }
 }

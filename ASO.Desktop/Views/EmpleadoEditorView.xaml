@@ -19,8 +19,10 @@
     </controls:FormField>
 
     <controls:FormField Etiqueta="Cargo">
-      <TextBox Style="{StaticResource FormTextBoxStyle}"
-               Text="{Binding Cargo, UpdateSourceTrigger=PropertyChanged}" />
+      <ComboBox Style="{StaticResource EditableComboBoxStyle}"
+                IsEditable="True" IsTextSearchEnabled="True"
+                ItemsSource="{Binding CargosExistentes}"
+                Text="{Binding Cargo, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
     <CheckBox Content="Activo" Margin="0,16,0,0" Cursor="Hand"

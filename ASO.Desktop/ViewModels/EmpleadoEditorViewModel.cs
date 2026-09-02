@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
@@ -23,9 +24,18 @@ public sealed class EmpleadoEditorViewModel : CrudEditorViewModelBase<Empleado>
         Cedula = original.Cedula;
         Cargo = original.Cargo;
         Activo = original.Activo;
+
+        CargosExistentes = new ObservableCollection<string>(
+            empleados.GetAll()
+                .Select(e => e.Cargo.Trim().ToUpperInvariant())
+                .Where(c => c.Length > 0)
+                .Distinct()
+                .OrderBy(c => c, StringComparer.Ordinal));
     }
 
     public override string Titulo => _original.Id == 0 ? "Nuevo empleado" : $"Editar empleado Nº {_original.Id}";
+
+    public ObservableCollection<string> CargosExistentes { get; }
 
     private string _nombre = string.Empty;
     public string Nombre
@@ -94,7 +104,7 @@ public sealed class EmpleadoEditorViewModel : CrudEditorViewModelBase<Empleado>
         Id = _original.Id,
         Nombre = Nombre.Trim(),
         Cedula = Cedula.Trim(),
-        Cargo = Cargo.Trim(),
+        Cargo = Cargo.Trim().ToUpperInvariant(),
         Activo = Activo
     };
 }

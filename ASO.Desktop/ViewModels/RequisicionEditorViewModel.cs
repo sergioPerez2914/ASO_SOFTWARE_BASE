@@ -1,6 +1,9 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 using ASO.Desktop.Models;
 using ASO.Desktop.Services;
@@ -29,10 +32,11 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
         _original = original;
 
         Articulos = articulos.GetAll().OrderBy(a => a.Nombre).ToList();
+        ArticulosView = CollectionViewSource.GetDefaultView(Articulos);
+        ArticulosView.Filter = o => o is InventoryItem articulo && CoincideBusquedaArticulo(articulo);
 
         Lineas = new ObservableCollection<RequisicionLinea>(original.Lineas.Select(l => l.Clonar()));
 
-        ArticuloLineaSeleccionado = Articulos.FirstOrDefault();
         TipoLubricanteSeleccionado = TiposLubricante[0];
         GradoViscosidadSeleccionado = GradosViscosidadLubricante[0];
 
@@ -56,6 +60,11 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
     public override double AnchoEditor => Ancho.Amplio;
 
     public IReadOnlyList<InventoryItem> Articulos { get; }
+
+    /// <summary>Vista filtrada de <see cref="Articulos"/> para el combo buscable de la línea de
+    /// Repuesto. Se refiltra en cada tecla desde el setter de <see cref="TextoBusquedaArticulo"/>,
+    /// mismo mecanismo que <c>CrudViewModelBase.ItemsView</c> usa para la búsqueda de pantalla.</summary>
+    public ICollectionView ArticulosView { get; }
 
     public ObservableCollection<RequisicionLinea> Lineas { get; }
 
@@ -108,6 +117,41 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
     {
         get => _articuloLineaSeleccionado;
         set => SetProperty(ref _articuloLineaSeleccionado, value);
+    }
+
+    private string _textoBusquedaArticulo = string.Empty;
+    /// <summary>Lo que el usuario escribe en el combo de Artículo. Al cambiar, filtra
+    /// <see cref="ArticulosView"/> y, si el texto ya no coincide con el artículo elegido, lo
+    /// deselecciona — sin esto, escribir encima de la caja después de elegir uno dejaría la
+    /// selección vieja pegada y "Agregar línea" lo agregaría en silencio en vez del que se ve.</summary>
+    public string TextoBusquedaArticulo
+    {
+        get => _textoBusquedaArticulo;
+        set
+        {
+            if (!SetProperty(ref _textoBusquedaArticulo, value))
+                return;
+
+            if (ArticuloLineaSeleccionado is { } seleccionado
+                && !string.Equals(seleccionado.Nombre, value, StringComparison.Ordinal))
+            {
+                ArticuloLineaSeleccionado = null;
+            }
+
+            ArticulosView.Refresh();
+        }
+    }
+
+    private bool CoincideBusquedaArticulo(InventoryItem item)
+    {
+        if (string.IsNullOrWhiteSpace(TextoBusquedaArticulo))
+            return true;
+
+        var texto = TextoBusquedaArticulo.Trim();
+        return item.Codigo.Contains(texto, StringComparison.OrdinalIgnoreCase)
+               || item.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase)
+               || item.Categoria.Contains(texto, StringComparison.OrdinalIgnoreCase)
+               || item.Ubicacion.Contains(texto, StringComparison.OrdinalIgnoreCase);
     }
 
     private string _tipoLubricanteSeleccionado = string.Empty;
@@ -164,14 +208,8 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
                 UnidadTexto = "L"
             });
         }
-        else
+        else if (ArticuloLineaSeleccionado is { } articulo)
         {
-            if (ArticuloLineaSeleccionado is not { } articulo)
-            {
-                ErrorValidacion = "Seleccione el artículo de la línea.";
-                return;
-            }
-
             Lineas.Add(new RequisicionLinea
             {
                 TipoInsumo = TipoInsumo.Repuesto,
@@ -180,6 +218,25 @@ public sealed class RequisicionEditorViewModel : CrudEditorViewModelBase<Requisi
                 Cantidad = cantidad,
                 UnidadTexto = articulo.Unidad
             });
+        }
+        else if (!string.IsNullOrWhiteSpace(TextoBusquedaArticulo))
+        {
+            // Todavía no está en el catálogo: se pide por descripción, igual que Combustible pide
+            // tipo/grado sin un Id. Recién al cotizar (Comparar proveedores) se elige o se crea el
+            // InventoryItem real — ver ComprasService.CotizacionEstaCompleta.
+            Lineas.Add(new RequisicionLinea
+            {
+                TipoInsumo = TipoInsumo.Repuesto,
+                ArticuloCodigo = null,
+                ArticuloNombre = TextoBusquedaArticulo.Trim(),
+                Cantidad = cantidad,
+                UnidadTexto = string.Empty
+            });
+        }
+        else
+        {
+            ErrorValidacion = "Escriba o seleccione el artículo de la línea.";
+            return;
         }
 
         ErrorValidacion = null;

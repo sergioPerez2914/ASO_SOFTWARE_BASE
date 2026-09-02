@@ -143,6 +143,13 @@ public class RecepcionMercanciaLinea
     public int? ActivoId { get; set; }
     public string ActivoEtiqueta { get; set; } = string.Empty;    // snapshot
 
+    /// <summary>Dónde queda el repuesto en el almacén. Se elige aquí, al recibir — no antes: quien
+    /// arma la orden de compra no tiene el repuesto físico enfrente para decidir el anaquel. Nace
+    /// prellenada con la ubicación que ya tuviera el artículo en el catálogo (en blanco si es uno
+    /// recién creado) y <c>ComprasService.ConfirmarRecepcion</c> la escribe en el catálogo al
+    /// confirmar, mismo momento en que suma el stock.</summary>
+    public string? UbicacionArticulo { get; set; }
+
     /// <summary>Referencia: lo que decía la orden de compra. No se usa para mover stock.</summary>
     public decimal CantidadPedida { get; set; }
 
@@ -159,6 +166,8 @@ public class RecepcionMercanciaLinea
     public bool EsDiesel => EsCombustible && TipoCombustibleSolicitado == TipoCombustible.Diesel;
 
     public bool EsLubricante => EsCombustible && TipoCombustibleSolicitado == TipoCombustible.Lubricante;
+
+    public bool EsRepuesto => TipoInsumo == TipoInsumo.Repuesto;
 
     public string TipoInsumoTexto => EsCombustible ? "Combustible" : "Repuesto";
 

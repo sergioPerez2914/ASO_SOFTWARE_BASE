@@ -41,6 +41,16 @@
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Ubicación" Width="14*" MinWidth="110">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <!-- Solo Repuesto: dónde queda en el almacén. Se decide acá, al recibir, no antes. -->
+              <TextBox Style="{StaticResource FormTextBoxStyle}"
+                       Text="{Binding UbicacionArticulo, UpdateSourceTrigger=PropertyChanged}"
+                       Visibility="{Binding EsRepuesto, Converter={StaticResource BoolToVis}}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
       </DataGrid.Columns>
     </DataGrid>
 

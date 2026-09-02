@@ -765,6 +765,7 @@ public class AsoDbContext : DbContext
                 linea.Property(x => x.ArticuloCodigo).HasMaxLength(30);
                 linea.Property(x => x.ArticuloNombre).HasMaxLength(150);
                 linea.Property(x => x.ActivoEtiqueta).HasMaxLength(150);
+                linea.Property(x => x.UbicacionArticulo).HasMaxLength(50);
                 linea.Property(x => x.StockCombustibleNombre).HasMaxLength(150);
                 linea.Property(x => x.UnidadTexto).HasMaxLength(20);
                 linea.Property(x => x.CantidadPedida).HasColumnType("decimal(18,2)");
@@ -779,6 +780,7 @@ public class AsoDbContext : DbContext
                 linea.Ignore(x => x.EsCombustible);
                 linea.Ignore(x => x.EsDiesel);
                 linea.Ignore(x => x.EsLubricante);
+                linea.Ignore(x => x.EsRepuesto);
                 linea.Ignore(x => x.TipoInsumoTexto);
                 linea.Ignore(x => x.DestinoTexto);
                 linea.Ignore(x => x.CantidadPedidaTexto);

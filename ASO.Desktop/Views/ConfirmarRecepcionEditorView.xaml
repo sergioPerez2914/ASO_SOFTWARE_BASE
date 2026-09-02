@@ -18,6 +18,27 @@
                Text="{Binding Notas, UpdateSourceTrigger=PropertyChanged}" />
     </controls:FormField>
 
+    <StackPanel Visibility="{Binding HayLineasRepuesto, Converter={StaticResource BoolToVis}}" Margin="0,12,0,0">
+      <TextBlock Text="Ubicación de los repuestos recibidos" Style="{StaticResource FormLabelStyle}" />
+      <ItemsControl ItemsSource="{Binding LineasRepuesto}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Grid Margin="0,4,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="2*" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0" Text="{Binding ArticuloNombre}" VerticalAlignment="Center"
+                         TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" />
+              <TextBox Grid.Column="2" Style="{StaticResource FormTextBoxStyle}"
+                       Text="{Binding UbicacionArticulo, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+
     <TextBlock Text="{Binding AvisoSinEmpleados}" FontSize="{StaticResource FsBody}" TextWrapping="Wrap"
                Margin="0,12,0,0"
                Foreground="{DynamicResource DangerTextBrush}"

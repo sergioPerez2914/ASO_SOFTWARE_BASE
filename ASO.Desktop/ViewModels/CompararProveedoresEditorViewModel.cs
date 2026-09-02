@@ -174,6 +174,7 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
             if (SetProperty(ref _necesidadSeleccionada, value))
             {
                 OnPropertyChanged(nameof(EsNecesidadLubricante));
+                OnPropertyChanged(nameof(EsNecesidadRepuestoSinCatalogar));
                 OnPropertyChanged(nameof(EtiquetaCantidadLinea));
             }
         }
@@ -181,6 +182,13 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
 
     public bool EsNecesidadLubricante =>
         NecesidadSeleccionada?.TipoCombustibleSolicitado == TipoCombustible.Lubricante;
+
+    /// <summary>La necesidad pide un repuesto que todavía no resolvió a un artículo del catálogo
+    /// (se escribió como descripción libre en la Requisición) — hay que elegirlo o crearlo acá,
+    /// antes de que la línea de compra pueda armarse.</summary>
+    public bool EsNecesidadRepuestoSinCatalogar =>
+        NecesidadSeleccionada?.TipoInsumo == TipoInsumo.Repuesto
+        && string.IsNullOrWhiteSpace(NecesidadSeleccionada?.ArticuloCodigo);
 
     /// <summary>Aclara en qué unidad se está pidiendo la cantidad de la línea — mismo criterio que
     /// <see cref="RequisicionEditorViewModel.EtiquetaCantidad"/>, para que "Cantidad" nunca quede
@@ -339,6 +347,16 @@ public sealed class CompararProveedoresEditorViewModel : CrudEditorViewModelBase
             linea.Presentacion = PresentacionLineaSeleccionada;
             linea.LitrosPorEnvase = hayLitrosPorEnvase ? litrosPorEnvase : null;
             linea.Unidades = hayUnidades ? unidades : null;
+        }
+        else if (EsNecesidadRepuestoSinCatalogar)
+        {
+            // La necesidad solo traía una descripción libre (se escribió sin catálogo en la
+            // Requisición) — se resuelve sola contra el catálogo (se busca por ese nombre o se
+            // crea), sin pedirle a quien cotiza que la vuelva a escribir.
+            var articulo = _servicio.ResolverOCrearArticulo(necesidad.ArticuloNombre);
+            linea.ArticuloCodigo = articulo.Codigo;
+            linea.ArticuloNombre = articulo.Nombre;
+            linea.UnidadTexto = articulo.Unidad;
         }
 
         LineasCotizacion.Add(linea);

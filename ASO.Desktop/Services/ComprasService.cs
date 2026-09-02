@@ -84,7 +84,7 @@ public sealed class ComprasService
                                          && string.IsNullOrWhiteSpace(l.TipoLubricante)))
             pendientes.Add("el grado del lubricante de cada línea de lubricante");
 
-        if (requisicion.Lineas.Any(l => l.TipoInsumo == TipoInsumo.Repuesto && string.IsNullOrWhiteSpace(l.ArticuloCodigo)))
+        if (requisicion.Lineas.Any(l => l.TipoInsumo == TipoInsumo.Repuesto && string.IsNullOrWhiteSpace(l.ArticuloNombre)))
             pendientes.Add("el artículo de cada línea de repuesto");
 
         faltantes = pendientes.Count == 0 ? null : string.Join(", ", pendientes);
@@ -139,6 +139,54 @@ public sealed class ComprasService
     public IEnumerable<CotizacionProveedor> CotizacionesDe(int requisicionId) =>
         _cotizaciones.GetByRequisicion(requisicionId);
 
+    /// <summary>
+    /// Resuelve el artículo de catálogo para una necesidad de Repuesto que la Requisición pidió
+    /// por descripción, sin elegir uno del catálogo (ver <c>RequisicionEditorViewModel</c>): se
+    /// busca uno existente con ese nombre exacto y, si no hay, se crea — mismo criterio
+    /// "buscar o crear" que ya usa <see cref="ConfirmarRecepcion"/> para el <c>Lubricante</c>
+    /// concreto. Pedirle a quien cotiza que elija o dé de alta el artículo a mano sería repetir lo
+    /// que ya se escribió en la Requisición.
+    /// </summary>
+    public InventoryItem ResolverOCrearArticulo(string nombreSolicitado)
+    {
+        var nombre = nombreSolicitado.Trim();
+
+        var existente = _articulos.GetAll()
+            .FirstOrDefault(a => string.Equals(a.Nombre, nombre, StringComparison.OrdinalIgnoreCase));
+        if (existente is not null)
+            return existente;
+
+        return _articulos.Add(new InventoryItem
+        {
+            Codigo = GenerarCodigoArticulo(nombre),
+            Nombre = nombre,
+            Unidad = "und"
+        });
+    }
+
+    /// <summary>Código legible a partir del nombre (mayúsculas, solo letras/números, espacios a
+    /// "-"), con un sufijo numérico si ya existe uno igual — <c>InventoryItem.Codigo</c> es la
+    /// clave primaria, así que tiene que ser único.</summary>
+    private string GenerarCodigoArticulo(string nombre)
+    {
+        var palabras = new string(nombre.ToUpperInvariant()
+                .Select(c => char.IsLetterOrDigit(c) ? c : ' ')
+                .ToArray())
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        var baseCodigo = string.Join('-', palabras);
+        if (baseCodigo.Length > 25)
+            baseCodigo = baseCodigo[..25].TrimEnd('-');
+        if (baseCodigo.Length == 0)
+            baseCodigo = "REPUESTO";
+
+        var codigo = baseCodigo;
+        for (var sufijo = 2; _articulos.GetById(codigo) is not null; sufijo++)
+            codigo = $"{baseCodigo}-{sufijo}";
+
+        return codigo;
+    }
+
     /// <summary>Mismo criterio que <see cref="OrdenCompraEstaCompleta"/>: lo usa la pantalla antes
     /// de dejar guardar la cotización de un proveedor. <paramref name="requisicion"/> es lo que
     /// permite exigir cobertura: cada línea de la requisición (una "necesidad") debe tener al
@@ -162,6 +210,9 @@ public sealed class ComprasService
 
         if (lineas.Any(l => l.EsLubricante && string.IsNullOrWhiteSpace(l.Presentacion)))
             pendientes.Add("la presentación de cada línea de lubricante");
+
+        if (lineas.Any(l => l.TipoInsumo == TipoInsumo.Repuesto && string.IsNullOrWhiteSpace(l.ArticuloCodigo)))
+            pendientes.Add("el artículo de cada línea de repuesto (elegido o creado)");
 
         var indicesCubiertos = lineas.Select(l => l.RequisicionLineaIndex).ToHashSet();
         if (Enumerable.Range(0, requisicion.Lineas.Count).Any(i => !indicesCubiertos.Contains(i)))
@@ -384,6 +435,12 @@ public sealed class ComprasService
             PrecioUnitario = l.PrecioUnitario,
             ArticuloCodigo = l.ArticuloCodigo,
             ArticuloNombre = l.ArticuloNombre,
+            // La ubicación se decide al recibir, no antes: quien arma la orden no tiene el
+            // repuesto físico enfrente. Nace con la que ya tuviera el artículo en el catálogo (en
+            // blanco si es uno recién creado), a confirmar o corregir en "Editar".
+            UbicacionArticulo = l.TipoInsumo == TipoInsumo.Repuesto
+                ? _articulos.GetById(l.ArticuloCodigo!)?.Ubicacion
+                : null,
             ActivoId = l.ActivoId,
             ActivoEtiqueta = l.ActivoEtiqueta,
             CantidadPedida = l.Cantidad,
@@ -469,6 +526,18 @@ public sealed class ComprasService
                 var articulo = _articulos.GetById(linea.ArticuloCodigo!)!;
                 var actualizado = articulo.Clonar();
                 actualizado.StockActual += linea.CantidadRecibida;
+
+                // El precio real es el que se pactó en la Orden de Compra, no uno suelto tecleado
+                // al catalogar el artículo — mismo criterio que la rama Lubricante de abajo. Es un
+                // snapshot del último precio pagado, no un promedio: la próxima recepción lo pisa.
+                if (linea.PrecioUnitario > 0)
+                    actualizado.CostoUnitario = linea.PrecioUnitario;
+
+                // La ubicación la decide quien recibe, no antes. Si se deja en blanco no se toca
+                // la que ya tuviera el artículo, para no borrar un dato bueno sin querer.
+                if (!string.IsNullOrWhiteSpace(linea.UbicacionArticulo))
+                    actualizado.Ubicacion = linea.UbicacionArticulo.Trim();
+
                 _articulos.Update(actualizado);
             }
             else if (linea.EsDiesel)

@@ -352,6 +352,165 @@
         </Setter>
     </Style>
 
+    <!-- El ComboBox de arriba es SOLO de seleccion: su plantilla no tiene un
+         PART_EditableTextBox real, asi que IsEditable="True" sobre ese estilo no muestra caja
+         para escribir. Este es aparte, para el caso de "elegir uno existente o escribir uno
+         nuevo" (Cargo de Empleado): en vez de tocar el ComboBox compartido -y arriesgar los
+         demas desplegables de solo-seleccion de la app-, es una plantilla propia con una caja de
+         texto real. El TextBox interno es implicito (ver el estilo de TextBox de arriba), asi que
+         ya trae PART_ContentHost, borde y foco resueltos solos; aqui solo se le quita su propio
+         fondo/borde para que se vea como una sola caja con la flecha. -->
+    <Style x:Key="ComboBoxFlechaStyle" TargetType="ToggleButton">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="ClickMode" Value="Press" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="Transparent">
+                        <Path HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Data="M 0 0 L 4 4 L 8 0 Z"
+                              Fill="{DynamicResource TextSecondaryBrush}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="EditableComboBoxStyle" TargetType="ComboBox">
+        <Setter Property="FontFamily" Value="{DynamicResource AppFont}" />
+        <Setter Property="FontSize" Value="{DynamicResource FsBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <Border x:Name="Bd" CornerRadius="{DynamicResource RadSm}" SnapsToDevicePixels="True"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" />
+
+                        <!-- Solo se le quita fondo y borde propios: el resto (PART_ContentHost,
+                             caret, seleccion) lo resuelve el estilo implicito de TextBox. -->
+                        <TextBox x:Name="PART_EditableTextBox"
+                                 Background="Transparent" BorderThickness="0"
+                                 CharacterCasing="Upper"
+                                 IsReadOnly="{TemplateBinding IsReadOnly}"
+                                 Margin="{TemplateBinding Padding}" Padding="0"
+                                 VerticalContentAlignment="Center" />
+
+                        <ToggleButton x:Name="Boton" Style="{StaticResource ComboBoxFlechaStyle}"
+                                      Width="24" HorizontalAlignment="Right"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay,
+                                                          RelativeSource={RelativeSource TemplatedParent}}" />
+
+                        <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True"
+                               Focusable="False" PopupAnimation="Fade"
+                               IsOpen="{TemplateBinding IsDropDownOpen}">
+                            <Border Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                    CornerRadius="{DynamicResource RadSm}" Padding="2"
+                                    MinWidth="{TemplateBinding ActualWidth}"
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                    Margin="0,0,8,8"
+                                    Effect="{DynamicResource SombraFlotante}">
+                                <ScrollViewer>
+                                    <ItemsPresenter SnapsToDevicePixels="True" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush"
+                                    Value="{DynamicResource AccentBlueBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush"
+                                    Value="{DynamicResource FocusRingBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Mismo esqueleto que EditableComboBoxStyle (TextBox real + flecha + Popup), pero para el
+         otro caso: "buscar entre los ya existentes y elegir uno", no "escribir uno nuevo". Por
+         eso NO lleva CharacterCasing -no hay razon para mayusculizar una busqueda- y en la vista
+         se ata SelectedItem a un objeto real, nunca Text a un string suelto. Va aparte de
+         EditableComboBoxStyle en vez de parametrizarlo porque CharacterCasing se fija en el
+         TextBox interno, no es una propiedad del ComboBox que se pueda TemplateBinding-ear. -->
+    <Style x:Key="BuscarComboBoxStyle" TargetType="ComboBox">
+        <Setter Property="FontFamily" Value="{DynamicResource AppFont}" />
+        <Setter Property="FontSize" Value="{DynamicResource FsBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <Border x:Name="Bd" CornerRadius="{DynamicResource RadSm}" SnapsToDevicePixels="True"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" />
+
+                        <TextBox x:Name="PART_EditableTextBox"
+                                 Background="Transparent" BorderThickness="0"
+                                 IsReadOnly="{TemplateBinding IsReadOnly}"
+                                 Margin="{TemplateBinding Padding}" Padding="0"
+                                 VerticalContentAlignment="Center" />
+
+                        <ToggleButton x:Name="Boton" Style="{StaticResource ComboBoxFlechaStyle}"
+                                      Width="24" HorizontalAlignment="Right"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay,
+                                                          RelativeSource={RelativeSource TemplatedParent}}" />
+
+                        <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True"
+                               Focusable="False" PopupAnimation="Fade"
+                               IsOpen="{TemplateBinding IsDropDownOpen}">
+                            <Border Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                    CornerRadius="{DynamicResource RadSm}" Padding="2"
+                                    MinWidth="{TemplateBinding ActualWidth}"
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                    Margin="0,0,8,8"
+                                    Effect="{DynamicResource SombraFlotante}">
+                                <ScrollViewer>
+                                    <ItemsPresenter SnapsToDevicePixels="True" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush"
+                                    Value="{DynamicResource AccentBlueBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush"
+                                    Value="{DynamicResource FocusRingBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- ============================ CheckBox ============================ -->
 
     <Style TargetType="CheckBox">
