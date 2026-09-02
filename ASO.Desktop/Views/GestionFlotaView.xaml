@@ -53,21 +53,15 @@
                                 Sugerencia="Buscar por código, placa, marca o modelo"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-            <RadioButton Content="Todos" GroupName="FiltroFlota" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Todos" />
-            <RadioButton Content="Cosechadoras" GroupName="FiltroFlota"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Cosechadora" />
-            <RadioButton Content="Tractores" GroupName="FiltroFlota"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Tractor" />
-            <RadioButton Content="Alzadoras" GroupName="FiltroFlota"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Alzadora" />
-            <RadioButton Content="Transporte" GroupName="FiltroFlota"
-                         Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                         Command="{Binding CambiarFiltroTipoCommand}" CommandParameter="Transporte" />
+            <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                     Margin="0,0,12,0" VerticalAlignment="Center"
+                                     Command="{Binding CambiarFiltroTipoCommand}">
+              <ComboBoxItem Content="Todos" />
+              <ComboBoxItem Content="Cosechadoras" Tag="Cosechadora" />
+              <ComboBoxItem Content="Tractores" Tag="Tractor" />
+              <ComboBoxItem Content="Alzadoras" Tag="Alzadora" />
+              <ComboBoxItem Content="Transporte" />
+            </controls:FiltroDropdown>
           </WrapPanel>
 
           <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"

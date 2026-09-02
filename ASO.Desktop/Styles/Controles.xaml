@@ -17,7 +17,21 @@
          (el TextBox del login, los CheckBox de los editores, las barras de scroll), que son
          justo los que se quedaban blancos.
 
-         Todo color va por DynamicResource: ver la nota de Services/Tema.cs. -->
+         Todo color va por DynamicResource: ver la nota de Services/Tema.cs.
+
+         Y los TOKENS (AppFont, IconFont, RadSm…) tambien, aunque no cambien con el tema. El
+         motivo es otro y muerde en silencio: este archivo es un diccionario HERMANO de
+         Tokens.xaml —los dos los mergea Theme.xaml— y un StaticResource escrito DENTRO de una
+         ControlTemplate no se resuelve al cargar el diccionario, sino al instanciar la plantilla,
+         y ahi ya no alcanza al hermano. Revienta con "No se puede encontrar el recurso con el
+         nombre 'RadSm'".
+
+         Lo peor es cuando revienta: compila sin una queja y no falla al arrancar, sino la
+         primera vez que se pinta un control de esa plantilla. Poner RadSm por StaticResource en
+         el ComboBox no dio guerra hasta que se abrio una pantalla con un desplegable; en el
+         TextBox tumbo el login en el acto. Con DynamicResource se busca en el arbol de recursos
+         de la aplicacion, donde Tokens.xaml si esta. -->
+
 
     <!-- ============================ Botones ============================ -->
 
@@ -74,20 +88,92 @@
 
     <!-- ============================ Texto ============================ -->
 
+    <!-- La plantilla va reemplazada, y no solo los colores, por el motivo de la nota de arriba:
+         Aero2 pinta el borde de la caja enfocada con un AZUL escrito a fuego (#569DE5) que no
+         sale de ninguna clave sustituible. Poner BorderBrush en el Style no lo alcanza, porque
+         el trigger de la plantilla de fabrica lo tapa en cuanto la caja recibe el foco.
+
+         Mientras la aplicacion fue azul el fallo era invisible —un azul mas entre azules—, pero
+         con la paleta verde cada campo enfocado salia con un cerco azul de otra familia. Medido
+         sobre la ventana de login: 668 pixeles de #569DE5 alrededor de la caja de contrasena. -->
     <Style TargetType="TextBox">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="6,4" />
         <Setter Property="CaretBrush" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="SelectionBrush" Value="{DynamicResource AccentBlueBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Bd" CornerRadius="{DynamicResource RadSm}" SnapsToDevicePixels="True"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="False"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="Center"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Hidden" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush"
+                                    Value="{DynamicResource AccentBlueBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush"
+                                    Value="{DynamicResource FocusRingBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="PasswordBox">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="6,4" />
         <Setter Property="CaretBrush" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="SelectionBrush" Value="{DynamicResource AccentBlueBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="PasswordBox">
+                    <Border x:Name="Bd" CornerRadius="{DynamicResource RadSm}" SnapsToDevicePixels="True"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="False"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="Center"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Hidden" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush"
+                                    Value="{DynamicResource AccentBlueBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush"
+                                    Value="{DynamicResource FocusRingBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- ============================ ComboBox ============================ -->
@@ -103,7 +189,8 @@
                     <Border x:Name="Bd"
                             Background="{DynamicResource SurfaceBrush}"
                             BorderBrush="{DynamicResource BorderBrush}"
-                            BorderThickness="1" SnapsToDevicePixels="True">
+                            BorderThickness="1" SnapsToDevicePixels="True"
+                            CornerRadius="{DynamicResource RadSm}">
                         <Path x:Name="Flecha" HorizontalAlignment="Right" VerticalAlignment="Center"
                               Margin="0,0,8,0" Data="M 0 0 L 4 4 L 8 0 Z"
                               Fill="{DynamicResource TextSecondaryBrush}" />
@@ -175,8 +262,13 @@
                         <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True"
                                Focusable="False" PopupAnimation="Fade"
                                IsOpen="{TemplateBinding IsDropDownOpen}">
+                            <!-- El desplegable repite la esquina de la caja cerrada. El Padding de
+                                 2 no es decorativo: el realce de un item es un rectangulo, y sin
+                                 ese hueco el primero y el ultimo volverian a cuadrar las esquinas
+                                 al pasar el raton, que es justo lo que se venia a quitar. -->
                             <Border Background="{DynamicResource SurfaceBrush}"
                                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                    CornerRadius="{DynamicResource RadSm}" Padding="2"
                                     MinWidth="{TemplateBinding ActualWidth}"
                                     MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                 <ScrollViewer>
@@ -208,7 +300,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBoxItem">
-                    <Border x:Name="Bd" Background="Transparent" Padding="{TemplateBinding Padding}">
+                    <Border x:Name="Bd" Background="Transparent" Padding="{TemplateBinding Padding}"
+                            CornerRadius="{DynamicResource RadSm}">
                         <ContentPresenter />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -313,8 +406,11 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="p:DataGridColumnHeader">
+                    <!-- Separador a la derecha ademas del de abajo: el cuerpo de la tabla lleva
+                         rejilla vertical, y sin esto las divisiones de columna arrancaban por
+                         debajo del rotulo, como si la cabecera fuera de otra tabla. -->
                     <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,1"
                             Padding="{TemplateBinding Padding}">
                         <!-- HorizontalAlignment enlazado y no fijo: el Setter de arriba pone
                              Left, pero la plantilla lo ignoraba y ninguna cabecera podia
@@ -532,7 +628,8 @@
                     <Border x:Name="PART_Root" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            SnapsToDevicePixels="True">
+                            SnapsToDevicePixels="True"
+                            CornerRadius="{DynamicResource RadSm}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -595,7 +692,8 @@
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Bd" Property="Background"
                                     Value="{DynamicResource AccentBlueBrush}" />
-                            <Setter TargetName="Numero" Property="Foreground" Value="White" />
+                            <Setter TargetName="Numero" Property="Foreground"
+                                    Value="{DynamicResource OnAccentBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

@@ -107,24 +107,16 @@
                                 Sugerencia="Buscar por proveedor, número o descripción"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-            <RadioButton Content="Todas" GroupName="FiltroCxP" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-            <RadioButton Content="Borrador" GroupName="FiltroCxP"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-            <RadioButton Content="Pendientes" GroupName="FiltroCxP"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Pendientes" />
-            <RadioButton Content="Vencidas" GroupName="FiltroCxP"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Vencidas" />
-            <RadioButton Content="Pagadas" GroupName="FiltroCxP"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Pagadas" />
-            <RadioButton Content="Anuladas" GroupName="FiltroCxP"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anuladas" />
+            <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                     Margin="0,0,12,0" VerticalAlignment="Center"
+                                     Command="{Binding CambiarFiltroEstadoCommand}">
+              <ComboBoxItem Content="Todas" />
+              <ComboBoxItem Content="Borrador" />
+              <ComboBoxItem Content="Pendientes" />
+              <ComboBoxItem Content="Vencidas" />
+              <ComboBoxItem Content="Pagadas" />
+              <ComboBoxItem Content="Anuladas" />
+            </controls:FiltroDropdown>
           </WrapPanel>
 
           <TextBlock Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center"

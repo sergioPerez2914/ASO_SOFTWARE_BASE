@@ -35,15 +35,13 @@
         </Grid.ColumnDefinitions>
 
         <WrapPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
-          <RadioButton Content="Pendientes" GroupName="FiltroPeticion" IsChecked="True"
-                       Style="{StaticResource FilterChipStyle}"
-                       Command="{Binding CambiarFiltroCommand}" CommandParameter="Pendientes" />
-          <RadioButton Content="Resueltas" GroupName="FiltroPeticion"
-                       Style="{StaticResource FilterChipStyle}"
-                       Command="{Binding CambiarFiltroCommand}" CommandParameter="Resueltas" />
-          <RadioButton Content="Todas" GroupName="FiltroPeticion"
-                       Style="{StaticResource FilterChipStyle}"
-                       Command="{Binding CambiarFiltroCommand}" CommandParameter="Todas" />
+          <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                   Margin="0,0,12,0" VerticalAlignment="Center"
+                                   Command="{Binding CambiarFiltroCommand}">
+            <ComboBoxItem Content="Pendientes" />
+            <ComboBoxItem Content="Resueltas" />
+            <ComboBoxItem Content="Todas" />
+          </controls:FiltroDropdown>
         </WrapPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"

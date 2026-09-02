@@ -138,21 +138,15 @@
                                 Sugerencia="Buscar por notas o destino de línea"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-            <RadioButton Content="Todas" GroupName="FiltroRequisicion" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-            <RadioButton Content="Borrador" GroupName="FiltroRequisicion"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-            <RadioButton Content="Enviada" GroupName="FiltroRequisicion"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Enviada" />
-            <RadioButton Content="Atendida" GroupName="FiltroRequisicion"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Atendida" />
-            <RadioButton Content="Anulada" GroupName="FiltroRequisicion"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+            <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                     Margin="0,0,12,0" VerticalAlignment="Center"
+                                     Command="{Binding CambiarFiltroEstadoCommand}">
+              <ComboBoxItem Content="Todas" />
+              <ComboBoxItem Content="Borrador" />
+              <ComboBoxItem Content="Enviada" />
+              <ComboBoxItem Content="Atendida" />
+              <ComboBoxItem Content="Anulada" />
+            </controls:FiltroDropdown>
           </WrapPanel>
 
           <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
@@ -226,21 +220,15 @@
                                 Sugerencia="Buscar por proveedor"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-            <RadioButton Content="Todas" GroupName="FiltroOrdenCompra" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-            <RadioButton Content="Borrador" GroupName="FiltroOrdenCompra"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-            <RadioButton Content="Aprobada" GroupName="FiltroOrdenCompra"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Aprobada" />
-            <RadioButton Content="Cerrada" GroupName="FiltroOrdenCompra"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Cerrada" />
-            <RadioButton Content="Anulada" GroupName="FiltroOrdenCompra"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+            <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                     Margin="0,0,12,0" VerticalAlignment="Center"
+                                     Command="{Binding CambiarFiltroEstadoCommand}">
+              <ComboBoxItem Content="Todas" />
+              <ComboBoxItem Content="Borrador" />
+              <ComboBoxItem Content="Aprobada" />
+              <ComboBoxItem Content="Cerrada" />
+              <ComboBoxItem Content="Anulada" />
+            </controls:FiltroDropdown>
           </WrapPanel>
 
           <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
@@ -325,18 +313,14 @@
                                 Sugerencia="Buscar por proveedor o quien recibió"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-            <RadioButton Content="Todas" GroupName="FiltroRecepcion" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-            <RadioButton Content="Borrador" GroupName="FiltroRecepcion"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-            <RadioButton Content="Confirmada" GroupName="FiltroRecepcion"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmada" />
-            <RadioButton Content="Anulada" GroupName="FiltroRecepcion"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+            <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                     Margin="0,0,12,0" VerticalAlignment="Center"
+                                     Command="{Binding CambiarFiltroEstadoCommand}">
+              <ComboBoxItem Content="Todas" />
+              <ComboBoxItem Content="Borrador" />
+              <ComboBoxItem Content="Confirmada" />
+              <ComboBoxItem Content="Anulada" />
+            </controls:FiltroDropdown>
           </WrapPanel>
 
           <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">

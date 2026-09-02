@@ -7,51 +7,58 @@
          de Application.Resources.MergedDictionaries, que es lo ultimo que se consulta al buscar
          una clave, asi que gana sobre la clara. Quitarla devuelve el tema claro.
 
-         Por eso NO mergea Colors.xaml y define las 39 claves de brush completas: una que faltara
-         se resolveria contra la paleta clara y saldria un recuadro blanco sobre fondo oscuro.
+         Por eso NO mergea Colors.xaml y define las 42 claves de brush completas: una que faltara
+         se resolveria contra la paleta clara y saldria un recuadro claro sobre fondo oscuro.
 
          Los colores van escritos aqui, no derivados de los claros: no hay formula que convierta
          una paleta clara en una oscura decente. Los acentos (exito, aviso, peligro) se aclaran
-         un escalon, porque el mismo rojo que resalta sobre blanco se apaga sobre azul marino. -->
+         un escalon, porque el mismo rojo que resalta sobre blanco se apaga sobre un fondo oscuro.
 
-    <SolidColorBrush x:Key="BackgroundBrush" Color="#0F172A" />
-    <SolidColorBrush x:Key="SurfaceBrush" Color="#1E293B" />
-    <SolidColorBrush x:Key="SidebarBrush" Color="#111C2E" />
-    <SolidColorBrush x:Key="SidebarBorderBrush" Color="#2A3A52" />
-    <SolidColorBrush x:Key="PrimaryBrush" Color="#3B82F6" />
-    <SolidColorBrush x:Key="PrimaryLightBrush" Color="#60A5FA" />
-    <SolidColorBrush x:Key="AccentBlueBrush" Color="#60A5FA" />
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E2E8F0" />
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8" />
-    <!-- Era #64748B, que sobre el fondo (#0F172A) daba 3,75:1 y sobre la superficie (#1E293B)
-         3,08:1: fallaba AA en las dos. #9CA3AF pasa de 4,5:1 en ambas. -->
-    <SolidColorBrush x:Key="TextMutedBrush" Color="#9CA3AF" />
-    <SolidColorBrush x:Key="BorderBrush" Color="#334155" />
+         Comparte tono con la paleta clara —el verde de marca #C1EF9A, HSL 92,5°— para que la
+         aplicacion tenga una sola identidad y no dos segun el tema. Las superficies dejaron el
+         azul marino por un carbon verde-gris, conservando la MISMA escalera de luminancia que
+         tenian; los acentos siguen el criterio de arriba y se aclaran, asi que aqui el verde de
+         marca es el acento y los verdes oscuros quedan para lo que lleva texto encima. -->
+
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#12150F" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#1E211B" />
+    <SolidColorBrush x:Key="SidebarBrush" Color="#141710" />
+    <SolidColorBrush x:Key="SidebarBorderBrush" Color="#2C3226" />
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#A3DE6F" />
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="#C1EF9A" />
+    <SolidColorBrush x:Key="AccentBlueBrush" Color="#C1EF9A" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E4E7E0" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#9BA396" />
+    <!-- Era #64748B, que sobre el fondo daba 3,75:1 y sobre la superficie 3,08:1: fallaba AA en
+         las dos. Su relevo desazulado mantiene el margen: 7,63:1 sobre el fondo (#12150F) y
+         6,75:1 sobre la superficie (#1E211B). -->
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#A2A99D" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#363D2F" />
     <SolidColorBrush x:Key="SuccessBrush" Color="#22C55E" />
     <SolidColorBrush x:Key="WarningBrush" Color="#FBBF24" />
     <SolidColorBrush x:Key="DangerBrush" Color="#EF4444" />
-    <SolidColorBrush x:Key="InfoBrush" Color="#60A5FA" />
+    <SolidColorBrush x:Key="InfoBrush" Color="#A3DE6F" />
 
-    <!-- Navegacion lateral: el hover sigue siendo neutro y el seleccionado azulado, para que
+    <!-- Navegacion lateral: el hover sigue siendo neutro y el seleccionado verde, para que
          no se confundan entre si, igual que en la paleta clara. -->
-    <SolidColorBrush x:Key="NavHoverBrush" Color="#1B2942" />
-    <SolidColorBrush x:Key="NavSelectedBrush" Color="#22375C" />
-    <SolidColorBrush x:Key="NavPressedBrush" Color="#2B4470" />
-    <SolidColorBrush x:Key="NavIndicatorBrush" Color="#60A5FA" />
-    <SolidColorBrush x:Key="NavTextSecondaryBrush" Color="#CBD5E1" />
+    <SolidColorBrush x:Key="NavHoverBrush" Color="#1D2318" />
+    <SolidColorBrush x:Key="NavSelectedBrush" Color="#24371A" />
+    <SolidColorBrush x:Key="NavPressedBrush" Color="#2F4622" />
+    <SolidColorBrush x:Key="NavIndicatorBrush" Color="#C1EF9A" />
+    <SolidColorBrush x:Key="NavTextSecondaryBrush" Color="#CDD3C7" />
 
-    <SolidColorBrush x:Key="CardHoverBrush" Color="#243449" />
+    <SolidColorBrush x:Key="CardHoverBrush" Color="#262D20" />
     <SolidColorBrush x:Key="DangerHoverBrush" Color="#F87171" />
     <SolidColorBrush x:Key="DangerPressedBrush" Color="#FCA5A5" />
-    <SolidColorBrush x:Key="ToggleHoverBrush" Color="#24354F" />
-    <SolidColorBrush x:Key="FilaAlternaBrush" Color="#18253C" />
+    <SolidColorBrush x:Key="ToggleHoverBrush" Color="#272E21" />
+    <SolidColorBrush x:Key="FilaAlternaBrush" Color="#1A1E16" />
 
     <!-- Sobre fondo oscuro el velo del hover aclara, en vez de oscurecer como en el tema claro. -->
     <SolidColorBrush x:Key="HoverOverlayBrush" Color="#1FFFFFFF" />
     <SolidColorBrush x:Key="PressedOverlayBrush" Color="#33FFFFFF" />
 
-    <!-- Fondo suave del boton "Volver al modulo": tiene que dejar leer el azul del acento. -->
-    <SolidColorBrush x:Key="VolverFondoBrush" Color="#1B2B45" />
+    <!-- Fondo suave del boton "Volver al modulo": tiene que dejar leer el verde del acento. -->
+    <SolidColorBrush x:Key="VolverFondoBrush" Color="#1E2E14" />
 
     <!-- Pares suave/texto de los estados. Aqui el "suave" es un tinte oscuro del tono, no un
          pastel: sobre fondo oscuro un pastel claro seria una mancha mas brillante que el propio
@@ -62,16 +69,24 @@
     <SolidColorBrush x:Key="WarningTextBrush" Color="#FCD34D" />
     <SolidColorBrush x:Key="DangerSoftBrush" Color="#3B1A1A" />
     <SolidColorBrush x:Key="DangerTextBrush" Color="#FCA5A5" />
-    <SolidColorBrush x:Key="InfoSoftBrush" Color="#172A47" />
-    <SolidColorBrush x:Key="InfoTextBrush" Color="#93C5FD" />
-    <SolidColorBrush x:Key="NeutralSoftBrush" Color="#1E293B" />
-    <SolidColorBrush x:Key="NeutralTextBrush" Color="#CBD5E1" />
+    <SolidColorBrush x:Key="InfoSoftBrush" Color="#1B2A12" />
+    <SolidColorBrush x:Key="InfoTextBrush" Color="#C1EF9A" />
+    <SolidColorBrush x:Key="NeutralSoftBrush" Color="#1E211B" />
+    <SolidColorBrush x:Key="NeutralTextBrush" Color="#CDD3C7" />
 
-    <!-- Mas oscuros que PrimaryBrush/DangerBrush: el texto blanco de encima da 5,0:1 y 6,5:1,
-         donde con los tonos de la paleta general daria 3,68:1 y 3,5:1. -->
-    <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#2563EB" />
+    <!-- Mas oscuros que PrimaryBrush/DangerBrush: el texto blanco de encima da 4,84:1 y 6,5:1,
+         donde con los tonos de la paleta general daria 1,59:1 y 3,5:1. Con el acento verde el
+         hueco es mayor que cuando era azul —#A3DE6F es claro y el blanco encima desaparece—,
+         asi que este token pasa de conveniencia a imprescindible. De paso corrige el que habia:
+         el #2563EB anterior daba 3,68:1 y no llegaba a AA. -->
+    <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#4E7E25" />
     <SolidColorBrush x:Key="DangerButtonBrush" Color="#B91C1C" />
 
-    <SolidColorBrush x:Key="FocusRingBrush" Color="#60A5FA" />
+    <!-- Lo que se pinta ENCIMA de un relleno de acento (ver Colors.xaml). Aqui es casi negro y no
+         blanco, porque en esta paleta los acentos son los verdes CLAROS: el glifo del punto de la
+         linea de tiempo sobre #A3DE6F da 11,9:1 en negro y 1,59:1 en blanco. -->
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#12150F" />
+
+    <SolidColorBrush x:Key="FocusRingBrush" Color="#C1EF9A" />
 
 </ResourceDictionary>

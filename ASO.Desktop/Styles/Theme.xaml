@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:models="clr-namespace:ASO.Desktop.Models">
+                    xmlns:models="clr-namespace:ASO.Desktop.Models"
+                    xmlns:controls="clr-namespace:ASO.Desktop.Controls">
 
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="Tokens.xaml" />
@@ -898,6 +899,19 @@
     </Setter>
   </Style>
 
+  <!-- Filtro de listado colapsado en una caja desplegable. Reemplaza a FilterChipStyle en las
+       pantallas de listado: con cinco o seis estados la fila de chips se rompia en dos lineas
+       en ventanas angostas. Reusa la plantilla de ComboBox de Controles.xaml (FiltroDropdown
+       hereda de ComboBox y no redefine su DefaultStyleKey), solo mas compacta. -->
+  <Style x:Key="FiltroDropdownStyle" TargetType="{x:Type controls:FiltroDropdown}"
+         BasedOn="{StaticResource {x:Type ComboBox}}">
+    <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+    <Setter Property="FontSize" Value="{StaticResource FsCaption}" />
+    <Setter Property="Padding" Value="10,4" />
+    <Setter Property="MinWidth" Value="140" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
   <!-- Interruptor de un ajuste. Una casilla de verificacion dice "esto forma parte de lo que voy a
        guardar"; un interruptor dice "esto ya esta puesto". En Configuracion los ajustes se aplican
        al instante, asi que es lo segundo. -->
@@ -966,7 +980,7 @@
           <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
               <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PrimaryBrush}" />
-              <Setter Property="Foreground" Value="White" />
+              <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
               <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
@@ -1000,13 +1014,32 @@
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="GridLinesVisibility" Value="Horizontal" />
+    <!-- La tabla va dentro de una tarjeta con Padding="0", pegada al marco. Un Border de WPF no
+         recorta a sus hijos, asi que la cabecera —que pinta un rectangulo solido— tapaba las
+         esquinas redondeadas y la tarjeta se veia cuadrada. 5 = radio de la tarjeta (RadMd, 6)
+         menos su borde (1). Aqui y no en cada vista: lo comparten las veinte pantallas. -->
+    <Setter Property="controls:RecorteRedondeado.Radio" Value="5" />
+    <!-- Rejilla completa: la horizontal separa registros y la vertical separa DATOS. En una tabla
+         de nueve columnas donde conviven codigos, nombres y cifras, sin la vertical la vista salta
+         de una columna a la de al lado y se leen dos datos como si fueran uno. Las dos van con
+         BorderBrush, que es la linea de pelo del sistema (1,28:1 sobre la superficie): marca la
+         division sin dibujar una cuadricula de hoja de calculo encima de los datos. -->
+    <Setter Property="GridLinesVisibility" Value="All" />
     <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource BorderBrush}" />
     <Setter Property="HeadersVisibility" Value="Column" />
     <Setter Property="AutoGenerateColumns" Value="False" />
     <Setter Property="IsReadOnly" Value="True" />
     <Setter Property="CanUserAddRows" Value="False" />
     <Setter Property="CanUserDeleteRows" Value="False" />
+    <!-- La tabla no se recoloca. WPF trae los tres en True por omision, asi que cualquiera podia
+         arrastrar una columna a otro sitio o cambiarle el ancho, y la disposicion dejaba de ser
+         la misma en dos maquinas: al explicar por telefono "el numero va en la tercera columna"
+         ya no valia. Ademas no se guarda en ningun lado, asi que el cambio se perdia al salir.
+         El orden y el ancho los decide la vista, que es donde se penso el reparto. -->
+    <Setter Property="CanUserReorderColumns" Value="False" />
+    <Setter Property="CanUserResizeColumns" Value="False" />
+    <Setter Property="CanUserResizeRows" Value="False" />
     <Setter Property="SelectionMode" Value="Single" />
     <Setter Property="RowBackground" Value="Transparent" />
     <Setter Property="AlternatingRowBackground" Value="{DynamicResource FilaAlternaBrush}" />

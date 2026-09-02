@@ -81,15 +81,13 @@
                               Sugerencia="Buscar por finca, lote o núcleo de transporte"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <RadioButton Content="Todo" GroupName="RangoProducto" IsChecked="True"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarRangoCommand}" CommandParameter="Todo" />
-          <RadioButton Content="Últimos 7 días" GroupName="RangoProducto"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarRangoCommand}" CommandParameter="Semana" />
-          <RadioButton Content="Hoy" GroupName="RangoProducto"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarRangoCommand}" CommandParameter="Hoy" />
+          <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                   Margin="0,0,12,0" VerticalAlignment="Center"
+                                   Command="{Binding CambiarRangoCommand}">
+            <ComboBoxItem Content="Todo" />
+            <ComboBoxItem Content="Últimos 7 días" Tag="Semana" />
+            <ComboBoxItem Content="Hoy" />
+          </controls:FiltroDropdown>
         </WrapPanel>
       </Grid>
     </Border>

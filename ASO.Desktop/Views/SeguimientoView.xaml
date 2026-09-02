@@ -106,21 +106,15 @@
                                   Sugerencia="Buscar por Nº, finca o placa"
                                   Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-              <RadioButton Content="Todas" GroupName="FiltroSeguimiento" IsChecked="True"
-                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-              <RadioButton Content="Borrador" GroupName="FiltroSeguimiento"
-                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-              <RadioButton Content="Confirmada" GroupName="FiltroSeguimiento"
-                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmada" />
-              <RadioButton Content="Recibida" GroupName="FiltroSeguimiento"
-                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Recibida" />
-              <RadioButton Content="Anulada" GroupName="FiltroSeguimiento"
-                           Style="{StaticResource FilterChipStyle}" Margin="0,0,6,6"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+              <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                       Margin="0,0,12,6" VerticalAlignment="Center"
+                                       Command="{Binding CambiarFiltroEstadoCommand}">
+                <ComboBoxItem Content="Todas" />
+                <ComboBoxItem Content="Borrador" />
+                <ComboBoxItem Content="Confirmada" />
+                <ComboBoxItem Content="Recibida" />
+                <ComboBoxItem Content="Anulada" />
+              </controls:FiltroDropdown>
             </WrapPanel>
           </Border>
 
@@ -256,7 +250,8 @@
 
                       <Border Grid.Row="1" Style="{StaticResource PuntoTimelineStyle}">
                         <TextBlock Text="{Binding Evento.Glifo}" Style="{StaticResource NavIconStyle}"
-                                   FontSize="{StaticResource FsBody}" Foreground="White"
+                                   FontSize="{StaticResource FsBody}"
+                                   Foreground="{DynamicResource OnAccentBrush}"
                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Border>
 

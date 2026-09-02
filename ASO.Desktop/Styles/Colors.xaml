@@ -1,45 +1,76 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Paleta Software ASO -->
-    <Color x:Key="BackgroundColor">#F0F2F5</Color>
-    <Color x:Key="SurfaceColor">#FFFFFF</Color>
-    <Color x:Key="SidebarColor">#E8EBF0</Color>
-    <Color x:Key="SidebarBorderColor">#D1D5DB</Color>
-    <Color x:Key="PrimaryColor">#1E3A5F</Color>
-    <Color x:Key="PrimaryLightColor">#2B4F7A</Color>
-    <Color x:Key="AccentBlueColor">#2563EB</Color>
-    <Color x:Key="TextPrimaryColor">#1E293B</Color>
-    <Color x:Key="TextSecondaryColor">#64748B</Color>
+    <!-- Paleta Software ASO.
+
+         Toda la familia sale de UN tono: el del verde de marca #C1EF9A (HSL 92,5°). Antes era
+         azul marino corporativo sobre blanco puro; el verde es el color del cultivo, y en una
+         empresa de zafra dice de que va la aplicacion sin tener que leer nada.
+
+         #C1EF9A es CLARO (L=77%): encima de el, el texto blanco da 1,4:1 y no se lee, asi que en
+         esta paleta NO aparece a pleno en ningun sitio. Lo que se hereda de el es el TONO: los
+         sitios con relleno solido y texto encima los ocupan verdes oscuros del mismo tono
+         (#355D14, #447619), y los tintes van rebajados (#E3F7CF en los chips, #E9F6DC en el
+         boton de volver). A pleno vive en la paleta oscura, donde el acento tiene que ser claro.
+         Cambia el color, no la jerarquia.
+
+         Los blancos son Benjamin Moore Decorator's White CC-20 (#EBEDEA, LRV 82,68) en vez de
+         blanco puro. Como CC-20 es mas oscuro que #FFFFFF, TODA la escalera de neutros baja con
+         el: la tarjeta tiene que seguir despegando del fondo de pagina, y eso solo se conserva
+         si Surface sigue siendo el escalon mas claro (Surface > FilaAlterna > Background >
+         Sidebar > Border). Los grises tambien dejaron el matiz azul (slate) por el verde-gris
+         que ya trae CC-20: con acento verde, un fondo azulado pelea con el tono. -->
+    <Color x:Key="BackgroundColor">#DADED4</Color>
+    <Color x:Key="SurfaceColor">#EBEDEA</Color>
+    <Color x:Key="SidebarColor">#D2D6CB</Color>
+    <Color x:Key="SidebarBorderColor">#C0C5B7</Color>
+    <Color x:Key="PrimaryColor">#355D14</Color>
+    <Color x:Key="PrimaryLightColor">#447619</Color>
+    <!-- Ya NO es azul: es el verde medio de la familia. La clave conserva el nombre porque la
+         citan quince sitios y renombrarla seria tocarlos todos por cosmetica. -->
+    <Color x:Key="AccentBlueColor">#447619</Color>
+    <Color x:Key="TextPrimaryColor">#1F2620</Color>
+    <Color x:Key="TextSecondaryColor">#5A6157</Color>
     <!-- Era #94A3B8, que sobre blanco daba 2,56:1 y fallaba AA (4,5:1). Es el segundo token mas
          usado de la app (103 usos, casi todo texto de ayuda), asi que era el fallo de contraste
-         de mayor superficie. #6B7280 da 4,83:1 y se sigue leyendo como texto secundario. -->
-    <Color x:Key="TextMutedColor">#6B7280</Color>
-    <Color x:Key="BorderColor">#E2E8F0</Color>
+         de mayor superficie. El #6B7280 que lo sustituyo daba 4,83:1 sobre blanco puro, pero
+         solo 4,34:1 sobre el fondo de pagina: seguia fallando donde mas texto de ayuda hay.
+         #585E55 da 5,67:1 sobre CC-20 y 4,89:1 sobre el fondo, o sea AA en los dos. -->
+    <Color x:Key="TextMutedColor">#585E55</Color>
+    <Color x:Key="BorderColor">#D0D4C9</Color>
     <Color x:Key="SuccessColor">#16A34A</Color>
     <Color x:Key="WarningColor">#F59E0B</Color>
     <Color x:Key="DangerColor">#DC2626</Color>
-    <Color x:Key="InfoColor">#3B82F6</Color>
+    <Color x:Key="InfoColor">#3F6B1E</Color>
 
-    <!-- Navegación lateral: el hover es gris neutro y el seleccionado azulado,
-         para que no se confundan entre sí. -->
-    <Color x:Key="NavHoverColor">#DEE3EA</Color>
-    <Color x:Key="NavSelectedColor">#D8E2F6</Color>
-    <Color x:Key="NavPressedColor">#C8D6F0</Color>
-    <Color x:Key="NavIndicatorColor">#2563EB</Color>
-    <Color x:Key="NavTextSecondaryColor">#475569</Color>
+    <!-- Navegación lateral. El elegido y el hover se distinguen por el LADO al que se van, no por
+         el tono: el elegido aclara sobre el sidebar (L 0,80 contra 0,66) y el hover oscurece
+         (0,60). Eso los separa aunque los dos sean neutros, y deja el pulsado un escalón por
+         debajo del hover, en la misma dirección.
+
+         El relleno del elegido va callado a propósito. La fila ya se marca DOS veces —barra de
+         3 px en NavIndicator y etiqueta en verde y negrita—, así que un relleno saturado encima
+         era decir lo mismo tres veces: con el verde de marca a fila entera, el item elegido se
+         convertía en lo más ruidoso de la pantalla y competía con el contenido. Con este relleno
+         quien marca es la barra, y el color se queda en la barra y en el texto. La etiqueta va en
+         PrimaryBrush (#355D14), que sobre él da 6,21:1. -->
+    <Color x:Key="NavHoverColor">#C9CDC1</Color>
+    <Color x:Key="NavSelectedColor">#E3E9DA</Color>
+    <Color x:Key="NavPressedColor">#BBC0B1</Color>
+    <Color x:Key="NavIndicatorColor">#447619</Color>
+    <Color x:Key="NavTextSecondaryColor">#454B43</Color>
 
     <!-- Estados que antes vivian como hex sueltos dentro de Theme.xaml. Estan aqui para que
          el cambio de tema los alcance: Services/Tema.cs recorre los brushes de la paleta, y
          un color escrito a mano en un Setter se quedaria claro sobre fondo oscuro. -->
-    <Color x:Key="CardHoverColor">#F8FAFF</Color>
+    <Color x:Key="CardHoverColor">#EDF3E3</Color>
     <Color x:Key="DangerHoverColor">#B91C1C</Color>
     <Color x:Key="DangerPressedColor">#991B1B</Color>
-    <Color x:Key="ToggleHoverColor">#E8EDF4</Color>
-    <Color x:Key="FilaAlternaColor">#F8FAFC</Color>
+    <Color x:Key="ToggleHoverColor">#E1E5DA</Color>
+    <Color x:Key="FilaAlternaColor">#E5E7E2</Color>
     <Color x:Key="HoverOverlayColor">#14000000</Color>
     <Color x:Key="PressedOverlayColor">#26000000</Color>
-    <Color x:Key="VolverFondoColor">#EAF0FE</Color>
+    <Color x:Key="VolverFondoColor">#E9F6DC</Color>
 
     <!-- Pares suave/texto para los estados.
 
@@ -56,19 +87,29 @@
     <Color x:Key="WarningTextColor">#B45309</Color>
     <Color x:Key="DangerSoftColor">#FEE2E2</Color>
     <Color x:Key="DangerTextColor">#B91C1C</Color>
-    <Color x:Key="InfoSoftColor">#DBEAFE</Color>
-    <Color x:Key="InfoTextColor">#1D4ED8</Color>
-    <Color x:Key="NeutralSoftColor">#F1F5F9</Color>
-    <Color x:Key="NeutralTextColor">#475569</Color>
+    <Color x:Key="InfoSoftColor">#E3F7CF</Color>
+    <Color x:Key="InfoTextColor">#355D14</Color>
+    <Color x:Key="NeutralSoftColor">#E3E6DF</Color>
+    <Color x:Key="NeutralTextColor">#4A5147</Color>
 
     <!-- Fondo de los botones solidos. Existe aparte de PrimaryBrush porque el texto que va
-         encima es blanco y tiene que aguantar AA en las dos paletas: en la oscura PrimaryBrush
-         es #3B82F6, y blanco sobre el da 3,68:1. Este token la sustituye solo bajo el texto. -->
-    <Color x:Key="PrimaryButtonColor">#1E3A5F</Color>
+         encima es blanco y tiene que aguantar AA en las dos paletas: PrimaryBrush se aclara en
+         la oscura (alli es #A3DE6F) y el blanco sobre el desapareceria. Este token la sustituye
+         solo bajo el texto, y en las dos paletas se queda oscuro: aqui #355D14 (blanco encima
+         7,70:1) y en la oscura #4E7E25 (4,84:1). -->
+    <Color x:Key="PrimaryButtonColor">#355D14</Color>
     <Color x:Key="DangerButtonColor">#DC2626</Color>
 
+    <!-- Lo que se pinta ENCIMA de un relleno de acento: el glifo del punto de la linea de tiempo,
+         el ToggleButton marcado, el dia elegido del calendario. Los tres tenian Foreground="White"
+         escrito a mano, y el blanco solo vale mientras el relleno sea oscuro. Al pasar la paleta
+         oscura a acentos verdes CLAROS (#A3DE6F, #C1EF9A) el blanco daba 1,3-1,6:1 y el glifo
+         desaparecia, asi que el color del texto pasa a ser una decision de la paleta y no del
+         estilo: blanco aqui, casi negro en la oscura. Mismo motivo que PrimaryButtonColor. -->
+    <Color x:Key="OnAccentColor">#FFFFFF</Color>
+
     <!-- Anillo de foco. No existia: ningun campo de captura mostraba donde estaba el teclado. -->
-    <Color x:Key="FocusRingColor">#2563EB</Color>
+    <Color x:Key="FocusRingColor">#447619</Color>
 
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
@@ -110,6 +151,7 @@
     <SolidColorBrush x:Key="NeutralTextBrush" Color="{StaticResource NeutralTextColor}" />
     <SolidColorBrush x:Key="PrimaryButtonBrush" Color="{StaticResource PrimaryButtonColor}" />
     <SolidColorBrush x:Key="DangerButtonBrush" Color="{StaticResource DangerButtonColor}" />
+    <SolidColorBrush x:Key="OnAccentBrush" Color="{StaticResource OnAccentColor}" />
     <SolidColorBrush x:Key="FocusRingBrush" Color="{StaticResource FocusRingColor}" />
 
 </ResourceDictionary>

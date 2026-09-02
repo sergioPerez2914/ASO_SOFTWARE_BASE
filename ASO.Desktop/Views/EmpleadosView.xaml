@@ -62,15 +62,13 @@
                                 Sugerencia="Buscar por nombre, cédula o cargo"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-            <RadioButton Content="Todos" GroupName="FiltroEmpleado" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todos" />
-            <RadioButton Content="Activos" GroupName="FiltroEmpleado"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Activos" />
-            <RadioButton Content="Inactivos" GroupName="FiltroEmpleado"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Inactivos" />
+            <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                     Margin="0,0,12,0" VerticalAlignment="Center"
+                                     Command="{Binding CambiarFiltroEstadoCommand}">
+              <ComboBoxItem Content="Todos" />
+              <ComboBoxItem Content="Activos" />
+              <ComboBoxItem Content="Inactivos" />
+            </controls:FiltroDropdown>
           </WrapPanel>
 
           <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
@@ -144,21 +142,15 @@
                                 Sugerencia="Buscar por nombre, cédula, rol o núcleo"
                                 Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-            <RadioButton Content="Todos" GroupName="FiltroRolCampo" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Todos" />
-            <RadioButton Content="Operador" GroupName="FiltroRolCampo"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Operador" />
-            <RadioButton Content="Tractorista" GroupName="FiltroRolCampo"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Tractorista" />
-            <RadioButton Content="Chofer" GroupName="FiltroRolCampo"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Chofer" />
-            <RadioButton Content="Remesero" GroupName="FiltroRolCampo"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroRolCommand}" CommandParameter="Remesero" />
+            <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                     Margin="0,0,12,0" VerticalAlignment="Center"
+                                     Command="{Binding CambiarFiltroRolCommand}">
+              <ComboBoxItem Content="Todos" />
+              <ComboBoxItem Content="Operador" />
+              <ComboBoxItem Content="Tractorista" />
+              <ComboBoxItem Content="Chofer" />
+              <ComboBoxItem Content="Remesero" />
+            </controls:FiltroDropdown>
           </WrapPanel>
 
           <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"

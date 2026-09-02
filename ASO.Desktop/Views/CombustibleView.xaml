@@ -60,21 +60,15 @@
                               Sugerencia="Buscar por activo, stock de combustible o responsable"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <RadioButton Content="Todos" GroupName="FiltroVale" IsChecked="True"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todos" />
-          <RadioButton Content="Borrador" GroupName="FiltroVale"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-          <RadioButton Content="Confirmado" GroupName="FiltroVale"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Confirmado" />
-          <RadioButton Content="Anulado" GroupName="FiltroVale"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulado" />
-          <RadioButton Content="Con alerta" GroupName="FiltroVale"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Alerta" />
+          <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                   Margin="0,0,12,0" VerticalAlignment="Center"
+                                   Command="{Binding CambiarFiltroEstadoCommand}">
+            <ComboBoxItem Content="Todos" />
+            <ComboBoxItem Content="Borrador" />
+            <ComboBoxItem Content="Confirmado" />
+            <ComboBoxItem Content="Anulado" />
+            <ComboBoxItem Content="Con alerta" Tag="Alerta" />
+          </controls:FiltroDropdown>
         </WrapPanel>
 
         <TextBlock Grid.Row="0" Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center"

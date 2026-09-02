@@ -37,21 +37,15 @@
                               Sugerencia="Buscar por núcleo o empleado"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <RadioButton Content="Todas" GroupName="FiltroLiquidacion" IsChecked="True"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-          <RadioButton Content="Borrador" GroupName="FiltroLiquidacion"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Borrador" />
-          <RadioButton Content="Cerrada" GroupName="FiltroLiquidacion"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Cerrada" />
-          <RadioButton Content="Pagada" GroupName="FiltroLiquidacion"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Pagada" />
-          <RadioButton Content="Anulada" GroupName="FiltroLiquidacion"
-                       Style="{StaticResource FilterChipStyle}" Margin="0,0,6,0"
-                       Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulada" />
+          <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                   Margin="0,0,12,0" VerticalAlignment="Center"
+                                   Command="{Binding CambiarFiltroEstadoCommand}">
+            <ComboBoxItem Content="Todas" />
+            <ComboBoxItem Content="Borrador" />
+            <ComboBoxItem Content="Cerrada" />
+            <ComboBoxItem Content="Pagada" />
+            <ComboBoxItem Content="Anulada" />
+          </controls:FiltroDropdown>
         </WrapPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"

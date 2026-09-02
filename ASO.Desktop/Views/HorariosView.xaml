@@ -114,15 +114,13 @@
             <TextBlock Text="Estado" VerticalAlignment="Center" Margin="0,0,8,0"
                        FontSize="{StaticResource FsCaption}"
                        Foreground="{DynamicResource TextMutedBrush}" />
-            <RadioButton Content="Todas" GroupName="FiltroJornadaEstado" IsChecked="True"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todas" />
-            <RadioButton Content="Abiertas" GroupName="FiltroJornadaEstado"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Abiertas" />
-            <RadioButton Content="Cerradas" GroupName="FiltroJornadaEstado"
-                         Style="{StaticResource FilterChipStyle}"
-                         Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Cerradas" />
+            <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                     VerticalAlignment="Center"
+                                     Command="{Binding CambiarFiltroEstadoCommand}">
+              <ComboBoxItem Content="Todas" />
+              <ComboBoxItem Content="Abiertas" />
+              <ComboBoxItem Content="Cerradas" />
+            </controls:FiltroDropdown>
           </StackPanel>
         </WrapPanel>
 

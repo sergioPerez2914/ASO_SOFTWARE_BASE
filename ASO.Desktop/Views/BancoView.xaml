@@ -102,24 +102,16 @@
                                   Sugerencia="Buscar por concepto, referencia o documento"
                                   Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-              <RadioButton Content="Todos" GroupName="FiltroBanco" IsChecked="True"
-                           Style="{StaticResource FilterChipStyle}"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Todos" />
-              <RadioButton Content="Registrados" GroupName="FiltroBanco"
-                           Style="{StaticResource FilterChipStyle}"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Registrados" />
-              <RadioButton Content="Conciliados" GroupName="FiltroBanco"
-                           Style="{StaticResource FilterChipStyle}"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Conciliados" />
-              <RadioButton Content="Entradas" GroupName="FiltroBanco"
-                           Style="{StaticResource FilterChipStyle}"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Entradas" />
-              <RadioButton Content="Salidas" GroupName="FiltroBanco"
-                           Style="{StaticResource FilterChipStyle}"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Salidas" />
-              <RadioButton Content="Anulados" GroupName="FiltroBanco"
-                           Style="{StaticResource FilterChipStyle}"
-                           Command="{Binding CambiarFiltroEstadoCommand}" CommandParameter="Anulados" />
+              <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                       Margin="0,0,12,0" VerticalAlignment="Center"
+                                       Command="{Binding CambiarFiltroEstadoCommand}">
+                <ComboBoxItem Content="Todos" />
+                <ComboBoxItem Content="Registrados" />
+                <ComboBoxItem Content="Conciliados" />
+                <ComboBoxItem Content="Entradas" />
+                <ComboBoxItem Content="Salidas" />
+                <ComboBoxItem Content="Anulados" />
+              </controls:FiltroDropdown>
 
               <!-- Período: vacío = sin límite por ese lado, que es como arranca. -->
               <TextBlock Text="Desde" VerticalAlignment="Center" Margin="12,0,6,0"

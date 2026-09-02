@@ -36,18 +36,14 @@
                               Sugerencia="Buscar por concepto, servicio, unidad o ámbito"
                               Texto="{Binding TextoBusqueda, Mode=TwoWay}" />
 
-          <RadioButton Content="Todas" GroupName="FiltroAmbito" IsChecked="True"
-                       Style="{StaticResource FilterChipStyle}"
-                       Command="{Binding CambiarFiltroAmbitoCommand}" CommandParameter="Todas" />
-          <RadioButton Content="Cobro al ingenio" GroupName="FiltroAmbito"
-                       Style="{StaticResource FilterChipStyle}"
-                       Command="{Binding CambiarFiltroAmbitoCommand}" CommandParameter="Cobro" />
-          <RadioButton Content="Pago por destajo" GroupName="FiltroAmbito"
-                       Style="{StaticResource FilterChipStyle}"
-                       Command="{Binding CambiarFiltroAmbitoCommand}" CommandParameter="Pago" />
-          <RadioButton Content="Solo vigentes" GroupName="FiltroAmbito"
-                       Style="{StaticResource FilterChipStyle}"
-                       Command="{Binding CambiarFiltroAmbitoCommand}" CommandParameter="Vigentes" />
+          <controls:FiltroDropdown Style="{StaticResource FiltroDropdownStyle}" SelectedIndex="0"
+                                   Margin="0,0,12,0" VerticalAlignment="Center"
+                                   Command="{Binding CambiarFiltroAmbitoCommand}">
+            <ComboBoxItem Content="Todas" />
+            <ComboBoxItem Content="Cobro al ingenio" Tag="Cobro" />
+            <ComboBoxItem Content="Pago por destajo" Tag="Pago" />
+            <ComboBoxItem Content="Solo vigentes" Tag="Vigentes" />
+          </controls:FiltroDropdown>
         </WrapPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
