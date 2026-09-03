@@ -63,7 +63,7 @@
       </StackPanel>
 
       <StackPanel Grid.Column="2">
-        <controls:FormField Etiqueta="Costo unitario (por litro)">
+        <controls:FormField Etiqueta="Costo unitario (USD/litro)">
           <TextBox Style="{StaticResource FormTextBoxStyle}"
                    Text="{Binding CostoUnitarioTexto, UpdateSourceTrigger=PropertyChanged}" />
         </controls:FormField>
@@ -71,7 +71,7 @@
     </Grid>
 
     <TextBlock Margin="0,8,0,0" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource FsBody}">
-      <Run Text="{Binding ValorPreviewTexto, StringFormat='Valor: {0}', Mode=OneWay}" />
+      <Run Text="{Binding ValorPreviewTexto, StringFormat='Valor: US$ {0}', Mode=OneWay}" />
     </TextBlock>
 
     <CheckBox Content="Activo" Margin="0,16,0,0" Cursor="Hand"

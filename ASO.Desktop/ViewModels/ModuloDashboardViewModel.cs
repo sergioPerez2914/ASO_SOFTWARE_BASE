@@ -200,7 +200,7 @@ public sealed class ModuloDashboardViewModel : ViewModelBase, IRecargable
             new Indicador("Bajo mínimo", bajos.ToString(), "por reponer", SegunCuenta(bajos, 5)),
             // Agotado es peor que bajo mínimo: uno solo ya para un taller.
             new Indicador("Agotados", agotados.ToString(), "sin existencia", SegunCuenta(agotados, 1)),
-            new Indicador("Valor de inventario", $"{valor:N2}", "existencia valorada")
+            new Indicador("Valor de inventario", $"US$ {valor:N2}", "existencia valorada, en dólares")
         ];
     }
 

@@ -53,7 +53,7 @@ public sealed class LubricantesCrudViewModel : CrudViewModelBase<Lubricante, int
         ? "Valor total del catálogo"
         : $"Valor de {SelectedItem.MarcaLubricanteNombre} · {SelectedItem.Tipo} {SelectedItem.GradoViscosidad}";
 
-    public string ValorMostradoTexto => (SelectedItem?.ValorTotal ?? ValorTotalCatalogo).ToString("N2");
+    public string ValorMostradoTexto => $"US$ {(SelectedItem?.ValorTotal ?? ValorTotalCatalogo):N2}";
 
     protected override bool CoincideBusqueda(Lubricante item, string texto) =>
         item.MarcaLubricanteNombre.Contains(texto, StringComparison.OrdinalIgnoreCase)

@@ -281,8 +281,8 @@
           <controls:ColumnaTexto Header="Presentación" Binding="{Binding Presentacion}" Width="11*" MinWidth="90" />
           <controls:ColumnaTexto Header="Envases" Binding="{Binding UnidadesTexto}" Width="9*" MinWidth="80" />
           <controls:ColumnaNumero Header="Cantidad" Binding="{Binding CantidadTexto}" Width="10*" MinWidth="85" />
-          <controls:ColumnaNumero Header="Precio/L" Binding="{Binding PrecioUnitarioTexto}" Width="10*" MinWidth="85" />
-          <controls:ColumnaNumero Header="Subtotal" Binding="{Binding SubtotalTexto}" Width="10*" MinWidth="85" />
+          <controls:ColumnaNumero Header="Precio/L (USD)" Binding="{Binding PrecioUnitarioTexto}" Width="10*" MinWidth="85" />
+          <controls:ColumnaNumero Header="Subtotal (USD)" Binding="{Binding SubtotalTexto}" Width="10*" MinWidth="85" />
         </DataGrid.Columns>
       </DataGrid>
 

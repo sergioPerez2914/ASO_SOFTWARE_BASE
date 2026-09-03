@@ -102,7 +102,7 @@
               <controls:ColumnaNumero Header="Existencia" Binding="{Binding StockTexto}" Width="11*" MinWidth="84" />
               <controls:ColumnaNumero Header="Mínimo" Width="8*" MinWidth="70"
                                       Binding="{Binding StockMinimo, StringFormat={}{0:N2}}" />
-              <controls:ColumnaNumero Header="Valor" Width="12*" MinWidth="84"
+              <controls:ColumnaNumero Header="Valor (USD)" Width="12*" MinWidth="84"
                                       Binding="{Binding ValorTotal, StringFormat={}{0:N2}}" />
               <DataGridTemplateColumn Header="Estado" Width="96">
                 <DataGridTemplateColumn.CellTemplate>
@@ -188,7 +188,7 @@
               <controls:ColumnaNumero Header="Cantidad" Binding="{Binding CantidadTexto}" Width="11*" MinWidth="84" />
               <controls:ColumnaTexto Header="Destino" Binding="{Binding DestinoTexto}" Width="18*" MinWidth="110" />
               <controls:ColumnaTexto Header="Mant." Binding="{Binding MantenimientoTexto}" Width="7*" MinWidth="64" />
-              <controls:ColumnaNumero Header="Costo" Binding="{Binding CostoTotalTexto}" Width="9*" MinWidth="74" />
+              <controls:ColumnaNumero Header="Costo (USD)" Binding="{Binding CostoTotalTexto}" Width="9*" MinWidth="74" />
               <DataGridTemplateColumn Header="Estado" Width="96">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
