@@ -21,8 +21,6 @@ public enum EstadoRecepcionMercancia
 /// de verdad mueve <see cref="InventoryItem.StockActual"/> o <see cref="StockCombustible.ExistenciaL"/>,
 /// según lo REALMENTE recibido y no lo pedido — el camión trae lo que trae. Una orden de compra
 /// admite una sola recepción activa a la vez (<see cref="OrdenCompra.RecepcionMercanciaId"/>).
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class RecepcionMercancia : IEntidad<int>, IDeOrganizacion
 {

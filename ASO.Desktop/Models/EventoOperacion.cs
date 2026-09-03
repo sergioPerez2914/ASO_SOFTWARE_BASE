@@ -43,8 +43,6 @@ public enum TipoEventoOperacion
 /// Solo se guardan los hechos que no dejan huella en ningún documento: cambios de turno,
 /// mantenimientos, notas, ediciones del borrador y la liberación de una remesa al anular su
 /// factura (ese sí borra el campo que lo delataba).
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class EventoOperacion : IEntidad<int>, IDeOrganizacion
 {

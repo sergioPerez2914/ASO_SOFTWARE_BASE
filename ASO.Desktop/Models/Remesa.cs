@@ -28,8 +28,6 @@ public enum EstadoRemesa
 ///
 /// Los datos de catálogo se guardan por Id <b>y</b> como texto: una remesa confirmada es un
 /// documento y debe conservar lo que decía el papel aunque el catálogo cambie después.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class Remesa : IEntidad<int>, IDeOrganizacion
 {

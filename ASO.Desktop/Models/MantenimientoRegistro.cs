@@ -15,8 +15,6 @@ public enum TipoMantenimiento
 ///
 /// Guarda snapshots del activo (código y etiqueta) por el mismo criterio que la remesa: el
 /// registro debe leerse igual aunque el catálogo cambie después.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class MantenimientoRegistro : IEntidad<int>, IDeOrganizacion
 {

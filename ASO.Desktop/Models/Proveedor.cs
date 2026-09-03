@@ -3,8 +3,6 @@ namespace ASO.Desktop.Models;
 /// <summary>
 /// Proveedor del centro: repuestos, combustible, taller externo, servicios.
 /// Dato maestro; cruza zafras, no lleva <c>ZafraId</c>.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class Proveedor : IEntidad<int>, IDeOrganizacion
 {

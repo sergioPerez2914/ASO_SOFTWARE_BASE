@@ -12,8 +12,6 @@ public enum StockStatus
 
 /// <summary>
 /// Repuesto o consumible de taller/almacén.
-/// Modelo de presentación temporal; se alineará con la entidad
-/// <c>ArticuloInventario</c> del dominio cuando exista la capa de datos.
 /// </summary>
 public class InventoryItem : IEntidad<string>, IDeOrganizacion
 {

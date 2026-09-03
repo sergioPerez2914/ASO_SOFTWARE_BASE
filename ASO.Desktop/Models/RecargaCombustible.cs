@@ -11,8 +11,6 @@ namespace ASO.Desktop.Models;
 ///
 /// PROVISIONAL: el proveedor se guarda como texto. Pasará a ProveedorId cuando exista Cuentas
 /// por Pagar, y entonces la recarga podrá generar la factura de compra.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class RecargaCombustible : IEntidad<int>, IDeOrganizacion
 {

@@ -4,8 +4,6 @@ namespace ASO.Desktop.Models;
 /// Regla de revisión periódica por tipo de activo: "cada X horas de uso" y/o "cada Y días".
 /// Si define ambos intervalos rige el que se cumpla primero. Las reglas de transporte son por
 /// días; el kilometraje se incorporará cuando Telemetría alimente el odómetro con regularidad.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class ReglaMantenimiento : IEntidad<int>, IDeOrganizacion
 {

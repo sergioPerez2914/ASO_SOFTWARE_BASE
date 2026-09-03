@@ -28,8 +28,6 @@ public enum EstadoActivo
 ///
 /// El uso se mide con dos instrumentos distintos: horómetro (horas, máquinas) y odómetro
 /// (kilómetros, transporte); por eso son dos campos y no uno.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class ActivoFlota : IEntidad<int>, IDeOrganizacion
 {

@@ -12,8 +12,6 @@ public enum TipoConcepto
 /// <summary>
 /// Concepto fijo de nómina que se suma o resta en la liquidación
 /// (p. ej. "Bono de asistencia" = devengo, "Anticipo" = deducción). Dato maestro.
-/// Modelo de presentación temporal; se alineará con la entidad del dominio cuando exista
-/// la capa de datos.
 /// </summary>
 public class ConceptoNomina : IEntidad<int>, IDeOrganizacion
 {

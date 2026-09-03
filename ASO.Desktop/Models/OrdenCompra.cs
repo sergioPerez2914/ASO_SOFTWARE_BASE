@@ -30,8 +30,6 @@ public enum EstadoOrdenCompra
 /// del proveedor elegido tras comparar precios (<see cref="CotizacionProveedor"/>). Autorizar el
 /// gasto es aprobarla; nada se refleja en inventario hasta que la mercancía se reciba (fuera de
 /// esta fase: ver Recepción de mercancía).
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class OrdenCompra : IEntidad<int>, IDeOrganizacion
 {

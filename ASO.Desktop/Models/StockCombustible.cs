@@ -9,8 +9,6 @@ namespace ASO.Desktop.Models;
 ///
 /// PROVISIONAL: la medición se asume por contómetro (litros despachados). Si el socio mide
 /// por aforo (regla de nivel), habrá que añadir la conversión y un ajuste de inventario.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class StockCombustible : IEntidad<int>, IDeOrganizacion
 {

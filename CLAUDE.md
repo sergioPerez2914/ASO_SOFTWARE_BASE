@@ -765,9 +765,12 @@ Fase 5 dashboard gerencial + reportes · Fase 6 (post-MVP) offline, API REST, ap
 
 Roles: **Remesero, Almacenista, AdministradorNucleo, Desarrollador** (los seis anteriores —Admin, Operaciones,
 Taller, Finanzas, RRHH, Consulta— se sustituyeron el 2026-08-20; ver "Roles y permisos").
-Todo se filtra por la **zafra activa**, todavía pendiente: quedan 7 `// TODO: ZafraId`. El mecanismo
-donde encaja ya existe — sería un `IDeZafra` con su segundo `HasQueryFilter`, igual que
-`IDeOrganizacion`.
+Todo se filtra por la **zafra activa**, todavía pendiente: quedan 11 `// TODO: ZafraId`
+(`FacturaCliente`, `FacturaProveedor`, `JornadaTrabajo`, `Liquidacion`, `MovimientoBanco`,
+`OrdenCompra`, `RecepcionMercancia`, `Remesa`, `Requisicion`, `SalidaInventario`,
+`ValeCombustible`). El mecanismo donde encaja ya existe como interfaz —`Models/IDeZafra.cs`,
+con su `int ZafraId`— pero ningún modelo la implementa todavía: falta declarar `: IDeZafra` en
+esos 11 y sumarle a `DbContext` el segundo `HasQueryFilter`, igual que `IDeOrganizacion`.
 
 ## Diseño del sistema de tickets ("documento de movimiento")
 
@@ -802,12 +805,22 @@ Entidades para la BD: Usuario/Rol/Permiso (+N:M), ReglaAprobacion, Aprobacion, y
 `Estado` + `CreadoPorId` + `ZafraId` + registro en `Auditoria`. En WPF: `ISesionActual` inyectado; comandos
 con `CanExecute = sesion.Puede("...")`; secciones del sidebar filtradas por rol.
 
-**Estado (2026-08-20):** hechas las capas 1 (RBAC), 3 (segregación: aprobador ≠ solicitante) y 5
-(auditoría de la decisión, en `PeticionCambio`). La capa 2 está en su versión simple —una petición,
-un aprobador— sin niveles ni umbrales configurables, y la 4 (override por excepción) sigue sin
-formalizarse. **Falta lo importante: la comprobación sigue siendo solo de UI.** Los servicios de
-dominio no consultan `ISesionActual`, así que la defensa en profundidad que pide este diseño todavía
-no existe; ver `FacturaClienteService.cs` (`// PROVISIONAL:`).
+**Estado (2026-08-20, actualizado 2026-09-02):** hechas las capas 1 (RBAC), 3 (segregación:
+aprobador ≠ solicitante) y 5 (auditoría de la decisión, en `PeticionCambio`). La capa 2 está en su
+versión simple —una petición, un aprobador— sin niveles ni umbrales configurables, y la 4
+(override por excepción) sigue sin formalizarse.
+
+El commit `3fb8132` (2026-08-28) ya le exige `ISesionActual` por constructor a los servicios de
+dominio y les agregó `_sesion.Puede(...)` a sus transiciones propias (Confirmar, Anular, Aprobar,
+Recepción…) — `FacturaClienteService` incluido, que ya no es un ejemplo vigente del hueco. **Lo que
+sigue faltando es más puntual:** el CRUD genérico (`CrudViewModelBase.Agregar/Editar/Eliminar`)
+escribe directo contra el `IDataSource`, sin pasar por el servicio de dominio ni por
+`_sesion.Puede`, así que el alta/edición/borrado básico de casi todos los documentos (Requisición,
+Orden de Compra, Recepción, Factura de Proveedor/Cliente, Usuarios, Zafra…) sigue defendido solo
+por el `CanExecute` de la UI — únicamente `RemesaService` lo cierra, y solo a medias (no tiene un
+método `Crear`, así que el alta de una remesa nueva también pasa por el CRUD genérico). Dos huecos
+puntuales más: `SeguimientoService.AgregarNota` no recibe `ISesionActual` y `ZafraService` no
+tiene un método `Editar` que valide `Zafra.Editar`.
 
 ## Próximo paso sugerido
 

@@ -5,8 +5,6 @@ namespace ASO.Desktop.Models;
 /// <summary>
 /// Finca del productor. El código debe corresponder con el aperturado en el CAM y el
 /// nombre con el del título de propiedad (reglamento de remesas).
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class Finca : IEntidad<int>, IDeOrganizacion
 {

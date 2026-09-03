@@ -15,8 +15,6 @@ namespace ASO.Desktop.Models;
 /// <see cref="ExistenciaL"/> es lo que de verdad se captura al recibir mercancía (litros
 /// recibidos, directo, nunca derivados de un envase) — mismo criterio que
 /// <see cref="StockCombustible.ExistenciaL"/>.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class Lubricante : IEntidad<int>, IDeOrganizacion
 {

@@ -24,8 +24,6 @@ public enum EstadoVale
 /// desde el vale anterior) y se compara con el promedio histórico del activo: si se dispara,
 /// el vale queda marcado con alerta. Ese consumo se guarda dentro del documento, no se
 /// recalcula al vuelo, porque es la foto de lo que pasó ese día.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class ValeCombustible : IEntidad<int>, IDeOrganizacion
 {

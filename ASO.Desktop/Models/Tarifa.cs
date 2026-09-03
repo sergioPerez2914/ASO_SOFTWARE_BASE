@@ -47,8 +47,6 @@ public enum ServicioZafra
 /// La vigencia es obligatoria: una factura o una liquidación reimpresa no puede cambiar de
 /// monto porque el tarifario se actualizó después. Por eso los documentos guardan el monto
 /// aplicado como copia (<c>TarifaMonto</c>) y esta entidad solo dice qué regía en cada fecha.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class Tarifa : IEntidad<int>, IDeOrganizacion
 {

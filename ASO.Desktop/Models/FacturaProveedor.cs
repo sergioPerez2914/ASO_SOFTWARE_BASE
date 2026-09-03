@@ -27,8 +27,6 @@ public enum EstadoFacturaProveedor
 /// PROVISIONAL: registro simple de la deuda y su vencimiento. Quedan pendientes de definición
 /// del socio las retenciones y la conciliación bancaria (el "bancos" que el plan de fases
 /// menciona y que todavía no tiene submódulo).
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class FacturaProveedor : IEntidad<int>, IDeOrganizacion
 {

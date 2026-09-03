@@ -23,8 +23,6 @@ public enum EstadoZafra
 /// de uno a muchos dentro del mismo núcleo: se abre, corre la temporada, se cierra, y se abre la
 /// siguiente. Por eso implementa <see cref="IDeOrganizacion"/> como <see cref="Tarifa"/> — cada
 /// núcleo lleva su propio calendario — y no es el ámbito de sesión: ver <c>Services/ZafraActiva.cs</c>.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class Zafra : IEntidad<int>, IDeOrganizacion
 {

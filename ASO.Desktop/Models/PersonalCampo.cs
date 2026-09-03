@@ -16,8 +16,6 @@ public enum RolCampo
 /// Padrón separado de <see cref="Empleado"/>: el personal de campo pertenece a un núcleo
 /// (C.O.D) y determina el pago por destajo, mientras que el empleado es nómina del centro.
 /// No se unifican hasta que el socio defina si son la misma persona en dos roles.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class PersonalCampo : IEntidad<int>, IDeOrganizacion
 {

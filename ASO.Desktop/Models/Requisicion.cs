@@ -21,8 +21,6 @@ public enum EstadoRequisicion
 /// Primer eslabón del flujo de compras: quien está en el campo o el taller identifica cuánto
 /// combustible/aceite o qué repuestos hacen falta, antes de que nadie compare precios ni compre
 /// nada. No lleva monto — eso lo decide la cotización, más adelante en la cadena.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class Requisicion : IEntidad<int>, IDeOrganizacion
 {

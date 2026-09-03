@@ -28,8 +28,6 @@ public enum TipoPersonal
 /// ni se elimina. Una asistencia que se puede reescribir no sirve como base de un pago, y
 /// además el modelo de solo-inserción es el que hace viable la sincronización cuando la
 /// captura se haga desde el campo.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class JornadaTrabajo : IEntidad<int>, IDeOrganizacion
 {

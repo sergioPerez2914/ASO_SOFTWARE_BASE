@@ -23,8 +23,6 @@ public enum EstadoSalida
 ///
 /// PROVISIONAL: una línea por salida. Pasará a cabecera + líneas si el socio aporta un
 /// formato de vale de almacén con varios artículos.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class SalidaInventario : IEntidad<int>, IDeOrganizacion
 {

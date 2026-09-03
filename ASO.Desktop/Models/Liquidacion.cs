@@ -41,8 +41,6 @@ public enum OrigenLinea
 /// Guarda los Ids de las remesas que ya computó (<see cref="RemesaIdsIncluidas"/>) porque esa
 /// lista es lo que impide pagar dos veces la misma tonelada: al generar una liquidación nueva se
 /// descartan las remesas que ya estén en otra liquidación no anulada del mismo sujeto.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class Liquidacion : IEntidad<int>, IDeOrganizacion
 {

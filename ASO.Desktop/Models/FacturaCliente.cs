@@ -23,8 +23,6 @@ public enum EstadoFacturaCliente
 /// Se arma desde las remesas recibidas, con tres líneas por remesa — corte, alza y empuje, y
 /// transporte — porque el reglamento atribuye cada servicio a un núcleo distinto y el ingenio
 /// paga los tres por separado.
-///
-/// Modelo de presentación temporal; se alineará con la entidad de dominio cuando exista la BD.
 /// </summary>
 public class FacturaCliente : IEntidad<int>, IDeOrganizacion
 {
