@@ -158,31 +158,23 @@ public sealed class ComprasService
 
         return _articulos.Add(new InventoryItem
         {
-            Codigo = GenerarCodigoArticulo(nombre),
+            Codigo = GenerarCodigoArticulo(),
             Nombre = nombre,
             Unidad = "und"
         });
     }
 
-    /// <summary>Código legible a partir del nombre (mayúsculas, solo letras/números, espacios a
-    /// "-"), con un sufijo numérico si ya existe uno igual — <c>InventoryItem.Codigo</c> es la
-    /// clave primaria, así que tiene que ser único.</summary>
-    private string GenerarCodigoArticulo(string nombre)
+    /// <summary>Código genérico y correlativo (REPUESTO-1, REPUESTO-2…), deliberadamente SIN el
+    /// nombre del artículo: quien cotiza no eligió un código de catálogo real, y uno derivado del
+    /// nombre se ve como si lo fuera. El código sigue siendo la clave primaria de
+    /// <c>InventoryItem</c> y, como cualquier otro, queda fijo tras crearlo — corregirlo por el
+    /// código definitivo es tarea de Inventario · Repuestos dando de alta el artículo correcto y
+    /// migrando el stock a mano, no editando este.</summary>
+    private string GenerarCodigoArticulo()
     {
-        var palabras = new string(nombre.ToUpperInvariant()
-                .Select(c => char.IsLetterOrDigit(c) ? c : ' ')
-                .ToArray())
-            .Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-        var baseCodigo = string.Join('-', palabras);
-        if (baseCodigo.Length > 25)
-            baseCodigo = baseCodigo[..25].TrimEnd('-');
-        if (baseCodigo.Length == 0)
-            baseCodigo = "REPUESTO";
-
-        var codigo = baseCodigo;
+        var codigo = "REPUESTO-1";
         for (var sufijo = 2; _articulos.GetById(codigo) is not null; sufijo++)
-            codigo = $"{baseCodigo}-{sufijo}";
+            codigo = $"REPUESTO-{sufijo}";
 
         return codigo;
     }
