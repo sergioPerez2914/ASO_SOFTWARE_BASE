@@ -22,15 +22,14 @@
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <!-- Marca. Es la primera pantalla del producto y lo unico que se ve antes de entrar. -->
+      <!-- Marca. Es la primera pantalla del producto y lo unico que se ve antes de entrar:
+           lleva el logo completo (Styles/Logo.xaml), no solo el nombre en texto. -->
       <StackPanel Grid.Row="0" Margin="{StaticResource TkBloque}">
-        <TextBlock Text="Software ASO"
-                   FontSize="{StaticResource FsDisplay}"
-                   FontWeight="{StaticResource FwBold}"
-                   Foreground="{DynamicResource PrimaryBrush}" />
+        <ContentControl Style="{StaticResource LogoAsoStyle}" Width="76"
+                        HorizontalAlignment="Left" />
         <TextBlock Text="Gestión de zafra"
                    FontSize="{StaticResource FsBody}"
-                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,0" />
       </StackPanel>
 
       <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}">

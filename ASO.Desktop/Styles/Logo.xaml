@@ -1,0 +1,108 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ================================ El logo ================================
+
+         La firma de la aplicacion, dibujada como geometria y no como imagen: WPF no renderiza
+         SVG, y un PNG por tamano se veria blando al escalar la interfaz al 125 %. El archivo
+         fuente para papel y documentos es Assets/Logo/aso-logo.svg, y las coordenadas de aqui
+         son las suyas — si una cambia, cambian las dos.
+
+         Las tres letras son UN solo grosor de linea con terminaciones rectas. La cana no se
+         dibuja: los trazos se cortan a intervalos regulares, que son los nudos del tallo.
+
+         Los cortes van en StrokeDashArray, que en WPF se mide en MULTIPLOS del grosor (no en
+         unidades del lienzo como en SVG): "2.514 0.1" con StrokeThickness=13 es un trazo de
+         32,68 unidades seguido de una RANURA FINA de 1,3. La primera version cortaba a casi la
+         mitad del grosor (0,269 de gap) y la letra se leia como linea punteada en vez de marca;
+         el gap fino mantiene el trazo solido a simple vista y solo se nota como nudo de cerca.
+
+         El travesano de la A queda SIN ranura: partirlo donde cruza las diagonales dejaba un
+         tramo suelto mas corto que un trazo, que a tamano de icono desaparecia del todo.
+
+         Los colores van por DynamicResource a la paleta: en el tema oscuro la marca se aclara.
+         El .ico del ejecutable y de las ventanas es otra cosa —un solo caracter sobre baldosa,
+         para que se lea a 16 px— y vive en Assets/Logo/aso.ico; LogoIsotipoStyle es la misma A
+         para usarla dentro de la app (p. ej. el monograma del sidebar). -->
+
+    <Style x:Key="LogoAsoStyle" TargetType="ContentControl">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="AutomationProperties.Name" Value="Software ASO" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContentControl">
+                    <Viewbox Stretch="Uniform" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                        <Canvas Width="274" Height="132" UseLayoutRounding="True" SnapsToDevicePixels="True">
+
+                            <!-- A. Las dos diagonales son un trazo continuo con vertice en
+                                 inglete: partirlo en dos dejaria dos cortes rectos enfrentados
+                                 en la punta. Los cortes caen simetricos respecto del vertice. -->
+                            <Path Stroke="{DynamicResource LogoMarcaBrush}" StrokeThickness="13"
+                                  StrokeLineJoin="Miter" StrokeDashArray="2.514 0.1"
+                                  Data="M 10,98 L 44,28 L 78,98" />
+
+                            <!-- El travesano entra por dentro de las diagonales: sus extremos
+                                 quedan tapados, asi que la union se ve solida. -->
+                            <Path Stroke="{DynamicResource LogoMarcaBrush}" StrokeThickness="13"
+                                  Data="M 24.5,63 L 63.5,63" />
+
+                            <!-- S: dos arcos de 270 grados, uno por lobulo. -->
+                            <Path Stroke="{DynamicResource LogoMarcaBrush}" StrokeThickness="13"
+                                  StrokeDashArray="2.6 0.1"
+                                  Data="M 161,39.5 A 28,19.5 0 1 0 133,59 A 28,19.5 0 1 1 105,78.5" />
+
+                            <!-- O: circulo exacto, cerrado en dos arcos de 180 grados. -->
+                            <Path Stroke="{DynamicResource LogoMarcaBrush}" StrokeThickness="13"
+                                  StrokeDashArray="2.4525 0.1"
+                                  Data="M 264,59 A 39,39 0 1 1 186,59 A 39,39 0 1 1 264,59" />
+
+                            <!-- La regla de tierra: ocupa el ancho exacto de la firma y es lo
+                                 unico que no es letra. -->
+                            <Rectangle Canvas.Left="3.5" Canvas.Top="118" Width="267" Height="2.5"
+                                       Fill="{DynamicResource LogoTierraBrush}" />
+                        </Canvas>
+                    </Viewbox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Solo la A, para el monograma del sidebar y cualquier sitio compacto: a 30x30 la firma
+         completa (274x132) se aplastaria hasta ser ilegible. Mismas coordenadas que la A de
+         LogoAsoStyle, recortadas a su propio lienzo (88x100). El color NO es DynamicResource a
+         LogoMarcaBrush aqui: vive sobre una baldosa de acento (PrimaryBrush), asi que quien
+         instancia el estilo decide el color con Foreground, igual que un icono de Phosphor.
+
+         SIN el corte de nudo de LogoAsoStyle: a los ~16-20 px a los que se usa este estilo la
+         ranura (1,3 unidades sobre un trazo escalado a menos de 3 px reales) no se lee como
+         detalle, se lee como ruido — el trazo parecia mal renderizado. UseLayoutRounding +
+         SnapsToDevicePixels alinean el trazo a la cuadricula de pixeles del dispositivo; sin
+         ellos, WPF antialiasa la geometria vectorial en coordenadas fraccionarias y a este
+         tamano el borde se ve borroso en vez de nitido. -->
+    <Style x:Key="LogoIsotipoStyle" TargetType="ContentControl">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContentControl">
+                    <Viewbox Stretch="Uniform" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                        <Canvas Width="88" Height="100" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                            <Path Stroke="{TemplateBinding Foreground}" StrokeThickness="13"
+                                  StrokeLineJoin="Miter" SnapsToDevicePixels="True"
+                                  Data="M 10,90 L 44,20 L 78,90" />
+                            <Path Stroke="{TemplateBinding Foreground}" StrokeThickness="13"
+                                  SnapsToDevicePixels="True"
+                                  Data="M 24.5,55 L 63.5,55" />
+                        </Canvas>
+                    </Viewbox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

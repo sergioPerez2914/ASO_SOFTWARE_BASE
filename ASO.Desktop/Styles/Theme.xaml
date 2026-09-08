@@ -8,6 +8,7 @@
     <ResourceDictionary Source="Colors.xaml" />
     <ResourceDictionary Source="Controles.xaml" />
     <ResourceDictionary Source="Componentes.xaml" />
+    <ResourceDictionary Source="Logo.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <BooleanToVisibilityConverter x:Key="BoolToVis" />

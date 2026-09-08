@@ -107,6 +107,12 @@
 
     <SolidColorBrush x:Key="FocusRingBrush" Color="#C1EF9A" />
 
+    <!-- El logo. El verde de la firma sube al acento claro por la misma razon que PrimaryBrush:
+         el #447619 de la paleta clara sobre el fondo (#12150F) da 2,5:1 y la marca se apaga. El
+         tierra de la regla sube con el, al tostado de la caña seca. -->
+    <SolidColorBrush x:Key="LogoMarcaBrush" Color="#A3DE6F" />
+    <SolidColorBrush x:Key="LogoTierraBrush" Color="#C9A66B" />
+
 
     <!-- Mas opaca que en claro (60 % contra 25 %): sobre un fondo ya oscuro una sombra tenue no
          se ve, y lo que despega el desplegable del fondo es que la sombra sea claramente mas

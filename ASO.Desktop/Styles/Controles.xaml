@@ -1112,4 +1112,16 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
     </Style>
 
+    <!-- ============================ Ventanas ============================ -->
+
+    <!-- Icono implicito para las ~30 Window de la app (MainWindow, LoginView,
+         PrimerArranqueView, CrudEditorWindow y cada …EditorView). Un solo sitio: sin esto la
+         barra de titulo y la barra de tareas de cada ventana se quedan con el icono generico de
+         WPF, pese a que el .exe ya lleva Assets/Logo/aso.ico por ApplicationIcon en el .csproj —
+         son dos mecanismos distintos (ver la nota del ItemGroup del .ico en el .csproj). El pack
+         URI exige que el .ico este declarado como Resource, no solo como ApplicationIcon. -->
+    <Style TargetType="Window">
+        <Setter Property="Icon" Value="pack://application:,,,/Assets/Logo/aso.ico" />
+    </Style>
+
 </ResourceDictionary>

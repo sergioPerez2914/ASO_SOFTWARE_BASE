@@ -135,6 +135,13 @@
     <!-- Anillo de foco. No existia: ningun campo de captura mostraba donde estaba el teclado. -->
     <Color x:Key="FocusRingColor">#447619</Color>
 
+    <!-- El logo (Styles/Logo.xaml). Va por clave, y no con los hex del archivo fuente, porque la
+         firma se pinta sobre los dos temas: el verde se aclara en la paleta oscura por el mismo
+         motivo que PrimaryBrush, y el tierra de la regla con el. Assets/Logo/aso-logo.svg lleva
+         los valores de ESTA paleta, que es la que vale para papel y documentos. -->
+    <Color x:Key="LogoMarcaColor">#447619</Color>
+    <Color x:Key="LogoTierraColor">#8B5E34</Color>
+
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
     <SolidColorBrush x:Key="SidebarBrush" Color="{StaticResource SidebarColor}" />
@@ -183,6 +190,8 @@
     <SolidColorBrush x:Key="DangerButtonBrush" Color="{StaticResource DangerButtonColor}" />
     <SolidColorBrush x:Key="OnAccentBrush" Color="{StaticResource OnAccentColor}" />
     <SolidColorBrush x:Key="FocusRingBrush" Color="{StaticResource FocusRingColor}" />
+    <SolidColorBrush x:Key="LogoMarcaBrush" Color="{StaticResource LogoMarcaColor}" />
+    <SolidColorBrush x:Key="LogoTierraBrush" Color="{StaticResource LogoTierraColor}" />
 
 
     <!-- ============================== Elevacion ==============================

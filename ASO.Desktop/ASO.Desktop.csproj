@@ -10,6 +10,7 @@
     <Product>Software ASO</Product>
     <Company>ASO</Company>
     <Description>Sistema de gestión de centros de procesamiento de caña de azúcar</Description>
+    <ApplicationIcon>Assets\Logo\aso.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +35,15 @@
     <Resource Include="Assets\Fonts\Satoshi-Regular.ttf" />
     <Resource Include="Assets\Fonts\Satoshi-Medium.ttf" />
     <Resource Include="Assets\Fonts\Satoshi-Bold.ttf" />
+  </ItemGroup>
+
+  <!-- El mismo .ico que ApplicationIcon empotra en el .exe (para el Explorador), embebido ademas
+       como Resource para que Window.Icon lo tome por pack URI: son dos mecanismos distintos, y
+       ApplicationIcon solo cubre el primero. Sin esto, la barra de titulo y la barra de tareas
+       de cada ventana se quedarian con el icono generico de WPF pese a que el .exe ya tiene el
+       correcto. -->
+  <ItemGroup>
+    <Resource Include="Assets\Logo\aso.ico" />
   </ItemGroup>
 
   <ItemGroup>

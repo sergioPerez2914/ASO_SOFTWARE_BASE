@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 274 132" width="274" height="132">
+  <title>ASO</title>
+
+  <g fill="none" stroke="#447619" stroke-width="13" stroke-linecap="butt" stroke-linejoin="miter">
+    <path d="M10,98 L44,28 L78,98" stroke-dasharray="32.68 1.3"/>
+    <path d="M24.5,63 L63.5,63"/>
+    <path d="M161,39.5 A28,19.5 0 1 0 133,59 A28,19.5 0 1 1 105,78.5" stroke-dasharray="33.8 1.3"/>
+    <path d="M264,59 A39,39 0 1 1 186,59 A39,39 0 1 1 264,59" stroke-dasharray="31.88 1.3"/>
+  </g>
+
+  <rect x="3.5" y="118" width="267" height="2.5" fill="#8B5E34"/>
+</svg>

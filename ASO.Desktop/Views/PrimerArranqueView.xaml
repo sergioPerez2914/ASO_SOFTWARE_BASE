@@ -19,9 +19,17 @@
     </Grid.RowDefinitions>
 
     <StackPanel Grid.Row="0" Margin="0,0,0,16">
-      <TextBlock Text="Configuración inicial" FontSize="{StaticResource FsDisplay}" FontWeight="{StaticResource FwBold}"
-                 Foreground="{DynamicResource PrimaryBrush}" />
-      <TextBlock TextWrapping="Wrap" FontSize="{StaticResource FsBody}" Margin="0,4,0,0"
+      <StackPanel Orientation="Horizontal">
+        <Border Width="30" Height="30" CornerRadius="{StaticResource RadSm}"
+                Background="{DynamicResource PrimaryBrush}" VerticalAlignment="Center">
+          <ContentControl Style="{StaticResource LogoIsotipoStyle}" Width="18" Height="18"
+                          Foreground="{DynamicResource OnAccentBrush}" />
+        </Border>
+        <TextBlock Text="Configuración inicial" Margin="10,0,0,0" VerticalAlignment="Center"
+                   FontSize="{StaticResource FsDisplay}" FontWeight="{StaticResource FwBold}"
+                   Foreground="{DynamicResource PrimaryBrush}" />
+      </StackPanel>
+      <TextBlock TextWrapping="Wrap" FontSize="{StaticResource FsBody}" Margin="0,8,0,0"
                  Foreground="{DynamicResource TextSecondaryBrush}"
                  Text="{Binding Explicacion}" />
     </StackPanel>
