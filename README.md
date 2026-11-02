@@ -34,6 +34,25 @@ Si en cambio quieres apuntar a un SQL Server real (compartido o remoto) en vez d
 local, copia `ASO.Desktop/appsettings.local.example.json` como `appsettings.local.json` y pon ahí
 tu cadena de conexión — no se sube al repo, así que cada quien puede tener la suya.
 
+## Publicar una versión (Velopack)
+
+El instalador y las actualizaciones automáticas van con [Velopack](https://velopack.io)
+(`dotnet tool install -g vpk`). Desde la raíz del repo, subiendo antes `<Version>` en
+`ASO.Desktop/ASO.Desktop.csproj`:
+
+```bash
+dotnet publish ASO.Desktop -c Release -r win-x64 --self-contained true -o publish
+vpk download github --repoUrl https://github.com/sergioPerez2914/ASO_SOFTWARE_BASE -o Releases  # solo desde la 2.ª versión: deja que se generen deltas
+vpk pack -u SoftwareASO -v <versión> -p publish -e ASO.Desktop.exe --packTitle "Software ASO" --packAuthors ASO -i ASO.Desktop/Assets/Logo/aso.ico -o Releases
+vpk upload github --repoUrl https://github.com/sergioPerez2914/ASO_SOFTWARE_BASE -o Releases --publish --releaseName "<versión>" --tag v<versión> --token <token>
+```
+
+Se reparte `Releases/SoftwareASO-win-Setup.exe`. Instalada, la app vive en
+`%LocalAppData%\SoftwareASO`, busca versiones nuevas en los Releases de GitHub después del login y
+guarda lo de la máquina (`App_Data` y `appsettings.local.json`) en `%LocalAppData%\ASO`, fuera de
+lo que reemplaza cada actualización. La máquina destino necesita **LocalDB** igual que en
+desarrollo, salvo que `appsettings.local.json` apunte a otro SQL Server.
+
 ## Estructura
 
 ```

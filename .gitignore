@@ -32,3 +32,7 @@ ASO.Desktop/App_Data/
 # Documentación interna del equipo (reglamentos del CAM, análisis, especificaciones).
 # El repositorio es PÚBLICO: estos documentos son de uso interno y no se publican.
 docs/
+
+# Velopack: salida de dotnet publish y de vpk pack (instaladores y paquetes de cada version)
+publish/
+Releases/

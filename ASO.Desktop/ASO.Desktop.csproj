@@ -11,6 +11,11 @@
     <Company>ASO</Company>
     <Description>Sistema de gestión de centros de procesamiento de caña de azúcar</Description>
     <ApplicationIcon>Assets\Logo\aso.ico</ApplicationIcon>
+    <Version>0.1.0</Version>
+    <!-- Main propio (Program.cs) en vez del que genera App.xaml: Velopack tiene que correr antes
+         que nada de WPF, porque al instalar, actualizar y desinstalar lanza el .exe con
+         argumentos suyos y espera que salga sin abrir ventanas. -->
+    <StartupObject>ASO.Desktop.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +25,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
+    <PackageReference Include="Velopack" Version="1.2.0" />
   </ItemGroup>
 
   <!-- La fuente de iconos viaja con el proyecto. Antes se usaba Segoe MDL2 Assets, que solo
@@ -50,8 +56,12 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <!-- Se copia para dotnet run / F5, pero NUNCA al publicar: el instalador acaba en GitHub
+         Releases de un repo publico y este archivo lleva la cadena de conexion de la maquina.
+         Instalada, la app lo busca en %LocalAppData%\ASO (ver AppConfig). -->
     <None Update="appsettings.local.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
 
